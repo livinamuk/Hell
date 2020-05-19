@@ -1,0 +1,58 @@
+#include "hellpch.h"
+#include "Player.h"
+#include "Helpers/Util.h"
+#include "Core/Input.h"
+#include "Audio/Audio.h"
+
+namespace HellEngine
+{
+	Player::Player()
+	{
+		//m_characterController = CharacterController(glm::vec3(0, 0, 0), 0.8f, 0.2f, 0.0f);
+		//m_characterController = CharacterController();
+	}
+
+	void Player::Update(float deltaTime)
+	{
+		// Stopped
+		if ((!Input::s_keyDown[HELL_KEY_W]) && (!Input::s_keyDown[HELL_KEY_S]) && (!Input::s_keyDown[HELL_KEY_A]) && (!Input::s_keyDown[HELL_KEY_D]))
+			m_movementState = PlayerMovementState::STOPPED;
+
+		// Walking
+		if (Input::s_keyDown[HELL_KEY_W])
+			m_movementState = PlayerMovementState::WALKING;
+		if (Input::s_keyDown[HELL_KEY_S])
+			m_movementState = PlayerMovementState::WALKING;
+		if (Input::s_keyDown[HELL_KEY_D])
+			m_movementState = PlayerMovementState::WALKING;
+		if (Input::s_keyDown[HELL_KEY_A])
+			m_movementState = PlayerMovementState::WALKING;
+
+		if (Input::s_leftMousePressed)
+			m_gunState == GunState::FIRING;
+
+		if (m_movementState == PlayerMovementState::WALKING)
+			isMoving = true;
+		else
+			isMoving = false;		
+
+			if (!isMoving)
+				footstepAudioTimer = 0;
+			else {
+				if (isMoving && footstepAudioTimer == 0) {
+					int random_number = std::rand() % 4 + 1;
+					std::string file = "player_step_" + std::to_string(random_number) + ".wav";
+					Audio::PlayAudio(file);
+				}
+				footstepAudioTimer += deltaTime;
+
+				///if (!isRunning)
+				//	footstepAudioLoopLength = 0.35f;
+				//else
+					footstepAudioLoopLength = 0.25f;
+
+				if (footstepAudioTimer > footstepAudioLoopLength)
+					footstepAudioTimer = 0;
+			}
+	}
+}

@@ -1,0 +1,163 @@
+{
+    "ROOMS": [
+        {
+            "Position": [
+                0.8000001311302185,
+                0.0
+            ],
+            "Size": [
+                3.4000024795532228,
+                4.0
+            ],
+            "Story": 0
+        },
+        {
+            "Position": [
+                0.0,
+                4.099999904632568
+            ],
+            "Size": [
+                5.0,
+                4.0
+            ],
+            "Story": 0
+        },
+        {
+            "Position": [
+                0.0,
+                -6.900000095367432
+            ],
+            "Size": [
+                2.799999952316284,
+                4.0
+            ],
+            "Story": 1
+        }
+    ],
+    "DOORS": [
+        {
+            "Position": [
+                0.0,
+                0.0,
+                2.049999952316284
+            ],
+            "Story": 0,
+            "Axis": "POS_X",
+            "RotateFloorTexture": false
+        },
+        {
+            "Position": [
+                2.549999952316284,
+                0.0,
+                2.799999952316284
+            ],
+            "Story": 0,
+            "Axis": "NEG_Z",
+            "RotateFloorTexture": false
+        }
+    ],
+    "LIGHTS": [
+        {
+            "Position": [
+                1.899999976158142,
+                0.6000000238418579,
+                1.5
+            ],
+            "ModelPosition": [
+                0.10000000149011612,
+                -0.6000000238418579,
+                0.0
+            ],
+            "ModelRotation": [
+                3.140000104904175,
+                0.0,
+                0.0
+            ],
+            "ModelScale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Color": [
+                1.0,
+                1.0,
+                0.699999988079071
+            ],
+            "Radius": 6.0,
+            "Strength": 44.0,
+            "Magic": 11.0
+        },
+        {
+            "Position": [
+                0.0,
+                2.200000047683716,
+                4.0
+            ],
+            "ModelPosition": [
+                0.0,
+                0.2549999952316284,
+                0.0
+            ],
+            "ModelRotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ModelScale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Color": [
+                1.0,
+                0.7799999713897705,
+                0.5289999842643738
+            ],
+            "Radius": 6.0,
+            "Strength": 10.0,
+            "Magic": 4.0
+        }
+    ],
+    "STAIRCASES": [
+        {
+            "Position": [
+                0.0,
+                6.099999904632568
+            ],
+            "Story": 0,
+            "Axis": "POS_X",
+            "FirstSetCount": 12,
+            "TurnsLeft": true
+        },
+        {
+            "Position": [
+                2.5,
+                4.0
+            ],
+            "Story": 0,
+            "Axis": "POS_Z",
+            "FirstSetCount": 12,
+            "TurnsLeft": true
+        },
+        {
+            "Position": [
+                -2.5,
+                4.0
+            ],
+            "Story": 0,
+            "Axis": "NEG_Z",
+            "FirstSetCount": 12,
+            "TurnsLeft": true
+        },
+        {
+            "Position": [
+                0.0,
+                -2.0
+            ],
+            "Story": 0,
+            "Axis": "NEG_X",
+            "FirstSetCount": 18,
+            "TurnsLeft": true
+        }
+    ]
+}

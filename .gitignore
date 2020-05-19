@@ -110,6 +110,7 @@ ipch/
 *.cachefile
 *.VC.db
 *.VC.VC.opendb
+*.tlog
 
 # Visual Studio profiler
 *.psess
@@ -358,3 +359,11 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+HellEngine/vendor/Glad/bin-int
+HellEngine/vendor/GLFW/bin-int
+HellEngine/vendor/imgui/bin-int
+
+bin-int
+
+

@@ -1,2 +1,2 @@
-call premake5.exe vs2017
+call premake5.exe vs2019
 PAUSE

@@ -10,7 +10,7 @@
 
 namespace HellEngine
 {
-	bool Game::s_debug = true;
+	bool Game::s_dontLoadShotgun = true;
 
 	Game::Game()
 	{
@@ -88,8 +88,6 @@ namespace HellEngine
 		for (Door& door : house.m_doors)
 			door.Update(deltaTime);
 
-		Model* shotgunModel = AssetManager::GetModelByName("Shotgun");
-
 		// Model IDs
 		if (m_HUDshotgun.m_modelID == -1)
 			m_HUDshotgun.m_modelID = AssetManager::GetModelIDByName("Shotgun");
@@ -108,7 +106,6 @@ namespace HellEngine
 
 		if (m_player.m_gunState == GunState::FIRING)
 			m_HUDshotgun.SetAnimation("Fire", false);
-
 		else {
 			if (m_player.m_movementState == PlayerMovementState::STOPPED)
 				m_HUDshotgun.SetAnimation("Idle", true);
@@ -116,13 +113,13 @@ namespace HellEngine
 				m_HUDshotgun.SetAnimation("Walk", true);
 		}
 
-
 		// Update animations
 		m_HUDshotgun.Update(deltaTime);
 
 		glm::mat4 shotgunCameraMatrix;
-		if (shotgunModel != NULL)
-			shotgunCameraMatrix = shotgunModel->GetSceneCameraMatrix();
+
+		if (AssetManager::GetModelByName("Shotgun") != nullptr)
+			shotgunCameraMatrix = AssetManager::GetModelByName("Shotgun")->GetSceneCameraMatrix();
 		else
 		{
 			Transform transform;

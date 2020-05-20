@@ -40,16 +40,16 @@ namespace HellEngine
 		glm::vec3 Forward = glm::normalize(glm::vec3(camera->m_Front.x, 0, camera->m_Front.z));
 
 		if (Input::s_keyDown[HELL_KEY_W]) {
-			targetVelocity += Forward ;
+			targetVelocity += Forward * deltaTime;
 		}
 		if (Input::s_keyDown[HELL_KEY_S] ) {
-			targetVelocity -= Forward ;
+			targetVelocity -= Forward * deltaTime;
 		}
 		if (Input::s_keyDown[HELL_KEY_A]) {
-			targetVelocity += camera->m_Right ;
+			targetVelocity += camera->m_Right * deltaTime;
 		}
 		if (Input::s_keyDown[HELL_KEY_D]) {
-			targetVelocity -= camera->m_Right ;
+			targetVelocity -= camera->m_Right * deltaTime;
 		}
 
 		glm::vec3 vector = targetVelocity * m_walkingSpeed;

@@ -115,7 +115,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>opengl32.lib;libfbxsdk-md.lib;fmodL_vc.lib;fmod_vc.lib;assimp-vc142-mt.lib;Bullet3Dynamics_RelWithDebugInfo.lib;BulletDynamics_RelWithDebugInfo.lib;BulletCollision_RelWithDebugInfo.lib;LinearMath_RelWithDebugInfo.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>vendor\FbxSDK\lib\x64\debug;vendor\bullet\bullet\lib\RelWithDebInfo;vendor\fmod\lib\x64;vendor\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Hell\HellEngine\vendor\FbxSDK\lib\x64\debug;vendor\bullet\bullet\lib\RelWithDebInfo;vendor\fmod\lib\x64;vendor\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">

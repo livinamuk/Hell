@@ -78,7 +78,7 @@ namespace HellEngine
 
 	void AssetManager::LoadHardcoded()
 	{
-		if (!Game::s_debug) {
+		if (!Game::s_dontLoadShotgun) {
 			models.emplace_back(Model("res/models/Shotgun.FBX"));
 			//models.emplace_back(Model("res/models/StaircaseLanding.FBX"));
 		}

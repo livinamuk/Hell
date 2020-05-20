@@ -39,7 +39,7 @@ namespace HellEngine
 		SkinnedMesh m_skinnedMesh;
 		std::vector<glm::mat4> m_animatedTransforms;
 
-		static bool s_debug;
+		static bool s_dontLoadShotgun;
 
 	};
 }

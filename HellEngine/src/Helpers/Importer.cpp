@@ -453,7 +453,7 @@ namespace HellEngine
 			}
 			if (duplicateFound)
 			{
-				continue;
+				//continue;
 			}
 
 			newFaceMappings[i] = newUvs.size();

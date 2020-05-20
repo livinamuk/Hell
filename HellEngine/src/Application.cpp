@@ -6,6 +6,7 @@
 #include "Helpers/AssetManager.h"
 #include "Helpers/Importer.h"
 #include "Renderer/Renderer.h"
+#include "Audio/Audio.h"
 
 using namespace HellEngine;
 
@@ -19,9 +20,9 @@ int main()
 	Importer::Init();
 	AssetManager::FindAllFiles();
 	AssetManager::ForceLoadTexture("CharSheet");
-	
-	// Loading loop
-	
+	Audio::Init();
+
+	// Loading loop	
 	while (!AssetManager::s_loadingComplete && !Input::s_keyDown[HELL_KEY_ESCAPE])
 	{
 		CoreGL::ProcessInput();
@@ -68,19 +69,24 @@ int main()
 	}
 
 	CoreGL::Terminate();
-	Importer::Terminate();
+	Importer::Terminate(); 
+	Audio::Terminate();
 	return 0;
 
-	Opp r = Opp(2400);
-	r.Deduct(1200);
+	{
+		Opp r = Opp(2400);
+		r.Deduct(1200);
 
-	Opp m = Opp(1200);
-	m.Deduct(300);
-	m.Deduct(-50);
-	m.Deduct(600);
+		Opp m = Opp(1200);
+		m.Deduct(300);
+		m.Deduct(-50);
+		m.Deduct(600);
 
-	Opp c = Opp(2400);
-	c.Deduct(300);
-	c.Deduct(300);
-	c.Deduct(300);
+		Opp c = Opp(2400);
+		c.Deduct(300);
+		c.Deduct(300);
+		c.Deduct(300);
+
+		Opp n = Opp(700);
+	}
 }

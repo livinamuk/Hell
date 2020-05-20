@@ -10,7 +10,7 @@
 
 namespace HellEngine
 {
-	bool Game::s_dontLoadShotgun = true;
+	bool Game::s_dontLoadShotgun = false;
 
 	Game::Game()
 	{
@@ -19,21 +19,10 @@ namespace HellEngine
 
 	void Game::OnLoad()
 	{
-		Audio::Init();
-
-		Audio::LoadAudio("player_step_1.wav");
-		Audio::LoadAudio("player_step_2.wav");
-		Audio::LoadAudio("player_step_3.wav");
-		Audio::LoadAudio("player_step_4.wav");
-		Audio::LoadAudio("Shotgun_Fire_01.wav");
-		Audio::LoadAudio("Door_Open.wav");
-
 		// Time
 		currentFrame = CoreGL::GetGLTime();
 		currentFrame = CoreGL::GetGLTime();
 		lastFrame = currentFrame;
-
-
 
 		///////////////////////////////////
 		// Working assimp animated model //
@@ -42,14 +31,13 @@ namespace HellEngine
 		if (!m_skinnedMesh.LoadMesh("res/models/boblampclean.md5mesh")) {
 			printf("Mesh load failed\n");
 		}
-
 		///////////////////////////////////
 
 
 
 		m_shotgunTransform.scale = glm::vec3(0.2);
 
-		Audio::StreamAudio("Music3.mp3");
+		//Audio::StreamAudio("Music3.mp3");
 		
 		testTrans.rotation.y = HELL_PI * 1.5f;
 
@@ -97,6 +85,7 @@ namespace HellEngine
 		{
 			m_player.m_gunState = GunState::FIRING;
 			Audio::PlayAudio("Shotgun_Fire_01.wav");
+			//Audio::PlayAudio("Door_Open.wav");
 			TextBlitter::TypeText("TESTING TEXT BLITTER.", true);
 		}
 		 

@@ -258,6 +258,9 @@
     <ClInclude Include="src\Renderer\SkinnedMesh.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\TextBlitter.h">
+      <Filter>src\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Renderer\Texture.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
@@ -1407,9 +1410,6 @@
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h">
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\TextBlitter.h">
-      <Filter>src\Renderer</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp">
@@ -1580,6 +1580,9 @@
     <ClCompile Include="src\Renderer\SkinnedMesh.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\TextBlitter.cpp">
+      <Filter>src\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Renderer\Texture.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
@@ -1597,9 +1600,6 @@
     </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\TextBlitter.cpp">
-      <Filter>src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

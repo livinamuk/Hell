@@ -40,7 +40,8 @@ namespace HellEngine
 				if (isMoving && footstepAudioTimer == 0) {
 					int random_number = std::rand() % 4 + 1;
 					std::string file = "player_step_" + std::to_string(random_number) + ".wav";
-					Audio::PlayAudio(file);
+					//char* name = ;
+					Audio::PlayAudio(file.c_str(), 0.5f);
 				}
 				footstepAudioTimer += deltaTime;
 

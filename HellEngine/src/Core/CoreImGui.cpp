@@ -167,13 +167,13 @@ namespace HellEngine
 					game->RebuildMap();
 				}
 				ImGui::Text("Story");
-				ImGui::SameLine(); if (ImGui::Button("<##A")) {
-					game->house.m_doors[i].m_story -= 1;
-					game->house.m_doors[i].Reconfigure();
+				ImGui::SameLine(); if (ImGui::Button("<##Asdf")) {
+					game->house.m_rooms[i].m_story -= 1;
+					game->RebuildMap();
 				}
-				ImGui::SameLine(); if (ImGui::Button(">##B")) {
-					game->house.m_doors[i].m_story += 1;
-					game->house.m_doors[i].Reconfigure();
+				ImGui::SameLine(); if (ImGui::Button(">##Bsdf")) {
+					game->house.m_rooms[i].m_story += 1;
+					game->RebuildMap();
 				}
 				if (ImGui::Button("Delete Room")) {
 					game->house.m_rooms.erase(game->house.m_rooms.begin() + i);
@@ -205,16 +205,19 @@ namespace HellEngine
 				ImGui::InputFloat("Magic    ", &game->house.m_lights[i].m_magic, 0.1f, 1.0f, "%0.5f");
 				ImGui::InputFloat("Strength ", &game->house.m_lights[i].m_strength, 0.1f, 1.0f, "%0.5f");
 				ImGui::ColorEdit3("Color", glm::value_ptr(game->house.m_lights[i].m_color));
+
+				if (ImGui::Button("Delete Light")) {
+					game->house.m_lights.erase(game->house.m_lights.begin() + i);
+					game->RebuildMap();
+				}
+				ImGui::SameLine(); if (ImGui::Button("New Light")) {
+					game->house.m_lights.push_back(Light(glm::vec3(0, 1, 0)));
+					game->RebuildMap();
+				}
+				
 				ImGui::EndTabItem();
 			}
-			if (ImGui::Button("Delete Light")) {
-				game->house.m_lights.erase(game->house.m_lights.begin() + i);
-				game->RebuildMap();
-			}
-			ImGui::SameLine(); if (ImGui::Button("New Light")) {
-				game->house.m_lights.push_back(Light(glm::vec3(0, 1, 0)));
-				game->RebuildMap();
-			}
+
 		}
 		ImGui::EndTabBar();
 		ImGui::Text(" ");
@@ -234,7 +237,9 @@ namespace HellEngine
 		{
 			if (ImGui::BeginTabItem(("Door " + std::to_string(i)).c_str()))
 			{
-				ImGui::InputFloat3("Position", glm::value_ptr(game->house.m_doors[i].m_rootTransform.position));
+				if (ImGui::InputFloat3("Position", glm::value_ptr(game->house.m_doors[i].m_rootTransform.position)))
+					game->RebuildMap(); 
+				
 				ImGui::Text("Story");
 				ImGui::SameLine(); if (ImGui::Button("<##A")) {
 					game->house.m_doors[i].m_story -= 1;
@@ -292,7 +297,9 @@ namespace HellEngine
 		{
 			if (ImGui::BeginTabItem(("Staircase " + std::to_string(i)).c_str()))
 			{
-				ImGui::InputFloat3("Position", glm::value_ptr(game->house.m_staircases[i].m_rootTransform.position));
+				if (ImGui::InputFloat3("Position", glm::value_ptr(game->house.m_staircases[i].m_rootTransform.position)))
+					game->RebuildMap();
+
 				ImGui::Text("Story");
 				ImGui::SameLine(); if (ImGui::Button("<##A")) {
 					game->house.m_staircases[i].m_story -= 1;
@@ -330,7 +337,7 @@ namespace HellEngine
 					game->RebuildMap();
 				}
 				ImGui::SameLine(); if (ImGui::Button("New Staircase")) {
-					game->house.m_staircases.push_back(Staircase(glm::vec2(0, 0), Axis::POS_X, 0, 18, false));
+					game->house.m_staircases.push_back(Staircase(glm::vec2(0, 0), Axis::POS_X, 0, 18, false, false, false, false));
 					game->RebuildMap();
 				}
 				ImGui::EndTabItem();
@@ -338,19 +345,12 @@ namespace HellEngine
 		}
 		ImGui::EndTabBar();
 		ImGui::Text(" ");
-
-
 	}
 
 	void CoreImGui::ShowPlayerMenu(Game* game)
 	{
-
-		//ImGui::InputFloat("scale", &scale, 3, 3, 3);
 		ImGui::Text("Cam rot: %.3f, %.3f, %.3f", game->camera.m_transform.rotation.x, game->camera.m_transform.rotation.y, game->camera.m_transform.rotation.z);
 		ImGui::Text("Cam pos: %.3f, %.3f, %.3f", game->camera.m_transform.position.x, game->camera.m_transform.position.y, game->camera.m_transform.position.z);
-		/*	ImGui::Text("Rig pos: %.3f, %.3f, %.3f", game->m_player.m_characterController.GetPosition().x,
-				game->m_player.m_characterController.GetPosition().y,
-				game->m_player.m_characterController.GetPosition().z);*/
 		ImGui::Text("Mouse: %d, %d", HellEngine::Input::s_mouseX, HellEngine::Input::s_mouseY);
 		ImGui::Text(" ");
 
@@ -363,10 +363,8 @@ namespace HellEngine
 
 		ImGui::InputFloat("Scale", &Staircase::trimScale, 0.1f, 1.0f, "%0.5f");
 		ImGui::InputFloat("Offset", &Staircase::yOffset, 0.1f, 1.0f, "%0.5f");
-		ImGui::InputFloat("Speed", &game->m_player.m_characterController.walkingSpeed, 0.1f, 1.0f, "%0.5f");
+		ImGui::InputFloat("Walking Speed", &game->m_player.m_characterController.m_walkingSpeed, 0.1f, 1.0f, "%0.5f");
 		ImGui::InputFloat("View height", &game->camera.m_viewHeight, 0.1f, 1.0f, "%0.5f");
-
-
 	}
 
 	void CoreImGui::ShowOtherMenu(Game* game)
@@ -411,9 +409,6 @@ namespace HellEngine
 
 		if (game->m_HUDshotgun.m_currentAnimation != NULL)
 			ImGui::Text("\nHUD shotgun: %s, %s, %s", game->m_HUDshotgun.m_currentAnimationName, game->m_HUDshotgun.m_currentAnimationTime.GetTimeString(), game->m_HUDshotgun.m_currentAnimation->m_endTime.GetTimeString());
-
-		if (game->m_TestEntity.m_currentAnimation != NULL)
-			ImGui::Text("Test shotgun: %s, %s, %s", game->m_TestEntity.m_currentAnimationName, game->m_TestEntity.m_currentAnimationTime.GetTimeString(), game->m_TestEntity.m_currentAnimation->m_endTime.GetTimeString());
 
 		//ImGui::Text("\nRaycast:  %s", game->m_cameraRaycast.m_name);
 		ImGui::Text("Distance: %f", game->m_cameraRaycast.m_distance);

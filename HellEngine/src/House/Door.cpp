@@ -27,7 +27,7 @@ namespace HellEngine
 
 		m_rootTransform.rotation = Util::SetRotationByAxis(m_axis);
 		m_doorTransform.position = glm::vec3(0, 0, 0.03f);
-		m_floor = Floor(glm::vec2(m_rootTransform.position.x, m_rootTransform.position.z), glm::vec2(1, 0.1f), m_story, m_floor.m_rotateTexture);
+		m_floor = Floor(m_rootTransform.position, glm::vec2(1, 0.1f), m_story, m_floor.m_rotateTexture);
 		m_floor.m_transform.rotation = Util::SetRotationByAxis(m_axis);
 		m_floor.CalculateWorldSpaceCorners();
 		m_openStatus = DoorStatus::DOOR_CLOSING;
@@ -39,13 +39,12 @@ namespace HellEngine
 		//shadowTransform.scale = glm::vec3(1.1);
 
 		//AssetManager::models[doorModelID].Draw(shader, m_rootTransform.to_mat4() * m_doorTransform.to_mat4());
-		if (Renderer::s_RenderSettings.DrawWeapon == false)
-			AssetManager::models[AssetManager::s_ModelID_Door].Draw(shader,GetDoorModelMatrixFromPhysicsEngine() * Renderer::s_DebugTransform.to_mat4());
-		else
-			AssetManager::models[AssetManager::s_ModelID_Door].Draw(shader, GetDoorModelMatrixFromPhysicsEngine());
+		//if (Renderer::s_RenderSettings.DrawWeapon == false)
+		//	AssetManager::models[AssetManager::s_ModelID_Door].Draw(shader,GetDoorModelMatrixFromPhysicsEngine() * Renderer::s_DebugTransform.to_mat4());
+		//else
 
-		
-		AssetManager::models[AssetManager::s_ModelID_DoorFrame].Draw(shader, m_rootTransform.to_mat4() * m_doorFrameTransform.to_mat4());
+		AssetManager::DrawModel(AssetManager::s_ModelID_Door, shader, GetDoorModelMatrixFromPhysicsEngine());
+		AssetManager::DrawModel(AssetManager::s_ModelID_DoorFrame, shader, m_rootTransform.to_mat4() * m_doorFrameTransform.to_mat4());
 
 		// Draw Floor
 		AssetManager::BindMaterial(AssetManager::s_MaterialID_FloorBoards);

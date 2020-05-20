@@ -9,7 +9,7 @@ namespace HellEngine
 	Camera::Camera()
 	{
 		m_transform.position = glm::vec3(0, 0.0f, 2);
-		m_transform.rotation = glm::vec3(0, HELL_PI, 0);
+		m_transform.rotation = glm::vec3(0.125f, 0, 0);
 		m_transform.scale = glm::vec3(1);
 		m_oldX = 1280 / 2;
 		m_oldY = 720 / 2;

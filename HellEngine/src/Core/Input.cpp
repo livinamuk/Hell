@@ -41,20 +41,8 @@ namespace HellEngine
 			s_showCursor = !s_showCursor;
 
 		// Toggle fullscreen
-		if (s_keyPressed[HELL_KEY_F])
-		{
-			CoreGL::SetFullscreen(!CoreGL::IsFullscreen());
-			Renderer::s_gBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
-			Renderer::s_LightingBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
-			Renderer::s_FinalImageBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
-			Renderer::s_DOFBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
-			Renderer::s_ChromaticAbberationBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
-			Renderer::s_FXAABuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);		 
-			Renderer::s_BlurBuffers[0].Configure(CoreGL::s_windowWidth / 2, CoreGL::s_windowHeight / 2);
-			Renderer::s_BlurBuffers[1].Configure(CoreGL::s_windowWidth / 4, CoreGL::s_windowHeight / 4);
-			Renderer::s_BlurBuffers[2].Configure(CoreGL::s_windowWidth / 8, CoreGL::s_windowHeight / 8);
-			Renderer::s_BlurBuffers[3].Configure(CoreGL::s_windowWidth / 16, CoreGL::s_windowHeight / 16);
-			std::cout << "Switching too: " << CoreGL::s_windowWidth << " x " << CoreGL::s_windowHeight << "\n";
+		if (s_keyPressed[HELL_KEY_F]) {
+			CoreGL::ToggleFullScreen();
 		}
 
 		// Hotload Shaders

@@ -23,6 +23,7 @@ namespace HellEngine
 
 	void Model::ReadFromDisk()
 	{
+		std::cout << "about to load model .... \n ";
 		if (m_fileType == FileType::FBX)
 			Importer::LoadFbxModel(this);
 
@@ -58,6 +59,8 @@ namespace HellEngine
 	{
 		// If it aint loaded DO NOT TRY DRAW
 		if (!m_loadedToGL) return;
+
+		if (m_meshes.size() <= 0) return;
 
 		shader->setBool("hasAnimation", m_hasAnimation[meshIndex]);
 		if (m_hasAnimation[meshIndex])

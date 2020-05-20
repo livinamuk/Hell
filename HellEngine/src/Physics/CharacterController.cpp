@@ -52,67 +52,12 @@ namespace HellEngine
 			targetVelocity -= camera->m_Right * deltaTime;
 		}
 
-		/*float velocityApproachSpeed = 1;
-		bool isRunning = false;
-		float currentSpeed;
-		float walkingSpeed = 2.25;
-		float runningSpeed = 3.25f;
-		float crouchingSpeed = 1.75f;
-		currentSpeed = walkingSpeed;
-		targetVelocity *= deltaTime *= currentSpeed * 60;
-		*/
-
-		glm::vec3 vector = targetVelocity * walkingSpeed;
+		glm::vec3 vector = targetVelocity * m_walkingSpeed;
 		bulletController_->setWalkDirection(Util::glmVec3_to_btVec3(vector));
-		//	bulletController_->set(0.2f);
-
 
 		btTransform t;
 		t = bulletController_->getGhostObject()->getWorldTransform();
-		//t.setRotation(ToBtQuaternion(node_->GetRotation()));
 		bulletController_->getGhostObject()->setWorldTransform(t);
-
-
-
-		// Lerp
-	//	m_manualVelocity.x = Util::FInterpTo(m_manualVelocity.x, targetVelocity.x, deltaTime, velocityApproachSpeed);
-	//	m_manualVelocity.z = Util::FInterpTo(m_manualVelocity.z, targetVelocity.z, deltaTime, velocityApproachSpeed);
-
-	//	for (int i = 0; i < 10; i++)
-		{
-	//	newPosition.x += m_manualVelocity.x * deltaTime * 0.0035f;
-	//	newPosition.z += m_manualVelocity.z * deltaTime * 0.0035f;
-		
-	//	float x = m_pRigidBody->getWorldTransform().getOrigin().getX();
-	//	float z = m_pRigidBody->getWorldTransform().getOrigin().getZ();
-	//	x += m_manualVelocity.x * deltaTime * 0.0035f;// *0.1f;
-	//	z += m_manualVelocity.z * deltaTime * 0.0035f;// *0.1f;
-
-
-		// Synch ghost with actual object
-
-		//reposition(btVector3(x, 0.6f, z));
-
-		//reposition(btVector3(x, 0.6f, z));
-
-		//m_pRigidBody->getWorldTransform().setOrigin(btVector3(x, 0.6f, z));
-		
-		
-		//m_pGhostObject->setWorldTransform(m_pRigidBody->getWorldTransform());
-
-//		reposition(btVector3(newPosition.x, 0.6f, newPosition.z));
-
-
-		}
-
-		//int count = m_pGhostObject->getNumOverlappingObjects();
-		//std::cout << " COUNT: " << count << "\n";
-
-		// Synch ghost with actual object
-		//m_pGhostObject->setWorldTransform(m_pRigidBody->getWorldTransform());
-
-		// Update transform
-		//m_pMotionState->getWorldTransform(m_motionTransform);
 	}
 
 	void CharacterController::reposition(btVector3 position) 
@@ -121,16 +66,9 @@ namespace HellEngine
 
 		initialTransform.setOrigin(position);
 
-
 		m_pRigidBody->getWorldTransform().setOrigin(position);
-		//m_pMotionState->getWorldTransform();// etOrigin(position);
 		m_pGhostObject->getWorldTransform().setOrigin(position);
-
 		m_pMotionState->setWorldTransform(initialTransform);
-
-	//	m_pRigidBody->setWorldTransform(initialTransform);
-	//	m_pMotionState->setWorldTransform(initialTransform);
-	//	m_pGhostObject->setWorldTransform(initialTransform);
 	}
 
 	struct btDrawingResult : public btCollisionWorld::ContactResultCallback

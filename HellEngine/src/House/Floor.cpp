@@ -9,11 +9,11 @@ namespace HellEngine
 	{
 	}
 
-	Floor::Floor(glm::vec2 position, glm::vec2 size, int story, bool rotateTexture)
+	Floor::Floor(glm::vec3 position, glm::vec2 size, int story, bool rotateTexture)
 	{
 		m_transform.position.x = position.x;
 		m_transform.position.y = STORY_HEIGHT * story;
-		m_transform.position.z = position.y;
+		m_transform.position.z = position.z;
 		m_transform.scale.x = size.x;
 		m_transform.scale.z = size.y;
 		m_rotateTexture = rotateTexture;

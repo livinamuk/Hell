@@ -9,11 +9,12 @@ Texture::Texture(std::string name, std::string filetype)
 
 void Texture::ReadFromDisk()
 {
+	//std::cout << "about to load tex ...." << name << "\n";
 	stbi_set_flip_vertically_on_load(false);
 	std::string fullpath = "res/textures/" + name + "." + filetype;
 	data = stbi_load(fullpath.c_str(), &width, &height, &nrChannels, 0);
 	m_readFromDisk = true;
-	//std::cout << "read from disk: " << name << "\n";
+	std::cout << "Read from disk: " << name << "\n";
 }
 
 void Texture::LoadToGL()

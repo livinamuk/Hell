@@ -9,7 +9,7 @@ namespace HellEngine
 	{
 	}
 
-	AssimpModel::AssimpModel(std::string const& path, MeshList meshList)
+	AssimpModel::AssimpModel(std::string const& path, std::vector<Mesh> meshList)
 	{
 		this->name = path;
 		this->meshes = meshList;

@@ -2,6 +2,7 @@
 #include "CoreGL.h"
 #include "Input.h"
 #include <windows.h>
+#include "Renderer/Renderer.h"
 
 namespace HellEngine
 {
@@ -296,6 +297,14 @@ namespace HellEngine
 		SetConsoleTextAttribute(hConsole, 7);
 	}
 
+	void CoreGL::ClearDefaultFrameBufferToBlack()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
 
 	void APIENTRY glDebugOutput(GLenum source, GLenum type,	GLuint id, GLenum severity,	GLsizei length,	const GLchar* message, const void* userParam)
 	{
@@ -356,5 +365,21 @@ namespace HellEngine
 			std::cout << "NOTIFICATION!!!\n";
 			std::cout << "NOTIFICATION!!!\n";
 		}*/
+	}
+
+	void CoreGL::ToggleFullScreen()
+	{
+		CoreGL::SetFullscreen(!CoreGL::IsFullscreen());
+		Renderer::s_gBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		Renderer::s_LightingBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		Renderer::s_FinalImageBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		Renderer::s_DOFBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		Renderer::s_ChromaticAbberationBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		Renderer::s_FXAABuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		Renderer::s_BlurBuffers[0].Configure(CoreGL::s_windowWidth / 2, CoreGL::s_windowHeight / 2);
+		Renderer::s_BlurBuffers[1].Configure(CoreGL::s_windowWidth / 4, CoreGL::s_windowHeight / 4);
+		Renderer::s_BlurBuffers[2].Configure(CoreGL::s_windowWidth / 8, CoreGL::s_windowHeight / 8);
+		Renderer::s_BlurBuffers[3].Configure(CoreGL::s_windowWidth / 16, CoreGL::s_windowHeight / 16);
+		std::cout << "Switching too: " << CoreGL::s_windowWidth << " x " << CoreGL::s_windowHeight << "\n";
 	}
 }	

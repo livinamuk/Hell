@@ -9,7 +9,7 @@ namespace HellEngine
 	class Staircase
 	{
 	public: // methods
-		Staircase(glm::vec2 bottomOpening, Axis axis, int story, int firstSetCount, bool turnsLeft);
+		Staircase(glm::vec2 bottomOpening, Axis axis, int story, int firstSetCount, bool turnsLeft, bool FloorRotateBottom, bool FloorRotateTop, bool FloorRotateLanding);
 		void Draw(Shader* shader);
 		void Reconfigure();
 

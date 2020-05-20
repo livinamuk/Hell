@@ -8,7 +8,7 @@ namespace HellEngine
 	float Staircase::trimScale = 0;
 	float Staircase::yOffset = 0;
 
-	Staircase::Staircase(glm::vec2 bottomOpening, Axis axis, int story, int firstSetCount, bool turnsLeft)
+	Staircase::Staircase(glm::vec2 bottomOpening, Axis axis, int story, int firstSetCount, bool turnsLeft, bool FloorRotateBottom, bool FloorRotateTop, bool FloorRotateLanding)
 	{
 		// Position
 		m_rootTransform.position.x = bottomOpening.x;
@@ -17,6 +17,10 @@ namespace HellEngine
 		m_axis = axis;
 		m_stepsInFirstSet = firstSetCount;
 		m_turnsLeft = turnsLeft;
+
+		m_bottomDoorwayFloor.m_rotateTexture = FloorRotateBottom;
+		m_topDoorwayFloor.m_rotateTexture = FloorRotateTop;
+		m_landingFloor.m_rotateTexture = FloorRotateLanding;
 
 		Reconfigure();
 	}
@@ -39,6 +43,7 @@ namespace HellEngine
 		if (m_axis == Axis::NEG_Z)
 			m_rootTransform.rotation.y = ROTATE_270;
 
+
 		// Landing
 		m_landingTransform.position.x = 0;
 		m_landingTransform.position.y = stepHeight * (m_stepsInFirstSet);
@@ -52,6 +57,7 @@ namespace HellEngine
 		// Doorway: bottom
 		Transform bottomDoorWayTransform;
 		bottomDoorWayTransform.position.z = 0.05f;
+
 		m_bottomDoorway.position = Util::GetTranslationFromMatrix(m_rootTransform.to_mat4() * bottomDoorWayTransform.to_mat4());
 		m_bottomDoorway.type = DoorWayType::STAIRCASE_OPENING;
 		m_bottomDoorway.story = m_story;
@@ -109,13 +115,20 @@ namespace HellEngine
 		Transform bottomFloorTransform;
 		bottomFloorTransform.position.y = 0;
 		bottomFloorTransform.position.z = (stairIndent / 2) + 0.025;
-		m_bottomDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * bottomFloorTransform.to_mat4()), glm::vec2(1, stairIndent + 0.05f));
 
+		glm::vec2 doorwayFloorSize;
+		if (m_axis == Axis::POS_X || m_axis == Axis::NEG_X)
+			doorwayFloorSize = glm::vec2(1, stairIndent + 0.05f);
+		else
+			doorwayFloorSize = glm::vec2(stairIndent + 0.05f, 1);
+
+		m_bottomDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * bottomFloorTransform.to_mat4()), doorwayFloorSize, m_story, m_bottomDoorwayFloor.m_rotateTexture);
+		
 		// Floor: top door way
 		Transform topDoorWayFloorTransform;
 		topDoorWayFloorTransform.position = m_topDoorway.position;
-		//topDoorWayFloorTransform.rotation = Util::rotatio
-		m_topDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * topDoorWayFloorTransform.to_mat4()), glm::vec2(1, stairIndent + 0.05f));
+		if (m_axis == Axis::POS_Z) topDoorWayFloorTransform.rotation.y = ROTATE_90;
+		m_topDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * topDoorWayFloorTransform.to_mat4()), doorwayFloorSize, m_story, m_topDoorwayFloor.m_rotateTexture);
 
 
 
@@ -408,8 +421,7 @@ namespace HellEngine
 			Transform trans;
 			trans.position.y = stepHeight * (3 * i);
 			trans.position.z = stepDepth * (3 * i) + stairIndent;
-			AssetManager::GetModelByName("Staircase")->SetMaterial(AssetManager::GetMaterialIDByName("Stairs01"));
-			AssetManager::GetModelByName("Staircase")->Draw(shader, m_rootTransform.to_mat4() * trans.to_mat4());
+			AssetManager::DrawModel(AssetManager::s_ModelID_Staircase, shader, m_rootTransform.to_mat4() * trans.to_mat4());
 		}
 
 		if (m_stepsInSecondSet > 0)
@@ -451,7 +463,7 @@ namespace HellEngine
 				trans.position.z = 0.5f;
 				trans.position.z += stepDepth * (3 * i);
 				trans.position.y = stepHeight * (3 * i);
-				AssetManager::GetModelByName("Staircase")->Draw(shader, m_rootTransform.to_mat4() * m_landingTransform.to_mat4() * trans.to_mat4());
+				AssetManager::DrawModel(AssetManager::s_ModelID_Staircase, shader, m_rootTransform.to_mat4() * m_landingTransform.to_mat4() * trans.to_mat4());
 			}
 			// Landing
 		//	AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("FloorBoards"));
@@ -463,8 +475,10 @@ namespace HellEngine
 		Transform trans;
 		trans.position.z += stairIndent;
 
-		AssetManager::GetModelByName("StaircaseCeilingTrimStraight")->SetMaterial(AssetManager::GetMaterialIDByName("Trims"));
-		AssetManager::GetModelByName("StaircaseCeilingTrimStraight")->Draw(shader, m_rootTransform.to_mat4() * trans.to_mat4());
+		//AssetManager::GetModelByName("StaircaseCeilingTrimStraight")->SetMaterial(AssetManager::GetMaterialIDByName("Trims"));
+		//AssetManager::GetModelByName("StaircaseCeilingTrimStraight")->Draw(shader, m_rootTransform.to_mat4() * trans.to_mat4());
+		
+		AssetManager::DrawModel(AssetManager::s_ModelID_StaircaseCeilingTrimStraight, shader, m_rootTransform.to_mat4() * trans.to_mat4());
 
 
 		// Top door trim

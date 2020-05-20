@@ -8,8 +8,6 @@ namespace HellEngine
 {
 	Player::Player()
 	{
-		//m_characterController = CharacterController(glm::vec3(0, 0, 0), 0.8f, 0.2f, 0.0f);
-		//m_characterController = CharacterController();
 	}
 
 	void Player::Update(float deltaTime)

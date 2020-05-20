@@ -17,10 +17,40 @@ int main()
 	Game game = Game();
 	Renderer::Init(&game);
 	Importer::Init();
+	AssetManager::FindAllFiles();
+	AssetManager::ForceLoadTexture("CharSheet");
+	
+	// Loading loop
+	/*
+	while (!AssetManager::s_loadingComplete && !Input::s_keyDown[HELL_KEY_ESCAPE])
+	{
+		CoreGL::ProcessInput();
+		CoreGL::OnUpdate();
+		CoreGL::ClearDefaultFrameBufferToBlack();
+
+		if (Input::s_keyPressed[HELL_KEY_F])
+			CoreGL::ToggleFullScreen();
+
+		AssetManager::LoadNextReadyAssetToGL();
+
+		TextBlitter::UpdateBlitter(1);
+		TextBlitter::BlitText(AssetManager::s_loadLog, false);
+		Renderer::TextBlitPlass(&Renderer::s_quadShader);
+
+		CoreGL::SwapBuffersAndPollEvents();
+
+		static bool RUN_ONCE = true;
+		if (RUN_ONCE) {
+			AssetManager::LoadAllTextures();
+			RUN_ONCE = false;
+		}
+	}
+	*/
 	AssetManager::LoadAllTextures();
 	AssetManager::LoadHardcoded();
 
-	// Main loop
+
+	// Main game loop
 	while (CoreGL::IsRunning() && !Input::s_keyDown[HELL_KEY_ESCAPE])
 	{
 		AssetManager::LoadNextReadyAssetToGL();
@@ -46,10 +76,10 @@ int main()
 	Opp m = Opp(1200);
 	m.Deduct(300);
 	m.Deduct(-50);
+	m.Deduct(600);
 
 	Opp c = Opp(2400);
 	c.Deduct(300);
 	c.Deduct(300);
-
-	Opp b = Opp(100);
+	c.Deduct(300);
 }

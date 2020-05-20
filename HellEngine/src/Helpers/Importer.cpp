@@ -34,7 +34,7 @@ namespace HellEngine
 		std::string warn, err;
 
 		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model->m_filePath.c_str())) {
-			throw std::runtime_error(warn + err);
+			//throw std::runtime_error(warn + err);
 		}
 
 		std::unordered_map<Vertex, uint32_t> uniqueVertices = {};
@@ -673,6 +673,8 @@ namespace HellEngine
 
 	void Importer::AddAnimation(Model* model, std::string filePath, std::string animName, uint32_t startFrame, uint32_t endFrame)
 	{
+		if (!model) return;
+
 		fbxsdk::FbxImporter* importer = fbxsdk::FbxImporter::Create(m_fbxMgr, "HeImporter");
 		bool status = importer->Initialize(filePath.c_str(), -1, m_fbxMgr->GetIOSettings());
 		if (!status)

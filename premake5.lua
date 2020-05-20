@@ -15,8 +15,6 @@ group "Dependencies"
 	include "HellEngine/vendor/GLFW"
 	include "HellEngine/vendor/Glad"
 	include "HellEngine/vendor/imgui"
-	--include "HellEngine/vendor/assimp"
-	--include "HellEngine/vendor/bullet"
 
 project "HellEngine"
 	location "HellEngine"
@@ -89,6 +87,7 @@ project "HellEngine"
 		"fmodL_vc.lib",
 		"fmod_vc.lib",
 		"assimp-vc142-mt.lib",
+		"assimp-vc142-mtd.lib",
 		"Bullet3Dynamics_RelWithDebugInfo.lib",
 		"BulletDynamics_RelWithDebugInfo.lib",
 		"BulletCollision_RelWithDebugInfo.lib",

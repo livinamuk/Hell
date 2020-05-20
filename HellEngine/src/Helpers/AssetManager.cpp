@@ -80,14 +80,13 @@ namespace HellEngine
 	{
 		if (!Game::s_debug) {
 			models.emplace_back(Model("res/models/Shotgun.FBX"));
-			models.emplace_back(Model("res/models/TrimFloor.FBX"));
-			models.emplace_back(Model("res/models/TrimCeiling.FBX"));
-			models.emplace_back(Model("res/models/StaircaseCeilingTrimStraight.FBX"));
-			models.emplace_back(Model("res/models/StaircaseLanding.FBX"));
-			models.emplace_back(Model("res/models/StaircaseTrimStraight.FBX"));
-			models.emplace_back(Model("res/models/Door.FBX"));
+			//models.emplace_back(Model("res/models/StaircaseLanding.FBX"));
 		}
 
+		models.emplace_back(Model("res/models/StaircaseCeilingTrimStraight.obj"));
+		models.emplace_back(Model("res/models/TrimFloor.obj"));
+		models.emplace_back(Model("res/models/TrimCeiling.obj"));
+		models.emplace_back(Model("res/models/Door.obj"));
 		models.emplace_back(Model("res/models/DoorFrame.obj"));
 		models.emplace_back(Model("res/models/Staircase.obj"));
 		models.emplace_back(Model("res/models/Light.obj"));
@@ -122,7 +121,7 @@ namespace HellEngine
 		}
 		// Otherwise create it
 		materials.emplace_back(Material(name));
-		std::cout << "Created material: " << name << "\n";
+		//std::cout << "Created material: " << name << "\n";
 	}
 
 	void AssetManager::LoadNextReadyAssetToGL()
@@ -134,7 +133,7 @@ namespace HellEngine
 			if (texture.m_readFromDisk && !texture.m_loadedToGL)
 			{
 				texture.LoadToGL();
-				s_loadLog += "loaded " + texture.name + "," + texture.filetype + "\n";
+				s_loadLog += "loaded " + texture.name + "." + texture.filetype + "\n";
 
 				if ((Util::StringEndsIn(texture.name, "_ALB")) ||
 					(Util::StringEndsIn(texture.name, "_NRM")) ||
@@ -151,10 +150,25 @@ namespace HellEngine
 		for (Model& model : models)
 		{
 			if (model.m_readFromDisk && !model.m_loadedToGL) {
+
+				s_loadLog += "loaded " + model.name + "." + Util::FileTypeToString(model.m_fileType) + "\n";
 				model.LoadMeshDataToGL();
 				return;
 			}
 		}
+
+		// Have you finished loading all your assets? Probably not.
+		s_loadingComplete = true;
+		for (Model& model : models)
+			if (!model.m_loadedToGL)
+				s_loadingComplete = false;
+		
+		for (Texture& texture : textures)
+			if (!texture.m_loadedToGL)
+				s_loadingComplete = false;
+
+		if (s_loadingComplete)
+			TextBlitter::ResetBlitter();
 	}
 
 	void AssetManager::AssignHardcodedModelMaterials()
@@ -247,7 +261,7 @@ namespace HellEngine
 			if (models[i].name == modelName)
 				return &models[i];
 		}
-		std::cout << "GetModelByName(std::string modelName): " << modelName << " not found\n";
+		std::cout << "GetModelByName(): " << modelName << " not found\n";
 		return nullptr;
 	}
 
@@ -338,7 +352,7 @@ namespace HellEngine
 
 	AssimpModel AssetManager::LoadFromFile(std:: string const& path)
 	{
-		std::cout << ("LOADING " + path) << "\n";
+		//std::cout << ("LOADING " + path) << "\n";
 
 		// read file via ASSIMP
 		Assimp::Importer importer;

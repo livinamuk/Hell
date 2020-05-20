@@ -39,6 +39,7 @@ namespace HellEngine
 		static glm::vec3 btVec3_to_glmVec3(btVector3);
 		static std::string Vec3_to_String(glm::vec3 vector);
 
+		static std::string FileTypeToString(FileType fileType);
 		static std::string AxisToString(Axis axis);
 		static Axis StringToAxis(std::string string);
 
@@ -55,7 +56,8 @@ namespace HellEngine
 		static glm::mat4 Mat4InitTranslationTransform(float x, float y, float z);
 		static std::string Mat4ToString(glm::mat4 m);
 		static void PrintMat4(glm::mat4 m);
-
+		static unsigned int CountLines(std::string str);
+		static void EraseFirstLine(std::string* str);
 	
 	private:
 			static unsigned int upFacingPlaneVAO;

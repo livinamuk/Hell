@@ -14,7 +14,7 @@ void Texture::ReadFromDisk()
 	std::string fullpath = "res/textures/" + name + "." + filetype;
 	data = stbi_load(fullpath.c_str(), &width, &height, &nrChannels, 0);
 	m_readFromDisk = true;
-	std::cout << "Read from disk: " << name << "\n";
+	//std::cout << "Read from disk: " << name << "\n";
 }
 
 void Texture::LoadToGL()

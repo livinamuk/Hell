@@ -11,6 +11,7 @@ namespace HellEngine
 		static void UpdateBlitter(float deltaTime);
 		static void TypeText(std::string text, bool centered);
 		static void BlitText(std::string text, bool centered);
+		static void ResetBlitter();
 
 	public: // fields
 		static unsigned int VAO, VBO;

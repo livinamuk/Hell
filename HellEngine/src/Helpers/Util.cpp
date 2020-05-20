@@ -67,7 +67,7 @@ namespace HellEngine
 		return (glm::dot(vector, other) / glm::length(other)) * other;
 		//return (Dot(other) / other.MagnitudeSquared()) * other;
 	}
-	
+
 	float Util::RandomFloat(float a, float b) {
 		float random = ((float)rand()) / (float)RAND_MAX;
 		float diff = b - a;
@@ -285,7 +285,7 @@ namespace HellEngine
 		vert1->Bitangent = bitangent;
 		vert2->Bitangent = bitangent;
 	}
-	
+
 	void Util::SetNormalsAndTangentsFromVertices(Vertex* vert0, Vertex* vert1, Vertex* vert2)
 	{
 		// above can be used to replace the shit below here. its the same.
@@ -519,6 +519,20 @@ namespace HellEngine
 		std::cout << "(" << m[3][0] << ", " << m[3][1] << ", " << m[3][2] << ", " << m[3][3] << ")\n";
 	}
 
+	std::string Util::FileTypeToString(FileType fileType)
+	{
+		if (fileType == FileType::FBX)
+			return "FBX";
+		if (fileType == FileType::OBJ)
+			return "OBJ";
+		if (fileType == FileType::PNG)
+			return "PNG";
+		if (fileType == FileType::JPG)
+			return "JPG";
+		else
+			return "UNKNOWN";
+	}
+
 	std::string Util::AxisToString(Axis axis)
 	{
 		if (axis == Axis::POS_X)
@@ -543,5 +557,22 @@ namespace HellEngine
 			return Axis::NEG_X;
 		else
 			return Axis::NEG_Z;
+	}
+
+	unsigned int Util::CountLines(std::string str)
+	{
+		long count = 0;
+		int position = 0;
+		while ((position = str.find('\n', position)) != -1)
+		{
+			count++;
+			position++;         // Skip this occurrence!
+		}
+		return count;
+	}
+
+	void Util::EraseFirstLine(std::string* str)
+	{
+		str->erase(0, str->find("\n") + 1);
 	}
 }

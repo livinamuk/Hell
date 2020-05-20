@@ -21,7 +21,7 @@ int main()
 	AssetManager::ForceLoadTexture("CharSheet");
 	
 	// Loading loop
-	/*
+	
 	while (!AssetManager::s_loadingComplete && !Input::s_keyDown[HELL_KEY_ESCAPE])
 	{
 		CoreGL::ProcessInput();
@@ -31,7 +31,9 @@ int main()
 		if (Input::s_keyPressed[HELL_KEY_F])
 			CoreGL::ToggleFullScreen();
 
-		AssetManager::LoadNextReadyAssetToGL();
+		// Limit log output to certain number of lines
+		if (Util::CountLines(AssetManager::s_loadLog) > 38)
+			Util::EraseFirstLine(&AssetManager::s_loadLog);
 
 		TextBlitter::UpdateBlitter(1);
 		TextBlitter::BlitText(AssetManager::s_loadLog, false);
@@ -42,13 +44,12 @@ int main()
 		static bool RUN_ONCE = true;
 		if (RUN_ONCE) {
 			AssetManager::LoadAllTextures();
+			AssetManager::LoadHardcoded();
 			RUN_ONCE = false;
 		}
-	}
-	*/
-	AssetManager::LoadAllTextures();
-	AssetManager::LoadHardcoded();
 
+		AssetManager::LoadNextReadyAssetToGL();
+	}
 
 	// Main game loop
 	while (CoreGL::IsRunning() && !Input::s_keyDown[HELL_KEY_ESCAPE])

@@ -23,7 +23,7 @@ namespace HellEngine
 
 	void Model::ReadFromDisk()
 	{
-		std::cout << "about to load model .... \n ";
+		//std::cout << "about to load model .... \n ";
 		if (m_fileType == FileType::FBX)
 			Importer::LoadFbxModel(this);
 
@@ -36,7 +36,7 @@ namespace HellEngine
 			return;
 		}
 
-		std::cout << "Read model from disk: " << m_filePath << " (" << m_meshes.size() << ") meshes\n";
+		//std::cout << "Read model from disk: " << m_filePath << " (" << m_meshes.size() << ") meshes\n";
 		m_readFromDisk = true;
 	}
 
@@ -46,7 +46,7 @@ namespace HellEngine
 			mesh->SetupMesh();
 
 		m_loadedToGL = true;
-		std::cout << "Loaded to GL: " << m_filePath << "\n";
+		//std::cout << "Loaded to GL: " << m_filePath << "\n";
 	}
 
 	void Model::Draw(Shader* shader, glm::mat4 modelMatrix)

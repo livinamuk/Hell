@@ -103,6 +103,7 @@ struct Vertex2D {
 	glm::vec2 TexCoords;
 };
 
+
 struct RenderSettings {
 	bool DrawWeapon;
 	bool BindMaterials;
@@ -137,7 +138,8 @@ struct Animation
 	bool m_finishedPlaying = false;
 };
 
-enum FileType {FBX, OBJ, PNG, JPG, UNKNOWN};
+enum FileType { FBX, OBJ, PNG, JPG, UNKNOWN };
+enum AssetType { TEXTURE, MODEL, AUDIO};
 enum Axis { POS_X, NEG_X, POS_Z, NEG_Z };
 enum PlayerMovementState { STOPPED, WALKING, RUNNING };
 enum RunningAnimationState { STARTING, LOOPING, ENDING, NOT_RUNNING};
@@ -152,5 +154,12 @@ struct DoorWay {
 	glm::vec3 position;
 	Axis axis;
 	int story;
+};
+
+struct AssetInfo {
+	AssetType assetType;
+	std::string filePath;
+	std::string fileName;
+	std::string fileExtension;
 };
 

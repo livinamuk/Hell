@@ -2,6 +2,8 @@
 #include "TextBlitter.h"
 #include <algorithm>
 #include "Core/CoreGL.h"
+#include "Helpers/Util.h"
+#include "Helpers/AssetManager.h"
 
 namespace HellEngine
 {
@@ -53,18 +55,18 @@ namespace HellEngine
 
 		float charWidth = 16;
 		float charHeight = 32;
+		float h = charHeight / (screenHeight / 2);
+		float w = charWidth / (screenWidth / 2);
 		float textureWidth = 766 * 2;
 		static float textScale = 0.75f;
-		static float lineHeight = 40 / (screenHeight / 2);;
+		static float lineHeight = 38 / (screenHeight / 2);;
 		static float cursor_X = 0;
 		static float cursor_Y = 0;
-		static float margin_X = -0.98f / textScale;
-		static float margin_Y = 0.9f / textScale;
+		static float margin_X = -1.00f / textScale;
+		static float margin_Y = (1.0f / textScale) - h;
 
 		std::vector<Vertex2D> vertices;
 
-		float h = charHeight / (screenHeight / 2);
-		float w = charWidth / (screenWidth / 2);
 
 		size_t lastLineBreakIndex = 0;
 		//bool centered;
@@ -99,7 +101,12 @@ namespace HellEngine
 		for (int i = 0; i < currentCharIndex; i++)
 		{
 			char character = s_textToBlit[i];
-			float totalWidth = s_textToBlit.find('\n', lastLineBreakIndex) * w;
+			
+			float totalWidth;
+			//if (s_textToBlit.find('\n', 0) != -1)
+				totalWidth = s_textToBlit.find('\n', lastLineBreakIndex) * w;
+			//else
+			//	totalWidth = s_textToBlit.length() * w;
 
 			// If there wasn't one, then it's simply the beginning of string
 			if (lastLineBreakIndex == -1)
@@ -181,11 +188,23 @@ namespace HellEngine
 
 	void TextBlitter::BlitText(std::string text, bool centered)
 	{
+		currentCharIndex = text.length();
 		s_blitTimer = 0;
 		s_waitTimer = 0;
 		s_blitSpeed = -1;
 		s_textToBlit = text;
 		s_centerText = centered;
+		s_timeToWait = -1;
+	}
+
+	void TextBlitter::ResetBlitter()
+	{
+		currentCharIndex = 0;
+		s_blitTimer = 0;
+		s_waitTimer = 0;
+		s_blitSpeed = -1;
+		s_textToBlit = "";
+		s_centerText = false;
 		s_timeToWait = -1;
 	}
 }

@@ -1,51 +1,25 @@
 #pragma once
-
-#include <cstdlib>
-#include <iostream>
-#include <windows.h>
-#include "common.h"
-#include "fmod.hpp"
+#include "soloud/soloud.h"
+#include "soloud/soloud_wav.h"
 #include <vector>
 
 namespace HellEngine
 {
+	struct AudioFile {
+		const char* name;
+		SoLoud::Wav* audio;
+	};
+
 	class Audio
 	{
-	public:
-		Audio(std::string fileName);
-		~Audio();
-		Audio();
-
-
-		static std::vector<Audio> loadedAudioFiles;
-		static void MainUpdate();
-		static void PlayAudio(std::string fileName);
-		static void LoadAudio(std::string fileName);
-		static void StreamAudio(std::string fileName);
+	public: // functions
 		static void Init();
-
-		static Audio stream;
-
-		bool initliased = false;
-		std::string name;
-		static FMOD::System* system;
-		FMOD::Sound* sound1;
-		FMOD::Channel* channel = 0;
-		static FMOD_RESULT       result;
-		unsigned int      version;
-		static void* extradriverdata;// = 0;
-
-		// for stream
-		FMOD::Sound* sound_to_play;
-		int numsubsounds;
-
-		void Update();
-		void Close();
-		
+		static void LoadAudio(const char* name);
+		static void PlayAudio(const char* name, float volume = 1.0f);
+		static void Terminate();
 	
-
-	private:
-		void Play();
-		
+	public: // variables
+		static SoLoud::Soloud gSoloud;
+		static std::vector<AudioFile> s_loadedAudio;
 	};
 }

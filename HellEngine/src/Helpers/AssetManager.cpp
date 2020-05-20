@@ -80,6 +80,9 @@ namespace HellEngine
 	{
 		if (!Game::s_dontLoadShotgun) {
 			models.emplace_back(Model("res/models/Shotgun.FBX"));
+			Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Idle.FBX", "Idle", 0, -1);
+			Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Walk.FBX", "Walk", 0, -1);
+			Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Fire.FBX", "Fire", 0, -1);
 			//models.emplace_back(Model("res/models/StaircaseLanding.FBX"));
 		}
 
@@ -95,9 +98,6 @@ namespace HellEngine
 		for (int i = 0; i < models.size(); i++)
 			models[i].ReadFromDisk(); 	
 
-		Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Idle.FBX", "Idle", 0, -1);
-		Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Walk.FBX", "Walk", 0, -1);
-		Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Fire.FBX", "Fire", 0, -1);
 	}
 
 	void AssetManager::MultiThreadedReadTextureFromDisk(Texture* texture)

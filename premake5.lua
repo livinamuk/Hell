@@ -63,7 +63,8 @@ project "HellEngine"
 		"%{prj.name}/vendor/bullet",
 		"%{prj.name}/vendor/assimp/include",
 		"%{prj.name}/vendor/rapidjson/include",
-		"%{prj.name}/vendor/fmod/include"
+		"%{prj.name}/vendor/sdl/include",
+		"%{prj.name}/vendor/soloud/include"
 	}
 
 
@@ -71,8 +72,9 @@ project "HellEngine"
 	{ 
 		"HellEngine/vendor/FbxSDK/lib/x64/debug",
 		"HellEngine/vendor/bullet/bullet/lib/RelWithDebInfo",
-		"HellEngine/vendor/fmod/lib/x64",
-		"HellEngine/vendor/assimp/lib/"
+		"HellEngine/vendor/assimp/lib/",
+		"HellEngine/vendor/soloud/lib/",
+		"HellEngine/vendor/sdl/lib/x64/"
 	}
 	
 	
@@ -83,15 +85,14 @@ project "HellEngine"
 		"ImGui",
 		"opengl32.lib",
 		"libfbxsdk-md.lib",
-		--"assimp",
-		"fmodL_vc.lib",
-		"fmod_vc.lib",
 		"assimp-vc142-mt.lib",
 		"assimp-vc142-mtd.lib",
 		"Bullet3Dynamics_RelWithDebugInfo.lib",
 		"BulletDynamics_RelWithDebugInfo.lib",
 		"BulletCollision_RelWithDebugInfo.lib",
-		"LinearMath_RelWithDebugInfo.lib"
+		"LinearMath_RelWithDebugInfo.lib",
+		"SDL2.lib",
+		"soloud_static_x64_d.lib"
 	}
 
     files -- I WANT THESE BELOW TO NOT REQUIRE A THE PRECOMPILED HEADER 

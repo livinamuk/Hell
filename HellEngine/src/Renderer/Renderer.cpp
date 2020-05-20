@@ -206,6 +206,9 @@ namespace HellEngine
 		//	ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[0].m_shadowMap.FboID);
 			//ViewCubeMap(game, &s_backgroundShader, s_CameraEnvMap.CubeMap_TexID);
 	//	}
+
+
+		TextBlitPlass(&s_quadShader);
 	}
 
 	void Renderer::ShadowMapPass(Game* game, Shader* shader)
@@ -486,6 +489,20 @@ namespace HellEngine
 		Quad2D::RenderQuad(shader);
 	}
 
+	void Renderer::TextBlitPlass(Shader* shader)
+	{
+		glEnable(GL_BLEND);
+		glDisable(GL_DEPTH_TEST);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		shader->use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("CharSheet"));
+
+		TextBlitter::DrawTextBlit(shader);
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+	}
 	
 	void Renderer::RenderReflectionMap(Game* game, Shader* shader)
 	{
@@ -577,41 +594,24 @@ namespace HellEngine
 	{
 		game->house.Draw(shader, envMapPass);
 
-		//game->m_assimpModel.Draw(shader);
-		/*
-		std::vector<glm::mat4> Transforms;
-		static float ANIMATION_TIME = 0;
-		ANIMATION_TIME += 0.05f;
-		//ANIMATION_TIME = 0;
-		game->m_skinnedMesh.BoneTransform(ANIMATION_TIME, Transforms);
-	//	game->m_skinnedMesh.BoneTransform(0, Transforms);
 
-		//Util::PrintMat4(Transforms[0]);
-		//Util::PrintMat4(Transforms[0]);
+		// Animated assimp model (SkinnedMesh)
+		{
+			Transform trans;
+			trans.position = glm::vec3(1.5f, 0, 7);
+			//trans.position = s_DebugTransform.position;
+			trans.rotation = glm::vec3(HELL_PI * 0.5f, HELL_PI, 0);
+			trans.scale = glm::vec3(0.03f);
+			shader->setMat4("model", trans.to_mat4());
 
-		//std::cout << "TRANSFORMS SIZE: " << Transforms[0] << "\n";
+			for (unsigned int i = 0; i < game->m_animatedTransforms.size(); i++)
+				shader->setMat4("skinningMats[" + std::to_string(i) + "]", glm::transpose(game->m_animatedTransforms[i]));
 
-		for (unsigned int i = 0; i < Transforms.size(); i++)
-			shader->setMat4("skinningMats[" + std::to_string(i) + "]", glm::transpose(Transforms[i]));
-		Transform trans;
-		trans.position = glm::vec3(-1, 0, 1);
-		trans.rotation = glm::vec3(HELL_PI * 0.5f, HELL_PI, 0);
-		//trans.rotation = s_DebugTransform.rotation;
-		trans.scale = glm::vec3(0.03f);
+			shader->setInt("hasAnimation", true);
+			game->m_skinnedMesh.Render();
+			shader->setInt("hasAnimation", false);
+		}
 
-		shader->setMat4("model", trans.to_mat4());
-		shader->setInt("hasAnimation", true);
-		game->m_skinnedMesh.Render();
-		shader->setInt("hasAnimation", false);
-		game->m_skinnedMesh.BoneTransform(ANIMATION_TIME, Transforms);
-
-
-
-		trans = s_DebugTransform;
-		shader->setMat4("model", trans.to_mat4());
-		game->m_assimpModel.Draw(shader);
-
-		*/
 
 		if (s_RenderSettings.DrawWeapon)
 		{

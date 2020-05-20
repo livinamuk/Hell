@@ -83,7 +83,19 @@ namespace HellEngine {
 				int story = ReadInt(rooms[i], "Story");
 				int firstSetCount = ReadInt(rooms[i], "FirstSetCount");
 				bool turnsLeft = ReadBool(rooms[i], "TurnsLeft");
-				house.AddStaircase(Staircase(position, Util::StringToAxis(axis), story, firstSetCount, turnsLeft));
+				bool FloorRotateBottom = ReadBool(rooms[i], "FloorRotateBottom");
+				bool FloorRotateTop = ReadBool(rooms[i], "FloorRotateTop");
+				bool FloorRotateLanding = ReadBool(rooms[i], "FloorRotateLanding");
+
+				house.AddStaircase(Staircase(
+					position, 
+					Util::StringToAxis(axis), 
+					story, 
+					firstSetCount, 
+					turnsLeft, 
+					FloorRotateBottom, 
+					FloorRotateTop, 
+					FloorRotateLanding));
 			}
 		}
 
@@ -148,6 +160,9 @@ namespace HellEngine {
 			SaveString(&object, "Axis", Util::AxisToString(staircase.m_axis), allocator);
 			SaveInt(&object, "FirstSetCount", staircase.m_stepsInFirstSet, allocator);
 			SaveBool(&object, "TurnsLeft", staircase.m_turnsLeft, allocator);
+			SaveBool(&object, "FloorRotateBottom", staircase.m_bottomDoorwayFloor.m_rotateTexture, allocator);
+			SaveBool(&object, "FloorRotateTop", staircase.m_topDoorwayFloor.m_rotateTexture, allocator);
+			SaveBool(&object, "FloorRotateLanding", staircase.m_landingFloor.m_rotateTexture, allocator);
 			staircasesArray.PushBack(object, allocator);
 		}
 

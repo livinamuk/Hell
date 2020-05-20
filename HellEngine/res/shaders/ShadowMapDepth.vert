@@ -5,37 +5,24 @@ layout (location = 6) in vec4 aBoneWeight;
 layout (location = 7) in mat4 instancedModelMatrix;
 
 uniform mat4 model;
-uniform bool animated;
-uniform bool instanced;
-uniform mat4 jointTransforms[50];	// hardcoded maximum bones 50
+
+uniform bool hasAnimation;
+uniform mat4 skinningMats[64];
 
 void main()
 {
-vec4 worldPos;
-	
-	// Instancing?
-	mat4 modelMatrix = model;
-	if (instanced)
-		modelMatrix = instancedModelMatrix;
+	vec4 worldPos;
+	vec4 totalLocalPos = vec4(0.0);
 
-	gl_Position = modelMatrix * vec4(aPos, 1.0);
-	
-	
 	// Animated
-	if (animated)
-	{
-		vec4 totalLocalPos = vec4(0.0);
-		vec4 totalNormal = vec4(0.0);
-		mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
-
-		for(int i=0;i<4;i++) 
-		{
-			mat4 jointTransform = jointTransforms[aBoneID[i]];
+	if (hasAnimation) {
+		for(int i=0;i<4;i++) {
+			mat4 jointTransform = skinningMats[int(aBoneID[i])];
 			vec4 posePosition = jointTransform * vec4(aPos, 1.0);
 			totalLocalPos += posePosition * aBoneWeight[i];		
 		}
-		gl_Position = modelMatrix * totalLocalPos;
+		gl_Position = model * totalLocalPos;
 	}
-
-	gl_Position = model * vec4(aPos, 1.0);
+	else
+		gl_Position = model * vec4(aPos, 1.0);
 }

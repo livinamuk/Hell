@@ -21,11 +21,13 @@ namespace HellEngine
 		static std::vector<std::future<void>> AssetManager::m_Futures;
 
 	public: // functions
+		static void FindAllFiles();
 		static void LoadAllTextures();
 		static void LoadHardcoded();
 		static void AddMaterial(std::string name);
 		static void LoadNextReadyAssetToGL();
 		static void AssignHardcodedModelMaterials();
+		static void ForceLoadTexture(std::string name);
 
 
 		static void SetModelMaterialIDByModelID(unsigned int modelID, unsigned int materialID);
@@ -54,6 +56,8 @@ namespace HellEngine
 
 	public: // fields
 		static unsigned int currentlyBoundMaterialID;
+		static bool s_loadingComplete;
+		static std::string s_loadLog;
 
 	public:
 		// hacky hardcodes
@@ -67,5 +71,8 @@ namespace HellEngine
 		static unsigned int s_MaterialID_FloorBoards;
 		static unsigned int s_MaterialID_PlasterCeiling;
 		static unsigned int s_MaterialID_WallPaper;
+
+		static unsigned int s_ModelID_StaircaseCeilingTrimStraight;
+		static unsigned int s_ModelID_Staircase;
 	};
 }

@@ -14,10 +14,14 @@ namespace HellEngine
 		static bool IsRunning();
 		static void Terminate();
 		static void SetVSync(bool enabled);
+		
+		static void ToggleFullScreen();
+
 		static void SetFullscreen(bool fullscreen);
 		static bool IsFullscreen(void);
 
 		static void CheckGLError_(const char* file, int line);
+		static void ClearDefaultFrameBufferToBlack();
 
 		//static void ToggleFullscreen();
 

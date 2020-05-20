@@ -28,13 +28,18 @@ namespace HellEngine
 	unsigned int AssetManager::s_ModelID_CeilingTrim;
 	unsigned int AssetManager::s_ModelID_FloorTrim;
 	unsigned int AssetManager::s_ModelID_DoorFrame;
-	unsigned int AssetManager::s_ModelID_Door;
+	unsigned int AssetManager::s_ModelID_Door;	
+	
+	unsigned int AssetManager::s_ModelID_StaircaseCeilingTrimStraight;
+	unsigned int AssetManager::s_ModelID_Staircase;
 
-	void AssetManager::LoadAllTextures()
+	bool AssetManager::s_loadingComplete = false;
+	std::string AssetManager::s_loadLog = "WELCOME TO HELL\n";
+
+	void AssetManager::FindAllFiles()
 	{
+		// Find all textures
 		std::string path = "res/textures/";
-
-		// Find all texture files
 		for (const auto& entry : std::filesystem::directory_iterator(path))
 		{
 			std::stringstream ss;
@@ -50,8 +55,22 @@ namespace HellEngine
 				continue;
 
 			textures.push_back(Texture(filename, filetype));
-		}		
+		}
+	}
+	void AssetManager::ForceLoadTexture(std::string name)
+	{
+		for (Texture& texture : textures)
+		{
+			if (texture.name == name)
+			{
+				texture.ReadFromDisk();
+				texture.LoadToGL();
+			}
+		}
+	}
 
+	void AssetManager::LoadAllTextures()
+	{
 		// Multi-thead load them
 		for (Texture& texture : textures)			
 			m_Futures.push_back(std::async(std::launch::async, MultiThreadedReadTextureFromDisk, &texture));
@@ -59,33 +78,23 @@ namespace HellEngine
 
 	void AssetManager::LoadHardcoded()
 	{
-		//models.emplace_back(Model("DUMMY")); // Dummy model, so that returning a model ID of 0 can draw nothing.
+		if (!Game::s_debug) {
+			models.emplace_back(Model("res/models/Shotgun.FBX"));
+			models.emplace_back(Model("res/models/TrimFloor.FBX"));
+			models.emplace_back(Model("res/models/TrimCeiling.FBX"));
+			models.emplace_back(Model("res/models/StaircaseCeilingTrimStraight.FBX"));
+			models.emplace_back(Model("res/models/StaircaseLanding.FBX"));
+			models.emplace_back(Model("res/models/StaircaseTrimStraight.FBX"));
+			models.emplace_back(Model("res/models/Door.FBX"));
+		}
 
-
-		models.emplace_back(Model("res/models/Shotgun.FBX"));
 		models.emplace_back(Model("res/models/DoorFrame.obj"));
-		models.emplace_back(Model("res/models/TrimFloor.FBX"));
-		models.emplace_back(Model("res/models/TrimCeiling.FBX"));
-		//models.emplace_back(Model("res/models/Staircase.FBX"));
-		models.emplace_back(Model("res/models/StaircaseCeilingTrimStraight.FBX"));
-		models.emplace_back(Model("res/models/StaircaseLanding.FBX"));
-		models.emplace_back(Model("res/models/StaircaseTrimStraight.FBX"));
-		models.emplace_back(Model("res/models/Door.FBX"));
 		models.emplace_back(Model("res/models/Staircase.obj"));
 		models.emplace_back(Model("res/models/Light.obj"));
 		models.emplace_back(Model("res/models/sphere.obj"));
 
 		for (int i = 0; i < models.size(); i++)
 			models[i].ReadFromDisk(); 	
-			//m_Futures.push_back(std::async(std::launch::async, MultiThreadedReadModelFromDisk, &models[i]));		<- attemped multi-theaded model loading
-
-		/* m_Futures.push_back(std::async(std::launch::async, MultiThreadedLoadAnimation,		 <- Attempted multi-threaded aniation loading
-			AssetManager::GetModelByName("Shotgun"), "res/models/Shotgun_Idle.FBX", "Idle"));
-		m_Futures.push_back(std::async(std::launch::async, MultiThreadedLoadAnimation,
-			AssetManager::GetModelByName("Shotgun"), "res/models/Shotgun_Fire.FBX", "Fire"));
-		m_Futures.push_back(std::async(std::launch::async, MultiThreadedLoadAnimation,
-			AssetManager::GetModelByName("Shotgun"), "res/models/Shotgun_Walk.FBX", "Walk"));
-			*/
 
 		Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Idle.FBX", "Idle", 0, -1);
 		Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Walk.FBX", "Walk", 0, -1);
@@ -97,18 +106,6 @@ namespace HellEngine
 		std::lock_guard<std::mutex> lock(s_TexturesMutex); 
 		texture->ReadFromDisk();
 	}
-
-	/*void AssetManager::MultiThreadedReadModelFromDisk(Model* model)
-	{
-		std::lock_guard<std::mutex> lock(s_ModelsMutex);
-		model->ReadFromDisk();
-	}*/
-
-	/*void AssetManager::MultiThreadedLoadAnimation(Model* model, const char* filepath, const char* name)
-	{
-		std::lock_guard<std::mutex> lock(s_AnimationsMutex);
-		Importer::AddAnimation(model, filepath, name, 0, -1);
-	}*/
 
 	void AssetManager::AddMaterial(std::string name)
 	{
@@ -130,12 +127,14 @@ namespace HellEngine
 
 	void AssetManager::LoadNextReadyAssetToGL()
 	{
+		
 		// Load in textures
 		for (Texture& texture : textures)
 		{
 			if (texture.m_readFromDisk && !texture.m_loadedToGL)
 			{
 				texture.LoadToGL();
+				s_loadLog += "loaded " + texture.name + "," + texture.filetype + "\n";
 
 				if ((Util::StringEndsIn(texture.name, "_ALB")) ||
 					(Util::StringEndsIn(texture.name, "_NRM")) ||
@@ -172,7 +171,6 @@ namespace HellEngine
 		AssetManager::s_MaterialID_FloorBoards = GetMaterialIDByName("FloorBoards");
 		AssetManager::s_MaterialID_PlasterCeiling = GetMaterialIDByName("PlasterCeiling");
 		AssetManager::s_MaterialID_WallPaper = GetMaterialIDByName("WallPaper");
-		//AssetManager::s_MaterialID_Trims = GetMaterialIDByName("Trims");
 
 		SetModelMaterialIDByModelID(GetModelIDByName("sphere"), GetMaterialIDByName("Red"));
 		SetModelMaterialIDByModelID(GetModelIDByName("TrimFloor"), GetMaterialIDByName("Trims"));
@@ -182,10 +180,19 @@ namespace HellEngine
 		AssetManager::s_ModelID_FloorTrim = AssetManager::GetModelIDByName("TrimFloor");
 		AssetManager::s_ModelID_DoorFrame = AssetManager::GetModelIDByName("DoorFrame");
 		AssetManager::s_ModelID_Door = AssetManager::GetModelIDByName("Door");
+
+		AssetManager::s_ModelID_StaircaseCeilingTrimStraight = AssetManager::GetModelIDByName("StaircaseCeilingTrimStraight");
+		AssetManager::s_ModelID_Staircase = AssetManager::GetModelIDByName("Staircase");
+
+		SetModelMaterialIDByModelID(s_ModelID_Staircase, GetMaterialIDByName("Stairs01"));
+		SetModelMaterialIDByModelID(s_ModelID_StaircaseCeilingTrimStraight, GetMaterialIDByName("Trims"));	
 	}
 
 	void AssetManager::SetModelMaterialIDByModelID(unsigned int modelID, unsigned int materialID)
 	{
+		if (modelID < 0 || modelID >= models.size())
+			return;
+
 		for (Mesh* mesh : models[modelID].m_meshes)
 			mesh->materialID = materialID;
 		return;
@@ -193,6 +200,9 @@ namespace HellEngine
 
 	void AssetManager::SetModelMaterialIDByModelIDMeshName(unsigned int modelID, std::string meshName, unsigned int materialID)
 	{
+		if (modelID < 0 || modelID >= models.size())
+			return;
+
 		for (Mesh* mesh : models[modelID].m_meshes) {
 			if (mesh->name == meshName) {
 				mesh->materialID = materialID;
@@ -286,17 +296,6 @@ namespace HellEngine
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, AssetManager::GetRmaTexID(materialID));
 		glActiveTexture(GL_TEXTURE3);
-
-		// Has AO
-		//if (material->RMA != 0) {
-		//	glBindTexture(GL_TEXTURE_2D, AssetManager::GetRmaTexID(materialID));
-		//	glActiveTexture(GL_TEXTURE3);
-		//}
-		// Has emmissive instead
-		//else if (material->RME != 0) {
-		//	glBindTexture(GL_TEXTURE_2D, AssetManager::GetRmeTexID(materialID));
-		//	glActiveTexture(GL_TEXTURE3);
-		//}
 	}
 
 	unsigned int AssetManager::GetAlbTexID(unsigned int materialID)

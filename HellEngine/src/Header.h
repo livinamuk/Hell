@@ -98,6 +98,11 @@ struct Vertex {
 	}
 };
 
+struct Vertex2D {
+	glm::vec2 Position;
+	glm::vec2 TexCoords;
+};
+
 struct RenderSettings {
 	bool DrawWeapon;
 	bool BindMaterials;

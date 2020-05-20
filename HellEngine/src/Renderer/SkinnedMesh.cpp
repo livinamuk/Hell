@@ -464,6 +464,7 @@ namespace HellEngine
     void SkinnedMesh::BoneTransform(float TimeInSeconds, vector<glm::mat4>& Transforms)
     {
         glm::mat4 Identity = glm::mat4(1);
+        Transforms.clear();
 
         float TicksPerSecond = (float)(m_pScene->mAnimations[0]->mTicksPerSecond != 0 ? m_pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
         float TimeInTicks = TimeInSeconds * TicksPerSecond;

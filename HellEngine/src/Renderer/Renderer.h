@@ -10,6 +10,7 @@
 #include "GL/FXAABuffer.h"
 #include "GL/ChromaticAbberationBuffer.h"
 #include "GL/CameraEnvMap.h"
+#include "TextBlitter.h"
 
 namespace HellEngine
 {
@@ -39,8 +40,11 @@ namespace HellEngine
 		static void RenderReflectionMap(Game* game, Shader* shader);
 		static void ViewCubeMap(Game* , Shader* shader, unsigned int CubeMapID);
 		static void RenderSphericalHarmonicsTexture(Game* game, Shader* shader);
-		static void RenderCameraEnvMap(Game* game, Shader* shader);
+		//static void RenderCameraEnvMap(Game* game, Shader* shader);
 		static void CreateBRDFLut();
+
+	public: // functions
+		static void TextBlitPlass(Shader* shader);
 
 	public: // Fields
 		static Shader s_forwardShader;

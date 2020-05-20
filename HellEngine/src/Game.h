@@ -28,26 +28,18 @@ namespace HellEngine
 
 	public: // Fields
 		double currentFrame, lastFrame;
-
 		Camera camera;
 		House house;
-	
-
 		Transform m_shotgunTransform;
-
 		RaycastResult m_cameraRaycast;
-
 		Transform m_doorTrans;
 		Player m_player;
-
 		Entity m_HUDshotgun;
-		Entity m_TestEntity;
-
 		Transform testTrans; 
-
-
-		AssimpModel m_assimpModel;
 		SkinnedMesh m_skinnedMesh;
-		SkinnedMesh m_skinnedAnimation;
+		std::vector<glm::mat4> m_animatedTransforms;
+
+		static bool s_debug;
+
 	};
 }

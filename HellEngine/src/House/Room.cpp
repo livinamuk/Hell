@@ -19,8 +19,8 @@ namespace HellEngine
 
 	void Room::Rebuild()
 	{
-		m_floor = Floor(m_position, m_size, m_story, false);
-		m_ceiling = Ceiling(m_position, m_size, m_story, false);
+		m_floor = Floor(glm::vec3(m_position.x, 0, m_position.y), m_size, m_story, false);
+		m_ceiling = Ceiling(glm::vec3(m_position.x, 0, m_position.y), m_size, m_story, false);
 
 		m_wallMesh.ClearMesh();
 

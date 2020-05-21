@@ -5,6 +5,7 @@
 #include "House/Floor.h"
 #include "House/Ceiling.h"
 #include "House/Staircase.h"
+#include "GL/LightVolume.h"
 
 namespace HellEngine
 {
@@ -20,6 +21,8 @@ namespace HellEngine
 		void BuildWallMesh();
 		void AddFloorTrim(glm::vec3 position, float rotation, float scale);
 		void AddCeilingTrim(glm::vec3 position, float rotation, float scale);
+		void CalculateWorldSpaceBounds();
+		void CalculateLightVolume();
 
 	public:	// fields
 		glm::vec2 m_position;
@@ -28,6 +31,7 @@ namespace HellEngine
 		WallMesh m_wallMesh;
 		Floor m_floor;
 		Ceiling m_ceiling;
+		LightVolume m_lightVolume;
 
 		std::vector<DoorWay> m_doorWaysFrontWall;
 		std::vector<DoorWay> m_doorWaysBackWall;
@@ -36,5 +40,7 @@ namespace HellEngine
 
 		std::vector<Transform> m_floorTrimTransforms;
 		std::vector<Transform> m_ceilingTrimTransforms;
+
+		float m_lowerX, m_upperX, m_lowerZ, m_upperZ;
 	};
 }

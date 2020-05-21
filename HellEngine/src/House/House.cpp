@@ -75,5 +75,28 @@ namespace HellEngine
 			room.BuildWallMesh();
 			room.m_wallMesh.BufferMeshToGL();
 		}
+
+		DetermineWhichLightIsInWhichRoom();
+	}
+
+	void House::DetermineWhichLightIsInWhichRoom() // note this does not consider rooms above rooms yet
+	{
+		// Reset IDs
+		for (Light& light : m_lights)
+			light.m_roomID = -1;
+
+		// Itereate through each room and check which lights are in.
+		// Store the ID of the room in that light, to be used for rendering light volumes in the stencil optimsiation pass.
+		for (int i = 0; i < m_rooms.size(); i++)
+		{
+			for (Light& light : m_lights)
+			{		
+				if (light.m_position.x > m_rooms[i].m_lowerX)
+					if (light.m_position.x < m_rooms[i].m_upperX)
+						if (light.m_position.z > m_rooms[i].m_lowerZ)
+							if (light.m_position.z < m_rooms[i].m_upperZ)
+								light.m_roomID = i;
+			}
+		}
 	}
 }

@@ -143,7 +143,7 @@ namespace HellEngine
 
 		// else use a margin
 
-		for (int i = 0; i < currentCharIndex; i++)
+		for (unsigned int i = 0; i < currentCharIndex; i++)
 		{
 			char character = textToBlit[i];
 			float totalWidth = textToBlit.find("_", lastLineBreakIndex) * w;

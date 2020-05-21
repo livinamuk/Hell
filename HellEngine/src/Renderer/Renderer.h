@@ -11,6 +11,7 @@
 #include "GL/ChromaticAbberationBuffer.h"
 #include "GL/CameraEnvMap.h"
 #include "TextBlitter.h"
+#include "House/Light.h"
 
 namespace HellEngine
 {
@@ -26,21 +27,23 @@ namespace HellEngine
 	private: // Functions
 		static void DrawScene(Game* game, Shader* shader, bool bindTextures, bool envMapPass);
 		static void GeometryPass(Game* game, Shader* shader);
-		static void LightingPass(Game* game, Shader* shader);
+		static void LightingPass(Game* game, Shader* stencilShader, Shader* lightingShader);
 		static void BlurPass(Shader* blurVerticalShader, Shader* blurHorizontalShader);
 		static void CompositePass(Game* game, Shader* shader);
 		static void ChromaticAberrationPass(Shader* shader);
 		static void FXAAPass(Shader* shader);
 		static void DOFPass(Shader* shader);
+
 		static void ShadowMapPass(Game* game, Shader* shader);
+
+		static void EnvMapPass(Game* game, Shader* envmapShader, Shader* sphericalHarmonicsShader);
+		static void RenderEnvMap(Game* game, Shader* shader, Light* light);
+		static void RenderSphericalHarmonicsTexture(Game* game, Shader* shader, Light* light);
 
 		static void RenderFinalImage(Shader* shader, unsigned int textureID);
 		static void RenderDebugTextures(Shader* shader, unsigned int texture0_ID, unsigned int texture1_ID, unsigned int texture2_ID, unsigned int texture3_ID);
 		static void BulletDebugDraw(Game* game, Shader* shader);
-		static void RenderReflectionMap(Game* game, Shader* shader);
 		static void ViewCubeMap(Game* , Shader* shader, unsigned int CubeMapID);
-		static void RenderSphericalHarmonicsTexture(Game* game, Shader* shader);
-		//static void RenderCameraEnvMap(Game* game, Shader* shader);
 		static void CreateBRDFLut();
 
 	public: // functions
@@ -51,6 +54,7 @@ namespace HellEngine
 		static Shader s_solidColorShader;
 		static Shader s_quadShader;
 		static Shader s_geometryShader;
+		static Shader s_StencilShader;
 		static Shader s_lightingShader;
 		static Shader s_compositeShader;
 		static Shader s_ShadowMapShader;

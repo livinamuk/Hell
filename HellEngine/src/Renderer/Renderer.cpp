@@ -26,7 +26,8 @@ namespace HellEngine
 	Shader Renderer::s_ChromaticAberrationShader;
 	Shader Renderer::s_ShadowMapShader;
 	Shader Renderer::s_FXAAShader;
-
+	Shader Renderer::s_StencilShader;
+	
 	RenderSettings Renderer::s_RenderSettings; 
 	Transform Renderer::s_DebugTransform;
 
@@ -66,6 +67,7 @@ namespace HellEngine
 		s_DOFShader = Shader("DOFShader", "DOF.vert", "DOF.frag", "NONE");
 		s_ChromaticAberrationShader = Shader("ChromaticAberration", "ChromaticAberration.vert", "ChromaticAberration.frag", "NONE");
 		s_FXAAShader = Shader("FXAAShader", "FXAA.vert", "FXAA.frag", "NONE");
+		s_StencilShader = Shader("StencilShader", "stencil.vert", "stencil.frag", "NONE");
 
 		// IBL
 		s_backgroundShader = Shader("Background", "background.vert", "background.frag", "NONE");
@@ -159,22 +161,30 @@ namespace HellEngine
 
 	void Renderer::RenderFrame(Game* game)
 	{
-		//RenderCameraEnvMap(game, &s_reflection_Map_Shader);
 
-		// IBL maps
-		//if (Input::s_keyDown[HELL_KEY_R]) 
+		EnvMapPass(game, &s_reflection_Map_Shader, &s_SphericalH_Harmonics_Shader);
+
+		/////////////////////////////////////////////
+		/// FIND OUT WHY IT'S NECCESSARY FOR EnvMapPass() TO HAVE TO RUN TWICE TO WORK.
+		static bool test = false;
+		if (test == false)
 		{
-			RenderReflectionMap(game, &s_reflection_Map_Shader);
-			RenderSphericalHarmonicsTexture(game, &s_SphericalH_Harmonics_Shader);
+			for (Light& light : game->house.m_lights)
+			{
+				light.m_LightProbe.m_needsEnvMapReRender = true;
+				light.m_LightProbe.m_needsSphericalHarmonicsReRender = true;
+			}
+			test = true;
 		}
+		EnvMapPass(game, &s_reflection_Map_Shader, &s_SphericalH_Harmonics_Shader);
+		////////////////////////////////////////////
 
 
-		// Main rendere pass
-		//if (Input::s_keyDown[HELL_KEY_P]) 
-			ShadowMapPass(game, &s_ShadowMapShader);
+
+		ShadowMapPass(game, &s_ShadowMapShader);
 
 		GeometryPass(game, &s_geometryShader);
-		LightingPass(game, &s_lightingShader);
+		LightingPass(game, &s_StencilShader, &s_lightingShader);
 		BlurPass(&s_blurVerticalShader, &s_blurHorizontalShader);
 		CompositePass(game, &s_compositeShader);
 		FXAAPass(&s_FXAAShader);
@@ -188,8 +198,8 @@ namespace HellEngine
 		else
 			RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gBuffer4);
 		//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
-		
-		
+
+
 		// Bullet Debug
 		if (m_showBulletDebug)
 			BulletDebugDraw(game, &s_solidColorShader);
@@ -201,14 +211,28 @@ namespace HellEngine
 		if (Input::s_keyDown[HELL_KEY_2]) {
 			ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[1].m_LightProbe.CubeMap_TexID);
 		}
+		if (Input::s_keyDown[HELL_KEY_3]) {
+			ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[2].m_LightProbe.CubeMap_TexID);
+		}
+		if (Input::s_keyDown[HELL_KEY_4]) {
+			ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[3].m_LightProbe.CubeMap_TexID);
+		}
 		// Show a cubemap
 	//	if (Input::s_keyDown[HELL_KEY_V]) {
 		//	ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[0].m_shadowMap.FboID);
 			//ViewCubeMap(game, &s_backgroundShader, s_CameraEnvMap.CubeMap_TexID);
 	//	}
-
+		if (Input::s_keyDown[HELL_KEY_4]) {
+			for (Light& light : game->house.m_lights)
+			{
+				light.m_LightProbe.m_needsEnvMapReRender = true; 
+				light.m_LightProbe.m_needsSphericalHarmonicsReRender = true;
+			}
+		}
 
 		TextBlitPlass(&s_quadShader);
+
+
 	}
 
 	void Renderer::ShadowMapPass(Game* game, Shader* shader)
@@ -243,6 +267,25 @@ namespace HellEngine
 		glPolygonOffset(0, 0);
 	}
 
+	void Renderer::EnvMapPass(Game* game, Shader* envMapShader, Shader* sphericalHarmonicsShader)
+	{
+		for (Light& light : game->house.m_lights)
+		{
+			if (light.m_LightProbe.m_needsEnvMapReRender) {
+				RenderEnvMap(game, envMapShader, &light);
+				light.m_LightProbe.m_needsEnvMapReRender = false;
+			}
+		}
+
+		for (Light& light : game->house.m_lights)
+		{
+			if (light.m_LightProbe.m_needsSphericalHarmonicsReRender) {
+				RenderSphericalHarmonicsTexture(game, sphericalHarmonicsShader, &light);
+				light.m_LightProbe.m_needsSphericalHarmonicsReRender = false;
+			}
+		}
+	}
+
 	void Renderer::GeometryPass(Game* game, Shader* shader)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
@@ -264,59 +307,77 @@ namespace HellEngine
 		DrawScene(game, shader, true, false);
 	}
 
-	void Renderer::LightingPass(Game* game, Shader* shader)
+	void Renderer::LightingPass(Game* game, Shader* stencilShader, Shader* lightingShader)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0); // to guarantee geo pass has finished... or is this bull shit and im crazy.
+		// Clear lighting buffer
 		glBindFramebuffer(GL_FRAMEBUFFER, s_LightingBuffer.ID);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		glUseProgram(shader->ID);
-		glDisable(GL_DEPTH_TEST);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gAlbedo);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gNormal);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gRMA);
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, s_gBuffer.rboDepth);
-		//glActiveTexture(GL_TEXTURE4);
-		//glBindTexture(GL_TEXTURE_CUBE_MAP, s_LightProbe.CubeMap_TexID);
-		//glBindTexture(GL_TEXTURE_CUBE_MAP, game->house.m_lights[0].m_shadowMap.DepthCubeMapID); 
-		//glBindTexture(GL_TEXTURE_CUBE_MAP, s_CameraEnvMap.CubeMap_TexID);
-		glActiveTexture(GL_TEXTURE6);
-		glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
-	//	glActiveTexture(GL_TEXTURE7);
-		//glBindTexture(GL_TEXTURE_CUBE_MAP, game->house.m_lights[0].m_shadowMap.DepthCubeMapID);
-				
-		s_lightingShader.setMat4("inverseProjectionMatrix", glm::inverse(game->camera.m_projectionMatrix));
-		s_lightingShader.setMat4("inverseViewMatrix", glm::inverse(game->camera.m_viewMatrix));
-		s_lightingShader.setMat4("viewMatrix", game->camera.m_viewMatrix);
-		s_lightingShader.setFloat("screenWidth", CoreGL::s_windowWidth);
-		s_lightingShader.setFloat("screenHeight", CoreGL::s_windowHeight);
-		s_lightingShader.setFloat("far_plane", FAR_PLANE);
-
-		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE); // additive blending for multiple lights. you always forget how to do this.
 
 		for (Light light : game->house.m_lights)
 		{
+			/*
+			// Stencil Buffer optimisation
+			glm::mat4 MVP = game->camera.m_projectionMatrix * game->camera.m_viewMatrix;
+			stencilShader->use();
+			stencilShader->setMat4("gWVP", MVP);
+			glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+			glDrawBuffer(GL_NONE);
+			glEnable(GL_STENCIL_TEST);
+			glEnable(GL_DEPTH_TEST);
+			glDisable(GL_CULL_FACE);
+			glClear(GL_STENCIL_BUFFER_BIT);
+			glStencilFunc(GL_ALWAYS, 0, 0);
+			glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+			glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+			
+			if (light.m_roomID != -1)
+				game->house.m_rooms[light.m_roomID].Draw(stencilShader);
+			*/
+
+			// Lighting from here on
+			glBindFramebuffer(GL_FRAMEBUFFER, s_LightingBuffer.ID);
+			unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+			
+			glUseProgram(lightingShader->ID);
+			glEnable(GL_DEPTH_TEST);
+			glDisable(GL_CULL_FACE);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, s_gBuffer.gAlbedo);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, s_gBuffer.gNormal);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, s_gBuffer.gRMA);
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, s_gBuffer.rboDepth);
+			glActiveTexture(GL_TEXTURE6);
+			glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
+
+
+			lightingShader->setMat4("inverseProjectionMatrix", glm::inverse(game->camera.m_projectionMatrix));
+			lightingShader->setMat4("inverseViewMatrix", glm::inverse(game->camera.m_viewMatrix));
+			lightingShader->setMat4("viewMatrix", game->camera.m_viewMatrix);
+			lightingShader->setFloat("screenWidth", CoreGL::s_windowWidth);
+			lightingShader->setFloat("screenHeight", CoreGL::s_windowHeight);
+			lightingShader->setFloat("far_plane", FAR_PLANE);
+
+			glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE); // additive blending for multiple lights. you always forget how to do this.
+
 			glActiveTexture(GL_TEXTURE4);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, light.m_shadowMap.DepthCubeMapID);
 			glActiveTexture(GL_TEXTURE5);
 			glBindTexture(GL_TEXTURE_2D, light.m_LightProbe.SH_TexID);
 			
-			s_lightingShader.setVec3("lightPosition", light.m_position);
-			s_lightingShader.setFloat("lightAttenuationConstant", light.m_radius);
-//			s_lightingShader.setFloat("lightAttenuationLinear", light.m_attenuationLinear);
-			s_lightingShader.setFloat("lightAttenuationExp", light.m_magic);
-			s_lightingShader.setFloat("lightStrength", light.m_strength);
-			s_lightingShader.setVec3("lightColor", light.m_color);
-			Quad2D::RenderQuad(shader);
+			lightingShader->setVec3("lightPosition", light.m_position);
+			lightingShader->setFloat("lightAttenuationConstant", light.m_radius);
+			lightingShader->setFloat("lightAttenuationExp", light.m_magic);
+			lightingShader->setFloat("lightStrength", light.m_strength);
+			lightingShader->setVec3("lightColor", light.m_color);
+			Quad2D::RenderQuad(lightingShader);
 		}
 		glDisable(GL_BLEND);
+		glDisable(GL_STENCIL_TEST);
 	}
 
 	void Renderer::BlurPass(Shader* blurVerticalShader, Shader* blurHorizontalShader)
@@ -504,7 +565,7 @@ namespace HellEngine
 		glEnable(GL_DEPTH_TEST);
 	}
 	
-	void Renderer::RenderReflectionMap(Game* game, Shader* shader)
+	void Renderer::RenderEnvMap(Game* game, Shader* shader, Light* light)
 	{
 		glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 		glm::mat4 captureViews[] =
@@ -518,38 +579,36 @@ namespace HellEngine
 		};
 		Transform viewPosTransform;
 
-		for (Light light : game->house.m_lights)
-		{
+
 			shader->use();
 			shader->setInt("equirectangularMap", 0);
 			shader->setMat4("projection", captureProjection);
-			shader->setVec3("lightPosition", light.m_position);
-			shader->setFloat("lightAttenuationConstant", light.m_radius);
-			shader->setFloat("lightAttenuationExp", light.m_magic);
-			shader->setFloat("lightStrength", light.m_strength);
-			shader->setVec3("lightColor", light.m_color);
+			shader->setVec3("lightPosition", light->m_position);
+			shader->setFloat("lightAttenuationConstant", light->m_radius);
+			shader->setFloat("lightAttenuationExp", light->m_magic);
+			shader->setFloat("lightStrength", light->m_strength);
+			shader->setVec3("lightColor", light->m_color);
 			shader->setVec3("viewPos", game->camera.m_viewPos);
 
-			glViewport(0, 0, light.m_LightProbe.width, light.m_LightProbe.height);
-			glBindFramebuffer(GL_FRAMEBUFFER, light.m_LightProbe.CubeMap_FBO);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, light.m_LightProbe.CubeMap_TexID);
+			glViewport(0, 0, light->m_LightProbe.width, light->m_LightProbe.height);
+			glBindFramebuffer(GL_FRAMEBUFFER, light->m_LightProbe.CubeMap_FBO);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, light->m_LightProbe.CubeMap_TexID);
 			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 			glClear(GL_DEPTH_BUFFER_BIT);
 
 			glEnable(GL_DEPTH_TEST);
 
 			for (unsigned int i = 0; i < 6; ++i)
-				shader->setMat4("captureViewMatrix[" + std::to_string(i) + "]", captureProjection * captureViews[i] * glm::inverse(Transform(light.m_position).to_mat4()));
+				shader->setMat4("captureViewMatrix[" + std::to_string(i) + "]", captureProjection * captureViews[i] * glm::inverse(Transform(light->m_position).to_mat4()));
 
 			s_RenderSettings.BindMaterials = true;
 			s_RenderSettings.DrawWeapon = false;
 			s_RenderSettings.DrawLightBulbs = false;
 
 			DrawScene(game, shader, true, true);
-		}
+		
 		
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void Renderer::RenderDebugTextures(Shader* shader, unsigned int texture0_ID, unsigned int texture1_ID, unsigned int texture2_ID, unsigned int texture3_ID)
@@ -599,7 +658,6 @@ namespace HellEngine
 		{
 			Transform trans;
 			trans.position = glm::vec3(1.5f, 0, 7);
-			//trans.position = s_DebugTransform.position;
 			trans.rotation = glm::vec3(HELL_PI * 0.5f, HELL_PI, 0);
 			trans.scale = glm::vec3(0.03f);
 			shader->setMat4("model", trans.to_mat4());
@@ -612,6 +670,23 @@ namespace HellEngine
 			shader->setInt("hasAnimation", false);
 		}
 
+		/////////////////////////////////////////////////////////////////////
+		// Srinivas Mesh
+		{
+			Transform trans;
+			trans.position = glm::vec3(0, 1, 0);
+			trans.scale = glm::vec3(0.03f);
+			shader->setMat4("model", trans.to_mat4());
+						
+			for (unsigned int i = 0; i < game->m_srinivasdAnimatedTransforms.size(); i++)
+				shader->setMat4("skinningMats[" + std::to_string(i) + "]", glm::transpose(game->m_srinivasdAnimatedTransforms[i]));
+
+			AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shotgun"));
+			shader->setInt("hasAnimation", true);
+			game->m_srinivasMesh.Render();
+			shader->setInt("hasAnimation", false);
+		}
+		/////////////////////////////////////////////////////////////////////
 
 		if (s_RenderSettings.DrawWeapon)
 		{
@@ -671,17 +746,14 @@ namespace HellEngine
 		cube.Draw(shader);
 		glCullFace(GL_BACK);
 	}
-	void Renderer::RenderSphericalHarmonicsTexture(Game* game, Shader* shader)
+	void Renderer::RenderSphericalHarmonicsTexture(Game* game, Shader* shader, Light* light)
 	{
-		for (Light& light : game->house.m_lights)
-		{
-			glViewport(0, 0, 3, 3);
-			glBindFramebuffer(GL_FRAMEBUFFER, light.m_LightProbe.SH_FboID);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glUseProgram(shader->ID);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, light.m_LightProbe.CubeMap_TexID);
-			Quad2D::RenderQuad(shader);
-		}
+		glViewport(0, 0, 3, 3);
+		glBindFramebuffer(GL_FRAMEBUFFER, light->m_LightProbe.SH_FboID);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(shader->ID);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, light->m_LightProbe.CubeMap_TexID);
+		Quad2D::RenderQuad(shader);
 	}
 }

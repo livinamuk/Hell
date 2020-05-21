@@ -19,6 +19,7 @@ namespace HellEngine
 		float m_magic = 4;
 		float m_strength = 10.00f;
 		glm::vec3 m_color = glm::vec3(1, 0.7799999713897705, 0.5289999842643738);
+		int m_roomID = -1;
 
 		ShadowMap m_shadowMap;
 		LightProbe m_LightProbe;

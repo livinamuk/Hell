@@ -30,7 +30,10 @@ namespace HellEngine
 		m_doorWaysRightWall.clear();
 
 		m_floorTrimTransforms.clear();
-		m_ceilingTrimTransforms.clear(); 
+		m_ceilingTrimTransforms.clear();
+
+		CalculateWorldSpaceBounds();
+		CalculateLightVolume();
 	}
 
 	bool sameCoordinate(float a, float b)
@@ -270,4 +273,71 @@ namespace HellEngine
 		}
 	}*/
 
+	void Room::CalculateWorldSpaceBounds()
+	{
+		m_lowerX = m_position.x - (m_size.x / 2);
+		m_lowerZ = m_position.y - (m_size.y / 2);
+		m_upperX = m_position.x + (m_size.x / 2);
+		m_upperZ = m_position.y + (m_size.y / 2);
+	}
+
+	void Room::CalculateLightVolume()
+	{
+		float bias = 0;
+		m_lightVolume.vertices.clear();
+		
+		// Create vertices
+		glm::vec3 A1 = glm::vec3(m_lowerX - bias, -bias, m_lowerZ - bias);
+		glm::vec3 B1 = glm::vec3(m_upperX + bias, -bias, m_lowerZ - bias);
+		glm::vec3 C1 = glm::vec3(m_lowerX - bias, -bias, m_upperZ + bias);
+		glm::vec3 D1 = glm::vec3(m_upperX + bias, -bias, m_upperZ + bias);
+		glm::vec3 A2 = glm::vec3(m_lowerX - bias, 2.4f + bias, m_lowerZ - bias);
+		glm::vec3 B2 = glm::vec3(m_upperX + bias, 2.4f + bias, m_lowerZ - bias);
+		glm::vec3 C2 = glm::vec3(m_lowerX - bias, 2.4f + bias, m_upperZ + bias);
+		glm::vec3 D2 = glm::vec3(m_upperX + bias, 2.4f + bias, m_upperZ + bias);
+
+		// Floor
+		m_lightVolume.vertices.push_back(A1);
+		m_lightVolume.vertices.push_back(B1);
+		m_lightVolume.vertices.push_back(C1);
+		m_lightVolume.vertices.push_back(D1);
+		m_lightVolume.vertices.push_back(C1);
+		m_lightVolume.vertices.push_back(B1);
+		// Ceiling
+		m_lightVolume.vertices.push_back(C2);
+		m_lightVolume.vertices.push_back(B2);
+		m_lightVolume.vertices.push_back(A2);
+		m_lightVolume.vertices.push_back(B2);
+		m_lightVolume.vertices.push_back(C2);
+		m_lightVolume.vertices.push_back(D2);
+		// Side wall
+		m_lightVolume.vertices.push_back(C1);
+		m_lightVolume.vertices.push_back(A2);
+		m_lightVolume.vertices.push_back(A1);
+		m_lightVolume.vertices.push_back(C2);
+		m_lightVolume.vertices.push_back(A2);
+		m_lightVolume.vertices.push_back(C1);
+		// Side wall the other one
+		m_lightVolume.vertices.push_back(B1);
+		m_lightVolume.vertices.push_back(B2);
+		m_lightVolume.vertices.push_back(D1);
+		m_lightVolume.vertices.push_back(D1);
+		m_lightVolume.vertices.push_back(B2);
+		m_lightVolume.vertices.push_back(D2);
+		// Front wall
+		m_lightVolume.vertices.push_back(A1);
+		m_lightVolume.vertices.push_back(B2);
+		m_lightVolume.vertices.push_back(B1);
+		m_lightVolume.vertices.push_back(A1);
+		m_lightVolume.vertices.push_back(A2);
+		m_lightVolume.vertices.push_back(B2);
+		// Back wall
+		m_lightVolume.vertices.push_back(D1);
+		m_lightVolume.vertices.push_back(D2);
+		m_lightVolume.vertices.push_back(C1);
+		m_lightVolume.vertices.push_back(D2);
+		m_lightVolume.vertices.push_back(C2);
+		m_lightVolume.vertices.push_back(C1);
+		m_lightVolume.Setup();
+	}
 }

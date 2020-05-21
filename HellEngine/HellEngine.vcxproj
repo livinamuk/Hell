@@ -161,11 +161,11 @@
     <ClInclude Include="src\GL\DOFBuffer.h" />
     <ClInclude Include="src\GL\EnvCubeMap.h" />
     <ClInclude Include="src\GL\FXAABuffer.h" />
-    <ClInclude Include="src\GL\FinalImageBuffer - Copy.h" />
     <ClInclude Include="src\GL\FinalImageBuffer.h" />
     <ClInclude Include="src\GL\GBuffer.h" />
     <ClInclude Include="src\GL\LightProbe.h" />
     <ClInclude Include="src\GL\LightingBuffer.h" />
+    <ClInclude Include="src\GL\LightVolume.h" />
     <ClInclude Include="src\GL\Quad2D.h" />
     <ClInclude Include="src\GL\ShadowMap.h" />
     <ClInclude Include="src\Game.h" />
@@ -609,6 +609,7 @@
     <ClCompile Include="src\GL\GBuffer.cpp" />
     <ClCompile Include="src\GL\LightProbe.cpp" />
     <ClCompile Include="src\GL\LightingBuffer.cpp" />
+    <ClCompile Include="src\GL\LightVolume.cpp" />
     <ClCompile Include="src\GL\Quad2D.cpp" />
     <ClCompile Include="src\GL\ShadowMap.cpp" />
     <ClCompile Include="src\Game.cpp" />

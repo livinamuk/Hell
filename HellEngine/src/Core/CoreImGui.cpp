@@ -183,6 +183,11 @@ namespace HellEngine
 					game->house.m_rooms.push_back(Room(glm::vec2(0, 0), glm::vec2(4, 4), 0));
 					game->RebuildMap();
 				}
+				ImGui::Text("Pos X, Z:  %.3f %.3f", game->house.m_rooms[i].m_position.x, game->house.m_rooms[i].m_position.y);
+				ImGui::Text("Size X, Z: %.3f %.3f", game->house.m_rooms[i].m_size.x, game->house.m_rooms[i].m_size.y);
+				ImGui::Text("Lower X, Lower Z: %.3f %.3f", game->house.m_rooms[i].m_lowerX, game->house.m_rooms[i].m_lowerZ);
+				ImGui::Text("Upper X, Upper Z: %.3f %.3f", game->house.m_rooms[i].m_upperX, game->house.m_rooms[i].m_upperZ);
+
 				ImGui::Text(" ");
 				ImGui::EndTabItem();
 			}
@@ -205,6 +210,7 @@ namespace HellEngine
 				ImGui::InputFloat("Magic    ", &game->house.m_lights[i].m_magic, 0.1f, 1.0f, "%0.5f");
 				ImGui::InputFloat("Strength ", &game->house.m_lights[i].m_strength, 0.1f, 1.0f, "%0.5f");
 				ImGui::ColorEdit3("Color", glm::value_ptr(game->house.m_lights[i].m_color));
+				ImGui::Text("RoomID: %d", game->house.m_lights[i].m_roomID);
 
 				if (ImGui::Button("Delete Light")) {
 					game->house.m_lights.erase(game->house.m_lights.begin() + i);

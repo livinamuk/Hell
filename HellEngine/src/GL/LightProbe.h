@@ -19,5 +19,7 @@ namespace HellEngine
 		unsigned int SH_FboID = 0;
 		unsigned int SH_TexID = 0; 
 		unsigned int depthCubemap;
+		bool m_needsEnvMapReRender = true;
+		bool m_needsSphericalHarmonicsReRender = true;
 	};
 }

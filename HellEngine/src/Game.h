@@ -36,8 +36,12 @@ namespace HellEngine
 		Player m_player;
 		Entity m_HUDshotgun;
 		Transform testTrans; 
+
 		SkinnedMesh m_skinnedMesh;
+		SkinnedMesh m_srinivasMesh;
+
 		std::vector<glm::mat4> m_animatedTransforms;
+		std::vector<glm::mat4> m_srinivasdAnimatedTransforms; 
 
 		static bool s_dontLoadShotgun;
 

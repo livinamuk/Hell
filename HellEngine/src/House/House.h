@@ -20,6 +20,7 @@ namespace HellEngine
 		void BuildWallMeshes();
 		void RebuildAll();
 		void Draw(Shader* shader, bool envMapPass);
+		void DetermineWhichLightIsInWhichRoom();
 		
 
 	public:	// fields

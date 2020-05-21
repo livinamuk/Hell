@@ -22,11 +22,11 @@ namespace HellEngine
 		m_name = "UNKNOWN";
 		
 		// Variance
-		float offset = (variance * 0.5) - Util::RandomFloat(0, variance);
+		float offset = (variance * 0.5f) - Util::RandomFloat(0, variance);
 		rayDirection.x += offset;
-		offset = (variance * 0.5) - Util::RandomFloat(0, variance);
+		offset = (variance * 0.5f) - Util::RandomFloat(0, variance);
 		rayDirection.y += offset;
-		offset = (variance * 0.5) - Util::RandomFloat(0, variance);
+		offset = (variance * 0.5f) - Util::RandomFloat(0, variance);
 		rayDirection.z += offset;
 		rayDirection = glm::normalize(rayDirection);
 

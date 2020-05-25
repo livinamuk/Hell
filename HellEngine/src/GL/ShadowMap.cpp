@@ -3,7 +3,7 @@
 
 namespace HellEngine
 {
-	unsigned int ShadowMap::SHADOW_MAP_SIZE = 512;
+	unsigned int ShadowMap::SHADOW_MAP_SIZE = 1024;
 
 	ShadowMap::ShadowMap()
 	{

@@ -45,11 +45,15 @@ namespace HellEngine
 
 		m_HUDshotgun = Entity();
 
-		house = File::LoadMap("Map.txt");
-
 		Physics::Init();
 
+		//this->RebuildMap();
+
+		this->house = File::LoadMap("Map.txt");
 		this->RebuildMap();
+
+
+
 	}
 
 	void Game::OnUpdate()

@@ -84,7 +84,7 @@
                 0.0
             ],
             "Story": 0,
-            "Axis": "POS_Z",
+            "Axis": "NEG_Z",
             "RotateFloorTexture": true
         }
     ],
@@ -208,36 +208,6 @@
             "Radius": 11.0,
             "Strength": 10.0,
             "Magic": 4.0
-        },
-        {
-            "Position": [
-                0.0,
-                2.200000047683716,
-                -1.0
-            ],
-            "ModelPosition": [
-                0.0,
-                0.24500000476837159,
-                0.0
-            ],
-            "ModelRotation": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "ModelScale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "Color": [
-                0.9852941036224365,
-                0.7689849138259888,
-                0.5071367025375366
-            ],
-            "Radius": 5.0,
-            "Strength": 10.0,
-            "Magic": 5.0
         }
     ],
     "STAIRCASES": [

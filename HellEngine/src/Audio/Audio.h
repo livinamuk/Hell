@@ -16,6 +16,7 @@ namespace HellEngine
 		static void Init();
 		static void LoadAudio(const char* name);
 		static void PlayAudio(const char* name, float volume = 1.0f);
+		static void LoopAudio(const char* name, float volume = 1.0f);
 		static void Terminate();
 	
 	public: // variables

@@ -8,6 +8,8 @@
 #include "Renderer/Renderer.h"
 #include "Audio/Audio.h"
 
+#include "Core/File.h"
+
 using namespace HellEngine;
 
 
@@ -21,6 +23,9 @@ int main()
 	AssetManager::FindAllFiles();
 	AssetManager::ForceLoadTexture("CharSheet");
 	Audio::Init();
+	
+	//Audio::LoopAudio("Music.wav");
+	//CoreGL::ToggleFullScreen();
 
 	// Loading loop	
 	while (!AssetManager::s_loadingComplete && !Input::s_keyDown[HELL_KEY_ESCAPE])
@@ -52,15 +57,23 @@ int main()
 		AssetManager::LoadNextReadyAssetToGL();
 	}
 
+
+
 	// Main game loop
 	while (CoreGL::IsRunning() && !Input::s_keyDown[HELL_KEY_ESCAPE])
 	{
+
+	//	game.house = File::LoadMap("Map.txt");
+	//	game.RebuildMap();
+
 		AssetManager::LoadNextReadyAssetToGL();
 		CoreGL::ProcessInput();
 		CoreGL::OnUpdate();
 		
 		game.OnUpdate();
 		game.OnRender();
+
+
 
 		if (Renderer::m_showImGui)
 			CoreImGui::Render(&game);
@@ -81,6 +94,7 @@ int main()
 		m.Deduct(300);
 		m.Deduct(-50);
 		m.Deduct(600);
+		m.Deduct(-1100);
 
 		Opp c = Opp(2400);
 		c.Deduct(300);

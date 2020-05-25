@@ -28,5 +28,6 @@ namespace HellEngine
 		m_shadowMap.Init();
 		m_shadowMap.CalculateProjectionTransforms(m_position);
 		m_LightProbe.Init();
+		std::cout << "INIT LIGHT\n";
 	}
 }

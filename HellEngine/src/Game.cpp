@@ -10,7 +10,7 @@
 
 namespace HellEngine
 {
-	bool Game::s_dontLoadShotgun = false;
+	bool Game::s_dontLoadShotgun = true;
 
 	Game::Game()
 	{
@@ -31,11 +31,16 @@ namespace HellEngine
 		if (!m_skinnedMesh.LoadMesh("res/models/boblampclean.md5mesh"))
 			printf("Mesh load failed\n");
 		
-		if (!m_srinivasMesh.LoadMesh("res/models/Shotgun.FBX"))
+		if (!m_assimpRootModel.LoadMesh("res/models/Shotgun.FBX"))
 			printf("Shotgun.FBX mesh load failed\n");
+		else {
+			if(!m_assimpRootModel.LoadAnimation("res/models/Shotgun_Fire.FBX")) 
+			{
+				printf("Shotgun_Fire.FBX mesh load failed\n");
+			}
+		}
 		
 		///////////////////////////////////
-
 
 		m_shotgunTransform.scale = glm::vec3(0.2);
 
@@ -129,10 +134,11 @@ namespace HellEngine
 		// Animated assimp model
 		static float ANIMATION_TIME = 0;
 		ANIMATION_TIME += deltaTime;
-		m_skinnedMesh.BoneTransform(ANIMATION_TIME, m_animatedTransforms);		
+		//m_skinnedMesh.BoneTransform(ANIMATION_TIME, m_animatedTransforms);		
 
 		// Animated assimp model
-		m_srinivasMesh.BoneTransform(ANIMATION_TIME, m_srinivasdAnimatedTransforms);
+		m_assimpRootModel.BoneTransform(ANIMATION_TIME, m_srinivasdAnimatedTransforms);
+
 	}
 
 	void Game::OnRender()

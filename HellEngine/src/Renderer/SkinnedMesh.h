@@ -128,6 +128,8 @@ namespace HellEngine
         glm::mat4 m_GlobalInverseTransform;
 
         const aiScene* m_pScene;
+        const aiScene* m_pAnimationScene;
         Assimp::Importer m_Importer;
+        Assimp::Importer m_AnimationImporter;
     };
 }

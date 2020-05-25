@@ -683,7 +683,7 @@ namespace HellEngine
 
 			AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shotgun"));
 			shader->setInt("hasAnimation", true);
-			game->m_srinivasMesh.Render();
+			game->m_assimpRootModel.Render();
 			shader->setInt("hasAnimation", false);
 		}
 		/////////////////////////////////////////////////////////////////////

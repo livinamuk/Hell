@@ -76,7 +76,9 @@ namespace HellEngine
 
         bool Ret = false;
 
-        m_pScene = m_Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+        const aiScene* tempScene = m_Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+        //Getting corrupted later. So deep copying now.
+        m_pScene = new aiScene(*tempScene);
 
         if (m_pScene) {
             m_GlobalInverseTransform = Util::aiMatrix4x4ToGlm(m_pScene->mRootNode->mTransformation);
@@ -93,26 +95,127 @@ namespace HellEngine
         return Ret;
     }
 
+	bool SkinnedMesh::InitFromScene(const aiScene* pScene, const string& Filename)
+	{
+		m_Entries.resize(pScene->mNumMeshes);
+
+		std::cout << "MESH COUNT: " << pScene->mNumMeshes << "\n";
+
+		vector<glm::vec3> Positions;
+		vector<glm::vec3> Normals;
+		vector<glm::vec2> TexCoords;
+		vector<VertexBoneData> Bones;
+		vector<unsigned int> Indices;
+
+		unsigned int NumVertices = 0;
+		unsigned int NumIndices = 0;
+
+		// Count the number of vertices and indices
+		for (unsigned int i = 0; i < m_Entries.size(); i++) {
+			m_Entries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
+			m_Entries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
+			m_Entries[i].BaseVertex = NumVertices;
+			m_Entries[i].BaseIndex = NumIndices;
+
+			NumVertices += pScene->mMeshes[i]->mNumVertices;
+			NumIndices += m_Entries[i].NumIndices;
+		}
+
+		// Reserve space in the vectors for the vertex attributes and indices
+		Positions.reserve(NumVertices);
+		Normals.reserve(NumVertices);
+		TexCoords.reserve(NumVertices);
+		Bones.resize(NumVertices);
+		Indices.reserve(NumIndices);
+
+		// Initialize the meshes in the scene one by one
+		for (unsigned int i = 0; i < m_Entries.size(); i++) {
+			const aiMesh* paiMesh = pScene->mMeshes[i];
+			InitMesh(i, paiMesh, Positions, Normals, TexCoords, Bones, Indices);
+		}
+
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(POSITION_LOCATION);
+		glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(NORMAL_LOCATION);
+		glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(TEX_COORD_LOCATION);
+		glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TANGENT_VB]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(TANGENT_LOCATION);
+		glVertexAttribPointer(TANGENT_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[BITANGENT_VB]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(BITANGENT_LOCATION);
+		glVertexAttribPointer(BITANGENT_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[BONE_VB]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Bones[0]) * Bones.size(), &Bones[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(BONE_ID_LOCATION);
+		glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
+		glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
+		glVertexAttribPointer(BONE_WEIGHT_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
+
+		std::cout << "INDICES.size: " << Indices.size() << "\n";
+
+		return true;
+	}
+
+	void SkinnedMesh::InitMesh(unsigned int MeshIndex,
+		const aiMesh* paiMesh,
+		vector<glm::vec3>& Positions,
+		vector<glm::vec3>& Normals,
+		vector<glm::vec2>& TexCoords,
+		vector<VertexBoneData>& Bones,
+		vector<unsigned int>& Indices)
+	{
+		const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+
+		// Populate the vertex attribute vectors
+		for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
+			const aiVector3D* pPos = &(paiMesh->mVertices[i]);
+			const aiVector3D* pNormal = &(paiMesh->mNormals[i]);
+			const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][i]) : &Zero3D;
+
+			Positions.push_back(glm::vec3(pPos->x, pPos->y, pPos->z));
+			Normals.push_back(glm::vec3(pNormal->x, pNormal->y, pNormal->z));
+			TexCoords.push_back(glm::vec2(pTexCoord->x, pTexCoord->y));
+		}
+
+		LoadBones(MeshIndex, paiMesh, Bones);
+
+		// Populate the index buffer
+		for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
+			const aiFace& Face = paiMesh->mFaces[i];
+			assert(Face.mNumIndices == 3);
+			Indices.push_back(Face.mIndices[0]);
+			Indices.push_back(Face.mIndices[1]);
+			Indices.push_back(Face.mIndices[2]);
+		}
+	}
+
     bool SkinnedMesh::LoadAnimation(const string& Filename)
     {
-        // Release the previously loaded mesh (if it exists)
-        Clear();
-
-        // Create the VAO
-        glGenVertexArrays(1, &m_VAO);
-        glBindVertexArray(m_VAO);
-
-        // Create the buffers for the vertices attributes
-        glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
-
         bool Ret = false;
 
-        m_pScene = m_Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+        const aiScene* tempAnimScene = m_AnimationImporter.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+        m_pAnimationScene = new aiScene(*tempAnimScene);
 
-        if (m_pScene) {
-            m_GlobalInverseTransform = Util::aiMatrix4x4ToGlm(m_pScene->mRootNode->mTransformation);
-            m_GlobalInverseTransform = glm::inverse(m_GlobalInverseTransform);
-        //    Ret = InitFromScene(m_pScene, Filename);
+        if (m_pAnimationScene) {
             Ret = true;
             std::cout << "NO SCENE\n";
         }
@@ -120,130 +223,7 @@ namespace HellEngine
             printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_Importer.GetErrorString());
         }
 
-        // Make sure the VAO is not changed from the outside
-        glBindVertexArray(0);
-
         return Ret;
-    }
-
-
-    bool SkinnedMesh::InitFromScene(const aiScene* pScene, const string& Filename)
-    {
-        m_Entries.resize(pScene->mNumMeshes);
-
-        std::cout << "MESH COUNT: " << pScene->mNumMeshes << "\n";
-
-        vector<glm::vec3> Positions;
-        vector<glm::vec3> Normals;
-        vector<glm::vec2> TexCoords;
-        vector<VertexBoneData> Bones;
-        vector<unsigned int> Indices;
-
-        unsigned int NumVertices = 0;
-        unsigned int NumIndices = 0;
-
-        // Count the number of vertices and indices
-        for (unsigned int i = 0; i < m_Entries.size(); i++) {
-            m_Entries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
-            m_Entries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
-            m_Entries[i].BaseVertex = NumVertices;
-            m_Entries[i].BaseIndex = NumIndices;
-
-            NumVertices += pScene->mMeshes[i]->mNumVertices;
-            NumIndices += m_Entries[i].NumIndices;
-        }
-
-        // Reserve space in the vectors for the vertex attributes and indices
-        Positions.reserve(NumVertices);
-        Normals.reserve(NumVertices);
-        TexCoords.reserve(NumVertices);
-        Bones.resize(NumVertices);
-        Indices.reserve(NumIndices);
-
-        // Initialize the meshes in the scene one by one
-        for (unsigned int i = 0; i < m_Entries.size(); i++) {
-            const aiMesh* paiMesh = pScene->mMeshes[i];
-            InitMesh(i, paiMesh, Positions, Normals, TexCoords, Bones, Indices);
-        }
-
-
-
-       // if (!InitMaterials(pScene, Filename)) {
-       ///     return false;
-      //  }
-
-        glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
-        glEnableVertexAttribArray(POSITION_LOCATION);
-        glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
-        glEnableVertexAttribArray(NORMAL_LOCATION);
-        glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], GL_STATIC_DRAW);
-        glEnableVertexAttribArray(TEX_COORD_LOCATION);
-        glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TANGENT_VB]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
-        glEnableVertexAttribArray(TANGENT_LOCATION);
-        glVertexAttribPointer(TANGENT_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[BITANGENT_VB]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
-        glEnableVertexAttribArray(BITANGENT_LOCATION);
-        glVertexAttribPointer(BITANGENT_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[BONE_VB]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Bones[0]) * Bones.size(), &Bones[0], GL_STATIC_DRAW);
-        glEnableVertexAttribArray(BONE_ID_LOCATION);
-        glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
-        glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
-        glVertexAttribPointer(BONE_WEIGHT_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
-
-        std::cout << "INDICES.size: " << Indices.size() << "\n";
-
-        return true;
-    }
-
-
-    void SkinnedMesh::InitMesh(unsigned int MeshIndex,
-        const aiMesh* paiMesh,
-        vector<glm::vec3>& Positions,
-        vector<glm::vec3>& Normals,
-        vector<glm::vec2>& TexCoords,
-        vector<VertexBoneData>& Bones,
-        vector<unsigned int>& Indices)
-    {
-        const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
-
-        // Populate the vertex attribute vectors
-        for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
-            const aiVector3D* pPos = &(paiMesh->mVertices[i]);
-            const aiVector3D* pNormal = &(paiMesh->mNormals[i]);
-            const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][i]) : &Zero3D;
-
-            Positions.push_back(glm::vec3(pPos->x, pPos->y, pPos->z));
-            Normals.push_back(glm::vec3(pNormal->x, pNormal->y, pNormal->z));
-            TexCoords.push_back(glm::vec2(pTexCoord->x, pTexCoord->y));
-        }
-
-        LoadBones(MeshIndex, paiMesh, Bones);
-
-        // Populate the index buffer
-        for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
-            const aiFace& Face = paiMesh->mFaces[i];
-            assert(Face.mNumIndices == 3);
-            Indices.push_back(Face.mIndices[0]);
-            Indices.push_back(Face.mIndices[1]);
-            Indices.push_back(Face.mIndices[2]);
-        }
     }
 
 
@@ -365,7 +345,7 @@ namespace HellEngine
         //assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
         float DeltaTime = (float)(pNodeAnim->mPositionKeys[NextPositionIndex].mTime - pNodeAnim->mPositionKeys[PositionIndex].mTime);
         float Factor = (AnimationTime - (float)pNodeAnim->mPositionKeys[PositionIndex].mTime) / DeltaTime;
-        assert(Factor >= 0.0f && Factor <= 1.0f);
+        //assert(Factor >= 0.0f && Factor <= 1.0f);
         const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
         const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
         aiVector3D Delta = End - Start;
@@ -386,7 +366,7 @@ namespace HellEngine
         //assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
         float DeltaTime = (float)(pNodeAnim->mRotationKeys[NextRotationIndex].mTime - pNodeAnim->mRotationKeys[RotationIndex].mTime);
         float Factor = (AnimationTime - (float)pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;
-        assert(Factor >= 0.0f && Factor <= 1.0f);
+        //assert(Factor >= 0.0f && Factor <= 1.0f);
         const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
         const aiQuaternion& EndRotationQ = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
         aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
@@ -406,7 +386,7 @@ namespace HellEngine
         //assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
         float DeltaTime = (float)(pNodeAnim->mScalingKeys[NextScalingIndex].mTime - pNodeAnim->mScalingKeys[ScalingIndex].mTime);
         float Factor = (AnimationTime - (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime) / DeltaTime;
-        assert(Factor >= 0.0f && Factor <= 1.0f);
+        //assert(Factor >= 0.0f && Factor <= 1.0f);
         const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
         const aiVector3D& End = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
         aiVector3D Delta = End - Start;
@@ -417,8 +397,8 @@ namespace HellEngine
     void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
     {
         string NodeName(pNode->mName.data);
-
-        const aiAnimation* pAnimation = m_pScene->mAnimations[0];
+        
+        const aiAnimation* pAnimation = m_pAnimationScene->mAnimations[0];
 
        // glm::mat4 NodeTransformation(pNode->mTransformation); CHECK HERE FOR ERRORS
         glm::mat4 NodeTransformation(Util::aiMatrix4x4ToGlm(pNode->mTransformation));
@@ -470,9 +450,9 @@ namespace HellEngine
         glm::mat4 Identity = glm::mat4(1);
         Transforms.clear();
 
-        float TicksPerSecond = (float)(m_pScene->mAnimations[0]->mTicksPerSecond != 0 ? m_pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
+        float TicksPerSecond = (float)(m_pAnimationScene->mAnimations[0]->mTicksPerSecond != 0 ? m_pAnimationScene->mAnimations[0]->mTicksPerSecond : 25.0f);
         float TimeInTicks = TimeInSeconds * TicksPerSecond;
-        float AnimationTime = fmod(TimeInTicks, (float)m_pScene->mAnimations[0]->mDuration);
+        float AnimationTime = fmod(TimeInTicks, (float)m_pAnimationScene->mAnimations[0]->mDuration);
 
         ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity);
 

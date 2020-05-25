@@ -38,7 +38,7 @@ namespace HellEngine
 		Transform testTrans; 
 
 		SkinnedMesh m_skinnedMesh;
-		SkinnedMesh m_srinivasMesh;
+		SkinnedMesh m_assimpRootModel;
 
 		std::vector<glm::mat4> m_animatedTransforms;
 		std::vector<glm::mat4> m_srinivasdAnimatedTransforms; 

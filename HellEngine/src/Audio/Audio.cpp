@@ -17,6 +17,7 @@ namespace HellEngine
 		Audio::LoadAudio("player_step_2.wav");
 		Audio::LoadAudio("player_step_3.wav");
 		Audio::LoadAudio("player_step_4.wav");
+		//Audio::LoadAudio("Music.wav");
 	}
 
 	void Audio::LoadAudio(const char* name)
@@ -37,6 +38,19 @@ namespace HellEngine
 		{
 			if (std::strcmp(audioFile.name, name) == 0) {
 				gSoloud.play(*audioFile.audio, volume);
+				return;
+			}
+		}
+		std::cout << "AUDIO NOT FOUND: " << name << "\n";
+	}
+
+	void Audio::LoopAudio(const char* name, float volume)
+	{
+		for (AudioFile& audioFile : s_loadedAudio)
+		{
+			if (std::strcmp(audioFile.name, name) == 0) {
+				gSoloud.play(*audioFile.audio, volume);
+				audioFile.audio->setLooping(true);
 				return;
 			}
 		}

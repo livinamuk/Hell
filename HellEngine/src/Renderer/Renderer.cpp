@@ -27,9 +27,12 @@ namespace HellEngine
 	Shader Renderer::s_ShadowMapShader;
 	Shader Renderer::s_FXAAShader;
 	Shader Renderer::s_StencilShader;
-	
-	RenderSettings Renderer::s_RenderSettings; 
+
+	bool Renderer::s_demo = true;
+
+	RenderSettings Renderer::s_RenderSettings;
 	Transform Renderer::s_DebugTransform;
+	Transform Renderer::s_DebugTransform2;
 
 	float Renderer::s_polygonFactor;
 	float Renderer::s_polygonUnits;
@@ -80,7 +83,7 @@ namespace HellEngine
 		s_blurHorizontalShader = Shader("Blur H", "blurHorizontal.vert", "blur.frag", "NONE");
 
 		SetTextureBindings();
-		
+
 		s_gBuffer = GBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		s_FinalImageBuffer = FinalImageBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		s_LightingBuffer = LightingBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
@@ -150,7 +153,7 @@ namespace HellEngine
 		glUniform1i(glGetUniformLocation(s_lightingShader.ID, "ShadowMap"), 4);
 		glUniform1i(glGetUniformLocation(s_lightingShader.ID, "Env_LUT"), 5);
 		glUniform1i(glGetUniformLocation(s_lightingShader.ID, "BRDF_LUT"), 6);
-		
+
 		glUseProgram(s_compositeShader.ID);
 		glUniform1i(glGetUniformLocation(s_compositeShader.ID, "FinalLighting_Texture"), 0);
 		glUniform1i(glGetUniformLocation(s_compositeShader.ID, "Emissive_Texture"), 1);
@@ -196,7 +199,7 @@ namespace HellEngine
 			//RenderFinalImage(&s_quadShader, s_FinalImageBuffer.TexID);
 			RenderFinalImage(&s_quadShader, s_ChromaticAbberationBuffer.TexID);
 		else
-			RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gBuffer4);
+			RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
 		//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
 
 
@@ -218,26 +221,37 @@ namespace HellEngine
 			ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[3].m_LightProbe.CubeMap_TexID);
 		}
 		// Show a cubemap
-	//	if (Input::s_keyDown[HELL_KEY_V]) {
-		//	ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[0].m_shadowMap.FboID);
+		if (Input::s_keyDown[HELL_KEY_V]) 
+			ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[0].m_shadowMap.FboID);
 			//ViewCubeMap(game, &s_backgroundShader, s_CameraEnvMap.CubeMap_TexID);
 	//	}
 		if (Input::s_keyDown[HELL_KEY_4]) {
 			for (Light& light : game->house.m_lights)
 			{
-				light.m_LightProbe.m_needsEnvMapReRender = true; 
+				light.m_LightProbe.m_needsEnvMapReRender = true;
 				light.m_LightProbe.m_needsSphericalHarmonicsReRender = true;
 			}
 		}
 
 		TextBlitPlass(&s_quadShader);
 
+		if (Input::s_keyDown[HELL_KEY_L])
+		{
+			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
+			s_solidColorShader.use();
+			s_solidColorShader.setMat4("projection", game->camera.m_projectionMatrix);
+			s_solidColorShader.setMat4("view", game->camera.m_viewMatrix);
+			s_solidColorShader.setMat4("model", glm::mat4(1));
+			s_solidColorShader.setVec3("color", glm::vec3(1, 0, 0));
+			game->house.m_rooms[1].m_lightVolume.Draw(&s_solidColorShader);
+		}
 
 	}
 
 	void Renderer::ShadowMapPass(Game* game, Shader* shader)
 	{
-		
+
 		for (Light light : game->house.m_lights)
 		{
 			glViewport(0, 0, ShadowMap::SHADOW_MAP_SIZE, ShadowMap::SHADOW_MAP_SIZE);
@@ -255,16 +269,18 @@ namespace HellEngine
 			s_RenderSettings.BindMaterials = false;
 			s_RenderSettings.DrawWeapon = false;
 			s_RenderSettings.DrawLightBulbs = false;
-			glDisable(GL_CULL_FACE); 
+			glDisable(GL_CULL_FACE);
 			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glPolygonOffset(s_polygonFactor, s_polygonUnits);
-			
+		
+			// glDepthRange(0.0, 0.9);	
 			DrawScene(game, shader, false, false);
 			glEnable(GL_CULL_FACE);
-
+			// glDepthRange(0.1, 1.0);
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glPolygonOffset(0, 0);
+		//glPolygonOffset(0, 0);
 	}
 
 	void Renderer::EnvMapPass(Game* game, Shader* envMapShader, Shader* sphericalHarmonicsShader)
@@ -290,12 +306,14 @@ namespace HellEngine
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
 		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
-		unsigned int attachments[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
-		glDrawBuffers(5, attachments);
+
 		glDepthMask(GL_TRUE);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable (GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_TEST);
+
+		unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+		glDrawBuffers(4, attachments);
 
 		s_RenderSettings.BindMaterials = true;
 		s_RenderSettings.DrawWeapon = true;
@@ -305,39 +323,54 @@ namespace HellEngine
 		s_geometryShader.setMat4("projection", game->camera.m_projectionMatrix);
 		s_geometryShader.setMat4("view", game->camera.m_viewMatrix);
 		DrawScene(game, shader, true, false);
+
+		glDepthMask(GL_FALSE);
 	}
+
 
 	void Renderer::LightingPass(Game* game, Shader* stencilShader, Shader* lightingShader)
 	{
-		// Clear lighting buffer
-		glBindFramebuffer(GL_FRAMEBUFFER, s_LightingBuffer.ID);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+
+		// Clear lighting buffer : NO NEEDD COZ ITS NOW CLEARED IN THE GEOM PPASS COZ ITS A TEXTURE THAT BELONGS TO IT NOW
+		//glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glm::mat4 MVP = game->camera.m_projectionMatrix * game->camera.m_viewMatrix;
+		
+		if (s_demo)
+			MVP = glm::mat4(1);
 
 		for (Light light : game->house.m_lights)
 		{
-			/*
-			// Stencil Buffer optimisation
-			glm::mat4 MVP = game->camera.m_projectionMatrix * game->camera.m_viewMatrix;
-			stencilShader->use();
-			stencilShader->setMat4("gWVP", MVP);
-			glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
-			glDrawBuffer(GL_NONE);
-			glEnable(GL_STENCIL_TEST);
-			glEnable(GL_DEPTH_TEST);
-			glDisable(GL_CULL_FACE);
-			glClear(GL_STENCIL_BUFFER_BIT);
-			glStencilFunc(GL_ALWAYS, 0, 0);
-			glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
-			glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
-			
-			if (light.m_roomID != -1)
-				game->house.m_rooms[light.m_roomID].Draw(stencilShader);
-			*/
+			glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 
+			// Stencil Buffer optimisation
+
+			if (!s_demo) {
+				stencilShader->use();
+				stencilShader->setMat4("gWVP", MVP);
+				glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+				glDrawBuffer(GL_NONE);
+
+				glEnable(GL_STENCIL_TEST);
+				glEnable(GL_DEPTH_TEST);
+				glDisable(GL_CULL_FACE);
+				glClear(GL_STENCIL_BUFFER_BIT);
+				glStencilFunc(GL_ALWAYS, 0, 0);
+				glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+				glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+
+				if (light.m_roomID != -1)
+					game->house.m_rooms[light.m_roomID].m_lightVolume.Draw(stencilShader);
+			}
+				
 			// Lighting from here on
-			glBindFramebuffer(GL_FRAMEBUFFER, s_LightingBuffer.ID);
-			unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
-			
+			//glBindFramebuffer(GL_FRAMEBUFFER, 0);				// FIX TO STOP JUNK DATA GLITCHES. 
+			glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+			glDrawBuffer(GL_COLOR_ATTACHMENT4);
+
+
 			glUseProgram(lightingShader->ID);
 			glEnable(GL_DEPTH_TEST);
 			glDisable(GL_CULL_FACE);
@@ -368,17 +401,46 @@ namespace HellEngine
 			glBindTexture(GL_TEXTURE_CUBE_MAP, light.m_shadowMap.DepthCubeMapID);
 			glActiveTexture(GL_TEXTURE5);
 			glBindTexture(GL_TEXTURE_2D, light.m_LightProbe.SH_TexID);
-			
+
 			lightingShader->setVec3("lightPosition", light.m_position);
 			lightingShader->setFloat("lightAttenuationConstant", light.m_radius);
 			lightingShader->setFloat("lightAttenuationExp", light.m_magic);
 			lightingShader->setFloat("lightStrength", light.m_strength);
 			lightingShader->setVec3("lightColor", light.m_color);
-			Quad2D::RenderQuad(lightingShader);
+
+			glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+
+			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_FUNC_ADD);
+			glBlendFunc(GL_ONE, GL_ONE);
+			
+			glEnable(GL_CULL_FACE);
+
+			lightingShader->setMat4("gWVP", MVP);
+
+			if (!s_demo) {
+				glCullFace(GL_FRONT);
+
+				if (light.m_roomID != -1)
+					game->house.m_rooms[light.m_roomID].m_lightVolume.Draw(lightingShader);
+
+			}		
+			else
+			{
+				glDisable(GL_STENCIL_TEST);
+				Quad2D::RenderQuad(lightingShader);
+			}
+
+			glCullFace(GL_BACK);
+			glDisable(GL_BLEND);
+			glDisable(GL_STENCIL_TEST);
 		}
-		glDisable(GL_BLEND);
-		glDisable(GL_STENCIL_TEST);
+		// HOLY SHIT. THIS CAUSED THAT ANNOYING AS FUCK PROBLEM.
+		// YOU CAN'T CREATE CUBEMAPS WITHOUT THIS SET BACK TO TRUE.
+		glDepthMask(GL_TRUE);
 	}
+
 
 	void Renderer::BlurPass(Shader* blurVerticalShader, Shader* blurHorizontalShader)
 	{
@@ -475,7 +537,7 @@ namespace HellEngine
 		glUseProgram(shader->ID);
 		glDisable(GL_DEPTH_TEST);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, s_LightingBuffer.TexID);			
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gFinalLighting);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, s_BlurBuffers[0].textureA);
 		glActiveTexture(GL_TEXTURE2);
@@ -564,7 +626,7 @@ namespace HellEngine
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 	}
-	
+
 	void Renderer::RenderEnvMap(Game* game, Shader* shader, Light* light)
 	{
 		glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -580,34 +642,34 @@ namespace HellEngine
 		Transform viewPosTransform;
 
 
-			shader->use();
-			shader->setInt("equirectangularMap", 0);
-			shader->setMat4("projection", captureProjection);
-			shader->setVec3("lightPosition", light->m_position);
-			shader->setFloat("lightAttenuationConstant", light->m_radius);
-			shader->setFloat("lightAttenuationExp", light->m_magic);
-			shader->setFloat("lightStrength", light->m_strength);
-			shader->setVec3("lightColor", light->m_color);
-			shader->setVec3("viewPos", game->camera.m_viewPos);
+		shader->use();
+		shader->setInt("equirectangularMap", 0);
+		shader->setMat4("projection", captureProjection);
+		shader->setVec3("lightPosition", light->m_position);
+		shader->setFloat("lightAttenuationConstant", light->m_radius);
+		shader->setFloat("lightAttenuationExp", light->m_magic);
+		shader->setFloat("lightStrength", light->m_strength);
+		shader->setVec3("lightColor", light->m_color);
+		shader->setVec3("viewPos", game->camera.m_viewPos);
 
-			glViewport(0, 0, light->m_LightProbe.width, light->m_LightProbe.height);
-			glBindFramebuffer(GL_FRAMEBUFFER, light->m_LightProbe.CubeMap_FBO);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, light->m_LightProbe.CubeMap_TexID);
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-			glClear(GL_DEPTH_BUFFER_BIT);
+		glViewport(0, 0, light->m_LightProbe.width, light->m_LightProbe.height);
+		glBindFramebuffer(GL_FRAMEBUFFER, light->m_LightProbe.CubeMap_FBO);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, light->m_LightProbe.CubeMap_TexID);
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
-			glEnable(GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_TEST);
 
-			for (unsigned int i = 0; i < 6; ++i)
-				shader->setMat4("captureViewMatrix[" + std::to_string(i) + "]", captureProjection * captureViews[i] * glm::inverse(Transform(light->m_position).to_mat4()));
+		for (unsigned int i = 0; i < 6; ++i)
+			shader->setMat4("captureViewMatrix[" + std::to_string(i) + "]", captureProjection * captureViews[i] * glm::inverse(Transform(light->m_position).to_mat4()));
 
-			s_RenderSettings.BindMaterials = true;
-			s_RenderSettings.DrawWeapon = false;
-			s_RenderSettings.DrawLightBulbs = false;
+		s_RenderSettings.BindMaterials = true;
+		s_RenderSettings.DrawWeapon = false;
+		s_RenderSettings.DrawLightBulbs = false;
 
-			DrawScene(game, shader, true, true);
-		
-		
+		DrawScene(game, shader, true, true);
+
+
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 	}
 
@@ -637,7 +699,7 @@ namespace HellEngine
 		glViewport(CoreGL::s_windowWidth / 2, 0, CoreGL::s_windowWidth / 2, CoreGL::s_windowHeight / 2);
 		Quad2D::RenderQuad(shader);
 	}
-	
+
 	void Renderer::RenderFinalImage(Shader* shader, unsigned int textureID)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -651,8 +713,20 @@ namespace HellEngine
 
 	void Renderer::DrawScene(Game* game, Shader* shader, bool bindTextures, bool envMapPass)
 	{
-		game->house.Draw(shader, envMapPass);
 
+
+		Transform t = Transform(glm::vec3(2, 0, 0), glm::vec3(0, -1.57f, 0), glm::vec3(0.07));
+		AssetManager::SetModelMaterialIDByModelID(AssetManager::GetModelIDByName("Couch"), AssetManager::GetMaterialIDByName("Couch"));
+		//AssetManager::DrawModel(AssetManager::GetModelIDByName("Couch"), shader, s_DebugTransform.to_mat4());
+		AssetManager::DrawModel(AssetManager::GetModelIDByName("Couch"), shader, t.to_mat4());
+		
+
+		t = Transform(glm::vec3(2.49, 1.5, 0.522), glm::vec3(3.14f, HELL_PI *1.5f, 1.57f), glm::vec3(1.1));
+		AssetManager::SetModelMaterialIDByModelID(AssetManager::GetModelIDByName("PictureFrame"), AssetManager::GetMaterialIDByName("Picture2"));
+		//AssetManager::DrawModel(AssetManager::GetModelIDByName("PictureFrame"), shader, s_DebugTransform2.to_mat4());
+		//AssetManager::DrawModel(AssetManager::GetModelIDByName("PictureFrame"), shader, t.to_mat4());
+
+		game->house.Draw(shader, envMapPass);
 
 		// Animated assimp model (SkinnedMesh)
 		{
@@ -672,12 +746,12 @@ namespace HellEngine
 
 		/////////////////////////////////////////////////////////////////////
 		// Srinivas Mesh
-		{
+		if (!s_demo) {
 			Transform trans;
 			trans.position = glm::vec3(0, 1, 0);
 			trans.scale = glm::vec3(0.03f);
 			shader->setMat4("model", trans.to_mat4());
-						
+
 			for (unsigned int i = 0; i < game->m_srinivasdAnimatedTransforms.size(); i++)
 				shader->setMat4("skinningMats[" + std::to_string(i) + "]", glm::transpose(game->m_srinivasdAnimatedTransforms[i]));
 
@@ -719,7 +793,7 @@ namespace HellEngine
 		glEnable(GL_DEPTH_TEST);
 		shader->use();
 		shader->setMat4("projection", game->camera.m_projectionMatrix);
-		
+
 		//glm::mat4 indentity = glm::mat4(1);
 		Transform cameraTransform;
 		Transform modelTransform;

@@ -18,7 +18,6 @@
 
 layout (location = 0) out vec4 FragColor;
 
-in vec2 TexCoords;
 
 uniform sampler2D ALB_Texture;
 uniform sampler2D NRM_Texture;
@@ -70,7 +69,7 @@ float ShadowCalculation(vec3 fragPos, vec3 viewPos)
     float currentDepth = length(fragToLight);
 
     float shadow = 0.0;
-    float bias = 0.4;
+    float bias = 0.175;
 	int samples = 20;
 
     float viewDistance = length(viewPos - fragPos);
@@ -336,6 +335,7 @@ void main()
 	 // Calculate texture co-ordinate
     vec2 gScreenSize = vec2(screenWidth, screenHeight);
     vec2 TexCoord = gl_FragCoord.xy / gScreenSize;
+	vec2 TexCoords = TexCoord;
 
     // Get the Fragment Z position (from the depth buffer)
     float z = texture(Depth_Texture, vec2(TexCoord.s, TexCoord.t)).x * 2.0f - 1.0f;
@@ -474,7 +474,8 @@ void main()
 //	if (WorldPos.z > 2 + bias)
 	//	shadow = min((1.0 - shadowFactor), NdotL * NdotL * NdotL);
 
-    color = shadow * (directLighting + indirectLighting) * attenuation;// + (albedo * 0.00125);
+    color = ((shadow * directLighting) + indirectLighting) * attenuation;// + (albedo * 0.00125);
+//color= shadow * (directLighting) * attenuation;
 //	color = (1.0 - shadow) * (directLighting + indirectLighting) * attenuation;// + (albedo * 0.00125);
 
 //	color = vec3(NdotL) * lightColor;

@@ -34,7 +34,7 @@ namespace HellEngine
 	unsigned int AssetManager::s_ModelID_Staircase;
 
 	bool AssetManager::s_loadingComplete = false;
-	std::string AssetManager::s_loadLog = "WELCOME TO HELL\n";
+	std::string AssetManager::s_loadLog = "WELCOME TO HELL\nLoadng please wait...\n";
 
 	void AssetManager::FindAllFiles()
 	{
@@ -94,6 +94,9 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Staircase.obj"));
 		models.emplace_back(Model("res/models/Light.obj"));
 		models.emplace_back(Model("res/models/sphere.obj"));
+		models.emplace_back(Model("res/models/PictureFrame2.obj"));
+		models.emplace_back(Model("res/models/PictureFrame.obj"));
+		models.emplace_back(Model("res/models/Couch.obj"));
 
 		for (int i = 0; i < models.size(); i++)
 			models[i].ReadFromDisk(); 	

@@ -74,6 +74,8 @@ namespace HellEngine
 
 		static std::vector<BlurBuffer> s_BlurBuffers;
 
+		static bool s_demo;
+
 		// FBOs
 		static GBuffer s_gBuffer;
 		static LightingBuffer s_LightingBuffer;
@@ -97,6 +99,7 @@ namespace HellEngine
 
 		static RenderSettings s_RenderSettings;
 		static Transform s_DebugTransform;
+		static Transform s_DebugTransform2;
 		static float s_polygonFactor;
 		static float s_polygonUnits;
 

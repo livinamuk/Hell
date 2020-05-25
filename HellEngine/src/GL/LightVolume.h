@@ -7,7 +7,10 @@ namespace HellEngine
 	{
 	public: // methods
 		LightVolume();
-		LightVolume(float lowerX, float lowerZ, float upperX, float upperZ);
+		//LightVolume(float lowerX, float lowerZ, float upperX, float upperZ);
+
+		void AddCuboidToLightVolume(glm::vec3, glm::vec3, glm::vec3, glm::vec3, glm::vec3, glm::vec3, glm::vec3, glm::vec3);
+
 	//	LightVolume(DoorHole* doorHole, Light light);
 	//	~LightVolume();
 		void Draw(Shader* shader);

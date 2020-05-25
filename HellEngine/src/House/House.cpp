@@ -58,13 +58,13 @@ namespace HellEngine
 		m_staircases.emplace_back(staircase);
 	}
 
-	void House::BuildWallMeshes()
+/*	void House::BuildWallMeshes()
 	{
 		for (Room& room : m_rooms) {
 			room.FindDoors(m_doors, m_staircases);
 			room.BuildWallMesh();
 		}			
-	}
+	}*/
 
 	void House::RebuildAll()
 	{
@@ -74,6 +74,8 @@ namespace HellEngine
 			room.FindDoors(m_doors, m_staircases);
 			room.BuildWallMesh();
 			room.m_wallMesh.BufferMeshToGL();
+			room.CalculateWorldSpaceBounds();
+			room.CalculateLightVolume();
 		}
 
 		DetermineWhichLightIsInWhichRoom();

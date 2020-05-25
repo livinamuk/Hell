@@ -396,6 +396,12 @@ namespace HellEngine
 		ImGui::InputFloat3("Poso", glm::value_ptr(Renderer::s_DebugTransform.position));
 		ImGui::InputFloat3("Rota", glm::value_ptr(Renderer::s_DebugTransform.rotation));
 		ImGui::InputFloat3("Scla", glm::value_ptr(Renderer::s_DebugTransform.scale));
+		ImGui::Text("\nDEBUG TRANSFORM2");
+		ImGui::InputFloat3("Poso2", glm::value_ptr(Renderer::s_DebugTransform2.position));
+		ImGui::InputFloat3("Rota2", glm::value_ptr(Renderer::s_DebugTransform2.rotation));
+		ImGui::InputFloat3("Scla2", glm::value_ptr(Renderer::s_DebugTransform2.scale));
+		
+		ImGui::Text("WIP"); ImGui::SameLine(); ImGui::Checkbox("##checkBoxq9", &Renderer::s_demo);
 
 
 

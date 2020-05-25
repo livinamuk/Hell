@@ -34,7 +34,7 @@ namespace HellEngine
 		LightVolume m_lightVolume;
 
 		std::vector<DoorWay> m_doorWaysFrontWall;
-		std::vector<DoorWay> m_doorWaysBackWall;
+		std::vector<DoorWay> m_doorWaysBackWall; 
 		std::vector<DoorWay> m_doorWaysLeftWall;
 		std::vector<DoorWay> m_doorWaysRightWall;
 

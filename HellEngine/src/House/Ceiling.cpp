@@ -30,6 +30,8 @@ namespace HellEngine
 
 	void Ceiling::Draw(Shader* shader)
 	{
+		return;
+
 		if (m_rotateTexture)
 			shader->setInt("TEXTURE_FLAG", 3);
 		else

@@ -23,12 +23,16 @@ namespace HellEngine
 		//if (!Input::s_showCursor)
 		//	return;
 
+
 		ImGuizmo::AnimationCurve demoCurve(ImVec2(0, 0), ImVec2(1, 1), 0xFF00FFFF, ImCurveEdit::CurveSmooth);
 		ImGuizmo::AnimationCurve linearCurve(ImVec2(0, 0), ImVec2(1, 1), 0xFF00FFFF, ImCurveEdit::CurveLinear);
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+
+
+		ImGui::ShowDemoWindow();
 
 		ImGuiIO* io = &(ImGui::GetIO());
 		int fps = std::round(io->Framerate);
@@ -71,9 +75,13 @@ namespace HellEngine
 		ImGui::BeginTabBar("MASTER_TAB_BAR", tab_bar_flags);
 		ImGui::Text("\n");
 
+		if (ImGui::BeginTabItem("Scene")) {
+			ShowSceneMenu(game);
+			ImGui::EndTabItem();
+		}
 		if (ImGui::BeginTabItem("Map")) {
 			ShowMapMenu(game);
-			ImGui::EndTabItem();
+			ImGui::EndTabItem(); 
 		}
 		if (ImGui::BeginTabItem("Player")) {
 			ShowPlayerMenu(game);
@@ -180,7 +188,7 @@ namespace HellEngine
 					game->RebuildMap();
 				}
 				ImGui::SameLine(); if (ImGui::Button("New Room")) {
-					game->house.m_rooms.push_back(Room(glm::vec2(0, 0), glm::vec2(4, 4), 0));
+					game->house.m_rooms.push_back(Room(glm::vec2(0, 0), glm::vec2(4, 4), 0, &game->house));
 					game->RebuildMap();
 				}
 				ImGui::Text("Pos X, Z:  %.3f %.3f", game->house.m_rooms[i].m_position.x, game->house.m_rooms[i].m_position.y);
@@ -353,6 +361,94 @@ namespace HellEngine
 		ImGui::Text(" ");
 	}
 
+	void CoreImGui::ShowSceneMenu(Game* game)
+	{
+	
+		static int selected = -1;
+
+
+
+		if (ImGui::TreeNode("Scene"))
+		{
+			for (int n = 0; n < game->house.m_entities.size(); n++)
+			{
+				Entity* entity = &game->house.m_entities[n];
+				char buf[32];
+				sprintf(buf, entity->m_tag, n);
+				if (ImGui::Selectable(buf, selected == n))
+					selected = n;
+			}
+			ImGui::TreePop();
+		}
+
+		// Properties
+		ImGui::Text("\n");
+		ImGui::Separator();
+		ImGui::Text("\n");
+		ImGui::Text("Properties");
+
+		if (selected != -1)
+		{
+			Entity* entity = &game->house.m_entities[selected];
+			ImGui::InputText("Tag", entity->m_tag, 64);
+
+			// Build models list
+			std::vector<std::string> modelList;
+			for (Model& model : AssetManager::models)
+				modelList.push_back(model.name);
+
+			// Build materials list
+			std::vector<std::string> materialList;
+			for (Material& material : AssetManager::materials)
+				materialList.push_back(material.name);
+
+			std::vector<std::string> currentModelName;
+			for (int i = 0; i < game->house.m_entities.size(); i++)
+				currentModelName.push_back(AssetManager::GetModelNameByID(game->house.m_entities[i].m_modelID));
+
+			std::vector<std::string> currentMaterialName;
+			for (int i = 0; i < game->house.m_entities.size(); i++)
+				currentMaterialName.push_back(AssetManager::GetMaterialNameByID(game->house.m_entities[i].m_materialID));
+
+			// Show models list
+			if (ImGui::BeginCombo("Model", currentModelName[selected].c_str()))
+			{
+				for (int n = 0; n < modelList.size(); n++)
+				{
+					bool is_selected = (currentModelName[selected] == modelList[n]);
+					if (ImGui::Selectable(modelList[n].c_str(), is_selected)) {
+						entity->m_modelID = AssetManager::GetModelIDByName(modelList[n]);
+					}
+					if (is_selected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+
+			// Show materials list
+			if (ImGui::BeginCombo("Material", currentMaterialName[selected].c_str()))
+			{
+				for (int n = 0; n < materialList.size(); n++)
+				{
+					bool is_selected = (currentMaterialName[selected] == materialList[n]);
+					if (ImGui::Selectable(materialList[n].c_str(), is_selected)) {
+						entity->m_materialID = AssetManager::GetMaterialIDByName(materialList[n]);
+					}
+					if (is_selected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+
+		
+
+			ImGui::PushItemWidth(200);
+			ImGui::InputFloat3("Position", glm::value_ptr(entity->m_transform.position));
+			ImGui::InputFloat3("Rotation", glm::value_ptr(entity->m_transform.rotation));
+			ImGui::InputFloat3("Scale   ", glm::value_ptr(entity->m_transform.scale));
+		}
+	}
+
 	void CoreImGui::ShowPlayerMenu(Game* game)
 	{
 		ImGui::Text("Cam rot: %.3f, %.3f, %.3f", game->camera.m_transform.rotation.x, game->camera.m_transform.rotation.y, game->camera.m_transform.rotation.z);
@@ -400,9 +496,10 @@ namespace HellEngine
 		ImGui::InputFloat3("Poso2", glm::value_ptr(Renderer::s_DebugTransform2.position));
 		ImGui::InputFloat3("Rota2", glm::value_ptr(Renderer::s_DebugTransform2.rotation));
 		ImGui::InputFloat3("Scla2", glm::value_ptr(Renderer::s_DebugTransform2.scale));
-		
-		ImGui::Text("WIP"); ImGui::SameLine(); ImGui::Checkbox("##checkBoxq9", &Renderer::s_demo);
 
+		ImGui::Text("WIP"); ImGui::SameLine(); ImGui::Checkbox("##checkBoxq9", &Renderer::s_demo);
+		ImGui::Text("Render Door Way Volumes"); ImGui::SameLine(); ImGui::Checkbox("##checkBo1123xq9", &Renderer::b_renderDoorWayVolumes);
+		
 
 
 		/*if (game->m_player.m_gunState == GunState::FIRING)
@@ -422,7 +519,7 @@ namespace HellEngine
 		if (game->m_HUDshotgun.m_currentAnimation != NULL)
 			ImGui::Text("\nHUD shotgun: %s, %s, %s", game->m_HUDshotgun.m_currentAnimationName, game->m_HUDshotgun.m_currentAnimationTime.GetTimeString(), game->m_HUDshotgun.m_currentAnimation->m_endTime.GetTimeString());
 
-		//ImGui::Text("\nRaycast:  %s", game->m_cameraRaycast.m_name);
+		ImGui::Text("\nRaycast:  %s", game->m_cameraRaycast.m_name);
 		ImGui::Text("Distance: %f", game->m_cameraRaycast.m_distance);
 
 		/*ImGui::Text("\nCHARACTER\nVelocity: %f, %f, %f",

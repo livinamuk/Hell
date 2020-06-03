@@ -388,6 +388,7 @@ namespace HellEngine
 		return;
 		*/
 
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("DoorFrame"));
 		AssetManager::GetModelByID(AssetManager::s_ModelID_DoorFrame)->DrawMesh(shader, 0, Transform(m_bottomDoorway.position, Util::SetRotationByAxis(m_bottomDoorway.axis)).to_mat4());
 		AssetManager::GetModelByID(AssetManager::s_ModelID_DoorFrame)->DrawMesh(shader, 0, Transform(m_topDoorway.position, Util::SetRotationByAxis(m_topDoorway.axis)).to_mat4());
 		 
@@ -416,6 +417,7 @@ namespace HellEngine
 
 		*/
 
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Stairs01"));
 		for (int i = 0; i < m_stepsInFirstSet / 3; i++)
 		{
 			Transform trans;
@@ -463,6 +465,7 @@ namespace HellEngine
 				trans.position.z = 0.5f;
 				trans.position.z += stepDepth * (3 * i);
 				trans.position.y = stepHeight * (3 * i);
+				AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Stairs01"));
 				AssetManager::DrawModel(AssetManager::s_ModelID_Staircase, shader, m_rootTransform.to_mat4() * m_landingTransform.to_mat4() * trans.to_mat4());
 			}
 			// Landing
@@ -477,7 +480,8 @@ namespace HellEngine
 
 		//AssetManager::GetModelByName("StaircaseCeilingTrimStraight")->SetMaterial(AssetManager::GetMaterialIDByName("Trims"));
 		//AssetManager::GetModelByName("StaircaseCeilingTrimStraight")->Draw(shader, m_rootTransform.to_mat4() * trans.to_mat4());
-		
+
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Trims"));
 		AssetManager::DrawModel(AssetManager::s_ModelID_StaircaseCeilingTrimStraight, shader, m_rootTransform.to_mat4() * trans.to_mat4());
 
 
@@ -509,6 +513,7 @@ namespace HellEngine
 		m_topDoorwayFloor.Draw(shader);
 
 		// Ceilings
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("PlasterCeiling"));
 		m_bottomDoorwayCeiling.Draw(shader);
 
 		m_ceilingMesh.Draw(shader);

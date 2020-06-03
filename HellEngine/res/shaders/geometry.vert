@@ -70,6 +70,7 @@ void main()
 	vec3 N = normalize(vec3(model * vec4(Normal,    0.0)));
 	TBN = mat3(T, B, N);
 
-	FragPos = worldPos.xyz;
+	FragPos = (worldPos).xyz;
+
 	gl_Position = projection * view * vec4(FragPos, 1);
 }

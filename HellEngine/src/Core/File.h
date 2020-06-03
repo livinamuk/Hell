@@ -16,6 +16,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include "Helpers/AssetManager.h"
 
 namespace HellEngine {
 
@@ -39,6 +40,7 @@ namespace HellEngine {
 		static glm::vec2 ReadVec2(const rapidjson::Value& value, std::string name);
 		static glm::vec3 ReadVec3(const rapidjson::Value& value, std::string name);
 		static std::string ReadString(const rapidjson::Value& value, std::string name);
+		static char* ReadText(const rapidjson::Value& value, std::string name);
 		static bool ReadBool(const rapidjson::Value& value, std::string name);
 		static float ReadFloat(const rapidjson::Value& value, std::string name);
 		static int ReadInt(const rapidjson::Value& value, std::string name);

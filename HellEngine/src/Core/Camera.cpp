@@ -39,12 +39,13 @@ namespace HellEngine
 		glm::vec4 vP = (m_inverseViewMatrix * glm::vec4(0, 0, 0, 1));
 		m_viewPos = glm::vec3(vP.x, vP.y, vP.z);
 
+		m_projectionViewMatrix = m_projectionMatrix * m_viewMatrix;
+
 		/*	Transform cameraTransform = this->m_transform;
 			//cameraTransform.position.y += m_viewHeight;
 			glm::mat4 cameraMatrix = cameraTransform.to_mat4();
 
 			m_viewMatrix = weaponCameraMatrix * glm::inverse(cameraMatrix);
-			m_projectionViewMatrix = m_projectionMatrix * m_viewMatrix;
 			m_inverseViewMatrix = glm::inverse(m_viewMatrix);
 
 			m_Right = glm::vec3(cameraMatrix[0]);

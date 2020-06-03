@@ -7,25 +7,19 @@
 #include "Helpers/Importer.h"
 #include "Renderer/Renderer.h"
 #include "Audio/Audio.h"
-
 #include "Core/File.h"
 
 using namespace HellEngine;
-
 
 int main()
 {
 	CoreGL::InitGL(SCR_WIDTH, SCR_HEIGHT);
 	CoreImGui::InitImGui();
-	Game game = Game();
-	Renderer::Init(&game);
 	Importer::Init();
+	Renderer::Init();
 	AssetManager::FindAllFiles();
 	AssetManager::ForceLoadTexture("CharSheet");
 	Audio::Init();
-	
-	//Audio::LoopAudio("Music.wav");
-	//CoreGL::ToggleFullScreen();
 
 	// Loading loop	
 	while (!AssetManager::s_loadingComplete && !Input::s_keyDown[HELL_KEY_ESCAPE])
@@ -57,23 +51,17 @@ int main()
 		AssetManager::LoadNextReadyAssetToGL();
 	}
 
-
+	Game game = Game();
 
 	// Main game loop
 	while (CoreGL::IsRunning() && !Input::s_keyDown[HELL_KEY_ESCAPE])
 	{
-
-	//	game.house = File::LoadMap("Map.txt");
-	//	game.RebuildMap();
-
 		AssetManager::LoadNextReadyAssetToGL();
 		CoreGL::ProcessInput();
 		CoreGL::OnUpdate();
 		
 		game.OnUpdate();
 		game.OnRender();
-
-
 
 		if (Renderer::m_showImGui)
 			CoreImGui::Render(&game);
@@ -87,20 +75,15 @@ int main()
 	return 0;
 
 	{
-		Opp r = Opp(2400);
-		r.Deduct(1200);
+		Opp r = Opp(1700);
 
-		Opp m = Opp(1200);
-		m.Deduct(300);
-		m.Deduct(-50);
-		m.Deduct(600);
-		m.Deduct(-1100);
+		Opp m = Opp(850);
 
 		Opp c = Opp(2400);
 		c.Deduct(300);
 		c.Deduct(300);
 		c.Deduct(300);
-
-		Opp n = Opp(700);
+		c.Deduct(300);
+		c.Deduct(300); 
 	}
 }

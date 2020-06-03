@@ -25,9 +25,15 @@ namespace HellEngine
 
 	void Light::Init()
 	{
+		// Setup cubemaps
 		m_shadowMap.Init();
 		m_shadowMap.CalculateProjectionTransforms(m_position);
 		m_LightProbe.Init();
+
+		// Build the light volume
+		//m_lightVolume.p_parentLight = this;
+		m_lightVolume.Rebuild();
+
 		std::cout << "INIT LIGHT\n";
 	}
 }

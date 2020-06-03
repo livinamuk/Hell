@@ -9,6 +9,11 @@ namespace HellEngine
 	{
 	}
 
+	Entity::Entity(char* tag)
+	{
+		m_tag = tag;
+	}
+
 	Entity::Entity(int modelID)
 	{
 		m_modelID = modelID;
@@ -57,6 +62,22 @@ namespace HellEngine
 			return false;
 
 		return (m_currentAnimationTime >= m_currentAnimation->m_endTime);
+	}
+
+
+	void Entity::DrawEntity(Shader* shader)
+	{
+		// Bind material
+		//if (this->m_materialID != -1 && this->m_materialID < AssetManager::materials.size())
+			AssetManager::BindMaterial(m_materialID);
+
+	//	std::cout << AssetManager::currentlyBoundMaterialID << "\n";
+
+			AssetManager::models[m_modelID].Draw(shader, m_transform.to_mat4());
+
+		// Draw model
+		//if (this->m_modelID != -1 && this->m_modelID < AssetManager::models.size())
+		//	AssetManager::DrawModel(this->m_modelID, shader, m_transform.to_mat4());
 	}
 
 	void Entity::Draw(Shader* shader, glm::mat4 modelMatrix)

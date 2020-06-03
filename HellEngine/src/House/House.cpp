@@ -6,8 +6,11 @@
 
 namespace HellEngine
 {
+	House* House::p_house;
+
 	House::House()
 	{
+		p_house = this;
 	}
 
 	House::~House()
@@ -25,12 +28,16 @@ namespace HellEngine
 		for (Staircase& staircase : m_staircases)
 			staircase.Draw(shader);
 
+		for (Entity& entity : m_entities)
+			entity.DrawEntity(shader);
+
 		if (Renderer::s_RenderSettings.DrawLightBulbs) {
+
+			AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Light")); 
 			for (Light& light : m_lights)
 			{
 				shader->setBool("hasEmissive", true);
 				shader->setVec3("emissiveColor", light.m_color);
-				AssetManager::SetModelMaterialIDByModelID(AssetManager::GetModelIDByName("Light"), AssetManager::GetMaterialIDByName("Light"));
 				Transform lightPosition(light.m_position);
 				AssetManager::GetModelByName("Light")->DrawMesh(shader, 0, lightPosition.to_mat4() * light.m_modelTransform.to_mat4());
 			}
@@ -75,10 +82,11 @@ namespace HellEngine
 			room.BuildWallMesh();
 			room.m_wallMesh.BufferMeshToGL();
 			room.CalculateWorldSpaceBounds();
-			room.CalculateLightVolume();
+			//room.CalculateLightVolume();
 		}
 
 		DetermineWhichLightIsInWhichRoom();
+		BuildLightVolumes();
 	}
 
 	void House::DetermineWhichLightIsInWhichRoom() // note this does not consider rooms above rooms yet
@@ -100,5 +108,31 @@ namespace HellEngine
 								light.m_roomID = i;
 			}
 		}
+	}
+
+	void House::BuildLightVolumes()
+	{
+		for (Light& light : m_lights)
+		{
+			Room* room = &m_rooms[light.m_roomID];
+			light.m_lightVolume.BuildFromRoom(room);
+
+			for (DoorWay& doorWay : room->m_doorWaysXBackWall)
+				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_upperZ));
+		
+			for (DoorWay& doorWay : room->m_doorWaysXFrontWall)
+				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_lowerZ));
+
+			for (DoorWay& doorWay : room->m_doorWaysZLeftWall)
+				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_lowerX));
+			
+			for (DoorWay& doorWay : room->m_doorWaysZRightWall)
+				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_upperX));
+		}
+
+		//Light* light = &m_lights[0];
+	//	Door* door = &m_doors[0];
+	//	LightVolumeDoorWay test(door, light->m_position, light->m_radius);
+	//	light->m_doorWayLightVolumes.push_back(test);
 	}
 }

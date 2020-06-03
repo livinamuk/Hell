@@ -2,13 +2,15 @@
 #include "Header.h"
 #include "GL/ShadowMap.h"
 #include "GL/LightProbe.h"
+#include "GL/LightVolume.h"
+#include "GL/LightVolumeDoorWay.h"
 
 namespace HellEngine
 {
 	class Light
 	{
 	public: // Methods
-		Light(glm::vec3 position); 
+		Light(glm::vec3 position);
 		Light(glm::vec3 position, glm::vec3 color, float radius, float strength, float magic, Transform modelTransform);
 		void Init();
 
@@ -23,5 +25,7 @@ namespace HellEngine
 
 		ShadowMap m_shadowMap;
 		LightProbe m_LightProbe;
+		LightVolume m_lightVolume;
+		std::vector<LightVolumeDoorWay> m_doorWayLightVolumes;
 	};
 }

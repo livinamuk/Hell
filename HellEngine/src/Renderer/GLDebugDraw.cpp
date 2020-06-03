@@ -21,9 +21,10 @@ namespace HellEngine
 	void GLDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& color)
 	{
 		Line line;
-		line.start = Util::btVec3_to_glmVec3(from);
-		line.end = Util::btVec3_to_glmVec3(to);
-		line.color = Util::btVec3_to_glmVec3(color);
+		line.start_pos = Util::btVec3_to_glmVec3(from);
+		line.end_pos = Util::btVec3_to_glmVec3(to);
+		line.start_color = Util::btVec3_to_glmVec3(color);
+		line.end_color = Util::btVec3_to_glmVec3(color);
 		lines.push_back(line);
 	}
 

@@ -16,6 +16,7 @@ namespace HellEngine
 	class Util
 	{
 	public:
+		static glm::mat4 btScalar2mat4(btScalar* matrix);
 		static glm::mat4 Get_Mat4_From_Vec3(glm::vec3 position);
 		static void TranslatePosition(glm::vec3* position, glm::mat4 translation);
 		static glm::vec3 Position_From_Mat_4(glm::mat4 matrix);

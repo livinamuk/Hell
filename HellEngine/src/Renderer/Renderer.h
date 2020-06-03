@@ -12,6 +12,8 @@
 #include "GL/CameraEnvMap.h"
 #include "TextBlitter.h"
 #include "House/Light.h"
+#include "BloodEffect.h"
+#include "SkinnedMesh.h"
 
 namespace HellEngine
 {
@@ -20,7 +22,7 @@ namespace HellEngine
 	class Renderer
 	{
 	public: // Functions
-		static void Init(Game* game);
+		static void Init();
 		static void RenderFrame(Game* game);
 		static void SetTextureBindings();
 
@@ -33,6 +35,7 @@ namespace HellEngine
 		static void ChromaticAberrationPass(Shader* shader);
 		static void FXAAPass(Shader* shader);
 		static void DOFPass(Shader* shader);
+		static void DecalPass(Game* game, Shader* shader);
 
 		static void ShadowMapPass(Game* game, Shader* shader);
 
@@ -45,6 +48,10 @@ namespace HellEngine
 		static void BulletDebugDraw(Game* game, Shader* shader);
 		static void ViewCubeMap(Game* , Shader* shader, unsigned int CubeMapID);
 		static void CreateBRDFLut();
+
+		static void DrawPoint(Shader* shader, glm::vec3 position);
+		static void DrawLine(Shader* shader, Line line, glm::mat4 modelMatrix);
+		static void DrawSkeleton(Shader* shader, SkinnedMesh* skinnedMesh, Transform* transform);
 
 	public: // functions
 		static void TextBlitPlass(Shader* shader);
@@ -72,6 +79,9 @@ namespace HellEngine
 		static Shader s_FXAAShader;
 		static Shader s_ChromaticAberrationShader;
 
+		static Shader s_BloodShader;
+		static Shader s_DecalShader;
+
 		static std::vector<BlurBuffer> s_BlurBuffers;
 
 		static bool s_demo;
@@ -96,12 +106,17 @@ namespace HellEngine
 		static bool m_showDebugTextures;
 		static bool m_showImGui;
 		static bool b_showCubemap;
+		static bool b_renderDoorWayVolumes;
 
 		static RenderSettings s_RenderSettings;
 		static Transform s_DebugTransform;
 		static Transform s_DebugTransform2;
 		static float s_polygonFactor;
 		static float s_polygonUnits;
+
+		static Transform s_hitPoint;
+		static unsigned int s_pointVAO;
+		static BloodEffect s_bloodEffect;
 
 	};
 }

@@ -195,7 +195,7 @@ namespace HellEngine
 		{
 			glGenVertexArrays(1, &BLIT_VAO);
 			glGenBuffers(1, &BLIT_VBO);
-			std::cout << "Initilized Blitter.\n";
+			std::cout << "\nInitilized text blitter.\n\n";
 
 		}
 		glBindVertexArray(BLIT_VAO);

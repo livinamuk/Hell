@@ -58,6 +58,9 @@ namespace HellEngine
 			Renderer::s_DOFShader.ReloadShader();
 			Renderer::s_ShadowMapShader.ReloadShader();
 			Renderer::s_FXAAShader.ReloadShader();
+			Renderer::s_BloodShader.ReloadShader();
+			Renderer::s_DecalShader.ReloadShader();
+			Renderer::s_solidColorShader.ReloadShader();
 			Renderer::SetTextureBindings();
 		}
 

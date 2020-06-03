@@ -164,8 +164,9 @@
     <ClInclude Include="src\GL\FinalImageBuffer.h" />
     <ClInclude Include="src\GL\GBuffer.h" />
     <ClInclude Include="src\GL\LightProbe.h" />
-    <ClInclude Include="src\GL\LightingBuffer.h" />
     <ClInclude Include="src\GL\LightVolume.h" />
+    <ClInclude Include="src\GL\LightVolumeDoorway.h" />
+    <ClInclude Include="src\GL\LightingBuffer.h" />
     <ClInclude Include="src\GL\Quad2D.h" />
     <ClInclude Include="src\GL\ShadowMap.h" />
     <ClInclude Include="src\Game.h" />
@@ -189,12 +190,16 @@
     <ClInclude Include="src\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="src\ImGuizmo\ImSequencer.h" />
     <ClInclude Include="src\Logic\ShotgunLogic.h" />
+    <ClInclude Include="src\Misc\Shell.h" />
     <ClInclude Include="src\Physics\CharacterController.h" />
     <ClInclude Include="src\Physics\Physics.h" />
+    <ClInclude Include="src\Physics\Ragdoll.h" />
     <ClInclude Include="src\Physics\RaycastResult.h" />
     <ClInclude Include="src\Renderer\Animator.h" />
     <ClInclude Include="src\Renderer\AssimpModel.h" />
+    <ClInclude Include="src\Renderer\BloodEffect.h" />
     <ClInclude Include="src\Renderer\Cube.h" />
+    <ClInclude Include="src\Renderer\Effects\Decal.h" />
     <ClInclude Include="src\Renderer\GLDebugDraw.h" />
     <ClInclude Include="src\Renderer\HDRTexture.h" />
     <ClInclude Include="src\Renderer\Material.h" />
@@ -608,8 +613,9 @@
     <ClCompile Include="src\GL\FinalImageBuffer.cpp" />
     <ClCompile Include="src\GL\GBuffer.cpp" />
     <ClCompile Include="src\GL\LightProbe.cpp" />
-    <ClCompile Include="src\GL\LightingBuffer.cpp" />
     <ClCompile Include="src\GL\LightVolume.cpp" />
+    <ClCompile Include="src\GL\LightVolumeDoorWay.cpp" />
+    <ClCompile Include="src\GL\LightingBuffer.cpp" />
     <ClCompile Include="src\GL\Quad2D.cpp" />
     <ClCompile Include="src\GL\ShadowMap.cpp" />
     <ClCompile Include="src\Game.cpp" />
@@ -646,12 +652,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Logic\ShotgunLogic.cpp" />
+    <ClCompile Include="src\Misc\Shell.cpp" />
     <ClCompile Include="src\Physics\CharacterController.cpp" />
     <ClCompile Include="src\Physics\Physics.cpp" />
+    <ClCompile Include="src\Physics\Ragdoll.cpp" />
     <ClCompile Include="src\Physics\RaycastResult.cpp" />
     <ClCompile Include="src\Renderer\Animator.cpp" />
     <ClCompile Include="src\Renderer\AssimpModel.cpp" />
+    <ClCompile Include="src\Renderer\BloodEffect.cpp" />
     <ClCompile Include="src\Renderer\Cube.cpp" />
+    <ClCompile Include="src\Renderer\Effects\Decal.cpp" />
     <ClCompile Include="src\Renderer\GLDebugDraw.cpp" />
     <ClCompile Include="src\Renderer\HDRTexture.cpp" />
     <ClCompile Include="src\Renderer\Material.cpp" />
@@ -690,6 +700,8 @@
     <None Include="res\shaders\ShadowMapDepth.vert" />
     <None Include="res\shaders\background.frag" />
     <None Include="res\shaders\background.vert" />
+    <None Include="res\shaders\blood.frag" />
+    <None Include="res\shaders\blood.vert" />
     <None Include="res\shaders\blur.frag" />
     <None Include="res\shaders\blurHorizontal.vert" />
     <None Include="res\shaders\blurVertical.vert" />
@@ -698,6 +710,8 @@
     <None Include="res\shaders\composite.frag" />
     <None Include="res\shaders\composite.vert" />
     <None Include="res\shaders\cubemap.vert" />
+    <None Include="res\shaders\decals.frag" />
+    <None Include="res\shaders\decals.vert" />
     <None Include="res\shaders\equirectangular_to_cubemap.frag" />
     <None Include="res\shaders\geometry.frag" />
     <None Include="res\shaders\geometry.vert" />
@@ -711,6 +725,8 @@
     <None Include="res\shaders\shader.frag" />
     <None Include="res\shaders\solidColor.frag" />
     <None Include="res\shaders\solidColor.vert" />
+    <None Include="res\shaders\stencil.frag" />
+    <None Include="res\shaders\stencil.vert" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">

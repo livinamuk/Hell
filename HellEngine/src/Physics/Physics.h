@@ -13,6 +13,8 @@
 #include "Renderer/Cube.h"
 #include "House/House.h"
 
+#include "Ragdoll.h"
+
 namespace HellEngine
 {
 	class Physics
@@ -29,9 +31,11 @@ namespace HellEngine
 		static btDiscreteDynamicsWorld* s_dynamicsWorld;
 		static btAlignedObjectArray<btRigidBody*> s_rigidBodies;
 		static btAlignedObjectArray<btCollisionObject*> s_collisionObjects;
-		static btCollisionObject* s_triangleCollisionObject;
+		//static btCollisionObject* s_triangleCollisionObject;
 		static std::vector<glm::vec3> s_points;
 		static std::map<const btCollisionObject*, std::vector<btManifoldPoint*>> s_objectsCollisions;
+
+		static Ragdoll* m_ragdoll;
 
 	public: // methods 
 
@@ -43,10 +47,14 @@ namespace HellEngine
 		static void Update(float deltaTime);
 		static void DebugDraw(Shader* shader);
 
-		static btRigidBody* createRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape, float friction);
-		static void AddRigidBody(btRigidBody* rigidBody);
+		static btRigidBody* createRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape, float friction, int group, int mask);
+		//static void AddRigidBody(btRigidBody* rigidBody);
+
+		static void AddEntityToPhysicsWorld(Entity* entity);
 
 		static void RebuildPhysicsWorld(House* house);
+
+		static glm::mat4 GetModelMatrixFromRigidBody(btRigidBody* rigidBody);
 
 	public: // Methods
 		//void AddGroundToPhysicsWorld();
@@ -61,4 +69,18 @@ namespace HellEngine
 		//public: // static methods
 
 	};
+
+	class OpenGLMotionState : public btDefaultMotionState {
+	/*ADD*/	public:
+		/*ADD*/		OpenGLMotionState(const btTransform& transform) : btDefaultMotionState(transform) {}
+		/*ADD*/
+		/*ADD*/		void GetWorldTransform(btScalar* transform) {
+			/*ADD*/			btTransform trans;
+			/*ADD*/			getWorldTransform(trans);
+			/*ADD*/			trans.getOpenGLMatrix(transform);
+			/*ADD*/
+		}
+		/*ADD*/
+	};
+
 }

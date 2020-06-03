@@ -53,6 +53,11 @@ uniform mat4 viewMatrix;
 uniform float screenWidth;
 uniform float screenHeight;
 
+uniform float room_lowerX;
+uniform float room_lowerZ;
+uniform float room_upperX;
+uniform float room_upperZ;
+
 // array of offset direction for sampling
 vec3 gridSamplingDisk[20] = vec3[]
 (
@@ -69,7 +74,7 @@ float ShadowCalculation(vec3 fragPos, vec3 viewPos)
     float currentDepth = length(fragToLight);
 
     float shadow = 0.0;
-    float bias = 0.175;
+    float bias = 0.2;
 	int samples = 20;
 
     float viewDistance = length(viewPos - fragPos);
@@ -79,10 +84,53 @@ float ShadowCalculation(vec3 fragPos, vec3 viewPos)
         float closestDepth = texture(ShadowMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
         closestDepth *= far_plane;
         if(currentDepth * currentDepth - bias > closestDepth * closestDepth)
-            shadow += 1.0;
+        {    
+			shadow += 1.0;
+		}
     }
     shadow /= float(samples);
-    return shadow;
+	
+   // return shadow;
+
+   vec2 res = vec2(1024, 1024);
+
+   float visibility = 1.0;
+  // float fragDepth = shadowCoord.z;
+   float fragDepth = currentDepth;
+	float nearestOccluderDepth = texture(ShadowMap, fragToLight).x;
+	nearestOccluderDepth *= far_plane;
+
+	if(fragDepth > 0){
+		// float s = 50.0;
+		float s = 1000.0;
+		// 	// visibility -= 0.2*(1.0-texture( shadowMap, vec3((shadowCoord.xy + poissonDisk[index]/700.0)*res,  (shadowCoord.z-bias)/shadowCoord.w) ));
+		visibility = clamp( exp( s * (nearestOccluderDepth - fragDepth)), 0.0, 1.0 );
+	}
+
+	//return 1 - visibility;
+	
+    diskRadius = (1.0 + (viewDistance / far_plane)) / 150.0;
+	fragDepth = fragDepth;
+	samples = 20;
+
+	for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(ShadowMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        closestDepth *= far_plane;
+		closestDepth = closestDepth;
+        
+		 //if(currentDepth * currentDepth - bias > closestDepth * closestDepth)
+		 if(fragDepth > 0)
+		{
+			float s = 150.0;
+			float b = 0.0275;
+			visibility += 1 - clamp( exp( s * (closestDepth - b - fragDepth)), 0.0, 1.0 );
+		}
+    }
+
+
+	 visibility /= float(samples);
+	return visibility;
 }
 
 struct PBRInfo
@@ -470,49 +518,21 @@ void main()
 	shadow =  1.0 - shadowFactor;
 
 
+	// Make indirect diffuse somewhat affected by shadows
+	indirectLighting *= shadowFactor / 2.5;
+
+//	shadow *= NdotL;
 //	float bias = 0.05;
 //	if (WorldPos.z > 2 + bias)
 	//	shadow = min((1.0 - shadowFactor), NdotL * NdotL * NdotL);
 
-    color = ((shadow * directLighting) + indirectLighting) * attenuation;// + (albedo * 0.00125);
-//color= shadow * (directLighting) * attenuation;
-//	color = (1.0 - shadow) * (directLighting + indirectLighting) * attenuation;// + (albedo * 0.00125);
+	if ((WorldPos.x < room_lowerX) || (WorldPos.z < room_lowerZ)  || (WorldPos.x > room_upperX) || (WorldPos.z > room_upperZ))
+		indirectLighting *= vec3(shadow);// * NdotL;
 
-//	color = vec3(NdotL) * lightColor;
-
-	//color = (1.0 - shadow) * (indirectLighting ) * attenuation;
-//    color = indirectLighting ;
-   // color = directLighting * attenuation;
-   // color = directLighting + indirectLighting;
-
-
-
-
-
+		//indirectLighting = vec3(0,0,0);
+	//	directLighting = vec3(0,0,0);
+	color = ((shadow * directLighting) + indirectLighting) * attenuation;
+	//color = ((shadow * directLighting) + (indirectLighting * shadow)) * attenuation;
 	
-//	color = albedo;
-	float depth = 1.91;
-
-	    vec3  position    = WorldPos + (n * depth * 10.0);
-        vec3  toLight     = lightPosition - position;
-     //   vec3  albedo      = vec3(1.0);
-        vec3  diffuse     = lightColor;
-      //  float attenuation = Attenuation(toLight);
-
-	 vec3  toEye    = v;//-ray.d;
-	 
-	 float SSSDistortion = 0.1;
-	 float SSSPower = 2.0;
-	 float SSSScale = 3.91;
-	 float thickness = 0.91;
-	 float SSSAmbient = 1;
-
-
-			vec3  SSSLight = (normalize(lightPosition - position) + n * SSSDistortion);
-        	float SSSDot   = pow(clamp(dot(toEye, -SSSLight), 0.0, 1.0), SSSPower) * SSSScale;
-        	float SSS      = (SSSDot + SSSAmbient) * thickness * attenuation;
-            
-        //    color = albedo * diffuse * SSS;
-
     FragColor = vec4(color, 1.0);
 }

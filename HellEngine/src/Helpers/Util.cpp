@@ -7,6 +7,14 @@ namespace HellEngine
 	unsigned int Util::upFacingPlaneVAO = INVALID_VALUE;
 	unsigned int Util::downFacingPlaneVAO = INVALID_VALUE;
 
+	glm::mat4 Util::btScalar2mat4(btScalar* matrix) {
+		return glm::mat4(
+			matrix[0], matrix[1], matrix[2], matrix[3],
+			matrix[4], matrix[5], matrix[6], matrix[7],
+			matrix[8], matrix[9], matrix[10], matrix[11],
+			matrix[12], matrix[13], matrix[14], matrix[15]);
+	}
+
 	glm::mat4 Util::Get_Mat4_From_Vec3(glm::vec3 position)
 	{
 		Transform trans;

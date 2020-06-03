@@ -38,6 +38,11 @@ namespace HellEngine
 
 		//std::cout << "Read model from disk: " << m_filePath << " (" << m_meshes.size() << ") meshes\n";
 		m_readFromDisk = true;
+
+		/*for (int i = 0; i < m_meshes.size(); i++)
+		{
+			std::cout << i << ": " << m_meshes[i]->name << "\n";
+		}*/
 	}
 
 	void Model::LoadMeshDataToGL()
@@ -48,6 +53,7 @@ namespace HellEngine
 		m_loadedToGL = true;
 		//std::cout << "Loaded to GL: " << m_filePath << "\n";
 	}
+
 
 	void Model::Draw(Shader* shader, glm::mat4 modelMatrix)
 	{
@@ -118,7 +124,19 @@ namespace HellEngine
 			int const index = m_nodeNameMap[nodeName];
 			//m_nodeBlendMatrices[index] = node->e
 			m_nodeBlendMatrices[index] = node->EvaluateGlobalTransform(currentTime);
+
+			/*std::cout << node->GetName() << "\n";
+			
+			glm::mat4 m;
+			for (int x = 0; x < 4; x++)
+				for (int y = 0; y < 4; y++)
+					m[x][y] = m_nodeBlendMatrices[index][x][y];
+
+			Util::PrintMat4(m);
+			std::cout << "\n";*/
+
 		}
+
 		if (m_sceneCamera)
 		{
 			m_sceneCamPos = m_sceneCamera->EvaluatePosition(currentTime);

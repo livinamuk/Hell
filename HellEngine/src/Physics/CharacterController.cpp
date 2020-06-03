@@ -25,13 +25,23 @@ namespace HellEngine
 		ghostObject_->setCollisionShape(capsule);
 		ghostObject_->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
 
+
+		EntityData* entityData = new EntityData();
+		entityData->name = "PLAYER";
+		entityData->vectorIndex = 0;
+		ghostObject_->setUserPointer(entityData);
+
 		//ghostObject_->getCollisionShape()->setMargin(0.04);
 		bulletController_ = new btKinematicCharacterController(ghostObject_, capsule, 0.3f, btVector3(0, 0, 1));
 		bulletController_->setGravity(Physics::s_dynamicsWorld->getGravity());
 
-		Physics::s_dynamicsWorld->addCollisionObject(ghostObject_, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
+		int group = CollisionGroups::PLAYER;
+		int mask = CollisionGroups::HOUSE | CollisionGroups::ENEMY;
+
+		Physics::s_dynamicsWorld->addCollisionObject(ghostObject_, group, mask);
 		Physics::s_dynamicsWorld->addAction(bulletController_);
 		bulletController_->setMaxJumpHeight(1.5);
+
 	}
 	
 	void CharacterController::Update(float deltaTime, Camera* camera)

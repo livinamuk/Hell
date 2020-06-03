@@ -64,7 +64,7 @@
                 2.049999952316284
             ],
             "Story": 0,
-            "Axis": "POS_X",
+            "Axis": "NEG_X",
             "RotateFloorTexture": false
         },
         {
@@ -112,12 +112,12 @@
             ],
             "Color": [
                 1.0,
-                1.0,
-                0.699999988079071
+                0.7840830087661743,
+                0.529411792755127
             ],
-            "Radius": 6.0,
-            "Strength": 44.0,
-            "Magic": 11.0
+            "Radius": 11.0,
+            "Strength": 20.0,
+            "Magic": 8.0
         },
         {
             "Position": [
@@ -176,8 +176,8 @@
                 0.0
             ],
             "Radius": 8.0,
-            "Strength": 55.0,
-            "Magic": 2.0
+            "Strength": 111.0,
+            "Magic": 10.0
         },
         {
             "Position": [
@@ -208,6 +208,36 @@
             "Radius": 11.0,
             "Strength": 10.0,
             "Magic": 4.0
+        },
+        {
+            "Position": [
+                0.0,
+                2.200000047683716,
+                -1.0
+            ],
+            "ModelPosition": [
+                0.0,
+                0.23999999463558198,
+                0.0
+            ],
+            "ModelRotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ModelScale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Color": [
+                1.0,
+                0.7799999713897705,
+                0.5289999842643738
+            ],
+            "Radius": 3.0,
+            "Strength": 5.0,
+            "Magic": 5.0
         }
     ],
     "STAIRCASES": [

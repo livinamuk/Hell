@@ -66,8 +66,19 @@
 #define SCR_HEIGHT 720
 #define NEAR_PLANE 0.01f
 #define FAR_PLANE 50.0f
+#define SHAADOW_FAR_PLANE 6.0f
+#define SHAADOW_NEAR_PLANE 0.1f
 
 #define CheckGLError() CheckGLError_(__FILE__, __LINE__)
+
+enum CollisionGroups { 
+	NONE = 0, 
+	HOUSE = 1 << 0, 
+	PLAYER = 1 << 1,
+	PROJECTILES = 1 << 2,
+	ENTITY = 2 << 3,
+	ENEMY = 3 << 4
+};
 
 struct Opp {
 	int m_initialAmount;
@@ -103,11 +114,11 @@ struct Vertex2D {
 	glm::vec2 TexCoords;
 };
 
-
 struct RenderSettings {
 	bool DrawWeapon;
 	bool BindMaterials;
 	bool DrawLightBulbs;
+	bool ShadowMapPass;
 };
 
 namespace std {
@@ -119,9 +130,10 @@ namespace std {
 }
 
 struct Line {
-	glm::vec3 start;
-	glm::vec3 end;
-	glm::vec3 color;
+	glm::vec3 start_pos;
+	glm::vec3 end_pos;
+	glm::vec3 start_color;
+	glm::vec3 end_color;
 };
 
 struct EntityData {
@@ -154,6 +166,7 @@ struct DoorWay {
 	glm::vec3 position;
 	Axis axis;
 	int story;
+	void* parent;
 };
 
 struct AssetInfo {

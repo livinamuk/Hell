@@ -5,7 +5,6 @@
 
 namespace HellEngine
 {
-	btCollisionObject* Physics::s_triangleCollisionObject;
 	btDiscreteDynamicsWorld* Physics::s_dynamicsWorld;
 	btAlignedObjectArray<btCollisionObject*> Physics::s_collisionObjects;
 	btAlignedObjectArray<btRigidBody*> Physics::s_rigidBodies;
@@ -19,6 +18,8 @@ namespace HellEngine
 	std::vector<glm::vec3> Physics::s_points;
 	std::map<const btCollisionObject*, std::vector<btManifoldPoint*>> Physics::s_objectsCollisions;
 
+	Ragdoll* Physics::m_ragdoll;
+
 	void Physics::Init()
 	{
 		s_debugDraw.Init();
@@ -31,38 +32,14 @@ namespace HellEngine
 		s_dispatcher = new btCollisionDispatcher(s_collisionConfiguration);
 		s_solver = new btSequentialImpulseConstraintSolver;
 		s_dynamicsWorld = new btDiscreteDynamicsWorld(s_dispatcher, s_broadphase, s_solver, s_collisionConfiguration);
-		s_dynamicsWorld->setGravity(btVector3(0, -10, 0));
+		s_dynamicsWorld->setGravity(btVector3(0, -5, 0));
 		s_dynamicsWorld->getPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
 	
 		CreateWorld();
 		AddHouse(house);
+
+		//m_ragdoll = new Ragdoll(s_dynamicsWorld, btVector3(0, 0, 0), 1.0f);
 	}
-
-	/*void myTickCallback(btDynamicsWorld* dynamicsWorld, btScalar timeStep) {
-		Physics::s_objectsCollisions.clear();
-		int numManifolds = Physics::s_dynamicsWorld->getDispatcher()->getNumManifolds();
-		for (int i = 0; i < numManifolds; i++) {
-			btPersistentManifold* contactManifold = Physics::s_dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
-			auto* objA = contactManifold->getBody0();
-			auto* objB = contactManifold->getBody1();
-			auto& collisionsA = Physics::s_objectsCollisions[objA];
-			auto& collisionsB = Physics::s_objectsCollisions[objB];
-			int numContacts = contactManifold->getNumContacts();
-			for (int j = 0; j < numContacts; j++) {
-				btManifoldPoint& pt = contactManifold->getContactPoint(j);
-				collisionsA.push_back(&pt);
-				collisionsB.push_back(&pt);
-			}
-		}
-		std::cout << "numManifolds: " << numManifolds << " collisions: " << Physics::s_objectsCollisions.size() << "\n";
-	}*/
-
-	/*void MyNearCallback(btBroadphasePair& collisionPair,
-		btCollisionDispatcher& dispatcher, btDispatcherInfo& dispatchInfo) {
-		// Do your collision logic here
-		// Only dispatch the Bullet collision information if you want the physics to continue
-		dispatcher.defaultNearCallback(collisionPair, dispatcher, dispatchInfo);
-	}*/
 
 	void Physics::DebugDraw(Shader* shader)
 	{
@@ -73,10 +50,10 @@ namespace HellEngine
 		for (int i = 0; i < s_debugDraw.lines.size() - 1; i++)
 		{
 			Vertex vert0, vert1;
-			vert0.Position = s_debugDraw.lines[i].start;
-			vert0.Normal = s_debugDraw.lines[i].color;	// Yes. You are storing the color in the vertex normal spot.
-			vert1.Position = s_debugDraw.lines[i].end;
-			vert1.Normal = s_debugDraw.lines[i].color;
+			vert0.Position = s_debugDraw.lines[i].start_pos;
+			vert0.Normal = s_debugDraw.lines[i].start_color;	// Yes. You are storing the color in the vertex normal spot.
+			vert1.Position = s_debugDraw.lines[i].end_pos;
+			vert1.Normal = s_debugDraw.lines[i].end_color;
 			s_debugDraw.vertices.push_back(vert0);
 			s_debugDraw.vertices.push_back(vert1);
 
@@ -98,8 +75,7 @@ namespace HellEngine
 		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
 
 
-		shader->setVec3("color", s_debugDraw.lines[0].color);
-
+		shader->setVec3("color", s_debugDraw.lines[0].start_color);
 		shader->setMat4("model", glm::mat4(1));
 		glBindVertexArray(s_debugDraw.VAO);
 		glDrawArrays(GL_LINES, 0, s_debugDraw.vertices.size());
@@ -117,7 +93,9 @@ namespace HellEngine
 		btRigidBody* floor;
 
 		btScalar mass(0.);
-		floor = createRigidBody(mass, groundTransform, groundShape, 1.0f);
+		int group = CollisionGroups::HOUSE;
+		int mask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
+		floor = createRigidBody(mass, groundTransform, groundShape, 1.0f, group, mask);
 		floor->setCustomDebugColor(DEBUG_COLOR_GROUND);
 
 
@@ -127,29 +105,18 @@ namespace HellEngine
 		floor->setUserPointer(entityData);
 
 		btBoxShape* collisionShape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
-		collisionShape->setLocalScaling(btVector3(0.15, 0.15, 0.15));
+		collisionShape->setLocalScaling(btVector3(0.015, 0.15, 0.15));
 		s_collisionShapes.push_back(collisionShape);
 
 
 
 
 
-		/*
-		EntityData* entityData2 = new EntityData();
-		entityData2->name = "STEP";
-		entityData2->vectorIndex = 0;
-		floor->setUserPointer(entityData2);
-
-		btBoxShape* collisionShape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
-		collisionShape->setLocalScaling(btVector3(1, 1, 1));
-		m_collisionShapes.push_back(collisionShape);*/
-
-
 		/// Create Dynamic Objects
 		btTransform startTransform;
 		startTransform.setIdentity();
 
-		mass = 1.1f;
+		mass = 1.f;
 		float friction = 0.5f;
 
 		//rigidbody is dynamic if and only if mass is non zero, otherwise static
@@ -158,6 +125,34 @@ namespace HellEngine
 		btVector3 localInertia(0, 0, 0);
 		if (isDynamic)
 			collisionShape->calculateLocalInertia(mass, localInertia);
+
+
+		for (int k = 0; k < 6; k++)		{
+			for (int i = 0; i < 3; i++)			{
+				for (int j = 0; j < 3; j++)				{
+					startTransform.setOrigin(btVector3(
+						btScalar(4.9f + 0.2 * i),
+						btScalar(0.1f + .2 * k),
+						btScalar(2.0f + 0.2 * j)));
+
+					int group = CollisionGroups::PROJECTILES;
+					int mask = CollisionGroups::HOUSE;
+
+					createRigidBody(mass, startTransform, collisionShape, friction, group, mask);
+				}
+			}
+		}
+
+
+
+
+
+
+
+
+
+
+
 
 
 		/*
@@ -266,27 +261,30 @@ namespace HellEngine
 		meshTransform.setIdentity();
 		meshTransform.setOrigin(btVector3(0, 0, 0));
 
-		s_triangleCollisionObject = new btCollisionObject();
-		s_triangleCollisionObject->setCollisionShape(triangleMeshShape);
-		s_triangleCollisionObject->setWorldTransform(meshTransform);
-		s_triangleCollisionObject->setFriction(0);
-		s_triangleCollisionObject->setCustomDebugColor(DEBUG_COLOR_RAMP);
+		btCollisionObject* collisionObject = new btCollisionObject();
+		collisionObject->setCollisionShape(triangleMeshShape);
+		collisionObject->setWorldTransform(meshTransform);
+		collisionObject->setFriction(0);
+		collisionObject->setCustomDebugColor(DEBUG_COLOR_RAMP);
 
 		EntityData* entityData = new EntityData();
 		entityData->name = "FLOOR";
 		entityData->vectorIndex = 0;
-		s_triangleCollisionObject->setUserPointer(entityData);
+		collisionObject->setUserPointer(entityData);
 
-		s_dynamicsWorld->removeCollisionObject(s_triangleCollisionObject);
-		
-		s_dynamicsWorld->addCollisionObject(s_triangleCollisionObject);
+		s_dynamicsWorld->removeCollisionObject(collisionObject);
 
-		s_triangleCollisionObject->setCollisionFlags(s_triangleCollisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		int group = CollisionGroups::HOUSE;
+		int mask = CollisionGroups::PLAYER | CollisionGroups::ENEMY;
+
+		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
+
+		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	}
 
 	void Physics::AddCubesToPhysicsWorld(std::vector<Cube> cubes)
 	{
-		for (size_t i = 0; i < cubes.size(); i++)
+		/*for (size_t i = 0; i < cubes.size(); i++)
 		{
 			btBoxShape* shape = new btBoxShape(Util::glmVec3_to_btVec3(cubes[i].m_transform.scale * glm::vec3(0.5f)));
 			s_collisionShapes.push_back(shape);
@@ -298,7 +296,7 @@ namespace HellEngine
 			btScalar mass = 0;
 			rigidBody = createRigidBody(mass, transform, shape, 1.0f);
 			rigidBody->setCustomDebugColor(DEBUG_COLOR_YELLOW);
-		}
+		}*/
 	}
 
 	void Physics::AddStaircaseToPhysicsWorld(House* house)
@@ -338,19 +336,23 @@ namespace HellEngine
 		meshTransform.setIdentity();
 		meshTransform.setOrigin(btVector3(0, 0, 0));
 
-		s_triangleCollisionObject = new btCollisionObject();
-		s_triangleCollisionObject->setCollisionShape(triangleMeshShape);
-		s_triangleCollisionObject->setWorldTransform(meshTransform);
-		s_triangleCollisionObject->setCustomDebugColor(btVector3(1, 0, 0));
+		btCollisionObject* collisionObject = new btCollisionObject();
+		collisionObject->setCollisionShape(triangleMeshShape);
+		collisionObject->setWorldTransform(meshTransform);
+		collisionObject->setCustomDebugColor(btVector3(1, 0, 0));
 		EntityData* entityData = new EntityData();
 		entityData->name = "STAIRS";
 		entityData->vectorIndex = 0;
-		s_triangleCollisionObject->setUserPointer(entityData);
-		s_dynamicsWorld->addCollisionObject(s_triangleCollisionObject);
+		collisionObject->setUserPointer(entityData);
 
-		s_collisionObjects.push_back(s_triangleCollisionObject);
+		int group = CollisionGroups::HOUSE;
+		int mask = CollisionGroups::PLAYER | CollisionGroups::ENEMY;
 
-		s_triangleCollisionObject->setCollisionFlags(s_triangleCollisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
+
+		s_collisionObjects.push_back(collisionObject);
+
+		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
 	}
 	/*
@@ -414,24 +416,26 @@ namespace HellEngine
 		meshTransform.setIdentity();
 		meshTransform.setOrigin(btVector3(0, 0, 0));
 
-		s_triangleCollisionObject = new btCollisionObject();
-		s_triangleCollisionObject->setCollisionShape(triangleMeshShape);
-		s_triangleCollisionObject->setWorldTransform(meshTransform);
-		s_triangleCollisionObject->setFriction(0);
-		s_triangleCollisionObject->setCustomDebugColor(DEBUG_COLOR_WALL);
+		btCollisionObject* collisionObject = new btCollisionObject();
+		collisionObject->setCollisionShape(triangleMeshShape);
+		collisionObject->setWorldTransform(meshTransform);
+		collisionObject->setFriction(0);
+		collisionObject->setCustomDebugColor(DEBUG_COLOR_WALL);
 		EntityData* entityData = new EntityData();
 		entityData->name = "WALL";
 		entityData->vectorIndex = 0;
-		s_triangleCollisionObject->setUserPointer(entityData);
-		s_dynamicsWorld->addCollisionObject(s_triangleCollisionObject);
+		collisionObject->setUserPointer(entityData);
 
-		s_collisionObjects.push_back(s_triangleCollisionObject);
+		int group = CollisionGroups::HOUSE;
+		int mask = CollisionGroups::PLAYER | CollisionGroups::ENEMY;
 
-		s_triangleCollisionObject->setCollisionFlags(s_triangleCollisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
+		s_collisionObjects.push_back(collisionObject);
+		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	}
 
 
-	btRigidBody* Physics::createRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape, float friction)
+	btRigidBody* Physics::createRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape, float friction, int group, int mask)
 	{
 		btAssert((!shape || shape->getShapeType() != INVALID_SHAPE_PROXYTYPE));
 
@@ -460,87 +464,72 @@ namespace HellEngine
 #endif  //
 
 		body->setUserIndex(-1);
-		s_dynamicsWorld->addRigidBody(body);
+		s_dynamicsWorld->addRigidBody(body, group, mask);
 
 		return body;
 
 	}
 
-	void Physics::AddRigidBody(btRigidBody* rigidBody)
+	void Physics::AddEntityToPhysicsWorld(Entity* entity)
 	{
-		s_dynamicsWorld->addRigidBody(rigidBody);
+		//if (AssetManager::models.size() == 0)
+		//	return;
+
+		btTriangleMesh* triangleMesh = new btTriangleMesh();
+
+		int indexCount = AssetManager::models[entity->m_modelID].m_meshes[0]->indices.size();
+
+
+			for (int i = 0; i < indexCount ; i += 3)
+			{
+				std::vector<Vertex>* vertices = &AssetManager::models[entity->m_modelID].m_meshes[0]->vertices;
+				std::vector<unsigned int>* indices = &AssetManager::models[entity->m_modelID].m_meshes[0]->indices;
+
+				glm::vec3 scale = entity->m_transform.scale;
+				btVector3 vertA = Util::glmVec3_to_btVec3(vertices->at(indices->at(i)).Position * scale);
+				btVector3 vertB = Util::glmVec3_to_btVec3(vertices->at(indices->at(i+1)).Position * scale);
+				btVector3 vertC = Util::glmVec3_to_btVec3(vertices->at(indices->at(i+2)).Position * scale);
+				triangleMesh->addTriangle(vertA, vertB, vertC);
+			}
+	
+
+		btBvhTriangleMeshShape* triangleMeshShape = new btBvhTriangleMeshShape(triangleMesh, true, true);
+
+		s_collisionShapes.push_back(triangleMeshShape);
+
+		btTransform meshTransform;
+		meshTransform.setIdentity();
+		meshTransform.setOrigin(Util::glmVec3_to_btVec3(entity->m_transform.position));
+
+		btQuaternion q = btQuaternion(entity->m_transform.rotation.y, 0, 0); // this is not always going to work. only for y it does.
+		meshTransform.setRotation((q));
+
+		//meshTransform.setFromOpenGLMatrix(glm::value_ptr(entity->m_transform.to_mat4()));
+
+		btCollisionObject* collisionObject = new btCollisionObject();
+		collisionObject->setCollisionShape(triangleMeshShape);
+		collisionObject->setWorldTransform(meshTransform);
+		collisionObject->setFriction(0);
+		collisionObject->setCustomDebugColor(btVector3(1, 0, 0));
+		EntityData* entityData = new EntityData();
+		entityData->name = "NEW MESH";
+		entityData->vectorIndex = 0;
+		collisionObject->setUserPointer(entityData);
+
+		int group = CollisionGroups::HOUSE;
+		int mask = CollisionGroups::ENTITY | CollisionGroups::ENEMY;
+
+		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
+
+		s_collisionObjects.push_back(collisionObject);
+
+		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	}
 
 
 	void Physics::Update(float deltaTime)
 	{
 		s_dynamicsWorld->stepSimulation(deltaTime);
-
-
-		//	m_points.clear();
-
-	/*
-
-			btCollisionAlgorithm* algo = m_dynamicsWorld->getDispatcher()->findAlgorithm(&objectA, &objectB);
-			btManifoldResult contactPointResult(&objectA, &objectB);
-			algo->processCollision(&objectA, &objectB, m_dynamicsWorld->getDispatchInfo(), &contactPointResult);
-
-			btManifoldArray manifoldArray;
-			algo->getAllContactManifolds(manifoldArray);
-
-			int numManifolds = manifoldArray.size();
-			for (int i = 0; i < numManifolds; i++)
-			{
-				btPersistentManifold* contactManifold = manifoldArray[i];
-				const btCollisionObject* obA = contactManifold->getBody0();
-				//	btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
-
-				glDisable(GL_DEPTH_TEST);
-				int numContacts = contactManifold->getNumContacts();
-				bool swap = obA == &objectA];
-
-				for (int j = 0; j < numContacts; j++)
-				{
-					btManifoldPoint& pt = contactManifold->getContactPoint(j);
-
-
-
-					btVector3 ptA = swap ? pt.getPositionWorldOnA() : pt.getPositionWorldOnB();
-					btVector3 ptB = swap ? pt.getPositionWorldOnB() : pt.getPositionWorldOnA();
-
-
-					glm::vec3 pos = Util::btVec3_to_glmVec3(pt.getPositionWorldOnA());
-					m_points.push_back(pos);
-
-					std::cout << "Dist: " << pt.getDistance() << "\n";
-				}
-
-				//you can un-comment out this line, and then all points are removed
-				contactManifold->clearManifold();
-
-				return;
-			}*/
-
-			/*int numManifolds = m_dynamicsWorld->getDispatcher()->getNumManifolds();
-			for (int i = 0; i < numManifolds; i++)
-			{
-				btPersistentManifold* contactManifold = m_dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
-				const btCollisionObject* obA = contactManifold->getBody0();
-				const btCollisionObject* obB = contactManifold->getBody1();
-
-				int numContacts = contactManifold->getNumContacts();
-				for (int j = 0; j < numContacts; j++)
-				{
-					btManifoldPoint& pt = contactManifold->getContactPoint(j);
-					if (pt.getDistance() < 0.f)
-					{
-						const btVector3& ptA = pt.getPositionWorldOnA();
-						const btVector3& ptB = pt.getPositionWorldOnB();
-						const btVector3& normalOnB = pt.m_normalWorldOnB;
-
-					}
-				}
-			}*/
 	}
 
 	void Physics::AddHouse(House* house)
@@ -555,6 +544,12 @@ namespace HellEngine
 
 		AddWallsToPhysicsWorld(house);
 		AddFloorsAndCeilingsToPhysicsWorld(house);
+
+
+		for (Entity& entity : house->m_entities)
+			AddEntityToPhysicsWorld(&entity);
+
+
 		//AddGroundToPhysicsWorld();
 
 		// Add doors
@@ -579,7 +574,11 @@ namespace HellEngine
 
 			btTransform.setOrigin(btVector3(x, y, z));
 			btTransform.setRotation(btQuaternion(door->m_rootTransform.rotation.y, 0, 0));
-			door->m_rigidBody = createRigidBody(0.0, btTransform, collisionShape, 1.0);
+
+			int group = CollisionGroups::HOUSE;
+			int mask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
+
+			door->m_rigidBody = createRigidBody(0.0, btTransform, collisionShape, 1.0, group, mask);
 			door->m_rigidBody->setCustomDebugColor(DEBUG_COLOR_DOOR);
 
 			// Entity Data
@@ -601,6 +600,17 @@ namespace HellEngine
 		
 		//m_dynamicsWorld.no
 		//m_dynamicsWorld->removeCollisionObject(m_triangleCollisionObject);
+	}
+
+	glm::mat4 Physics::GetModelMatrixFromRigidBody(btRigidBody* rigidBody)
+	{
+		btTransform trans;
+		rigidBody->getMotionState()->getWorldTransform(trans);
+
+		btScalar matrix[16];
+		trans.getOpenGLMatrix(matrix);
+
+		return Util::btScalar2mat4(matrix);
 	}
 }
 

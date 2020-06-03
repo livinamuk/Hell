@@ -36,6 +36,7 @@ namespace HellEngine
 		static int GetModelIDByName(std::string textureName);
 		static Model* GetModelByID(int modelID);
 		static Model* GetModelByName(std::string modelName);
+		static std::string GetModelNameByID(int modelID);
 		static void DrawModel(int modelID, Shader* shader, glm::mat4 modelMatrix);
 		static void DrawMesh(int modelID, int meshIndex, Shader* shader, glm::mat4 modelMatrix);
 		static unsigned int GetAlbTexID(unsigned int materialID);

@@ -2,6 +2,9 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 class Transform
 {
@@ -12,8 +15,20 @@ public: // fields
 
 public: // methods
 	glm::mat4 to_mat4(); 
+	glm::mat4 blood_mat4();
 	Transform();
 	Transform(glm::vec3 position);
 	Transform(glm::vec3 position, glm::vec3 rotation);
 	Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+	Transform(glm::mat4 matrix);
+
+	// overloads
+	/*Transform operator* (const Transform& other) const
+	{
+		Transform result;
+		result.position = position * other.position;
+		result.rotation = rotation * other.rotation;
+		result.scale = scale * other.scale;
+		return result;
+	}*/
 };

@@ -83,13 +83,14 @@ namespace HellEngine
 			Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Idle.FBX", "Idle", 0, -1);
 			Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Walk.FBX", "Walk", 0, -1);
 			Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Fire.FBX", "Fire", 0, -1);
-			//models.emplace_back(Model("res/models/StaircaseLanding.FBX"));
 		}
 
 		models.emplace_back(Model("res/models/StaircaseCeilingTrimStraight.obj"));
 		models.emplace_back(Model("res/models/TrimFloor.obj"));
 		models.emplace_back(Model("res/models/TrimCeiling.obj"));
 		models.emplace_back(Model("res/models/Door.obj"));
+		models.emplace_back(Model("res/models/DoorVolumeA.obj"));
+		models.emplace_back(Model("res/models/DoorShadowCaster.obj"));
 		models.emplace_back(Model("res/models/DoorFrame.obj"));
 		models.emplace_back(Model("res/models/Staircase.obj"));
 		models.emplace_back(Model("res/models/Light.obj"));
@@ -97,6 +98,8 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/PictureFrame2.obj"));
 		models.emplace_back(Model("res/models/PictureFrame.obj"));
 		models.emplace_back(Model("res/models/Couch.obj"));
+		models.emplace_back(Model("res/models/Mannequin.obj"));
+		models.emplace_back(Model("res/models/Shell.obj"));
 
 		for (int i = 0; i < models.size(); i++)
 			models[i].ReadFromDisk(); 	
@@ -266,6 +269,14 @@ namespace HellEngine
 		}
 		std::cout << "GetModelByName(): " << modelName << " not found\n";
 		return nullptr;
+	}
+
+	std::string AssetManager::GetModelNameByID(int modelID)
+	{
+		if (modelID < 0 || modelID >= models.size())
+			return "No Model";
+
+		return models[modelID].name;
 	}
 
 	void AssetManager::DrawModel(int modelID, Shader* shader, glm::mat4 modelMatrix)

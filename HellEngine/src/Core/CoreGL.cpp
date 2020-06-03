@@ -195,45 +195,6 @@ namespace HellEngine
 				Input::s_keyPressed[i] = false;
 			Input::s_keyDownLastFrame[i] = Input::s_keyDown[i];
 		}
-
-		/*if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-			glfwSetWindowShouldClose(window, true);
-
-		glm::vec3 Front = camera.m_Front;
-		Front.y = 0;
-		Front = glm::normalize(Front);
-
-		// Stopped
-
-		if ((glfwGetKey(window, GLFW_KEY_W) != GLFW_PRESS) &&
-			(glfwGetKey(window, GLFW_KEY_S) != GLFW_PRESS) &&
-			(glfwGetKey(window, GLFW_KEY_A) != GLFW_PRESS) &&
-			(glfwGetKey(window, GLFW_KEY_D) != GLFW_PRESS))
-			playerMovementState = PlayerMovementState::STOPPED;
-
-		// Walking Movement
-		float cameraSpeed = 2.5 * deltaTime;
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-			playerMovementState = PlayerMovementState::WALKING;
-			camera.m_transform.position -= cameraSpeed * Front;
-		}
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-			playerMovementState = PlayerMovementState::WALKING;
-			camera.m_transform.position += cameraSpeed * Front;
-		}
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-			playerMovementState = PlayerMovementState::WALKING;
-			camera.m_transform.position += glm::normalize(glm::cross(camera.m_Front, camera.m_Up)) * cameraSpeed;
-		}
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-			playerMovementState = PlayerMovementState::WALKING;
-			camera.m_transform.position -= glm::normalize(glm::cross(camera.m_Front, camera.m_Up)) * cameraSpeed;
-		}
-		// Running
-		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) {
-			if (playerMovementState = PlayerMovementState::WALKING)
-				playerMovementState = PlayerMovementState::RUNNING;
-		}*/
 	}
 
 	bool CoreGL::IsFullscreen(void)
@@ -320,6 +281,8 @@ namespace HellEngine
 		// ignore non-significant error/warning codes
 	//	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
+		if (id == 131218) return; // Shader state
+
 		std::cout << "---------------" << std::endl;
 		std::cout << "Debug message (" << id << "): " << message << std::endl;
 
@@ -357,7 +320,7 @@ namespace HellEngine
 
 		if (severity == GL_DEBUG_SEVERITY_HIGH)
 		{
-			std::cout << "SEVERE!!!\n";
+ 			std::cout << "SEVERE!!!\n";
 			std::cout << "SEVERE!!!\n";
 		}
 		/*if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)

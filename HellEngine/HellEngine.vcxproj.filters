@@ -34,11 +34,17 @@
     <Filter Include="src\Logic">
       <UniqueIdentifier>{EAF659B3-5661-0E2A-9F9F-BFCF0B49EC7E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Misc">
+      <UniqueIdentifier>{083622CF-F402-7DDA-1D1C-6B820948B268}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Physics">
       <UniqueIdentifier>{9F8B9316-0B41-0C0C-9435-06E300EA0210}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Renderer">
       <UniqueIdentifier>{73D1DFBF-5F34-6F64-08BA-A71AF4FB3AE7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Renderer\Effects">
+      <UniqueIdentifier>{2214ED2F-0EA3-76F9-B7C1-8AF4A32F879F}</UniqueIdentifier>
     </Filter>
     <Filter Include="vendor">
       <UniqueIdentifier>{B3738122-9F15-ACF8-88D0-BF4C74113349}</UniqueIdentifier>
@@ -141,6 +147,12 @@
     <ClInclude Include="src\GL\LightProbe.h">
       <Filter>src\GL</Filter>
     </ClInclude>
+    <ClInclude Include="src\GL\LightVolume.h">
+      <Filter>src\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GL\LightVolumeDoorway.h">
+      <Filter>src\GL</Filter>
+    </ClInclude>
     <ClInclude Include="src\GL\LightingBuffer.h">
       <Filter>src\GL</Filter>
     </ClInclude>
@@ -213,10 +225,16 @@
     <ClInclude Include="src\Logic\ShotgunLogic.h">
       <Filter>src\Logic</Filter>
     </ClInclude>
+    <ClInclude Include="src\Misc\Shell.h">
+      <Filter>src\Misc</Filter>
+    </ClInclude>
     <ClInclude Include="src\Physics\CharacterController.h">
       <Filter>src\Physics</Filter>
     </ClInclude>
     <ClInclude Include="src\Physics\Physics.h">
+      <Filter>src\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics\Ragdoll.h">
       <Filter>src\Physics</Filter>
     </ClInclude>
     <ClInclude Include="src\Physics\RaycastResult.h">
@@ -228,8 +246,14 @@
     <ClInclude Include="src\Renderer\AssimpModel.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\BloodEffect.h">
+      <Filter>src\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Renderer\Cube.h">
       <Filter>src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\Effects\Decal.h">
+      <Filter>src\Renderer\Effects</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\GLDebugDraw.h">
       <Filter>src\Renderer</Filter>
@@ -1407,7 +1431,6 @@
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h">
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
-    <ClInclude Include="src\GL\LightVolume.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp">
@@ -1465,6 +1488,12 @@
       <Filter>src\GL</Filter>
     </ClCompile>
     <ClCompile Include="src\GL\LightProbe.cpp">
+      <Filter>src\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GL\LightVolume.cpp">
+      <Filter>src\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GL\LightVolumeDoorWay.cpp">
       <Filter>src\GL</Filter>
     </ClCompile>
     <ClCompile Include="src\GL\LightingBuffer.cpp">
@@ -1536,10 +1565,16 @@
     <ClCompile Include="src\Logic\ShotgunLogic.cpp">
       <Filter>src\Logic</Filter>
     </ClCompile>
+    <ClCompile Include="src\Misc\Shell.cpp">
+      <Filter>src\Misc</Filter>
+    </ClCompile>
     <ClCompile Include="src\Physics\CharacterController.cpp">
       <Filter>src\Physics</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics\Physics.cpp">
+      <Filter>src\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Ragdoll.cpp">
       <Filter>src\Physics</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics\RaycastResult.cpp">
@@ -1551,8 +1586,14 @@
     <ClCompile Include="src\Renderer\AssimpModel.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\BloodEffect.cpp">
+      <Filter>src\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Renderer\Cube.cpp">
       <Filter>src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Effects\Decal.cpp">
+      <Filter>src\Renderer\Effects</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\GLDebugDraw.cpp">
       <Filter>src\Renderer</Filter>
@@ -1599,7 +1640,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\GL\LightVolume.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">
@@ -1641,6 +1681,12 @@
     <None Include="res\shaders\background.vert">
       <Filter>res\shaders</Filter>
     </None>
+    <None Include="res\shaders\blood.frag">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\blood.vert">
+      <Filter>res\shaders</Filter>
+    </None>
     <None Include="res\shaders\blur.frag">
       <Filter>res\shaders</Filter>
     </None>
@@ -1663,6 +1709,12 @@
       <Filter>res\shaders</Filter>
     </None>
     <None Include="res\shaders\cubemap.vert">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\decals.frag">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\decals.vert">
       <Filter>res\shaders</Filter>
     </None>
     <None Include="res\shaders\equirectangular_to_cubemap.frag">
@@ -1702,6 +1754,12 @@
       <Filter>res\shaders</Filter>
     </None>
     <None Include="res\shaders\solidColor.vert">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\stencil.frag">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\stencil.vert">
       <Filter>res\shaders</Filter>
     </None>
   </ItemGroup>

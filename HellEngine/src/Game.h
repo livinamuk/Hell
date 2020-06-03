@@ -12,6 +12,8 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/SkinnedMesh.h"
 #include "Renderer/AssimpModel.h"
+#include "Renderer/Effects/Decal.h"
+#include "Misc/Shell.h"
 
 namespace HellEngine
 {
@@ -39,9 +41,14 @@ namespace HellEngine
 
 		SkinnedMesh m_skinnedMesh;
 		SkinnedMesh m_srinivasMesh;
+		SkinnedMesh m_ZombieBoyMesh;
 
 		std::vector<glm::mat4> m_animatedTransforms;
+		std::vector<glm::mat4> m_ZombieBoyAnimatedTransforms;
 		std::vector<glm::mat4> m_srinivasdAnimatedTransforms; 
+
+		std::vector<Decal> m_decals;
+		std::vector<Shell> m_shells;
 
 		static bool s_dontLoadShotgun;
 

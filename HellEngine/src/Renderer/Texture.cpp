@@ -21,6 +21,8 @@ void Texture::LoadToGL()
 {
 	glGenTextures(1, &ID);
 	glBindTexture(GL_TEXTURE_2D, ID);
+
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -28,6 +30,7 @@ void Texture::LoadToGL()
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	GLint format = GL_RGB;
+
 	if (nrChannels == 4)
 		format = GL_RGBA;
 	if (nrChannels == 1)

@@ -5,14 +5,14 @@
 #include "House/Floor.h"
 #include "House/Ceiling.h"
 #include "House/Staircase.h"
-#include "GL/LightVolume.h"
+//#include "GL/LightVolume.h"
 
 namespace HellEngine
 {
 	class Room
 	{
 	public: // methods
-		Room(glm::vec2 position, glm::vec2 size, int story);
+		Room(glm::vec2 position, glm::vec2 size, int story, void* house);
 		~Room();
 		void Draw(Shader* shader);
 		void Rebuild();
@@ -22,7 +22,6 @@ namespace HellEngine
 		void AddFloorTrim(glm::vec3 position, float rotation, float scale);
 		void AddCeilingTrim(glm::vec3 position, float rotation, float scale);
 		void CalculateWorldSpaceBounds();
-		void CalculateLightVolume();
 
 	public:	// fields
 		glm::vec2 m_position;
@@ -31,12 +30,14 @@ namespace HellEngine
 		WallMesh m_wallMesh;
 		Floor m_floor;
 		Ceiling m_ceiling;
-		LightVolume m_lightVolume;
+		//LightVolume m_lightVolume;
+		void* p_house;
 
-		std::vector<DoorWay> m_doorWaysFrontWall;
-		std::vector<DoorWay> m_doorWaysBackWall; 
-		std::vector<DoorWay> m_doorWaysLeftWall;
-		std::vector<DoorWay> m_doorWaysRightWall;
+		std::vector<Door*> m_conenctedDoors;
+		std::vector<DoorWay> m_doorWaysXFrontWall;
+		std::vector<DoorWay> m_doorWaysXBackWall; 
+		std::vector<DoorWay> m_doorWaysZLeftWall;
+		std::vector<DoorWay> m_doorWaysZRightWall;
 
 		std::vector<Transform> m_floorTrimTransforms;
 		std::vector<Transform> m_ceilingTrimTransforms;

@@ -39,8 +39,11 @@ namespace HellEngine
 		);
 
 		// Ingore player capsule
-		rayCallback.m_collisionFilterMask &= ~btBroadphaseProxy::CharacterFilter;
-		
+		//rayCallback.m_collisionFilterMask &= ~btBroadphaseProxy::CharacterFilter;
+		//rayCallback.m_collisionFilterMask &= CollisionGroups::HOUSE | CollisionGroups::PROJECTILES;
+		rayCallback.m_collisionFilterGroup = btBroadphaseProxy::AllFilter;
+		rayCallback.m_collisionFilterMask =  ~CollisionGroups::PLAYER;
+
 		Physics::s_dynamicsWorld->rayTest(
 			btVector3(rayOrigin.x, rayOrigin.y, rayOrigin.z),
 			btVector3(rayEnd.x, rayEnd.y, rayEnd.z),

@@ -17,6 +17,7 @@ namespace HellEngine
 		Audio::LoadAudio("player_step_2.wav");
 		Audio::LoadAudio("player_step_3.wav");
 		Audio::LoadAudio("player_step_4.wav");
+		Audio::LoadAudio("Flesh.wav");
 		//Audio::LoadAudio("Music.wav");
 	}
 

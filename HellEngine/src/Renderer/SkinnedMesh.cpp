@@ -24,9 +24,6 @@ namespace HellEngine
                 return;
             }
         }
-
-        std::cout << "BoneID: " << BoneID << "\n";
-        std::cout << "Weight: " << Weight << "\n";
         return;
 
         // should never get here - more bones than we have space for
@@ -76,7 +73,19 @@ namespace HellEngine
 
         bool Ret = false;
 
-        m_pScene = m_Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+        m_pScene = m_Importer.ReadFile(Filename.c_str(),
+            aiProcess_Triangulate |
+            aiProcess_LimitBoneWeights |
+            aiProcess_GenSmoothNormals |
+            aiProcess_FlipUVs |
+            //	aiProcess_OptimizeGraph | WHATS THIS?
+            aiProcess_CalcTangentSpace);
+        
+        //aiProcess_Triangulate |
+         //   aiProcess_GenSmoothNormals |
+        //    aiProcess_FlipUVs);
+
+          //  aiProcess_PreTransformVertices); NEVER WORKED
 
         if (m_pScene) {
             m_GlobalInverseTransform = Util::aiMatrix4x4ToGlm(m_pScene->mRootNode->mTransformation);
@@ -89,6 +98,11 @@ namespace HellEngine
 
         // Make sure the VAO is not changed from the outside
         glBindVertexArray(0);
+
+
+        std::cout << "Loaded: " << Filename << "\n";
+        std::cout << " " << m_pScene->mNumMeshes << " meshes\n";
+        std::cout << " " << this->m_NumBones << " bones\n\n";
 
         return Ret;
     }
@@ -131,8 +145,6 @@ namespace HellEngine
     {
         m_Entries.resize(pScene->mNumMeshes);
 
-        std::cout << "MESH COUNT: " << pScene->mNumMeshes << "\n";
-
         vector<glm::vec3> Positions;
         vector<glm::vec3> Normals;
         vector<glm::vec2> TexCoords;
@@ -148,6 +160,7 @@ namespace HellEngine
             m_Entries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
             m_Entries[i].BaseVertex = NumVertices;
             m_Entries[i].BaseIndex = NumIndices;
+            m_Entries[i].MeshName = pScene->mMeshes[i]->mName.C_Str();
 
             NumVertices += pScene->mMeshes[i]->mNumVertices;
             NumIndices += m_Entries[i].NumIndices;
@@ -166,11 +179,10 @@ namespace HellEngine
             InitMesh(i, paiMesh, Positions, Normals, TexCoords, Bones, Indices);
         }
 
-
-
-       // if (!InitMaterials(pScene, Filename)) {
-       ///     return false;
-      //  }
+        // CHRIS you added this. It's to find those fucking tranforms.
+        std::cout << "\nLOADING MESH TRANFORMS\n";
+        LoadMeshTransforms(m_pScene->mRootNode, glm::mat4(1));
+        std::cout << "\n";
 
         glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
@@ -207,7 +219,6 @@ namespace HellEngine
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
 
-        std::cout << "INDICES.size: " << Indices.size() << "\n";
 
         return true;
     }
@@ -297,22 +308,20 @@ namespace HellEngine
     }
 
 
-    void SkinnedMesh::Render()
+    void SkinnedMesh::Render(Shader* shader, const glm::mat4& modelMatrix)
     {
         glBindVertexArray(m_VAO);
+        
+        for (MeshEntry& mesh : m_Entries) {
 
-        for (unsigned int i = 0; i < m_Entries.size(); i++) {
+            // If a model space mesh transformation exist, apply it.
+            if (m_transforms.find(mesh.MeshName) == m_transforms.end())
+                shader->setMat4("model", modelMatrix);
+            else
+                shader->setMat4("model", modelMatrix * m_transforms[mesh.MeshName]);
 
-
-            glDrawElementsBaseVertex(GL_TRIANGLES,
-                m_Entries[i].NumIndices,
-                GL_UNSIGNED_INT,
-                (void*)(sizeof(unsigned int) * m_Entries[i].BaseIndex),
-                m_Entries[i].BaseVertex);
+            glDrawElementsBaseVertex(GL_TRIANGLES, mesh.NumIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh.BaseIndex), mesh.BaseVertex);
         }
-
-        // Make sure the VAO is not changed from the outside    
-        glBindVertexArray(0);
     }
 
 
@@ -414,74 +423,121 @@ namespace HellEngine
     }
 
 
-    void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
+    // void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
+    glm::mat4 SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
     {
+        // Get this nodes transformation, convert it from aiMatrix4x4 to glm::mat4, and transpose for GL.
+        glm::mat4 NodeTransformation(Util::aiMatrix4x4ToGlm(pNode->mTransformation));
+        NodeTransformation = glm::transpose(NodeTransformation);
+
+        // Get node name
         string NodeName(pNode->mName.data);
 
-        const aiAnimation* pAnimation = m_pScene->mAnimations[0];
-
-       // glm::mat4 NodeTransformation(pNode->mTransformation); CHECK HERE FOR ERRORS
-        glm::mat4 NodeTransformation(Util::aiMatrix4x4ToGlm(pNode->mTransformation));
-        NodeTransformation = glm::transpose(NodeTransformation); // Transposed for OGL
-
-
-        const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
-
-        if (pNodeAnim) {
-            // Interpolate scaling and generate scaling transformation matrix
-            aiVector3D Scaling;
-            CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-            glm::mat4 ScalingM;
-            ScalingM = Util::Mat4InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
-
-            // Interpolate rotation and generate rotation transformation matrix
-            aiQuaternion RotationQ;
-            CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
-            glm::mat4 RotationM = Util::aiMatrix3x3ToGlm(RotationQ.GetMatrix());
-
-            // Interpolate translation and generate translation transformation matrix
-            aiVector3D Translation;
-            CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
-            glm::mat4 TranslationM;
-            TranslationM = Util::Mat4InitTranslationTransform(Translation.x, Translation.y, Translation.z);
-
-            // Combine the above transformations
-           // NodeTransformation = TranslationM * RotationM * ScalingM;
-            NodeTransformation = ScalingM * RotationM * TranslationM;
+        // Is there an animation then modifty the NodeTransformation matrix.
+        if (m_pScene->mAnimations != nullptr)
+        {
+            const aiAnimation* pAnimation = m_pScene->mAnimations[0];
+            const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
+            if (pNodeAnim) {
+                // Interpolate scaling and generate scaling transformation matrix
+                aiVector3D Scaling;
+                CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
+                glm::mat4 ScalingM;
+                ScalingM = Util::Mat4InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
+                // Interpolate rotation and generate rotation transformation matrix
+                aiQuaternion RotationQ;
+                CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
+                glm::mat4 RotationM = Util::aiMatrix3x3ToGlm(RotationQ.GetMatrix());
+                // Interpolate translation and generate translation transformation matrix
+                aiVector3D Translation;
+                CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
+                glm::mat4 TranslationM;
+                TranslationM = Util::Mat4InitTranslationTransform(Translation.x, Translation.y, Translation.z);
+                // Combine the above transformations
+                NodeTransformation = ScalingM * RotationM * TranslationM;
+            }
         }
 
-      //  glm::mat4 GlobalTransformation = ParentTransform * NodeTransformation;
+
+
+     
+
         glm::mat4 GlobalTransformation = NodeTransformation * ParentTransform;
 
-        if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) {
+        if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) 
+        {
             unsigned int BoneIndex = m_BoneMapping[NodeName];
-         //   m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
             m_BoneInfo[BoneIndex].FinalTransformation = m_BoneInfo[BoneIndex].BoneOffset * GlobalTransformation * m_GlobalInverseTransform;
         }
 
         for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
-            ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
+
+            glm::mat4 childTransformation = ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
+
+            // ok
+            // u need to look into the boneinfo array, 
+            // by the name of this child node you will get the bone index, 
+            // and retrieve its final transformation
+
+            /*std::string childName = pNode->mChildren[i]->mName.C_Str();
+
+            if (m_BoneMapping.find(childName) != m_BoneMapping.end())
+            {
+                unsigned int BoneIndex = m_BoneMapping[childName];
+                childTransformation = m_BoneInfo[BoneIndex].FinalTransformation;
+            }*/       
+
+            Line line;
+            line.start_pos = Util::GetTranslationFromMatrix(glm::transpose(GlobalTransformation * this->m_GlobalInverseTransform));
+            line.end_pos = Util::GetTranslationFromMatrix(glm::transpose(childTransformation * this->m_GlobalInverseTransform));
+            line.start_color = glm::vec3(1, 0, 1);
+            line.end_color = glm::vec3(1, 1, 1);
+
+            // if its a bone name, then add
+            if (m_BoneMapping.find(NodeName) != m_BoneMapping.end())
+                m_lines.push_back(line);        
         }
+
+        // try and find a way to not have to return this mat4. 
+        // its only so u can draw the lines. 
+        // you can probably do it from the child name.
+
+        return GlobalTransformation;
     }
 
 
     void SkinnedMesh::BoneTransform(float TimeInSeconds, vector<glm::mat4>& Transforms)
     {
-        glm::mat4 Identity = glm::mat4(1);
+        if (m_pScene == nullptr)
+            return;
+
+        this->m_lines.clear();
         Transforms.clear();
-
-        float TicksPerSecond = (float)(m_pScene->mAnimations[0]->mTicksPerSecond != 0 ? m_pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
-        float TimeInTicks = TimeInSeconds * TicksPerSecond;
-        float AnimationTime = fmod(TimeInTicks, (float)m_pScene->mAnimations[0]->mDuration);
-
-        ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity);
-
         Transforms.resize(m_NumBones);
+
+        // If there is an animation, figure out the frame time
+        float AnimationTime = 0;
+        if (m_pScene->mNumAnimations > 0) {
+            float TicksPerSecond = (float)(m_pScene->mAnimations[0]->mTicksPerSecond != 0 ? m_pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
+            float TimeInTicks = TimeInSeconds * TicksPerSecond;
+            AnimationTime = fmod(TimeInTicks, (float)m_pScene->mAnimations[0]->mDuration);
+        }
+        // If not just continue with time = 0
+        ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, glm::mat4(1));
+
+
 
         for (unsigned int i = 0; i < m_NumBones; i++) {
             Transforms[i] = m_BoneInfo[i].FinalTransformation;
         }
     }
+
+	void SkinnedMesh::SetBindPose(std::vector<glm::mat4>& Transforms)
+	{
+        Transforms.clear();
+        Transforms.resize(m_NumBones);
+        BoneTransform(0, Transforms);
+	}
 
 
     const aiNodeAnim* SkinnedMesh::FindNodeAnim(const aiAnimation* pAnimation, const string NodeName)
@@ -495,5 +551,17 @@ namespace HellEngine
         }
 
         return NULL;
+    }
+
+    void SkinnedMesh::LoadMeshTransforms(const aiNode* pNode, const glm::mat4& ParentTransform)
+    {
+        std::string nodeName = pNode->mName.C_Str();
+        glm::mat4 transformation = Util::aiMatrix4x4ToGlm(pNode->mTransformation);
+
+        m_transforms[nodeName] = transformation * ParentTransform;
+
+        // Climb down the tree
+        for (unsigned int i = 0; i < pNode->mNumChildren; i++)
+            LoadMeshTransforms(pNode->mChildren[i], transformation);
     }
 }

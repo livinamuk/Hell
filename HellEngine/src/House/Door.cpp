@@ -43,7 +43,23 @@ namespace HellEngine
 		//	AssetManager::models[AssetManager::s_ModelID_Door].Draw(shader,GetDoorModelMatrixFromPhysicsEngine() * Renderer::s_DebugTransform.to_mat4());
 		//else
 
-		AssetManager::DrawModel(AssetManager::s_ModelID_Door, shader, GetDoorModelMatrixFromPhysicsEngine());
+		int modelID;
+
+		if (Renderer::s_RenderSettings.ShadowMapPass == true)
+			modelID = AssetManager::GetModelIDByName("DoorShadowCaster");
+		else
+			modelID = AssetManager::GetModelIDByName("Door");
+	
+		modelID = AssetManager::GetModelIDByName("Door");
+
+
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Door"));
+		AssetManager::DrawModel(modelID, shader, GetDoorModelMatrixFromPhysicsEngine());
+	//	AssetManager::DrawModel(AssetManager::GetModelIDByName("DoorVolumeA"), shader, GetDoorModelMatrixFromPhysicsEngine());
+
+		//AssetManager::DrawModel(AssetManager::s_ModelID_Door, shader, GetDoorModelMatrixFromPhysicsEngine());
+
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("DoorFrame")); 
 		AssetManager::DrawModel(AssetManager::s_ModelID_DoorFrame, shader, m_rootTransform.to_mat4() * m_doorFrameTransform.to_mat4());
 
 		// Draw Floor

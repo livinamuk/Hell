@@ -53,7 +53,7 @@ namespace HellEngine {
 				glm::vec2 position = ReadVec2(rooms[i], "Position");
 				glm::vec2 size = ReadVec2(rooms[i], "Size");
 				int story = ReadInt(rooms[i], "Story");
-				house.AddRoom(Room(position, size, story));
+				house.AddRoom(Room(position, size, story, &house));
 			}
 		}
 
@@ -117,6 +117,30 @@ namespace HellEngine {
 				house.AddLight(Light(position, color, radius, strength, magic, Transform(modelPosition, modelRotation, modelScale)));
 			}
 		}
+
+		
+		if (document.HasMember("ENTITIES"))
+		{
+			const rapidjson::Value& entities = document["ENTITIES"];
+			for (rapidjson::SizeType i = 0; i < entities.Size(); i++)
+			{
+				glm::vec3 Position = ReadVec3(entities[i], "Position");
+				glm::vec3 Rotation = ReadVec3(entities[i], "Rotation");
+				glm::vec3 Scale = ReadVec3(entities[i], "Scale");
+				char* Tag = ReadText(entities[i], "Tag");
+				char* ModelName = ReadText(entities[i], "ModelName");
+				char* MaterialName = ReadText(entities[i], "MaterialName");
+
+				Entity e(Tag);
+				e.m_transform.position = Position;
+				e.m_transform.rotation = Rotation;
+				e.m_transform.scale = Scale;
+				e.m_modelID = AssetManager::GetModelIDByName(ModelName);
+				e.m_materialID = AssetManager::GetMaterialIDByName(MaterialName);
+				house.m_entities.push_back(e);
+			}
+		}
+
 		return house;
 	}
 
@@ -128,8 +152,22 @@ namespace HellEngine {
 		rapidjson::Value doorsArray(rapidjson::kArrayType);
 		rapidjson::Value lightsArray(rapidjson::kArrayType);
 		rapidjson::Value staircasesArray(rapidjson::kArrayType);
+		rapidjson::Value entitiesArray(rapidjson::kArrayType);
 		document.SetObject();
 
+		// Save Entities
+		for (Entity& entity : house->m_entities)
+		{
+			rapidjson::Value object(rapidjson::kObjectType);
+			SaveVec3(&object, "Position", entity.m_transform.position, allocator);
+			SaveVec3(&object, "Rotation", entity.m_transform.rotation, allocator);
+			SaveVec3(&object, "Scale", entity.m_transform.scale, allocator);
+			SaveString(&object, "ModelName", AssetManager::GetModelNameByID(entity.m_modelID), allocator);
+			SaveString(&object, "MaterialName", AssetManager::GetMaterialNameByID(entity.m_materialID), allocator);
+			SaveString(&object, "Tag", entity.m_tag, allocator);
+			entitiesArray.PushBack(object, allocator);
+		}			
+		
 		// Save rooms
 		for (Room & room : house->m_rooms)
 		{
@@ -182,6 +220,7 @@ namespace HellEngine {
 		}
 
 		// Add arrays
+		document.AddMember("ENTITIES", entitiesArray, allocator);
 		document.AddMember("ROOMS", roomsArray, allocator);
 		document.AddMember("DOORS", doorsArray, allocator);
 		document.AddMember("LIGHTS", lightsArray, allocator);
@@ -286,6 +325,21 @@ namespace HellEngine {
 		else
 			std::cout << "'" << name << "' NOT FOUND IN MAP FILE\n";
 		return s;
+	}
+
+	char* File::ReadText(const rapidjson::Value& value, std::string name)
+	{
+		std::string s = "NOT FOUND";
+		if (value.HasMember(name.c_str()))
+			s = value[name.c_str()].GetString();
+		else
+			std::cout << "'" << name << "' NOT FOUND IN MAP FILE\n";
+		
+		char* cstr = new char[s.length() + 1];
+		strcpy(cstr, s.c_str());
+		// do stuff
+		//delete[] cstr;		
+		return cstr;
 	}
 
 	bool File::ReadBool(const rapidjson::Value & value, std::string name)

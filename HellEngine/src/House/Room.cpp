@@ -5,11 +5,12 @@
 
 namespace HellEngine
 {
-	Room::Room(glm::vec2 position, glm::vec2 size, int story)
+	Room::Room(glm::vec2 position, glm::vec2 size, int story, void* house)
 	{
 		m_position = position;
 		m_size = size;
 		m_story = story;
+		p_house = house;
 		Rebuild();
 	}
 
@@ -65,15 +66,14 @@ namespace HellEngine
 		m_wallMesh.Draw(shader);	
 
 		// Floor trims
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Trims"));
 		for (Transform transform : m_floorTrimTransforms) {
 			shader->setVec2("TEXTURE_SCALE", glm::vec2(transform.scale.x, 1.0));
-			AssetManager::BindMaterial(AssetManager::s_MaterialID_Trims);
 			AssetManager::DrawModel(AssetManager::s_ModelID_FloorTrim, shader, transform.to_mat4());
 		}
 		// Ceiling trims
 		for (Transform transform : m_ceilingTrimTransforms) {
 			shader->setVec2("TEXTURE_SCALE", glm::vec2(transform.scale.x, 1.0));
-			AssetManager::BindMaterial(AssetManager::s_MaterialID_Trims);
 			AssetManager::DrawModel(AssetManager::s_ModelID_CeilingTrim, shader, transform.to_mat4());
 		}
 		// Reset to default
@@ -104,6 +104,8 @@ namespace HellEngine
 			doorWay.position = door.m_rootTransform.position;
 			doorWay.type = DoorWayType::DOOR;
 			doorWay.story = door.m_story;
+			doorWay.axis = door.m_axis;
+			doorWay.parent = &door;
 			potentialConnectedDoorWays.push_back(doorWay);
 		}
 
@@ -255,62 +257,43 @@ namespace HellEngine
 
 	void Room::CalculateWorldSpaceBounds()
 	{
-		m_lowerX = m_position.x - (m_size.x / 2);
-		m_lowerZ = m_position.y - (m_size.y / 2);
-		m_upperX = m_position.x + (m_size.x / 2);
-		m_upperZ = m_position.y + (m_size.y / 2);
-	}
-
-	void Room::CalculateLightVolume()
-	{
 		float bias = 0.02;
-		m_lightVolume.vertices.clear();
-		
-		// Create vertices
-		glm::vec3 A1 = glm::vec3(m_lowerX - bias, -bias, m_lowerZ - bias);
-		glm::vec3 B1 = glm::vec3(m_upperX + bias, -bias, m_lowerZ - bias);
-		glm::vec3 C1 = glm::vec3(m_lowerX - bias, -bias, m_upperZ + bias);
-		glm::vec3 D1 = glm::vec3(m_upperX + bias, -bias, m_upperZ + bias);
-		glm::vec3 A2 = glm::vec3(m_lowerX - bias, 2.4f + bias, m_lowerZ - bias);
-		glm::vec3 B2 = glm::vec3(m_upperX + bias, 2.4f + bias, m_lowerZ - bias);
-		glm::vec3 C2 = glm::vec3(m_lowerX - bias, 2.4f + bias, m_upperZ + bias);
-		glm::vec3 D2 = glm::vec3(m_upperX + bias, 2.4f + bias, m_upperZ + bias);
-		m_lightVolume.AddCuboidToLightVolume(A1, B1, C1, D1, A2, B2, C2, D2);
+		m_lowerX = m_position.x - (m_size.x / 2) - bias;
+		m_lowerZ = m_position.y - (m_size.y / 2) - bias;
+		m_upperX = m_position.x + (m_size.x / 2) + bias;
+		m_upperZ = m_position.y + (m_size.y / 2) + bias;
 
-	//	for (DoorWay& doorWay : m_doorWaysXFrontWall)
-	//		std::cout << "FrontWall: " << Util::AxisToString(doorWay.axis) << "\n";
 
 		for (DoorWay& doorWay : m_doorWaysXBackWall)
-		{
-			std::cout << "BackWall: " << Util::AxisToString(doorWay.axis) << "\n";
+			if (doorWay.type == DoorWayType::DOOR)
+				if (((Door*)doorWay.parent)->m_axis == Axis::POS_X)
+					m_upperZ += 0.06;
 
-			if (doorWay.axis == Axis::POS_X)
-			{
-
-				/*glm::vec3 A1 = glm::vec3(lowerX - bias, -bias, lowerZ - bias);
-				glm::vec3 B1 = glm::vec3(upperX + bias, -bias, lowerZ - bias);
-				glm::vec3 C1 = glm::vec3(lowerX - bias, -bias, upperZ + bias);
-				glm::vec3 D1 = glm::vec3(upperX + bias, -bias, upperZ + bias);
-				glm::vec3 A2 = glm::vec3(lowerX - bias, 2.4f + bias, lowerZ - bias);
-				glm::vec3 B2 = glm::vec3(upperX + bias, 2.4f + bias, lowerZ - bias);
-				glm::vec3 C2 = glm::vec3(lowerX - bias, 2.4f + bias, upperZ + bias);
-				glm::vec3 D2 = glm::vec3(upperX + bias, 2.4f + bias, upperZ + bias);
-				m_lightVolume.AddCuboidToLightVolume(A1, B1, C1, D1, A2, B2, C2, D2);
-				*/
-			}
-		}
-			
-	//	for (DoorWay& doorWay : m_doorWaysZLeftWall)
-	//		std::cout << "LeftWall: " << Util::AxisToString(doorWay.axis) << "\n";
-
-	//	for (DoorWay& doorWay : m_doorWaysZRightWall)
-	//		std::cout << "RightWall: " << Util::AxisToString(doorWay.axis) << "\n";
+		for (DoorWay& doorWay : m_doorWaysXFrontWall)
+			if (doorWay.type == DoorWayType::DOOR)
+				if (((Door*)doorWay.parent)->m_axis == Axis::NEG_X)
+					m_lowerZ -= 0.06;
 
 
+		for (DoorWay& doorWay : m_doorWaysZRightWall)
+			if (doorWay.type == DoorWayType::DOOR)
+				if (((Door*)doorWay.parent)->m_axis == Axis::POS_Z)
+					m_upperX += 0.06;
 
-		m_lightVolume.Setup();
+		for (DoorWay& doorWay : m_doorWaysZLeftWall)
+			if (doorWay.type == DoorWayType::DOOR)
+				if (((Door*)doorWay.parent)->m_axis == Axis::NEG_Z)
+					m_lowerX -= 0.06;
+		/*
+			light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_upperZ));
+
+		for (DoorWay& doorWay : room->m_doorWaysXFrontWall)
+			light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_lowerZ));
+
+		for (DoorWay& doorWay : room->m_doorWaysZLeftWall)
+			light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_lowerX));
+
+		for (DoorWay& doorWay : room->m_doorWaysZRightWall)
+			light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_upperX));*/
 	}
-
-
-
 }

@@ -7,7 +7,6 @@
 #include "glm/gtx/hash.hpp"
 
 #include "Core/keycodes.h"
-#include "fbxsdk.h"
 
 #include "Renderer/Shader.h"
 #include "Renderer/Transform.h"
@@ -139,15 +138,6 @@ struct Line {
 struct EntityData {
 	char* name = "NONE";
 	int vectorIndex = -1;
-};
-
-struct Animation
-{
-	fbxsdk::FbxTime  m_startTime;
-	fbxsdk::FbxTime  m_endTime;
-	fbxsdk::FbxTime  m_currentTime;
-	fbxsdk::FbxScene* m_scene = nullptr;
-	bool m_finishedPlaying = false;
 };
 
 enum FileType { FBX, OBJ, PNG, JPG, UNKNOWN };

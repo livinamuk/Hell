@@ -15,7 +15,7 @@ namespace HellEngine
 	public:	// fields
 		CharacterController m_characterController;
 		PlayerMovementState m_movementState;
-		GunState m_gunState;
+
 
 		bool isMoving;
 		float footstepAudioTimer;

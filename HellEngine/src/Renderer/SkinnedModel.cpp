@@ -1,9 +1,9 @@
 
 #include "hellpch.h"
 //#include <assert.h>
-#include "SkinnedMesh.h"
+#include "SkinnedModel.h"
 #include "Helpers/Util.h"
-//#include "HellEngine//Audio/Audio.h"
+#include "Helpers/AssetManager.h"
 
 #define POSITION_LOCATION    0
 #define NORMAL_LOCATION		 1
@@ -15,7 +15,7 @@
 
 namespace HellEngine
 {
-    void SkinnedMesh::VertexBoneData::AddBoneData(unsigned int BoneID, float Weight)
+    void SkinnedModel::VertexBoneData::AddBoneData(unsigned int BoneID, float Weight)
     {
         for (unsigned int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(IDs); i++) {
             if (Weights[i] == 0.0) {
@@ -24,13 +24,16 @@ namespace HellEngine
                 return;
             }
         }
+
+        //   std::cout << "BoneID: " << BoneID << "\n";
+       //    std::cout << "Weight: " << Weight << "\n";
         return;
 
         // should never get here - more bones than we have space for
         assert(0);
     }
 
-    SkinnedMesh::SkinnedMesh()
+    SkinnedModel::SkinnedModel()
     {
         m_VAO = 0;
         ZERO_MEM(m_Buffers);
@@ -38,14 +41,24 @@ namespace HellEngine
         m_pScene = NULL;
     }
 
+    SkinnedModel::SkinnedModel(const char* filename)
+    {
+        m_VAO = 0;
+        ZERO_MEM(m_Buffers);
+        m_NumBones = 0;
+        m_pScene = NULL;
+        m_filename = filename;
+        LoadMesh(filename);
+    }
 
-    SkinnedMesh::~SkinnedMesh()
+
+    SkinnedModel::~SkinnedModel()
     {
         Clear();
     }
 
 
-    void SkinnedMesh::Clear()
+    void SkinnedModel::Clear()
     {
 
         if (m_Buffers[0] != 0) {
@@ -59,7 +72,7 @@ namespace HellEngine
     }
 
 
-    bool SkinnedMesh::LoadMesh(const string& Filename)
+    bool SkinnedModel::LoadMesh(const string& Filename)
     {
         // Release the previously loaded mesh (if it exists)
         Clear();
@@ -73,66 +86,34 @@ namespace HellEngine
 
         bool Ret = false;
 
-        m_pScene = m_Importer.ReadFile(Filename.c_str(),
-            aiProcess_Triangulate |
-            aiProcess_LimitBoneWeights |
-            aiProcess_GenSmoothNormals |
-            aiProcess_FlipUVs |
-            //	aiProcess_OptimizeGraph | WHATS THIS?
-            aiProcess_CalcTangentSpace);
-        
-        //aiProcess_Triangulate |
-         //   aiProcess_GenSmoothNormals |
-        //    aiProcess_FlipUVs);
+        std::string filepath = "res/models/";
+        filepath += Filename;
 
-          //  aiProcess_PreTransformVertices); NEVER WORKED
+        const aiScene* tempScene = m_Importer.ReadFile(filepath.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+
+        //Getting corrupted later. So deep copying now.
+        m_pScene = new aiScene(*tempScene);
 
         if (m_pScene) {
             m_GlobalInverseTransform = Util::aiMatrix4x4ToGlm(m_pScene->mRootNode->mTransformation);
+            //   m_GlobalInverseTransform = Util::SwitchCoordSystem(m_GlobalInverseTransform);
             m_GlobalInverseTransform = glm::inverse(m_GlobalInverseTransform);
+
             Ret = InitFromScene(m_pScene, Filename);
         }
         else {
             printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_Importer.GetErrorString());
         }
 
-        // Make sure the VAO is not changed from the outside
-        glBindVertexArray(0);
-
-
         std::cout << "Loaded: " << Filename << "\n";
         std::cout << " " << m_pScene->mNumMeshes << " meshes\n";
         std::cout << " " << this->m_NumBones << " bones\n\n";
 
-        return Ret;
-    }
+        if (m_pScene->mNumCameras > 0)
+            aiCamera* m_camera = m_pScene->mCameras[0];
 
-    bool SkinnedMesh::LoadAnimation(const string& Filename)
-    {
-        // Release the previously loaded mesh (if it exists)
-        Clear();
 
-        // Create the VAO
-        glGenVertexArrays(1, &m_VAO);
-        glBindVertexArray(m_VAO);
 
-        // Create the buffers for the vertices attributes
-        glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
-
-        bool Ret = false;
-
-        m_pScene = m_Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
-
-        if (m_pScene) {
-            m_GlobalInverseTransform = Util::aiMatrix4x4ToGlm(m_pScene->mRootNode->mTransformation);
-            m_GlobalInverseTransform = glm::inverse(m_GlobalInverseTransform);
-        //    Ret = InitFromScene(m_pScene, Filename);
-            Ret = true;
-            std::cout << "NO SCENE\n";
-        }
-        else {
-            printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_Importer.GetErrorString());
-        }
 
         // Make sure the VAO is not changed from the outside
         glBindVertexArray(0);
@@ -140,10 +121,11 @@ namespace HellEngine
         return Ret;
     }
 
-
-    bool SkinnedMesh::InitFromScene(const aiScene* pScene, const string& Filename)
+    bool SkinnedModel::InitFromScene(const aiScene* pScene, const string& Filename)
     {
         m_Entries.resize(pScene->mNumMeshes);
+
+        std::cout << "MESH COUNT: " << pScene->mNumMeshes << "\n";
 
         vector<glm::vec3> Positions;
         vector<glm::vec3> Normals;
@@ -178,11 +160,6 @@ namespace HellEngine
             const aiMesh* paiMesh = pScene->mMeshes[i];
             InitMesh(i, paiMesh, Positions, Normals, TexCoords, Bones, Indices);
         }
-
-        // CHRIS you added this. It's to find those fucking tranforms.
-        std::cout << "\nLOADING MESH TRANFORMS\n";
-        LoadMeshTransforms(m_pScene->mRootNode, glm::mat4(1));
-        std::cout << "\n";
 
         glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
@@ -219,12 +196,12 @@ namespace HellEngine
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
 
+        std::cout << "INDICES.size: " << Indices.size() << "\n";
 
         return true;
     }
 
-
-    void SkinnedMesh::InitMesh(unsigned int MeshIndex,
+    void SkinnedModel::InitMesh(unsigned int MeshIndex,
         const aiMesh* paiMesh,
         vector<glm::vec3>& Positions,
         vector<glm::vec3>& Normals,
@@ -257,8 +234,14 @@ namespace HellEngine
         }
     }
 
+    bool SkinnedModel::LoadAnimation(const char* Filename)
+    {
+        m_animations.emplace_back(new Animation(Filename));
+        return false;
+    }
 
-    void SkinnedMesh::LoadBones(unsigned int MeshIndex, const aiMesh* pMesh, vector<VertexBoneData>& Bones)
+
+    void SkinnedModel::LoadBones(unsigned int MeshIndex, const aiMesh* pMesh, vector<VertexBoneData>& Bones)
     {
         for (unsigned int i = 0; i < pMesh->mNumBones; i++) {
             unsigned int BoneIndex = 0;
@@ -270,8 +253,8 @@ namespace HellEngine
                 m_NumBones++;
                 BoneInfo bi;
                 m_BoneInfo.push_back(bi);
-                //m_BoneInfo[BoneIndex].BoneOffset = pMesh->mBones[i]->mOffsetMatrix;  CHECK HERE FOR ERROS MAYBE?
-                m_BoneInfo[BoneIndex].BoneOffset = glm::transpose(Util::aiMatrix4x4ToGlm(pMesh->mBones[i]->mOffsetMatrix));
+                m_BoneInfo[BoneIndex].BoneOffset = Util::aiMatrix4x4ToGlm(pMesh->mBones[i]->mOffsetMatrix);
+                m_BoneInfo[BoneIndex].BoneName = BoneName;
                 m_BoneMapping[BoneName] = BoneIndex;
             }
             else {
@@ -287,7 +270,7 @@ namespace HellEngine
     }
 
 
-    bool SkinnedMesh::InitMaterials(const aiScene* pScene, const string& Filename)
+    bool SkinnedModel::InitMaterials(const aiScene* pScene, const string& Filename)
     {
         // Extract the directory part from the file name
         string::size_type SlashIndex = Filename.find_last_of("/");
@@ -308,49 +291,83 @@ namespace HellEngine
     }
 
 
-    void SkinnedMesh::Render(Shader* shader, const glm::mat4& modelMatrix)
+    void SkinnedModel::Render(Shader* shader, const glm::mat4& modelMatrix)
     {
         glBindVertexArray(m_VAO);
-        
+        shader->setMat4("model", modelMatrix);
         for (MeshEntry& mesh : m_Entries) {
 
-            // If a model space mesh transformation exist, apply it.
-            if (m_transforms.find(mesh.MeshName) == m_transforms.end())
-                shader->setMat4("model", modelMatrix);
-            else
-                shader->setMat4("model", modelMatrix * m_transforms[mesh.MeshName]);
+            if (mesh.MeshName == "Arms")
+                AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Hands"));
+            if (mesh.MeshName == "Shotgun Mesh")
+                AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shotgun"));
+            if (mesh.MeshName == "Shell Mesh")
+                AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shell"));
 
             glDrawElementsBaseVertex(GL_TRIANGLES, mesh.NumIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh.BaseIndex), mesh.BaseVertex);
         }
+        shader->setMat4("bindPoseMatrix", glm::mat4(1));
     }
 
-
-    unsigned int SkinnedMesh::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
+    int SkinnedModel::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
     {
+        // bail if current animation time is earlier than the this nodes first keyframe time
+        if (AnimationTime < (float)pNodeAnim->mPositionKeys[0].mTime)
+            return -1;
+
+        /*
+        if (pNodeAnim->mNumPositionKeys == 4)
+        {
+            std::cout << "ANIM TIME:   " << AnimationTime << "\n";
+            std::cout << pNodeAnim->mNodeName.C_Str() << "\n";
+            std::cout << "NUM OF KEYS: " << pNodeAnim->mNumPositionKeys << "\n\n";
+
+            for (unsigned int i = 0; i < pNodeAnim->mNumPositionKeys; i++)
+            {
+
+                std::cout << "key: " << (float)pNodeAnim->mPositionKeys[i].mTime << "\n\n";
+
+                //if (AnimationTime < (float)pNodeAnim->mPositionKeys[i + 1].mTime) {
+                 //   return i;
+               // }
+            }
+        }
+        */
+        /*  if (pNodeAnim->mNodeName.data == "Pumpslide_bone")
+              std::cout << "Pumpslide_bone " << pNodeAnim->mNumPositionKeys << "\n";
+          if (pNodeAnim->mNodeName.data == "ShotgunMain_bone")
+              std::cout << "ShotgunMain_bone " << pNodeAnim->mNumPositionKeys << "\n";*/
+
         for (unsigned int i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++) {
             if (AnimationTime < (float)pNodeAnim->mPositionKeys[i + 1].mTime) {
                 return i;
             }
         }
-        return 0;
+        return -1;
     }
 
 
-    unsigned int SkinnedMesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
+    int SkinnedModel::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
     {
-        assert(pNodeAnim->mNumRotationKeys > 0);
+        // bail if current animation time is earlier than the this nodes first keyframe time
+        if (AnimationTime < (float)pNodeAnim->mRotationKeys[0].mTime)
+            return -1;
 
         for (unsigned int i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++) {
             if (AnimationTime < (float)pNodeAnim->mRotationKeys[i + 1].mTime) {
                 return i;
             }
         }
-        return 0;
+        return -1;
     }
 
 
-    unsigned int SkinnedMesh::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
+    int SkinnedModel::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
     {
+        // bail if current animation time is earlier than the this nodes first keyframe time
+        if (AnimationTime < (float)pNodeAnim->mScalingKeys[0].mTime)
+            return -1;
+
         assert(pNodeAnim->mNumScalingKeys > 0);
 
         for (unsigned int i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++) {
@@ -358,23 +375,33 @@ namespace HellEngine
                 return i;
             }
         }
-        return 0;
+        return -1;
     }
 
 
-    void SkinnedMesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+    void SkinnedModel::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
     {
         if (pNodeAnim->mNumPositionKeys == 1) {
             Out = pNodeAnim->mPositionKeys[0].mValue;
             return;
         }
 
-        unsigned int PositionIndex = FindPosition(AnimationTime, pNodeAnim);
-        unsigned int NextPositionIndex = (PositionIndex + 1);
+        int PositionIndex = FindPosition(AnimationTime, pNodeAnim);
+        int NextPositionIndex = (PositionIndex + 1);
+
+        // Nothing to report
+        if (PositionIndex == -1) {
+            Out = aiVector3D(0, 0, 0);
+            Out = pNodeAnim->mPositionKeys[0].mValue;
+            return;
+            //PositionIndex = 0;
+            //NextPositionIndex = 0;
+        }
+
         //assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
         float DeltaTime = (float)(pNodeAnim->mPositionKeys[NextPositionIndex].mTime - pNodeAnim->mPositionKeys[PositionIndex].mTime);
         float Factor = (AnimationTime - (float)pNodeAnim->mPositionKeys[PositionIndex].mTime) / DeltaTime;
-        assert(Factor >= 0.0f && Factor <= 1.0f);
+        //assert(Factor >= 0.0f && Factor <= 1.0f);
         const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
         const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
         aiVector3D Delta = End - Start;
@@ -382,7 +409,7 @@ namespace HellEngine
     }
 
 
-    void SkinnedMesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+    void SkinnedModel::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
     {
         // we need at least two values to interpolate...
         if (pNodeAnim->mNumRotationKeys == 1) {
@@ -390,12 +417,22 @@ namespace HellEngine
             return;
         }
 
-        unsigned int RotationIndex = FindRotation(AnimationTime, pNodeAnim);
+        int RotationIndex = FindRotation(AnimationTime, pNodeAnim);
         unsigned int NextRotationIndex = (RotationIndex + 1);
+
+        // Nothing to report
+        if (RotationIndex == -1) {
+            Out = aiQuaternion(1, 0, 0, 0);
+            Out = pNodeAnim->mRotationKeys[0].mValue;
+            return;
+            RotationIndex = 0;
+            NextRotationIndex = 0;
+        }
+
         //assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
         float DeltaTime = (float)(pNodeAnim->mRotationKeys[NextRotationIndex].mTime - pNodeAnim->mRotationKeys[RotationIndex].mTime);
         float Factor = (AnimationTime - (float)pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;
-        assert(Factor >= 0.0f && Factor <= 1.0f);
+        //assert(Factor >= 0.0f && Factor <= 1.0f);
         const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
         const aiQuaternion& EndRotationQ = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
         aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
@@ -403,19 +440,29 @@ namespace HellEngine
     }
 
 
-    void SkinnedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+    void SkinnedModel::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
     {
         if (pNodeAnim->mNumScalingKeys == 1) {
             Out = pNodeAnim->mScalingKeys[0].mValue;
             return;
         }
 
-        unsigned int ScalingIndex = FindScaling(AnimationTime, pNodeAnim);
+        int ScalingIndex = FindScaling(AnimationTime, pNodeAnim);
         unsigned int NextScalingIndex = (ScalingIndex + 1);
+
+        // Nothing to report
+        if (ScalingIndex == -1) {
+            Out = aiVector3D(1, 1, 1);
+            Out = pNodeAnim->mScalingKeys[0].mValue;
+            return;
+            ScalingIndex = 0;
+            NextScalingIndex = 0;
+        }
+
         //assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
         float DeltaTime = (float)(pNodeAnim->mScalingKeys[NextScalingIndex].mTime - pNodeAnim->mScalingKeys[ScalingIndex].mTime);
         float Factor = (AnimationTime - (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime) / DeltaTime;
-        assert(Factor >= 0.0f && Factor <= 1.0f);
+        //assert(Factor >= 0.0f && Factor <= 1.0f);
         const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
         const aiVector3D& End = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
         aiVector3D Delta = End - Start;
@@ -423,124 +470,76 @@ namespace HellEngine
     }
 
 
-    // void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
-    glm::mat4 SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
+    void SkinnedModel::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
     {
-        // Get this nodes transformation, convert it from aiMatrix4x4 to glm::mat4, and transpose for GL.
-        glm::mat4 NodeTransformation(Util::aiMatrix4x4ToGlm(pNode->mTransformation));
-        NodeTransformation = glm::transpose(NodeTransformation);
 
-        // Get node name
+        aiAnimation* animation = m_animations[currentAnimationIndex]->m_pAnimationScene->mAnimations[0];
+
         string NodeName(pNode->mName.data);
+        glm::mat4 NodeTransformation(Util::aiMatrix4x4ToGlm(pNode->mTransformation));
+        const aiAnimation* pAnimation = animation;
+        const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
 
-        // Is there an animation then modifty the NodeTransformation matrix.
-        if (m_pScene->mAnimations != nullptr)
-        {
-            const aiAnimation* pAnimation = m_pScene->mAnimations[0];
-            const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
-            if (pNodeAnim) {
-                // Interpolate scaling and generate scaling transformation matrix
-                aiVector3D Scaling;
-                CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-                glm::mat4 ScalingM;
-                ScalingM = Util::Mat4InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
-                // Interpolate rotation and generate rotation transformation matrix
-                aiQuaternion RotationQ;
-                CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
-                glm::mat4 RotationM = Util::aiMatrix3x3ToGlm(RotationQ.GetMatrix());
-                // Interpolate translation and generate translation transformation matrix
-                aiVector3D Translation;
-                CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
-                glm::mat4 TranslationM;
-                TranslationM = Util::Mat4InitTranslationTransform(Translation.x, Translation.y, Translation.z);
-                // Combine the above transformations
-                NodeTransformation = ScalingM * RotationM * TranslationM;
-            }
+
+
+        if (pNodeAnim) {
+            aiVector3D Scaling;
+            CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
+            glm::mat4 ScalingM;
+            ScalingM = Util::Mat4InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
+            aiQuaternion RotationQ;
+            CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
+            glm::mat4 RotationM = Util::aiMatrix3x3ToGlm(RotationQ.GetMatrix());
+            aiVector3D Translation;
+            CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
+            glm::mat4 TranslationM;
+            TranslationM = Util::Mat4InitTranslationTransform(Translation.x, Translation.y, Translation.z);
+            NodeTransformation = TranslationM * RotationM * ScalingM;
         }
 
 
+        glm::mat4 GlobalTransformation = ParentTransform * NodeTransformation;
 
-     
+       /* std::cout << NodeName << "\n";
+        Util::PrintMat4(GlobalTransformation);
+        std::cout << "\n";*/
 
-        glm::mat4 GlobalTransformation = NodeTransformation * ParentTransform;
+        if (NodeName == "Camera001") {
+            m_CameraMatrix = GlobalTransformation;
+        //   Util::RemoveTranslation(m_CameraMatrix);
+        }
 
-        if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) 
-        {
+        if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) {
             unsigned int BoneIndex = m_BoneMapping[NodeName];
-            m_BoneInfo[BoneIndex].FinalTransformation = m_BoneInfo[BoneIndex].BoneOffset * GlobalTransformation * m_GlobalInverseTransform;
+            m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
+            m_BoneInfo[BoneIndex].TangentSpaceDebugMatrix = GlobalTransformation;
         }
 
-        for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
-
-            glm::mat4 childTransformation = ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
-
-            // ok
-            // u need to look into the boneinfo array, 
-            // by the name of this child node you will get the bone index, 
-            // and retrieve its final transformation
-
-            /*std::string childName = pNode->mChildren[i]->mName.C_Str();
-
-            if (m_BoneMapping.find(childName) != m_BoneMapping.end())
-            {
-                unsigned int BoneIndex = m_BoneMapping[childName];
-                childTransformation = m_BoneInfo[BoneIndex].FinalTransformation;
-            }*/       
-
-            Line line;
-            line.start_pos = Util::GetTranslationFromMatrix(glm::transpose(GlobalTransformation * this->m_GlobalInverseTransform));
-            line.end_pos = Util::GetTranslationFromMatrix(glm::transpose(childTransformation * this->m_GlobalInverseTransform));
-            line.start_color = glm::vec3(1, 0, 1);
-            line.end_color = glm::vec3(1, 1, 1);
-
-            // if its a bone name, then add
-            if (m_BoneMapping.find(NodeName) != m_BoneMapping.end())
-                m_lines.push_back(line);        
-        }
-
-        // try and find a way to not have to return this mat4. 
-        // its only so u can draw the lines. 
-        // you can probably do it from the child name.
-
-        return GlobalTransformation;
+        for (unsigned int i = 0; i < pNode->mNumChildren; i++)
+            ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
     }
 
 
-    void SkinnedMesh::BoneTransform(float TimeInSeconds, vector<glm::mat4>& Transforms)
+    void SkinnedModel::BoneTransform(float TimeInSeconds, vector<glm::mat4>& Transforms)
     {
-        if (m_pScene == nullptr)
-            return;
 
-        this->m_lines.clear();
-        Transforms.clear();
-        Transforms.resize(m_NumBones);
+        aiAnimation* animation = m_animations[currentAnimationIndex]->m_pAnimationScene->mAnimations[0];
 
-        // If there is an animation, figure out the frame time
-        float AnimationTime = 0;
-        if (m_pScene->mNumAnimations > 0) {
-            float TicksPerSecond = (float)(m_pScene->mAnimations[0]->mTicksPerSecond != 0 ? m_pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
-            float TimeInTicks = TimeInSeconds * TicksPerSecond;
-            AnimationTime = fmod(TimeInTicks, (float)m_pScene->mAnimations[0]->mDuration);
-        }
-        // If not just continue with time = 0
+        float TicksPerSecond = (float)(animation->mTicksPerSecond != 0 ? animation->mTicksPerSecond : 25.0f);
+        float TimeInTicks = TimeInSeconds * TicksPerSecond;
+        float AnimationTime = fmod(TimeInTicks, (float)animation->mDuration);
+
         ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, glm::mat4(1));
 
-
+        Transforms.clear();
+        Transforms.resize(m_NumBones);
 
         for (unsigned int i = 0; i < m_NumBones; i++) {
             Transforms[i] = m_BoneInfo[i].FinalTransformation;
         }
     }
 
-	void SkinnedMesh::SetBindPose(std::vector<glm::mat4>& Transforms)
-	{
-        Transforms.clear();
-        Transforms.resize(m_NumBones);
-        BoneTransform(0, Transforms);
-	}
-
-
-    const aiNodeAnim* SkinnedMesh::FindNodeAnim(const aiAnimation* pAnimation, const string NodeName)
+    const aiNodeAnim* SkinnedModel::FindNodeAnim(const aiAnimation* pAnimation, const string NodeName)
     {
         for (unsigned int i = 0; i < pAnimation->mNumChannels; i++) {
             const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
@@ -549,19 +548,6 @@ namespace HellEngine
                 return pNodeAnim;
             }
         }
-
         return NULL;
-    }
-
-    void SkinnedMesh::LoadMeshTransforms(const aiNode* pNode, const glm::mat4& ParentTransform)
-    {
-        std::string nodeName = pNode->mName.C_Str();
-        glm::mat4 transformation = Util::aiMatrix4x4ToGlm(pNode->mTransformation);
-
-        m_transforms[nodeName] = transformation * ParentTransform;
-
-        // Climb down the tree
-        for (unsigned int i = 0; i < pNode->mNumChildren; i++)
-            LoadMeshTransforms(pNode->mChildren[i], transformation);
     }
 }

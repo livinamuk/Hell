@@ -13,8 +13,8 @@ namespace HellEngine
 		void DrawEntity(Shader* shader);
 		void Draw(Shader* shader);
 		void Draw(Shader* shader, glm::mat4 modelMatrix);
-		void SetAnimation(char* animationName, bool loop); // switches animation. 
-		bool IsAnimationComplete();
+		//void SetAnimation(char* animationName, bool loop); // switches animation. 
+		//bool IsAnimationComplete();
 
 
 	public:	// fields

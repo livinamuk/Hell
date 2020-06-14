@@ -58,8 +58,6 @@ project "HellEngine"
 		"%{prj.name}/vendor/imgui",
 		"%{prj.name}/vendor/imguizmo",
 		"%{prj.name}/vendor/glm",
-		"%{prj.name}/vendor/FbxSDK/include",
-		"%{prj.name}/vendor/FbxSDK/include/fbxsdk",
 		"%{prj.name}/vendor/bullet",
 		"%{prj.name}/vendor/assimp/include",
 		"%{prj.name}/vendor/rapidjson/include",
@@ -70,7 +68,6 @@ project "HellEngine"
 
 	libdirs 
 	{ 
-		"HellEngine/vendor/FbxSDK/lib/x64/debug",
 		"HellEngine/vendor/bullet/bullet/lib/RelWithDebInfo",
 		"HellEngine/vendor/assimp/lib/",
 		"HellEngine/vendor/soloud/lib/",
@@ -84,7 +81,6 @@ project "HellEngine"
 		"Glad",
 		"ImGui",
 		"opengl32.lib",
-		"libfbxsdk-md.lib",
 		"assimp-vc142-mt.lib",
 		"assimp-vc142-mtd.lib",
 		"Bullet3Dynamics_RelWithDebugInfo.lib",

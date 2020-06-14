@@ -4,7 +4,6 @@
 #include "Core/CoreGL.h"
 #include "Core/CoreImGui.h"
 #include "Helpers/AssetManager.h"
-#include "Helpers/Importer.h"
 #include "Renderer/Renderer.h"
 #include "Audio/Audio.h"
 #include "Core/File.h"
@@ -15,7 +14,6 @@ int main()
 {
 	CoreGL::InitGL(SCR_WIDTH, SCR_HEIGHT);
 	CoreImGui::InitImGui();
-	Importer::Init();
 	Renderer::Init();
 	AssetManager::FindAllFiles();
 	AssetManager::ForceLoadTexture("CharSheet");
@@ -70,20 +68,20 @@ int main()
 	}
 
 	CoreGL::Terminate();
-	Importer::Terminate(); 
 	Audio::Terminate();
 	return 0;
 
 	{
-		Opp r = Opp(1700);
+		Opp r = Opp(1400);
 
-		Opp m = Opp(850);
+		Opp m = Opp(750);
 
 		Opp c = Opp(2400);
 		c.Deduct(300);
 		c.Deduct(300);
 		c.Deduct(300);
 		c.Deduct(300);
-		c.Deduct(300); 
+		c.Deduct(300);
+		c.Deduct(300);
 	}
 }

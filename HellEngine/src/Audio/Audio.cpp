@@ -17,7 +17,14 @@ namespace HellEngine
 		Audio::LoadAudio("player_step_2.wav");
 		Audio::LoadAudio("player_step_3.wav");
 		Audio::LoadAudio("player_step_4.wav");
-		Audio::LoadAudio("Flesh.wav");
+		Audio::LoadAudio("Impact_Flesh.wav");
+		Audio::LoadAudio("Empty.wav");
+		Audio::LoadAudio("Shotgun_Reload_01.wav");
+		Audio::LoadAudio("Shotgun_Reload_05.wav");
+		Audio::LoadAudio("Shotgun_ReloadStart.wav");
+		Audio::LoadAudio("Shotgun_ReloadEnd.wav");
+		Audio::LoadAudio("ShellFloorBounce.wav");
+		Audio::LoadAudio("ShellWallBounce.wav");
 		//Audio::LoadAudio("Music.wav");
 	}
 

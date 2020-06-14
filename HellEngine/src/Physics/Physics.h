@@ -14,12 +14,23 @@
 #include "House/House.h"
 
 #include "Ragdoll.h"
+#include <set>
+#include <iterator>
+#include <algorithm>
 
 namespace HellEngine
 {
+	typedef std::pair<const btRigidBody*, const btRigidBody*> CollisionPair;
+	typedef std::set<CollisionPair> CollisionPairs;
+
 	class Physics
 	{
 	public: // fields
+		static CollisionPairs s_pairsLastUpdate;
+
+		static void CheckForCollisionEvents();
+		static void CollisionEvent(btRigidBody* pBody0, btRigidBody* pBody1);
+		static void SeparationEvent(btRigidBody* pBody0, btRigidBody* pBody1);
 
 		static GLDebugDrawer s_debugDraw;
 		static btDefaultCollisionConfiguration* s_collisionConfiguration;
@@ -31,7 +42,6 @@ namespace HellEngine
 		static btDiscreteDynamicsWorld* s_dynamicsWorld;
 		static btAlignedObjectArray<btRigidBody*> s_rigidBodies;
 		static btAlignedObjectArray<btCollisionObject*> s_collisionObjects;
-		//static btCollisionObject* s_triangleCollisionObject;
 		static std::vector<glm::vec3> s_points;
 		static std::map<const btCollisionObject*, std::vector<btManifoldPoint*>> s_objectsCollisions;
 

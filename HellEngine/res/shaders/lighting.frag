@@ -519,7 +519,8 @@ void main()
 
 
 	// Make indirect diffuse somewhat affected by shadows
-	indirectLighting *= shadowFactor / 2.5;
+//	indirectLighting *= shadowFactor / 2.5;
+//		indirectLighting *= (shadowFactor);// * 10.0);
 
 //	shadow *= NdotL;
 //	float bias = 0.05;
@@ -532,6 +533,7 @@ void main()
 		//indirectLighting = vec3(0,0,0);
 	//	directLighting = vec3(0,0,0);
 	color = ((shadow * directLighting) + indirectLighting) * attenuation;
+	//color = indirectLighting;
 	//color = ((shadow * directLighting) + (indirectLighting * shadow)) * attenuation;
 	
     FragColor = vec4(color, 1.0);

@@ -6,6 +6,8 @@
 
 namespace HellEngine
 {
+	std::vector<Decal> Decal::s_decals;
+
 	Decal::Decal(glm::vec3 position, glm::vec3 normal)
 	{
 		//this->decalType = decalType;

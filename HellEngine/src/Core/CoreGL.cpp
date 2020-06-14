@@ -128,11 +128,16 @@ namespace HellEngine
 	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	{
 		int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-		
 		if (state == GLFW_PRESS)
 			Input::s_leftMouseDown = true;
 		else if (state == GLFW_RELEASE)
-			Input::s_leftMouseDown = false;
+			Input::s_leftMouseDown = false;		
+		
+		int RMstate = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
+		if (RMstate == GLFW_PRESS)
+			Input::s_rightMouseDown = true;
+		else if (RMstate == GLFW_RELEASE)
+			Input::s_rightMouseDown = false;
 	}
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -180,6 +185,13 @@ namespace HellEngine
 		else
 			Input::s_leftMousePressed = false;
 		Input::s_leftMouseDownLastFrame = Input::s_leftMouseDown;
+
+		// Rught mouse pressed
+		if (Input::s_rightMouseDown && !Input::s_rightMouseDownLastFrame)
+			Input::s_rightMousePressed = true;
+		else
+			Input::s_rightMousePressed = false;
+		Input::s_rightMouseDownLastFrame = Input::s_rightMouseDown;
 
 		for (int i = 30; i < 350; i++) {
 			// Key down

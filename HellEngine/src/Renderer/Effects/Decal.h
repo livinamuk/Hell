@@ -17,8 +17,9 @@ namespace HellEngine
 		float randomRotation;
 
 	public: // methods
-		//Decal(DecalType decaltype, glm::vec3 position, glm::vec3 normal);
 		Decal(glm::vec3 position, glm::vec3 normal);
 		void Draw(Shader* shader, bool blackOnly);
+
+		static std::vector<Decal> s_decals;
 	};
 }

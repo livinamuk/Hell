@@ -1,12 +1,13 @@
 #include "hellpch.h"
 #include "Game.h"
 #include "Helpers/AssetManager.h"
-#include "Helpers/Importer.h"
 #include "Helpers/Util.h"
 #include "Core/File.h"
 #include "Core/CoreGL.h"
 #include "GL/Quad2D.h"
 #include "Audio/Audio.h"
+#include "Logic/ShotgunLogic.h"
+#include "Config.h"
 
 namespace HellEngine
 {
@@ -19,163 +20,189 @@ namespace HellEngine
 
 	void Game::OnLoad()
 	{
-		// Time
-		currentFrame = CoreGL::GetGLTime();
-		currentFrame = CoreGL::GetGLTime();
-		lastFrame = currentFrame;
+		currentTime = CoreGL::GetGLTime();
+		lastFrame = 0;
+
+
+		// Set up sketchy ass pointers
+		ShotgunLogic::p_camera = &camera;
+		ShotgunLogic::p_player = &m_player;
+		ShotgunLogic::p_model = &m_shotgunAnimatedEntity;
+
 
 		///////////////////////////////////
 		// Working assimp animated model //
 		///////////////////////////////////
 
-		if (!m_skinnedMesh.LoadMesh("res/models/boblampclean.md5mesh"))
-			printf("Mesh load failed\n");
+//		if (!m_skinnedMesh.LoadMesh("res/models/boblampclean.md5mesh"))
+//			printf("Mesh load failed\n");
 	
-		if (!m_ZombieBoyMesh.LoadMesh("res/models/ZombieBoy.fbx"))
-			printf("Mesh load failed\n");
+//		if (!m_ZombieBoyMesh.LoadMesh("res/models/ZombieBoy.fbx"))
+//			printf("Mesh load failed\n");
 		
-		if (!m_srinivasMesh.LoadMesh("res/models/Shotgun.FBX"))
-			printf("Shotgun.FBX mesh load failed\n");
-		
-		///////////////////////////////////
+	//	if (!m_srinivasMesh.LoadMesh("res/models/Shotgun.fbx"))
+	//		printf("Shotgun.FBX mesh load failed\n");
 
 
-		m_shotgunTransform.scale = glm::vec3(0.2);
 
 		//Audio::StreamAudio("Music3.mp3");
 		
 		testTrans.rotation.y = HELL_PI * 1.5f;
 
-		m_HUDshotgun = Entity();
 
 		Physics::Init();
 
-		//this->RebuildMap();
 
 		this->house = File::LoadMap("Map.txt");
 		this->RebuildMap();
 
 
-		m_shells.push_back(Shell(Transform(glm::vec3(0, 1, 0))));
-		m_shells.push_back(Shell(Transform(glm::vec3(0.3f, 1, 0))));
 
 	//Entity e("Boy");
 	//	e.m_modelID = 1;
 	//	e.m_materialID = 1;
 	//	house.m_entities.push_back(e);
 
-		m_HUDshotgun.m_modelID = AssetManager::GetModelIDByName("Shotgun");
 	}
 
 	void Game::OnUpdate()
 	{
+		if (Input::s_keyPressed[HELL_KEY_O])
+			m_shotgunAnimatedEntity.m_currentAnimationIndex -= 1;
+		if (Input::s_keyPressed[HELL_KEY_P])
+			m_shotgunAnimatedEntity.m_currentAnimationIndex += 1;
+
+
+	
+
 		// Keypresses
 		Input::HandleKeypresses();
 		if (Input::s_keyPressed[HELL_KEY_E])
 			OnInteract();
 
-		// Time
-		currentFrame = CoreGL::GetGLTime();
-		float deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+		// Time		
+		const float MAX_FRAME_DELTA = 2;
+		
+		currentTime = CoreGL::GetGLTime();
+		float deltaTime = currentTime - lastFrame;
+		lastFrame = currentTime;
+			
+		// Clamp.
+		deltaTime = min(deltaTime, MAX_FRAME_DELTA);
+		m_deltaTime = deltaTime;
 
-		Renderer::s_bloodEffect.Update(deltaTime);
-		TextBlitter::UpdateBlitter(deltaTime);
+		// Update in discrete steps
+	//	for (int i = 0; i < deltaTime / 100; i++)
+		{
 
-		// Player
-		m_player.Update(deltaTime);
-		m_player.m_characterController.Update(deltaTime, &camera);
+			Renderer::s_bloodEffect.Update(deltaTime);
+			Renderer::s_muzzleFlash.Update(deltaTime);
+
+			TextBlitter::UpdateBlitter(deltaTime);
+
+			// Player
+			m_player.Update(deltaTime);
+			m_player.m_characterController.Update(deltaTime, &camera);
+
+
+			// Doors
+			for (Door& door : house.m_doors)
+				door.Update(deltaTime);
+
+			ShotgunLogic::Update(deltaTime);
+			m_cameraRaycast = ShotgunLogic::m_raycast;
+
+
+			m_shotgunAnimatedEntity.Update(deltaTime);
+
+
+			// Camera
+
+			//camera.m_zoomLimit = Config::TEST_FLOAT;
+			//camera.m_zoomSpeed = Config::TEST_FLOAT2;
+
+			if (Input::s_rightMouseDown)
+				camera.m_zoomFactor += deltaTime * camera.m_zoomSpeed;
+			else
+				camera.m_zoomFactor -= deltaTime * camera.m_zoomSpeed;
+
+			camera.m_zoomFactor = std::min(camera.m_zoomFactor, camera.m_zoomLimit);
+			camera.m_zoomFactor = std::max(camera.m_zoomFactor, 0.0f);
+
+
+			camera.Update(deltaTime);
+			camera.m_weaponCameraMatrix = m_shotgunAnimatedEntity.GetCameraMatrix();
+			//	camera.m_weaponCameraMatrix = glm::mat4(1);// m_skinnedShotgunMesh.m_CameraMatrix;
+			camera.CalculateMatrices(m_player.m_characterController.GetWorldPosition());
+			camera.CalculateProjectionMatrix((float)SCR_WIDTH, (float)SCR_HEIGHT);
+
+			// Camera ray cast
+			m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);
+
+
+
+		}
 
 		Physics::Update(deltaTime);
 
-		// Doors
-		for (Door& door : house.m_doors)
-			door.Update(deltaTime);
 
-		// Fire shotgun
-		//if (Input::s_leftMousePressed && m_player.m_gunState != GunState::FIRING)
-		if (Input::s_leftMousePressed)
+
+
+			/*for (Shell& shell : m_shells)
 			{
-			if (!s_dontLoadShotgun)
-				m_player.m_gunState = GunState::FIRING;
+				btTransform worldTran = shell.m_rigidBody->getWorldTransform();
 
-			//Physics::m_ragdoll->m_bodies[0]->applyForce(btVector3(10, 10, 10), btVector3(10, 10, 10));
-			//Physics::m_ragdoll->m_bodies[6]->applyForce(btVector3(10, 10, 10), btVector3(10, 10, 10));
+				btVector3 position = worldTran.getOrigin();
 
-			Audio::PlayAudio("Shotgun_Fire_01.wav");
-			//Audio::PlayAudio("Door_Open.wav");
-			TextBlitter::TypeText("TESTING TEXT BLITTER.", true);
+				// find bolt world pos
 
-			for (int i = 0; i < 12; i++) {
-				RaycastResult ray;
-				ray.CastRay(camera.m_viewPos, camera.m_Front, 10.0f, 0.125f);
-				m_decals.push_back(Decal(ray.m_hitPoint, ray.m_surfaceNormal));
+				static Transform trans;
+				trans.scale = glm::vec3(0.002f);
+				trans.position = camera.m_viewPos;
+				trans.rotation = camera.m_transform.rotation;
 
-				if (ray.m_name == "NEW MESH") {
-					Renderer::s_bloodEffect.m_CurrentTime = 0;
-				//	Audio::PlayAudio("Flesh.wav", 0.25f);
-				}
-			}
 
-		Renderer::s_hitPoint.position = m_cameraRaycast.m_hitPoint;
-		Renderer::s_hitPoint.rotation = camera.m_transform.rotation;
+				//SkinnedModel* model = AssetManager::skinnedModels[m_shotgunAnimatedEntity.m_skinnedModelID];
+				SkinnedModel* model = AssetManager::skinnedModels[0];
+				unsigned int BoneIndex = model->m_BoneMapping["Bolt_bone"];
 
-		}
-		 
-		// HUD shotgun animation
-		if (m_player.m_gunState == GunState::FIRING && m_HUDshotgun.IsAnimationComplete())
-			m_player.m_gunState = GunState::IDLE;
+				Renderer::s_DebugTransform.position = camera.m_Front;
+				Renderer::s_DebugTransform2.position = camera.m_Right * glm::vec3(-1);
 
-		if (m_player.m_gunState == GunState::FIRING)
-			m_HUDshotgun.SetAnimation("Fire", false);
-		else {
-			if (m_player.m_movementState == PlayerMovementState::STOPPED)
-				m_HUDshotgun.SetAnimation("Idle", true);
-			if (m_player.m_movementState == PlayerMovementState::WALKING)
-				m_HUDshotgun.SetAnimation("Walk", true);
-		}
+				glm::mat4 worldMatrix = trans.to_mat4() * model->m_BoneInfo[BoneIndex].FinalTransformation * Renderer::s_DebugTransform2.to_mat4();
+				glm::vec4 worldPos = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) * worldMatrix;
 
-	
 
-		// Update animations
+
+				glm::vec3 v = Util::TranslationFromMat4(worldMatrix);
+
+				v += camera.m_Front * glm::vec3(Renderer::s_DebugTransform.scale.x);
+				v += camera.m_Right * glm::vec3(Renderer::s_DebugTransform2.scale.x);
+
+				std::cout << "V: " << Util::Vec3_to_String(v);
+				Renderer::s_debugString = Util::Vec3_to_String(v);
+				Renderer::s_debugString += "\n\n";
+				Renderer::s_debugString += Util::Mat4ToString(worldMatrix);
+
+				glm::quat qt = glm::quat(camera.m_transform.rotation);
+
+				//qt *= glm::quat(0.7071, 0, 0, 0.7071);
+				qt *= glm::quat(0.5, 0.5, 0.5, 0.5);
+
+				//	btVector3 newPos = btVector3(worldPos.x, worldPos.y, worldPos.z);
+				btVector3 newPos = Util::glmVec3_to_btVec3(v);
+				;
+				worldTran.setOrigin(newPos);
+				worldTran.setRotation(btQuaternion(qt.x, qt.y, qt.z, qt.w));
+
+
 		
-	//	m_HUDshotgun.SetAnimation("Fire", false);
-	//	m_HUDshotgun.Update(0);
 
-		glm::mat4 shotgunCameraMatrix;
-
-		if (!s_dontLoadShotgun)
-		{
-			m_HUDshotgun.Update(deltaTime);
-			shotgunCameraMatrix = AssetManager::GetModelByName("Shotgun")->GetSceneCameraMatrix();
-		}
-		else
-		{
-			Transform transform;
-			transform.rotation.y = HELL_PI;
-			shotgunCameraMatrix = transform.to_mat4();			
-		}
+				shell.m_rigidBody->setWorldTransform(worldTran);
+			}*/
 			
 
-
-		// Camera
-		camera.Update(deltaTime);
-		camera.CalculateMatrices(m_player.m_characterController.GetWorldPosition(), shotgunCameraMatrix);
-		camera.CalculateProjectionMatrix((float)SCR_WIDTH, (float)SCR_HEIGHT);
-		
-		// Camera ray cast
-		m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);
-
-		// Animated assimp model
-		static float ANIMATION_TIME = 0;
-		ANIMATION_TIME += deltaTime;
-
-		m_skinnedMesh.BoneTransform(ANIMATION_TIME, m_animatedTransforms);
-
-		m_ZombieBoyMesh.BoneTransform(0, m_ZombieBoyAnimatedTransforms);
-
-		// Animated assimp model
-		//m_srinivasMesh.BoneTransform(ANIMATION_TIME, m_srinivasdAnimatedTransforms);
+	
 	}
 
 	void Game::OnRender()

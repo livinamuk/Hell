@@ -3,6 +3,8 @@
 #include "Camera.h"
 #include "Header.h"
 #include "Helpers/Util.h"
+#include "Core/CoreGL.h"
+#include "Config.h"
 
 namespace HellEngine
 {
@@ -17,19 +19,23 @@ namespace HellEngine
 		Input::s_mouseY = m_oldY;
 	}
 
-	void Camera::CalculateMatrices(glm::vec3 worldPos, glm::mat4 shotgunMatrix)
+	void Camera::CalculateMatrices(glm::vec3 worldPos)
 	{
 
 		m_transform.position = worldPos;
 		m_transform.position.y += m_viewHeight;
-		m_viewMatrix = shotgunMatrix * glm::inverse(m_transform.to_mat4());
+		m_viewMatrix = inverse(m_weaponCameraMatrix) * glm::inverse(m_transform.to_mat4());
 
 		m_inverseViewMatrix = glm::inverse(m_viewMatrix);
 
-		glm::mat4 worldMatrix = m_transform.to_mat4();
+		glm::mat4 worldMatrix = (m_weaponCameraMatrix) * m_transform.to_mat4();
 		m_Right = glm::vec3(worldMatrix[0]);
 		m_Up = glm::vec3(worldMatrix[1]);
 		m_Front = glm::vec3(worldMatrix[2]);
+
+		m_Right = glm::vec3(worldMatrix[0]); // glm::vec3(-1, -1, -1);
+		m_Up = glm::vec3(worldMatrix[1]);// *glm::vec3(-1, -1, -1);
+		m_Front = glm::vec3(worldMatrix[2]) * glm::vec3(-1, -1, -1);
 
 		m_viewPos.x = m_inverseViewMatrix[3][0];
 		m_viewPos.y = m_inverseViewMatrix[3][1];
@@ -40,26 +46,11 @@ namespace HellEngine
 		m_viewPos = glm::vec3(vP.x, vP.y, vP.z);
 
 		m_projectionViewMatrix = m_projectionMatrix * m_viewMatrix;
-
-		/*	Transform cameraTransform = this->m_transform;
-			//cameraTransform.position.y += m_viewHeight;
-			glm::mat4 cameraMatrix = cameraTransform.to_mat4();
-
-			m_viewMatrix = weaponCameraMatrix * glm::inverse(cameraMatrix);
-			m_inverseViewMatrix = glm::inverse(m_viewMatrix);
-
-			m_Right = glm::vec3(cameraMatrix[0]);
-			m_Up = glm::vec3(cameraMatrix[1]);
-			m_Front = glm::vec3(cameraMatrix[2]);
-
-			m_viewPos.x = m_inverseViewMatrix[3][0];
-			m_viewPos.y = m_inverseViewMatrix[3][1];
-			m_viewPos.z = m_inverseViewMatrix[3][2];*/
 	}
 
 	void Camera::CalculateProjectionMatrix(int screenWidth, int screenHeight)
 	{
-		m_projectionMatrix = glm::perspective(1.00f, (float)screenWidth / (float)screenHeight, NEAR_PLANE, FAR_PLANE);
+		m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, FAR_PLANE);
 	}
 
 	void Camera::Update(float deltaTime)
@@ -71,7 +62,7 @@ namespace HellEngine
 	void Camera::MouseLook(float deltaTime)
 	{
 		m_xoffset = (float)Input::s_mouseX - m_oldX;
-		m_yoffset = m_oldY - (float)Input::s_mouseY;
+		m_yoffset = (float)Input::s_mouseY - m_oldY;
 		m_oldX = (float)Input::s_mouseX;
 		m_oldY = (float)Input::s_mouseY;
 

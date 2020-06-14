@@ -8,7 +8,7 @@ namespace HellEngine
 	{
 	public:	// Methods
 		Camera();
-		void CalculateMatrices(glm::vec3 worldPos, glm::mat4 weaponCameraMatrix);
+		void CalculateMatrices(glm::vec3 worldPos);
 		void CalculateProjectionMatrix(int screenWidth, int screenHeight);
 		void Update(float deltaTime);
 
@@ -34,11 +34,16 @@ namespace HellEngine
 		glm::mat4 m_viewMatrix;
 		glm::mat4 m_inverseViewMatrix;
 		glm::mat4 m_inversePprojectionMatrix;
-	
+		glm::mat4 m_weaponCameraMatrix;
+
 		float m_mmouseSensitivity;
 		
 		glm::vec3 m_viewPos = glm::vec3(0);
 		float m_viewHeight = 1.0f;
+
+		float m_zoomLimit = 0.2f;
+		float m_zoomSpeed = 2;
+		float m_zoomFactor;
 
 	};
 }

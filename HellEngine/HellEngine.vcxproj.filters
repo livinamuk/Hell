@@ -10,6 +10,9 @@
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Animation">
+      <UniqueIdentifier>{5C00BBE1-C8C0-3618-91FB-7F95FD7A7BF4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Audio">
       <UniqueIdentifier>{EE2696B2-5A91-4A29-A3CF-FBCE0F79287E}</UniqueIdentifier>
     </Filter>
@@ -84,11 +87,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Animation\Animation.h">
+      <Filter>src\Animation</Filter>
+    </ClInclude>
     <ClInclude Include="src\Audio\Audio.h">
       <Filter>src\Audio</Filter>
     </ClInclude>
     <ClInclude Include="src\Config.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\AnimatedEntity.h">
+      <Filter>src\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Camera.h">
       <Filter>src\Core</Filter>
@@ -171,9 +180,6 @@
     <ClInclude Include="src\Helpers\AssetManager.h">
       <Filter>src\Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="src\Helpers\Importer.h">
-      <Filter>src\Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="src\Helpers\Util.h">
       <Filter>src\Helpers</Filter>
     </ClInclude>
@@ -246,13 +252,19 @@
     <ClInclude Include="src\Renderer\AssimpModel.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\BloodEffect.h">
-      <Filter>src\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="src\Renderer\Cube.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\Effects\BloodEffect.h">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClInclude>
     <ClInclude Include="src\Renderer\Effects\Decal.h">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\Effects\MuzzleFlash.h">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\Effects\Quad.h">
       <Filter>src\Renderer\Effects</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\GLDebugDraw.h">
@@ -270,13 +282,16 @@
     <ClInclude Include="src\Renderer\Model.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\NumberBlitter.h">
+      <Filter>src\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Renderer\Renderer.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Shader.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\SkinnedMesh.h">
+    <ClInclude Include="src\Renderer\SkinnedModel.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\TextBlitter.h">
@@ -288,7 +303,16 @@
     <ClInclude Include="src\Renderer\Transform.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\math_3d.h">
+      <Filter>src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\ogldev_types.h">
+      <Filter>src\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Renderer\stb_image.h">
+      <Filter>src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\util.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\hellpch.h">
@@ -1433,11 +1457,17 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Animation\Animation.cpp">
+      <Filter>src\Animation</Filter>
+    </ClCompile>
     <ClCompile Include="src\Application.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Audio\Audio.cpp">
       <Filter>src\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\AnimatedEntity.cpp">
+      <Filter>src\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Camera.cpp">
       <Filter>src\Core</Filter>
@@ -1509,9 +1539,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Helpers\AssetManager.cpp">
-      <Filter>src\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Helpers\Importer.cpp">
       <Filter>src\Helpers</Filter>
     </ClCompile>
     <ClCompile Include="src\Helpers\Util.cpp">
@@ -1586,13 +1613,19 @@
     <ClCompile Include="src\Renderer\AssimpModel.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\BloodEffect.cpp">
-      <Filter>src\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\Cube.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\Effects\BloodEffect.cpp">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClCompile>
     <ClCompile Include="src\Renderer\Effects\Decal.cpp">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Effects\MuzzleFlash.cpp">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Effects\Quad.cpp">
       <Filter>src\Renderer\Effects</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\GLDebugDraw.cpp">
@@ -1610,13 +1643,16 @@
     <ClCompile Include="src\Renderer\Model.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\NumberBlitter.cpp">
+      <Filter>src\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Renderer\Renderer.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Shader.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\SkinnedMesh.cpp">
+    <ClCompile Include="src\Renderer\SkinnedModel.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\TextBlitter.cpp">
@@ -1626,6 +1662,9 @@
       <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Transform.cpp">
+      <Filter>src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\math_3d.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\hellpch.cpp">

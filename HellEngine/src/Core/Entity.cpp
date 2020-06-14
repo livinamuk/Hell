@@ -29,18 +29,18 @@ namespace HellEngine
 		if (m_currentAnimation == NULL)
 			return;
 
-		if (IsAnimationComplete())
+	/*	if (IsAnimationComplete())
 		{
 			if (m_loopAnimation)
 				m_currentAnimationTime = m_currentAnimation->m_startTime;
 			else
 				m_currentAnimationTime = m_currentAnimation->m_endTime;
-		}
+		}*.
 	}
 
 	void Entity::SetAnimation(char* animationName, bool loop)
 	{
-		// Bail if not a valid model
+	/*	// Bail if not a valid model
 		if (m_modelID == -1)
 			return;
 		// Bail if already playing that animation
@@ -53,16 +53,16 @@ namespace HellEngine
 		m_currentAnimation = &AssetManager::models[m_modelID].m_animations[animationName];
 		m_currentAnimationTime = m_currentAnimation->m_startTime;
 		m_currentAnimationName = animationName;
-		m_loopAnimation = loop;
+		m_loopAnimation = loop;*/
 	}
 
-	bool Entity::IsAnimationComplete()
+	/*bool Entity::IsAnimationComplete()
 	{
 		if (m_currentAnimation == NULL)
 			return false;
 
-		return (m_currentAnimationTime >= m_currentAnimation->m_endTime);
-	}
+		return false;// (m_currentAnimationTime >= m_currentAnimation->m_endTime);
+	}*/
 
 
 	void Entity::DrawEntity(Shader* shader)
@@ -82,16 +82,16 @@ namespace HellEngine
 
 	void Entity::Draw(Shader* shader, glm::mat4 modelMatrix)
 	{
-		if (m_modelID != -1)
-			AssetManager::models[m_modelID].CalculateAnimation(m_currentAnimationName, m_currentAnimationTime);
+		//if (m_modelID != -1)
+		//	AssetManager::models[m_modelID].CalculateAnimation(m_currentAnimationName, m_currentAnimationTime);
 		
 		AssetManager::DrawModel(m_modelID, shader, modelMatrix);
 	}
 
 	void Entity::Draw(Shader* shader)
 	{
-		if (m_modelID != -1)
-			AssetManager::models[m_modelID].CalculateAnimation(m_currentAnimationName, m_currentAnimationTime);
+		//if (m_modelID != -1)
+		//	AssetManager::models[m_modelID].CalculateAnimation(m_currentAnimationName, m_currentAnimationTime);
 		
 		AssetManager::DrawModel(m_modelID, shader, m_transform.to_mat4());
 	}

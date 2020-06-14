@@ -116,7 +116,7 @@ namespace HellEngine
 			if (character == '\n')
 			{
 				lastLineBreakIndex = i;
-				std::string nextLine = s_textToBlit.substr(lastLineBreakIndex + 1, s_textToBlit.find('_', lastLineBreakIndex + 1) - i);
+				std::string nextLine = s_textToBlit.substr(lastLineBreakIndex + 1, s_textToBlit.find('\n', lastLineBreakIndex + 1) - i);
 				lengthOfLine = nextLine.length() - 1;
 
 				if (lengthOfLine == -1)
@@ -131,31 +131,32 @@ namespace HellEngine
 				continue;
 			}
 
+			else 
+			{
+				int charPos = s_CharSheet.find(character);
 
+				float tex_coord_L = (charWidth / textureWidth) * charPos;
+				float tex_coord_R = (charWidth / textureWidth) * (charPos + 1);
 
-			int charPos = s_CharSheet.find(character);
+				Vertex2D v1 = { glm::vec2(cursor_X, cursor_Y + h), glm::vec2(tex_coord_L, 0) };
+				Vertex2D v2 = { glm::vec2(cursor_X, cursor_Y), glm::vec2(tex_coord_L, 1) };
+				Vertex2D v3 = { glm::vec2(cursor_X + w, cursor_Y + h), glm::vec2(tex_coord_R, 0) };
+				Vertex2D v4 = { glm::vec2(cursor_X + w, cursor_Y), glm::vec2(tex_coord_R, 1) };
 
-			float tex_coord_L = (charWidth / textureWidth) * charPos;
-			float tex_coord_R = (charWidth / textureWidth) * (charPos + 1);
+				vertices.push_back(v1);
+				vertices.push_back(v2);
+				vertices.push_back(v3);
+				vertices.push_back(v4);
 
-			Vertex2D v1 = { glm::vec2(cursor_X, cursor_Y + h), glm::vec2(tex_coord_L, 0) };
-			Vertex2D v2 = { glm::vec2(cursor_X, cursor_Y), glm::vec2(tex_coord_L, 1) };
-			Vertex2D v3 = { glm::vec2(cursor_X + w, cursor_Y + h), glm::vec2(tex_coord_R, 0) };
-			Vertex2D v4 = { glm::vec2(cursor_X + w, cursor_Y), glm::vec2(tex_coord_R, 1) };
-
-			vertices.push_back(v1);
-			vertices.push_back(v2);
-			vertices.push_back(v3);
-			vertices.push_back(v4);
-
-			cursor_X += w;
+				cursor_X += w;
+			}			
 		}
 
 		if (VAO == 0)
 		{
 			glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
-			std::cout << "Initilized Blitter.\n";
+			std::cout << "Initialized Blitter.\n";
 
 		}
 		glBindVertexArray(VAO);
@@ -170,6 +171,9 @@ namespace HellEngine
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(textScale, textScale, 1));
 		shader->setMat4("model", modelMatrix);
+		shader->setVec3("colorTint", glm::vec3(1, 1, 1));
+
+		glEnable(GL_CULL_FACE);
 
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());

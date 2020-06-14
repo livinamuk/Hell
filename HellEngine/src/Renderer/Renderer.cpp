@@ -7,6 +7,8 @@
 #include "GL/Quad2D.h"
 #include "Config.h"
 #include "Effects/Decal.h"
+#include "Logic/ShotgunLogic.h"
+#include "Config.h"
 
 namespace HellEngine
 {
@@ -31,8 +33,11 @@ namespace HellEngine
 	Shader Renderer::s_BloodShader;
 	Shader Renderer::s_DecalShader;
 
+	std::string Renderer::s_debugString;
+
 	BloodEffect Renderer::s_bloodEffect;
-	bool Renderer::s_demo = true; 
+	MuzzleFlash Renderer::s_muzzleFlash;
+	bool Renderer::s_demo = true;
 
 	Transform Renderer::s_hitPoint;
 	unsigned int Renderer::s_pointVAO;
@@ -73,6 +78,7 @@ namespace HellEngine
 		s_forwardShader = Shader("BasicShader", "shader.vert", "shader.frag", "NONE");
 		s_solidColorShader = Shader("SolidColor", "solidColor.vert", "solidColor.frag", "NONE");
 		s_quadShader = Shader("QuadShader", "quadShader.vert", "quadShader.frag", "NONE");
+
 		s_geometryShader = Shader("GeometryShader", "geometry.vert", "geometry.frag", "NONE");
 		s_lightingShader = Shader("LightingShader", "lighting.vert", "lighting.frag", "NONE");
 		s_compositeShader = Shader("CompositeShader", "composite.vert", "composite.frag", "NONE");
@@ -116,6 +122,7 @@ namespace HellEngine
 		CreateBRDFLut();
 
 		s_bloodEffect.Init();
+		s_muzzleFlash.Init();
 	}
 
 	void Renderer::CreateBRDFLut()
@@ -148,25 +155,33 @@ namespace HellEngine
 		glDeleteRenderbuffers(1, &BRDFLut_Rbo);
 	}
 
-	void Renderer::DrawPoint(Shader* shader, glm::vec3 position)
+	void Renderer::DrawPoint(Shader* shader, glm::vec3 position, glm::vec3 color)
 	{
-		if (s_pointVAO == 0) {
-			float vertices[] = {
-				0,0,0
-			};
-			unsigned int VBO;
-			glGenVertexArrays(1, &s_pointVAO);
+		static unsigned int VAO = 0;
+		static unsigned int VBO;
+
+		if (VAO == 0)
+		{
+			glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
-			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-			glBindVertexArray(s_pointVAO);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-			glEnableVertexAttribArray(0);
 		}
 
-		shader->setVec3("color", glm::vec3(1,0,0));
+		float vertices[] = {
+				0,0,0, color.r, color.g, color.b
+
+		};
+		glPointSize(4);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glBindVertexArray(VAO);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+
+		shader->setVec3("color", glm::vec3(1, 0, 0));
 		shader->setMat4("model", Transform(position).to_mat4());
-		glBindVertexArray(s_pointVAO);
+		glBindVertexArray(VAO);
 		glDrawArrays(GL_POINTS, 0, 1);
 	}
 
@@ -225,26 +240,55 @@ namespace HellEngine
 		//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), &vertexData[0], GL_STATIC_DRAW);
 		glBindVertexArray(VAO);
 
-		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(0);f
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(3 * sizeof(float)));
 
-		
+
 		shader->setMat4("model", modelMatrix);
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_LINES, 0, 6);*/
 	}
 
-	void Renderer::DrawSkeleton(Shader* shader, SkinnedMesh* skinnedMesh, Transform* transform)
+	void Renderer::DrawSkeleton(Shader* shader, SkinnedModel* skinnedModel, Transform* transform)
 	{
-		shader->setVec3("color", glm::vec3(1, 0, 1));
+		/*shader->setVec3("color", glm::vec3(1, 0, 1));
 
 		for (Line line : skinnedMesh->m_lines)	{
 			DrawLine(shader, line, transform->to_mat4());
+		}*/
+
+		Line x, y, z;
+
+		float lineScale = 5;
+
+		x.start_pos = glm::vec3(0, 0, 0);
+		x.end_pos = glm::vec3(lineScale, 0, 0);
+		x.start_color = glm::vec3(1, 0, 0);
+		x.end_color = glm::vec3(1, 0, 0);
+
+
+		y.start_pos = glm::vec3(0, 0, 0);
+		y.end_pos = glm::vec3(0, lineScale, 0);
+		y.start_color = glm::vec3(0, 1, 0);
+		y.end_color = glm::vec3(0, 1, 0);
+
+		z.start_pos = glm::vec3(0, 0, 0);
+		z.end_pos = glm::vec3(0, 0, lineScale);
+		z.start_color = glm::vec3(0, 0, 1);
+		z.end_color = glm::vec3(0, 0, 1);
+
+
+		for (int i = 0; i < skinnedModel->m_NumBones; i++)
+		{
+			glm::mat4 matrix = skinnedModel->m_BoneInfo[i].TangentSpaceDebugMatrix;
+			DrawLine(shader, x, transform->to_mat4() * matrix);
+			DrawLine(shader, y, transform->to_mat4() * matrix);
+			DrawLine(shader, z, transform->to_mat4() * matrix);
 		}
 	}
-		
+
 
 	void Renderer::SetTextureBindings()
 	{
@@ -299,6 +343,7 @@ namespace HellEngine
 		GeometryPass(game, &s_geometryShader);
 		DecalPass(game, &s_DecalShader);
 		LightingPass(game, &s_StencilShader, &s_lightingShader);
+		EffectsPass(game, &s_BloodShader);
 		BlurPass(&s_blurVerticalShader, &s_blurHorizontalShader);
 		CompositePass(game, &s_compositeShader);
 		FXAAPass(&s_FXAAShader);
@@ -310,7 +355,8 @@ namespace HellEngine
 			//RenderFinalImage(&s_quadShader, s_FinalImageBuffer.TexID);
 			RenderFinalImage(&s_quadShader, s_ChromaticAbberationBuffer.TexID);
 		else
-			RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
+			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
+			RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, game->house.m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
 		//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
 
 
@@ -319,7 +365,7 @@ namespace HellEngine
 			BulletDebugDraw(game, &s_solidColorShader);
 
 		// Show a cubemap
-		if (Input::s_keyDown[HELL_KEY_1]) {
+		/*if (Input::s_keyDown[HELL_KEY_1]) {
 			ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[0].m_LightProbe.CubeMap_TexID);
 		}
 		if (Input::s_keyDown[HELL_KEY_2]) {
@@ -327,7 +373,7 @@ namespace HellEngine
 		}
 		if (Input::s_keyDown[HELL_KEY_3]) {
 			ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[2].m_LightProbe.CubeMap_TexID);
-		}
+		}*/
 		//if (Input::s_keyDown[HELL_KEY_4]) {
 		//	ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[3].m_LightProbe.CubeMap_TexID);
 		//}
@@ -335,10 +381,13 @@ namespace HellEngine
 		//if (Input::s_keyDown[HELL_KEY_V])
 		//	ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[0].m_shadowMap.FboID);
 
-		if (Input::s_keyDown[HELL_KEY_T])
-			game->m_decals.clear();
+		if (Input::s_keyDown[HELL_KEY_T]) {
+			Decal::s_decals.clear();
 
-	//	}
+			//		game->m_shotgunAmmo = 4;
+		}
+
+		//	}
 		if (Input::s_keyDown[HELL_KEY_4]) {
 			for (Light& light : game->house.m_lights)
 			{
@@ -348,6 +397,7 @@ namespace HellEngine
 		}
 
 		TextBlitPlass(&s_quadShader);
+		HUDPass(game, &s_quadShader);
 
 		if (Input::s_keyDown[HELL_KEY_L])
 		{
@@ -358,24 +408,24 @@ namespace HellEngine
 			s_solidColorShader.setMat4("view", game->camera.m_viewMatrix);
 			s_solidColorShader.setMat4("model", glm::mat4(1));
 			s_solidColorShader.setVec3("color", glm::vec3(1, 0, 0));
-		//	game->house.m_lights[0].m_lightVolume.Draw(&s_solidColorShader);
+			//	game->house.m_lights[0].m_lightVolume.Draw(&s_solidColorShader);
 
 			Light* light = &game->house.m_lights[0];
 
 
-		/*	for (Door& door : game->house.m_doors)
-			{
-				AssetManager::DrawModel(AssetManager::GetModelIDByName("DoorVolumeA"), &s_solidColorShader, door.GetDoorModelMatrixFromPhysicsEngine());
-			}*/
-	
-			//	for (LightVolumeDoorWay& lightVolumeDoorWay : light->m_doorWayLightVolumes)
-		//		lightVolumeDoorWay.Draw(&s_solidColorShader);
+			/*	for (Door& door : game->house.m_doors)
+				{
+					AssetManager::DrawModel(AssetManager::GetModelIDByName("DoorVolumeA"), &s_solidColorShader, door.GetDoorModelMatrixFromPhysicsEngine());
+				}*/
+
+				//	for (LightVolumeDoorWay& lightVolumeDoorWay : light->m_doorWayLightVolumes)
+			//		lightVolumeDoorWay.Draw(&s_solidColorShader);
 		}
 
-		glDisable(GL_DEPTH_TEST);
-		
+		//glDisable(GL_DEPTH_TEST);
+
 		glDisable(GL_CULL_FACE);
-		s_bloodEffect.Draw(&s_BloodShader, game->camera, s_hitPoint);
+
 
 
 		s_solidColorShader.use();
@@ -385,16 +435,115 @@ namespace HellEngine
 		// Render lantern guy skeleton
 		Transform trans;
 		trans.position = glm::vec3(1.5f, 0, 7);
-		trans.rotation = glm::vec3(HELL_PI * 0.5f, HELL_PI, 0);
+		trans.rotation = glm::vec3(HELL_PI * 1.5f, HELL_PI, 0);
 		trans.scale = glm::vec3(0.03f);
-		DrawSkeleton(&s_solidColorShader, &game->m_skinnedMesh, &trans);
+		//	DrawSkeleton(&s_solidColorShader, &game->m_skinnedMesh, &trans);
 
-		// Render zombie boy skeleton
-		//game->m_ZombieBoyMesh.FindSkeleton();
+			// Render zombie boy skeleton
 		Transform trans2;
 		trans2.rotation = glm::vec3(HELL_PI * 0.5f, HELL_PI / 2, HELL_PI);
 		trans2.scale = glm::vec3(0.01f);
-		DrawSkeleton(&s_solidColorShader, &game->m_ZombieBoyMesh, &trans2);
+		//DrawSkeleton(&s_solidColorShader, &game->m_ZombieBoyMesh, &trans2);
+
+		Transform trans3;
+		trans3.position = glm::vec3(1, 1, 0);
+		trans3.scale = glm::vec3(0.02f);
+		//	DrawSkeleton(&s_solidColorShader, &game->m_srinivasMesh, &trans3);
+			//std::cout << game->m_srinivasMesh.m_lines.size() << "\n";
+
+
+
+
+
+
+		/*static Transform camTrans;
+		camTrans.scale = glm::vec3(0.002f);
+		camTrans.position = game->camera.m_viewPos;
+		camTrans.rotation = game->camera.m_transform.rotation;
+
+
+		SkinnedModel* model = AssetManager::skinnedModels[0];
+		unsigned int BoneIndex = model->m_BoneMapping["ShotgunMain_bone"];
+		//Renderer::s_DebugTransform.position = p_camera->m_Front;
+		//Renderer::s_DebugTransform2.position = p_camera->m_Right * glm::vec3(-1);
+		Transform trans4;
+		glm::mat4 worldMatrix = camTrans.to_mat4() * model->m_BoneInfo[BoneIndex].FinalTransformation * s_DebugTransform2.to_mat4();
+		glm::vec3 v = Util::TranslationFromMat4(worldMatrix);*/
+
+		glm::vec3 v = ShotgunLogic::GetShotgunBarrelHoleWorldPosition();
+
+		glDisable(GL_DEPTH_TEST);
+
+	//	DrawPoint(&s_solidColorShader, v, glm::vec3(1,1,1));
+
+		/*
+		Line line;
+		line.start_pos = glm::vec3(0, 0, 0);
+		line.end_pos = glm::vec3(0, 1, 1);
+		line.start_color = glm::vec3(1, 1, 1);
+		line.end_color = glm::vec3(1, 1, 1);
+		DrawLine(&s_solidColorShader, line);
+		*/
+
+
+
+		glm::mat4 camMat = game->m_shotgunAnimatedEntity.GetCameraMatrix();
+		std::string text = Util::Mat4ToString(camMat);
+
+		text += "Anim index: ";
+		text += std::to_string(game->m_shotgunAnimatedEntity.m_currentAnimationIndex) + "\n";
+		text += "Anim time: ";
+		text += std::to_string(game->m_shotgunAnimatedEntity.m_currentAnimationTime) + "\n";
+		text += "Anim dur:  ";
+		text += std::to_string(game->m_shotgunAnimatedEntity.m_currentAnimationDuration) + "\n";
+
+		if (game->m_shotgunAnimatedEntity.IsAnimationComplete())
+			text += "Anim commplete: TRUE\n";
+		else
+			text += "Anim commplete: FALSE\n";
+
+		text += "Movement State: ";
+		if (game->m_player.m_movementState == PlayerMovementState::STOPPED)
+			text += "STOPPED\n";
+		if (game->m_player.m_movementState == PlayerMovementState::WALKING)
+			text += "WALKING\n";
+		if (game->m_player.m_movementState == PlayerMovementState::RUNNING)
+			text += "RUNNING\n";
+
+		text += "Gun State: ";
+		if (ShotgunLogic::m_gunState == GunState::FIRING)
+			text += "FIRING\n";
+		if (ShotgunLogic::m_gunState == GunState::IDLE)
+			text += "IDLE\n";
+		if (ShotgunLogic::m_gunState == GunState::RELOADING)
+			text += "RELOADING\n";
+
+		text += "Reload State: ";
+		if (ShotgunLogic::m_reloadState == ReloadState::FROM_IDLE)
+			text += "FROM_IDLE\n";
+		if (ShotgunLogic::m_reloadState == ReloadState::BACK_TO_IDLE)
+			text += "BACK_TO_IDLE\n";
+		if (ShotgunLogic::m_reloadState == ReloadState::DOUBLE_RELOAD)
+			text += "DOUBLE_RELOAD\n";
+		if (ShotgunLogic::m_reloadState == ReloadState::NOT_RELOADING)
+			text += "NOT_RELOADING\n";
+		if (ShotgunLogic::m_reloadState == ReloadState::SINGLE_RELOAD)
+			text += "SINGLE_RELOAD\n";
+
+		text += "Iron Sight State: ";
+		if (ShotgunLogic::m_ironSightState == IronSightState::BEGIN_IRON_SIGHTING)
+			text += "BEGIN_IRON_SIGHTING\n";
+		if (ShotgunLogic::m_ironSightState == IronSightState::END_IRON_SIGHTING)
+			text += "END_IRON_SIGHTING\n";
+		if (ShotgunLogic::m_ironSightState == IronSightState::IRON_SIGHTING)
+			text += "IRON_SIGHTING\n";
+		if (ShotgunLogic::m_ironSightState == IronSightState::NOT_IRON_SIGHTING)
+			text += "NOT_IRON_SIGHTING\n";
+
+		text += s_debugString;
+
+		TextBlitter::BlitText(text, false);
+		TextBlitPlass(&s_quadShader);
 	}
 
 	void Renderer::ShadowMapPass(Game* game, Shader* shader)
@@ -422,11 +571,11 @@ namespace HellEngine
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glPolygonOffset(s_polygonFactor, s_polygonUnits);
-		
+
 
 			// glDepthRange(0.0, 0.9);	
 			glEnable(GL_CULL_FACE);
-			
+
 			glCullFace(GL_FRONT);
 			DrawScene(game, shader, false, false);
 			glEnable(GL_CULL_FACE);
@@ -487,6 +636,42 @@ namespace HellEngine
 		glDepthMask(GL_FALSE);
 	}
 
+	void Renderer::EffectsPass(Game* game, Shader* shader)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+
+		unsigned int attachments[1] = {GL_COLOR_ATTACHMENT4 };
+		glDrawBuffers(1, attachments);
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
+		glDisable(GL_CULL_FACE);
+
+		shader->use();
+		shader->setMat4("u_MatrixProjection", game->camera.m_projectionMatrix);
+		shader->setMat4("u_MatrixView", game->camera.m_viewMatrix);
+
+		SkinnedModel* model = AssetManager::skinnedModels[0];
+		unsigned int BoneIndex = model->m_BoneMapping["Bolt_bone"];
+		//Renderer::s_DebugTransform.position = p_camera->m_Front;
+		//Renderer::s_DebugTransform2.position = p_camera->m_Right * glm::vec3(-1);
+		Transform trans;
+		glm::mat4 worldMatrix = trans.to_mat4() * model->m_BoneInfo[BoneIndex].FinalTransformation;
+		glm::vec3 v = Util::TranslationFromMat4(worldMatrix);
+
+		Transform t;
+		t.position = s_muzzleFlash.m_worldPos;;;
+		t.position = ShotgunLogic::GetShotgunBarrelHoleWorldPosition();
+		t.rotation = game->camera.m_transform.rotation;
+
+		// Blood
+		s_bloodEffect.Draw(&s_BloodShader, s_hitPoint);
+		s_muzzleFlash.Draw(&s_BloodShader, t);
+
+		// Muzzle flash
+	}
+
 	void Renderer::DecalPass(Game* game, Shader* shader)
 	{
 		shader->use(); 
@@ -510,7 +695,7 @@ namespace HellEngine
 		glEnable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		for (Decal decal : game->m_decals) {
+		for (Decal decal : Decal::s_decals) {
 			shader->setVec3("targetPlaneSurfaceNormal", decal.normal);
 			decal.Draw(shader, true);
 		}
@@ -521,11 +706,11 @@ namespace HellEngine
 
 
 		shader->setInt("writeRoughnessMetallic", 0);
-		for (Decal decal : game->m_decals) {
+		for (Decal decal : Decal::s_decals) {
 			decal.Draw(shader, false);
 		}
 		shader->setInt("writeRoughnessMetallic", 1);
-		for (Decal decal : game->m_decals) {
+		for (Decal decal : Decal::s_decals) {
 			shader->setVec3("targetPlaneSurfaceNormal", decal.normal);
 			decal.Draw(shader, true);
 		}
@@ -879,6 +1064,84 @@ namespace HellEngine
 		TextBlitter::DrawTextBlit(shader);
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
+	}	
+	
+	void Renderer::HUDPass(Game* game, Shader* shader)
+	{
+	//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		//glColorMask(false, false, false, false);
+
+		//glDepthMask(false);
+
+	//	glClearColor(1, 0, 0, 1);
+
+
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glEnable(GL_BLEND);
+		glDisable(GL_DEPTH_TEST);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+		glBlendEquation(GL_FUNC_ADD);
+		glActiveTexture(GL_TEXTURE0);
+
+		shader->use();
+
+		// Ammo
+		Quad2D::RenderQuad(shader, AssetManager::GetTextureByName("HUDGradient"), 1604, 934);
+
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("NumSheet"));
+
+		std::string ammoInGun = std::to_string(ShotgunLogic::m_AmmoInGun);
+		std::string ammoAvaliable = std::to_string(ShotgunLogic::m_AmmoAvaliable);
+
+		char* cstr = new char[ammoInGun.length() + 1];
+		strcpy(cstr, ammoInGun.c_str());
+		char* cstr2 = new char[ammoAvaliable.length() + 1];
+		strcpy(cstr2, ammoAvaliable.c_str());
+
+		glm::vec3 ammoColor = glm::vec3(0.26f, 0.78f, 0.33f);
+		if (ShotgunLogic::m_AmmoInGun == 0)
+			ammoColor = glm::vec3(0.78125f, 0.3f, 0.3f);
+
+		NumberBlitter::DrawTextBlit(shader, "/", 1700, 943);
+		NumberBlitter::DrawTextBlit(shader, cstr2, 1715, 943, 0.8);
+		NumberBlitter::DrawTextBlit(shader, cstr, 1695, 943, 1.0f, ammoColor, false);
+	
+		// Crosshair
+		//int texID = AssetManager::GetTexIDByName("CrosshairCross");
+		int texID = AssetManager::GetTexIDByName("CrosshairDefault");
+
+		/*if (cameraRaycastData.distance < interactDistance)
+		{
+			if (cameraRaycastData.name == "DOOR"
+				|| (!Door::PlayerHasKey && cameraRaycastData.name == "KEY")
+				|| (cameraRaycastData.name == "NOTE"))
+				texID = Texture::GetIDByName("CrosshairInteract");
+		}*/
+
+
+		shader->setVec3("colorTint", glm::vec3(1, 1, 1));
+		int crosshairSize = 16;
+
+		shader->use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texID);
+		//glViewport(SCR_WIDTH / 2 - (crosshairSize / 2), SCR_HEIGHT / 2 - (crosshairSize / 2), crosshairSize, crosshairSize);
+	//	Quad2D::RenderCrosshair(shader, SCR_WIDTH, SCR_HEIGHT, crosshairSize);
+
+	//	Quad2D::RenderQuad(shader, AssetManager::GetTextureByName("NumSheet"), 1604, 934);
+	//	Quad2D::RenderQuad(shader, AssetManager::GetTextureByName("NumSheet"), 960, 540);
+
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+
+
+
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+
+		// Reset color tint bruvva
 	}
 
 	void Renderer::RenderEnvMap(Game* game, Shader* shader, Light* light)
@@ -972,7 +1235,7 @@ namespace HellEngine
 		game->house.Draw(shader, envMapPass);
 		
 		// Projectiles
-		for (Shell& shell : game->m_shells)
+		for (Shell& shell : Shell::s_shells)
 			shell.Draw(shader);
 
 
@@ -987,11 +1250,11 @@ namespace HellEngine
 		trans.rotation = glm::vec3(HELL_PI * 0.5f, HELL_PI / 2, HELL_PI);
 		trans.scale = glm::vec3(0.01f);
 
-		for (unsigned int i = 0; i < game->m_ZombieBoyAnimatedTransforms.size(); i++)
+		for (unsigned int i = 0; i < game->m_ZombieBoyMesh.m_animatedTransforms.size(); i++)
 			shader->setMat4("skinningMats[" + std::to_string(i) + "]", glm::mat4(1));
 
 		shader->setInt("hasAnimation", true);
-		game->m_ZombieBoyMesh.Render(shader, trans.to_mat4());
+		//game->m_ZombieBoyMesh.Render(shader, trans.to_mat4());
 		shader->setInt("hasAnimation", false);
 
 
@@ -999,13 +1262,14 @@ namespace HellEngine
 		{
 			Transform trans;
 			trans.position = glm::vec3(1.5f, 0, 7);
-			trans.rotation = glm::vec3(HELL_PI * 0.5f, HELL_PI, 0);
+			trans.rotation = glm::vec3(HELL_PI * 1.5f, HELL_PI, 0);
 			trans.scale = glm::vec3(0.03f);
 
 			AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Light"));
 
-			for (unsigned int i = 0; i < game->m_animatedTransforms.size(); i++)
-				shader->setMat4("skinningMats[" + std::to_string(i) + "]", glm::transpose(game->m_animatedTransforms[i]));
+			for (unsigned int i = 0; i < game->m_skinnedMesh.m_animatedTransforms.size(); i++)
+				//shader->setMat4("skinningMats[" + std::to_string(i) + "]", glm::transpose(game->m_skinnedMesh.m_animatedTransforms[i]));
+				shader->setMat4("skinningMats[" + std::to_string(i) + "]", game->m_skinnedMesh.m_animatedTransforms[i]);
 
 			shader->setInt("hasAnimation", true);
 			game->m_skinnedMesh.Render(shader, trans.to_mat4());
@@ -1016,45 +1280,46 @@ namespace HellEngine
 		// Srinivas Mesh
 		//if (!s_demo) {	
 		{
-			Transform trans;
-			trans.position = glm::vec3(1, 1, 0);
-			trans.scale = glm::vec3(0.02f);
+		//	Transform trans;
+		//	trans.position = glm::vec3(1, 1, 0);
+		//	trans.scale = glm::vec3(0.02f);
 			
-			int boneCount = game->m_srinivasMesh.GetBoneCount();
-
-			if (Input::s_keyDown[HELL_KEY_6])
-				game->m_srinivasMesh.m_applyMeshTransforms = true;
-			else
-				game->m_srinivasMesh.m_applyMeshTransforms = false;
-
-
-			if (Input::s_keyDown[HELL_KEY_5])
-			{
-				game->m_srinivasMesh.SetBindPose(game->m_srinivasdAnimatedTransforms);
-				for (unsigned int i = 0; i < game->m_srinivasdAnimatedTransforms.size(); i++)
-					shader->setMat4("skinningMats[" + std::to_string(i) + "]", glm::transpose(game->m_srinivasdAnimatedTransforms[i]));
-			}
-			else
-			for (unsigned int i = 0; i < boneCount; i++)
-				shader->setMat4("skinningMats[" + std::to_string(i) + "]", glm::mat4(1));
-
-			AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shotgun"));
-			shader->setInt("hasAnimation", true);
-			game->m_srinivasMesh.Render(shader, trans.to_mat4());
-			shader->setInt("hasAnimation", false);
+			
 		}
 		/////////////////////////////////////////////////////////////////////
 
 		// First pesron weapon
-		if (s_RenderSettings.DrawWeapon && !game->s_dontLoadShotgun)
+		if (s_RenderSettings.DrawWeapon)
 		{
-			Transform weaponTransform;
-			weaponTransform.rotation.y = HELL_PI * 1.5f;
-			game->m_HUDshotgun.m_transform.position = game->camera.m_viewPos;
-			//game->m_HUDshotgun.m_transform.position = glm::vec3(0, 1, 0);
-			//game->m_HUDshotgun.m_transform.scale = glm::vec3(2, 2, 2);
-			game->m_HUDshotgun.m_transform.rotation = game->camera.m_transform.rotation;
-			game->m_HUDshotgun.Draw(shader, game->m_HUDshotgun.m_transform.to_mat4() * game->m_shotgunTransform.to_mat4() * weaponTransform.to_mat4());
+			for (unsigned int i = 0; i < game->m_shotgunAnimatedEntity.m_animatedTransforms.size(); i++)
+				shader->setMat4("skinningMats[" + std::to_string(i) + "]", game->m_shotgunAnimatedEntity.m_animatedTransforms[i]);
+
+			static Transform trans;
+			trans.scale = glm::vec3(0.002f);
+			trans.position = game->camera.m_viewPos;
+			trans.rotation = game->camera.m_transform.rotation;
+
+
+			float movementX = -game->camera.m_xoffset * Config::SWAY_AMOUNT;
+			float movementY = -game->camera.m_yoffset * Config::SWAY_AMOUNT;
+
+			movementX = std::min(movementX, Config::SWAY_MAX_X);
+			movementX = std::max(movementX, Config::SWAY_MIN_X);
+			movementY = std::min(movementY, Config::SWAY_MAX_Y);
+			movementY = std::max(movementY, Config::SWAY_MIN_Y);
+
+
+			static Transform swayTransform;
+
+			glm::vec3 finalPosition = glm::vec3(movementX, movementY, 0);
+
+			swayTransform.position = Util::Vec3InterpTo(swayTransform.position, finalPosition , game->m_deltaTime, Config::SMOOTH_AMOUNT);
+
+
+			AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shotgun"));
+			shader->setInt("hasAnimation", true);
+			game->m_shotgunAnimatedEntity.Draw(shader, trans.to_mat4() * swayTransform.to_mat4());
+			shader->setInt("hasAnimation", false);
 		}
 	}
 

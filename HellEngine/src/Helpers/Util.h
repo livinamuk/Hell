@@ -16,6 +16,7 @@ namespace HellEngine
 	class Util
 	{
 	public:
+	//	static void RemoveTranslation(glm::mat4& matrix);
 		static glm::mat4 btScalar2mat4(btScalar* matrix);
 		static glm::mat4 Get_Mat4_From_Vec3(glm::vec3 position);
 		static void TranslatePosition(glm::vec3* position, glm::mat4 translation);
@@ -59,6 +60,12 @@ namespace HellEngine
 		static void PrintMat4(glm::mat4 m);
 		static unsigned int CountLines(std::string str);
 		static void EraseFirstLine(std::string* str);
+
+		static Derivative evaluate(const State& initial, double t, float dt, const Derivative& d);
+		static float acceleration(const State& state, double t);
+		static void integrate(State& state, double t, float dt);
+
+		static glm::vec3 TranslationFromMat4(glm::mat4& matrix);
 	
 	private:
 			static unsigned int upFacingPlaneVAO;

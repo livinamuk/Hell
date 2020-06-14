@@ -478,15 +478,41 @@ namespace HellEngine
 		ImGui::Text("Front:    (%f, %f, %f)", game->camera.m_Front.x, game->camera.m_Front.y, game->camera.m_Front.z);
 
 
+
+
+		ImGui::Text("\n");
+		ImGui::Text("TEST_FLOAT"); ImGui::SameLine();
+		ImGui::InputFloat("##Gasdasd", &Config::TEST_FLOAT, 0.0f, 9.0f, 10.0f);
+		ImGui::Text("TEST_FLOAT2"); ImGui::SameLine();
+		ImGui::InputFloat("##Gadfsdasd", &Config::TEST_FLOAT2, 0.0f, 9.0f, 10.0f);
+		ImGui::Text("TEST_FLOAT3"); ImGui::SameLine();
+		ImGui::InputFloat("##Gasdasdfsd", &Config::TEST_FLOAT3, 0.0f, 9.0f, 10.0f);
+
+		ImGui::Text("\n");
+		ImGui::Text("sway amount"); ImGui::SameLine();
+		ImGui::InputFloat("##G", &Config::SWAY_AMOUNT, 0.0f, 9.0f, 10.0f);
+		ImGui::Text("smooth amount"); ImGui::SameLine();
+		ImGui::InputFloat("##Gf", &Config::SMOOTH_AMOUNT, 0.0f, 9.0f, 10.0f);
+		ImGui::Text("min X"); ImGui::SameLine();
+		ImGui::InputFloat("##fGf", &Config::SWAY_MIN_X, 0.0f, 9.0f, 10.0f);
+		ImGui::Text("man X"); ImGui::SameLine();
+		ImGui::InputFloat("##ffGf", &Config::SWAY_MAX_X, 0.0f, 9.0f, 10.0f);
+		ImGui::Text("min Y"); ImGui::SameLine();
+		ImGui::InputFloat("##fgGf", &Config::SWAY_MIN_Y, 0.0f, 9.0f, 10.0f);
+		ImGui::Text("man Y"); ImGui::SameLine();
+		ImGui::InputFloat("##fqwefGf", &Config::SWAY_MAX_Y, 0.0f, 9.0f, 10.0f);
+
+		ImGui::Text("\n");
+
 		ImGui::InputFloat("glPolygonOffset factor: ", &Renderer::s_polygonFactor, 0.1f, 1.0f, "%0.5f");
 		ImGui::InputFloat("glPolygonOffset units:  ", &Renderer::s_polygonUnits, 0.1f, 1.0f, "%0.5f");
 		;
 
-		ImGui::Text("\nSHOTTY");
+		/*ImGui::Text("\nSHOTTY");
 		ImGui::InputFloat3("Pos", glm::value_ptr(game->m_shotgunTransform.position));
 		ImGui::InputFloat3("Rot", glm::value_ptr(game->m_shotgunTransform.rotation));
 		ImGui::InputFloat3("Scl", glm::value_ptr(game->m_shotgunTransform.scale));
-
+		*/
 
 		ImGui::Text("\nDEBUG TRANSFORM");
 		ImGui::InputFloat3("Poso", glm::value_ptr(Renderer::s_DebugTransform.position));
@@ -516,8 +542,8 @@ namespace HellEngine
 		//ImGui::Text("Mouse pressed: %i", Input::s_leftMousePressed);
 		//ImGui::Text("Mouse down last frame: %i", Input::s_leftMouseDownLastFrame);
 
-		if (game->m_HUDshotgun.m_currentAnimation != NULL)
-			ImGui::Text("\nHUD shotgun: %s, %s, %s", game->m_HUDshotgun.m_currentAnimationName, game->m_HUDshotgun.m_currentAnimationTime.GetTimeString(), game->m_HUDshotgun.m_currentAnimation->m_endTime.GetTimeString());
+		//if (game->m_HUDshotgun.m_currentAnimation != NULL)
+		//	ImGui::Text("\nHUD shotgun: %s, %s, %s", game->m_HUDshotgun.m_currentAnimationName, game->m_HUDshotgun.m_currentAnimationTime.GetTimeString(), game->m_HUDshotgun.m_currentAnimation->m_endTime.GetTimeString());
 
 		ImGui::Text("\nRaycast:  %s", game->m_cameraRaycast.m_name);
 		ImGui::Text("Distance: %f", game->m_cameraRaycast.m_distance);

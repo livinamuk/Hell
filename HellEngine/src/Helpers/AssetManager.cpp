@@ -2,7 +2,6 @@
 #include "AssetManager.h"
 #include "Util.h"
 #include "Game.h"
-#include "Importer.h"
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
@@ -13,6 +12,7 @@ namespace HellEngine
 	std::vector<Texture> AssetManager::textures;
 	std::vector<Material> AssetManager::materials;
 	std::vector<Model> AssetManager::models;
+	std::vector<SkinnedModel*> AssetManager::skinnedModels;
 
 	std::mutex AssetManager::s_TexturesMutex;
 	std::mutex AssetManager::s_ModelsMutex;
@@ -69,6 +69,35 @@ namespace HellEngine
 		}
 	}
 
+	void AssetManager::LoadAnimation(const char* skinnedModelName, const char* filename)
+	{
+		for (SkinnedModel* skinnedModel : skinnedModels)
+		{
+			if (std::strcmp(skinnedModel->m_filename, skinnedModelName) == 0)
+			{
+				skinnedModel->LoadAnimation(filename);
+				return;
+			}
+		}
+		std::cout << "Couldn't add animation [" << filename << "] because couldn't find [" << skinnedModelName << "] :(\n";
+	}
+
+	/*int AssetManager::GetTextureWidth(int textureID)
+	{
+		if (textureID < 0 || textureID >= textures.size())
+			return -1;
+		else
+			return textures[textureID].width;
+	}
+
+	int AssetManager::GetTextureHeight(int textureID)
+	{
+		if (textureID < 0 || textureID >= textures.size())
+			return -1;
+		else
+			return textures[textureID].height;
+	}*/
+
 	void AssetManager::LoadAllTextures()
 	{
 		// Multi-thead load them
@@ -78,13 +107,6 @@ namespace HellEngine
 
 	void AssetManager::LoadHardcoded()
 	{
-		if (!Game::s_dontLoadShotgun) {
-			models.emplace_back(Model("res/models/Shotgun.FBX"));
-			Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Idle.FBX", "Idle", 0, -1);
-			Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Walk.FBX", "Walk", 0, -1);
-			Importer::AddAnimation(GetModelByName("Shotgun"), "res/models/Shotgun_Fire.FBX", "Fire", 0, -1);
-		}
-
 		models.emplace_back(Model("res/models/StaircaseCeilingTrimStraight.obj"));
 		models.emplace_back(Model("res/models/TrimFloor.obj"));
 		models.emplace_back(Model("res/models/TrimCeiling.obj"));
@@ -101,6 +123,29 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Mannequin.obj"));
 		models.emplace_back(Model("res/models/Shell.obj"));
 
+		skinnedModels.emplace_back(new SkinnedModel("Shotgun.fbx"));
+
+		LoadAnimation("Shotgun.fbx", "Shotgun_Idle.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_Walk.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_Fire.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_ReloadWetStart.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_Reload1Shell.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_Reload2Shells.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_ReloadEnd.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_ReloadDryStart.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_Equip.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_Dequip.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_GunUp.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_GunUpWalk.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_GunDown.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_SprintStart.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_SprintLoop.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_SprintStop.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_SightingIn.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_SightingWalk.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_SightingFire.fbx");
+		LoadAnimation("Shotgun.fbx", "Shotgun_SightingOut.fbx");
+		
 		for (int i = 0; i < models.size(); i++)
 			models[i].ReadFromDisk(); 	
 
@@ -242,11 +287,31 @@ namespace HellEngine
 		return 0;
 	}
 
+	Texture* AssetManager::GetTextureByName(char* name)
+	{
+		for (Texture& texture : textures)
+		{
+			if (strcmp(texture.name.c_str(), name) == 0)
+				return &texture;
+		}
+		return nullptr;
+	}
+
 	int AssetManager::GetModelIDByName(std::string modelName)
 	{
 		for (size_t i = 0; i < models.size(); i++)
 		{
 			if (models[i].name == modelName)
+				return i;
+		}
+		return -1;
+	}
+
+	int AssetManager::GetSkinnedModelIDByName(const char* name)
+	{
+		for (size_t i = 0; i < skinnedModels.size(); i++)
+		{
+			if (std::strcmp(skinnedModels[i]->m_filename, name) == 0)
 				return i;
 		}
 		return -1;
@@ -363,7 +428,7 @@ namespace HellEngine
 		}
 		return 0;
 	}
-
+	/*
 	AssimpModel AssetManager::LoadFromFile(std:: string const& path)
 	{
 		//std::cout << ("LOADING " + path) << "\n";
@@ -482,5 +547,5 @@ namespace HellEngine
 
 
 		return Mesh(vertices, indices, mesh->mName.C_Str());
-	}
+	}*/
 }

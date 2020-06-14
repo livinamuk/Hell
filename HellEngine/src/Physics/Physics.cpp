@@ -2,6 +2,7 @@
 #include "Physics.h"
 #include "Helpers/Util.h"
 #include "Helpers/AssetManager.h"
+#include "audio/Audio.h"
 
 namespace HellEngine
 {
@@ -17,6 +18,7 @@ namespace HellEngine
 	btAlignedObjectArray<btCollisionShape*> Physics::s_collisionShapes;
 	std::vector<glm::vec3> Physics::s_points;
 	std::map<const btCollisionObject*, std::vector<btManifoldPoint*>> Physics::s_objectsCollisions;
+	CollisionPairs Physics::s_pairsLastUpdate;
 
 	Ragdoll* Physics::m_ragdoll;
 
@@ -32,7 +34,7 @@ namespace HellEngine
 		s_dispatcher = new btCollisionDispatcher(s_collisionConfiguration);
 		s_solver = new btSequentialImpulseConstraintSolver;
 		s_dynamicsWorld = new btDiscreteDynamicsWorld(s_dispatcher, s_broadphase, s_solver, s_collisionConfiguration);
-		s_dynamicsWorld->setGravity(btVector3(0, -5, 0));
+		s_dynamicsWorld->setGravity(btVector3(0, -10, 0));
 		s_dynamicsWorld->getPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
 	
 		CreateWorld();
@@ -85,11 +87,11 @@ namespace HellEngine
 	{
 
 		// Create the ground
-		btBoxShape* groundShape = new btBoxShape(btVector3(btScalar(20.), btScalar(20.), btScalar(20.)));
+		/*btBoxShape* groundShape = new btBoxShape(btVector3(btScalar(20.), btScalar(20.), btScalar(20.)));
 		s_collisionShapes.push_back(groundShape);
 		btTransform groundTransform;
 		groundTransform.setIdentity();
-		groundTransform.setOrigin(btVector3(0, -20.05, 0));
+		groundTransform.setOrigin(btVector3(0, -20.00, 0));
 		btRigidBody* floor;
 
 		btScalar mass(0.);
@@ -107,7 +109,7 @@ namespace HellEngine
 		btBoxShape* collisionShape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
 		collisionShape->setLocalScaling(btVector3(0.015, 0.15, 0.15));
 		s_collisionShapes.push_back(collisionShape);
-
+		*/
 
 
 
@@ -116,32 +118,13 @@ namespace HellEngine
 		btTransform startTransform;
 		startTransform.setIdentity();
 
-		mass = 1.f;
+	//	float mass = 1.f;
 		float friction = 0.5f;
 
 		//rigidbody is dynamic if and only if mass is non zero, otherwise static
-		bool isDynamic = (mass != 0.f);
+		//bool isDynamic = (mass != 0.f);
 
-		btVector3 localInertia(0, 0, 0);
-		if (isDynamic)
-			collisionShape->calculateLocalInertia(mass, localInertia);
-
-
-		for (int k = 0; k < 6; k++)		{
-			for (int i = 0; i < 3; i++)			{
-				for (int j = 0; j < 3; j++)				{
-					startTransform.setOrigin(btVector3(
-						btScalar(4.9f + 0.2 * i),
-						btScalar(0.1f + .2 * k),
-						btScalar(2.0f + 0.2 * j)));
-
-					int group = CollisionGroups::PROJECTILES;
-					int mask = CollisionGroups::HOUSE;
-
-					createRigidBody(mass, startTransform, collisionShape, friction, group, mask);
-				}
-			}
-		}
+		
 
 
 
@@ -181,7 +164,39 @@ namespace HellEngine
 		btTriangleMesh* triangleMesh = new btTriangleMesh();
 		for (Room& room : house->m_rooms)
 		{
-			// Floor
+			float roomX = room.m_position.x;
+			float roomZ = room.m_position.y;
+			float roomWidth = room.m_size.x;
+			float roomDepth = room.m_size.y;
+
+			// Create the ground
+			btBoxShape* groundShape = new btBoxShape(btVector3(btScalar(roomWidth/2), btScalar(0.2), btScalar(roomDepth/2)));
+			s_collisionShapes.push_back(groundShape);
+			btTransform groundTransform;
+			groundTransform.setIdentity();
+			groundTransform.setOrigin(btVector3(roomX, -0.2, roomZ));
+			btRigidBody* floor;
+
+			btScalar mass(0.);
+			btScalar friction = 0.5f;
+			int group = CollisionGroups::HOUSE;
+			int mask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
+			floor = createRigidBody(mass, groundTransform, groundShape, friction, group, mask);
+			floor->setCustomDebugColor(DEBUG_COLOR_GROUND);
+
+			EntityData* entityData = new EntityData();
+			entityData->name = "FLOOR";
+			floor->setUserPointer(entityData);
+
+		//	btBoxShape* collisionShape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
+		//	collisionShape->setLocalScaling(btVector3(0.015, 0.15, 0.15));
+		//	s_collisionShapes.push_back(collisionShape);
+		
+
+
+
+
+			/*// Floor
 			btVector3 vertA, vertB, vertC, vertD;
 			vertA = Util::glmVec3_to_btVec3(room.m_floor.worldSpaceCorners[0]);
 			vertB = Util::glmVec3_to_btVec3(room.m_floor.worldSpaceCorners[1]);
@@ -189,7 +204,7 @@ namespace HellEngine
 			vertD = Util::glmVec3_to_btVec3(room.m_floor.worldSpaceCorners[3]);
 			triangleMesh->addTriangle(vertA, vertB, vertC);
 			triangleMesh->addTriangle(vertC, vertD, vertA);
-
+			*/
 			// Ceiling
 		/*	vertA = Util::glmVec3_to_btVec3(room.ceiling.worldSpaceCorners[0]);
 			vertB = Util::glmVec3_to_btVec3(room.ceiling.worldSpaceCorners[1]);
@@ -264,8 +279,10 @@ namespace HellEngine
 		btCollisionObject* collisionObject = new btCollisionObject();
 		collisionObject->setCollisionShape(triangleMeshShape);
 		collisionObject->setWorldTransform(meshTransform);
-		collisionObject->setFriction(0);
+		collisionObject->setFriction(0.5);
 		collisionObject->setCustomDebugColor(DEBUG_COLOR_RAMP);
+
+		//triangleMeshShape->setMargin(btScalar(0.01f));
 
 		EntityData* entityData = new EntityData();
 		entityData->name = "FLOOR";
@@ -275,7 +292,7 @@ namespace HellEngine
 		s_dynamicsWorld->removeCollisionObject(collisionObject);
 
 		int group = CollisionGroups::HOUSE;
-		int mask = CollisionGroups::PLAYER | CollisionGroups::ENEMY;
+		int mask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
 
 		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
 
@@ -344,6 +361,8 @@ namespace HellEngine
 		entityData->name = "STAIRS";
 		entityData->vectorIndex = 0;
 		collisionObject->setUserPointer(entityData);
+
+		collisionObject->setFriction(10);
 
 		int group = CollisionGroups::HOUSE;
 		int mask = CollisionGroups::PLAYER | CollisionGroups::ENEMY;
@@ -419,7 +438,7 @@ namespace HellEngine
 		btCollisionObject* collisionObject = new btCollisionObject();
 		collisionObject->setCollisionShape(triangleMeshShape);
 		collisionObject->setWorldTransform(meshTransform);
-		collisionObject->setFriction(0);
+		collisionObject->setFriction(0.2f);
 		collisionObject->setCustomDebugColor(DEBUG_COLOR_WALL);
 		EntityData* entityData = new EntityData();
 		entityData->name = "WALL";
@@ -427,7 +446,7 @@ namespace HellEngine
 		collisionObject->setUserPointer(entityData);
 
 		int group = CollisionGroups::HOUSE;
-		int mask = CollisionGroups::PLAYER | CollisionGroups::ENEMY;
+		int mask = CollisionGroups::PLAYER | CollisionGroups::ENEMY | CollisionGroups::PROJECTILES;
 
 		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
 		s_collisionObjects.push_back(collisionObject);
@@ -529,8 +548,154 @@ namespace HellEngine
 
 	void Physics::Update(float deltaTime)
 	{
-		s_dynamicsWorld->stepSimulation(deltaTime);
+		int maxSubSteps = 1;
+		btScalar fixedTimeStep = btScalar(1.) / btScalar(60.);
+
+		maxSubSteps = 10;
+		fixedTimeStep = 1.0 / 240.0;
+		s_dynamicsWorld->stepSimulation(deltaTime , maxSubSteps, fixedTimeStep);
+
+		CheckForCollisionEvents();
 	}
+
+	void Physics::CheckForCollisionEvents() 
+	{
+		// keep a list of the collision pairs we
+		// found during the current update
+		CollisionPairs pairsThisUpdate;
+	
+		// iterate through all of the manifolds in the dispatcher
+		for (int i = 0; i < s_dispatcher->getNumManifolds(); ++i) 
+		{		
+			// get the manifold
+			btPersistentManifold* pManifold = s_dispatcher->getManifoldByIndexInternal(i);
+			
+			// ignore manifolds that have 
+			// no contact points.
+			if (pManifold->getNumContacts() > 0) 
+			{
+				// get the two rigid bodies involved in the collision
+				const btRigidBody* pBody0 = static_cast<const btRigidBody*>(pManifold->getBody0());
+				const btRigidBody* pBody1 = static_cast<const btRigidBody*>(pManifold->getBody1());
+			
+				// always create the pair in a predictable order
+				// (use the pointer value..)
+				bool const swapped = pBody0 > pBody1;
+				const btRigidBody* pSortedBodyA = swapped ? pBody1 : pBody0;
+				const btRigidBody* pSortedBodyB = swapped ? pBody0 : pBody1;
+				
+				// create the pair
+				CollisionPair thisPair = std::make_pair(pSortedBodyA, pSortedBodyB);
+				
+				// insert the pair into the current list
+				pairsThisUpdate.insert(thisPair);
+				
+				// if this pair doesn't exist in the list
+				// from the previous update, it is a new
+				// pair and we must send a collision event
+				if (s_pairsLastUpdate.find(thisPair) == s_pairsLastUpdate.end()) 
+				{				
+					CollisionEvent((btRigidBody*)pBody0, (btRigidBody*)pBody1);
+				}
+			}
+		}
+		// create another list for pairs that
+		// were removed this update
+		CollisionPairs removedPairs;
+
+		// this handy function gets the difference beween
+		// two sets. It takes the difference between
+		// collision pairs from the last update, and this 
+		// update and pushes them into the removed pairs list
+		std::set_difference(s_pairsLastUpdate.begin(), s_pairsLastUpdate.end(),
+		pairsThisUpdate.begin(), pairsThisUpdate.end(),
+		std::inserter(removedPairs, removedPairs.begin()));
+		
+		// iterate through all of the removed pairs
+		// sending separation events for them
+		for (CollisionPairs::const_iterator iter = removedPairs.begin(); iter != removedPairs.end(); ++iter) {
+			SeparationEvent((btRigidBody*)iter->first, (btRigidBody*)iter->second);
+		}
+
+		// in the next iteration we'll want to
+		// compare against the pairs we found
+		// in this iteration
+		s_pairsLastUpdate = pairsThisUpdate;
+	}
+
+	void Physics::CollisionEvent(btRigidBody* pBody0, btRigidBody* pBody1) 
+	{
+		// find the two colliding objects
+		/*GameObject* pObj0 = FindGameObject(pBody0);
+		GameObject* pObj1 = FindGameObject(pBody1);
+		
+		// exit if we didn't find anything
+		if (!pObj0 || !pObj1) return;
+		
+		// set their colors to white
+		pObj0->SetColor(btVector3(1.0, 1.0, 1.0));
+		pObj1->SetColor(btVector3(1.0, 1.0, 1.0));*/
+		std::string name1, name2;
+
+		EntityData* entityData = (EntityData*)pBody0->getUserPointer();
+		if (entityData) {
+			name1 = entityData->name;
+		}
+		EntityData* entityData1 = (EntityData*)pBody1->getUserPointer();
+		if (entityData1) {
+			name2 = entityData1->name;
+		}
+
+		bool shell = false;
+		bool floor = false;
+		bool wall = false;
+
+		if (name1 == "SHELL" || name2 == "SHELL")
+			shell = true;
+		if (name1 == "FLOOR" || name2 == "FLOOR")
+			floor = true;
+		if (name1 == "WALL" || name2 == "WALL")
+			wall = true;
+		if (name1 == "DOOR" || name2 == "DOOR")
+			wall = true;
+
+		std::cout << "Collision between [" << name1 << "] and [" << name2 << "]\n";
+
+		if (shell && wall)
+			Audio::PlayAudio("ShellWallBounce.wav", 0.4f);
+		if (shell && floor)
+			Audio::PlayAudio("ShellFloorBounce.wav", 0.4f);
+	}
+
+	void Physics::SeparationEvent(btRigidBody* pBody0, btRigidBody* pBody1) 
+	{
+		/*
+		// get the two separating objects
+		GameObject* pObj0 = FindGameObject((btRigidBody*)pBody0);
+		GameObject* pObj1 = FindGameObject((btRigidBody*)pBody1);
+		
+		// exit if we didn't find anything
+		if (!pObj0 || !pObj1) return;
+		
+		// set their colors to black
+		pObj0->SetColor(btVector3(0.0, 0.0, 0.0));
+		pObj1->SetColor(btVector3(0.0, 0.0, 0.0));
+		
+		*/
+	}
+
+	/*::FindGameObject(btRigidBody* pBody) {
+		// search through our list of gameobjects finding
+		// the one with a rigid body that matches the given one
+		for (GameObjects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter) {
+			if ((*iter)->GetRigidBody() == pBody) {
+				// found the body, so return the corresponding game object
+				return *iter;
+			}
+		}
+		return 0;
+	}*/
+
 
 	void Physics::AddHouse(House* house)
 	{

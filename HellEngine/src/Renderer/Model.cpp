@@ -1,10 +1,12 @@
 #include "hellpch.h"
 #include "Model.h"
 #include "Helpers/AssetManager.h"
-#include "Helpers/Importer.h"
 #include "Helpers/Util.h"
 
 #include <assert.h>
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
+
 namespace HellEngine
 {
 	Model::Model(const char* filepath)
@@ -24,16 +26,67 @@ namespace HellEngine
 	void Model::ReadFromDisk()
 	{
 		//std::cout << "about to load model .... \n ";
-		if (m_fileType == FileType::FBX)
-			Importer::LoadFbxModel(this);
+		/*if (m_fileType == FileType::FBX)
+			Importer::LoadFbxModel(this);*/
 
-		else if (m_fileType == FileType::OBJ)
-			Importer::LoadOBJModel(this);
+		tinyobj::attrib_t attrib;
+		std::vector<tinyobj::shape_t> shapes;
+		std::vector<tinyobj::material_t> materials;
+		std::string warn, err;
 
-		else {
-			std::cout << "COULD NOT READ " << name << " (Unknown file format)\n";
-			m_readFromDisk = true;
-			return;
+		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, this->m_filePath.c_str())) {
+			//throw std::runtime_error(warn + err);
+		}
+
+		std::unordered_map<Vertex, uint32_t> uniqueVertices = {};
+
+		for (const auto& shape : shapes)
+		{
+			std::vector<Vertex> vertices;
+			std::vector<unsigned int> indices;
+
+			for (const auto& index : shape.mesh.indices) {
+				Vertex vertex = {};
+
+				vertex.Position = {
+					attrib.vertices[3 * index.vertex_index + 0],
+					attrib.vertices[3 * index.vertex_index + 1],
+					attrib.vertices[3 * index.vertex_index + 2]
+				};
+
+				vertex.TexCoords = {
+					attrib.texcoords[2 * index.texcoord_index + 0],
+					1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+				};
+
+				/*vertex.Normal = {
+					attrib.vertices[3 * index.normal_index + 0],
+					attrib.vertices[3 * index.normal_index + 1],
+					attrib.vertices[3 * index.normal_index + 2]
+				};*/
+
+				//vertex.color = { 1.0f, 1.0f, 1.0f };
+
+				if (uniqueVertices.count(vertex) == 0) {
+					uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+					vertices.push_back(vertex);
+				}
+
+				indices.push_back(uniqueVertices[vertex]);
+			}
+
+			for (int i = 0; i < indices.size(); i += 3) {
+				Util::SetNormalsAndTangentsFromVertices(&vertices[indices[i]], &vertices[indices[i + 1]], &vertices[indices[i + 2]]);
+
+				//				Util::SetTangentsFromVertices(&vertices[indices[i]], &vertices[indices[i + 1]], &vertices[indices[i + 2]]);
+			}
+
+			//	std::cout << "verticies.size " << vertices.size() << "\n";
+			//	std::cout << "indices.size " << indices.size() << "\n";
+
+			Mesh* mesh = new Mesh(vertices, indices, shape.name.c_str());
+			this->m_meshes.push_back(mesh);
+			this->m_hasAnimation.push_back(false);
 		}
 
 		//std::cout << "Read model from disk: " << m_filePath << " (" << m_meshes.size() << ") meshes\n";
@@ -91,60 +144,7 @@ namespace HellEngine
 		shader->setBool("hasAnimation", 0);
 	}
 
-	void Model::CalculateAnimation(std::string name, FbxTime currentTime)
-	{
-		auto it = m_animations.find(name);
-		if (it == m_animations.end()) {
-			return;
-		}
-		//if (m_nodeBlendMatrices.size() == 0)
-		//	return;
-
-		Animation& anim = (*it).second;
-		fbxsdk::FbxScene* scene = anim.m_scene;
-		int const nodeCount = scene->GetNodeCount();
-
-		fbxsdk::FbxAnimLayer* animLayer = nullptr;
-
-		fbxsdk::FbxAMatrix lDummyGlobalPosition;
-		fbxsdk::FbxPose* pose = nullptr;
-
-		for (int i = 0; i < nodeCount; ++i)
-		{
-			fbxsdk::FbxNode* node = scene->GetNode(i);
-			if (node->GetCamera() != nullptr)
-			{
-				m_sceneCamera = node->GetCamera();
-			}
-			std::string nodeName(node->GetNameOnly().Buffer());
-			if (m_nodeNameMap.find(nodeName) == m_nodeNameMap.end())
-			{
-				continue;
-			}
-			int const index = m_nodeNameMap[nodeName];
-			//m_nodeBlendMatrices[index] = node->e
-			m_nodeBlendMatrices[index] = node->EvaluateGlobalTransform(currentTime);
-
-			/*std::cout << node->GetName() << "\n";
-			
-			glm::mat4 m;
-			for (int x = 0; x < 4; x++)
-				for (int y = 0; y < 4; y++)
-					m[x][y] = m_nodeBlendMatrices[index][x][y];
-
-			Util::PrintMat4(m);
-			std::cout << "\n";*/
-
-		}
-
-		if (m_sceneCamera)
-		{
-			m_sceneCamPos = m_sceneCamera->EvaluatePosition(currentTime);
-			m_sceneCamLookAt = m_sceneCamera->EvaluateLookAtPosition(currentTime);
-			m_sceneCamUpVec = m_sceneCamera->EvaluateUpDirection(m_sceneCamPos, m_sceneCamLookAt, currentTime);
-		}	
-	}
-
+	
 	void Model::SetMeshMaterialByName(const char* meshName, unsigned int materialID)
 	{
 		for (size_t i = 0; i < m_meshes.size(); i++)

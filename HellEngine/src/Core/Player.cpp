@@ -26,8 +26,8 @@ namespace HellEngine
 		if (Input::s_keyDown[HELL_KEY_A])
 			m_movementState = PlayerMovementState::WALKING;
 
-		if (Input::s_leftMousePressed)
-			m_gunState == GunState::FIRING;
+		//if (Input::s_leftMousePressed)
+		//	m_gunState == GunState::FIRING;
 
 		if (m_movementState == PlayerMovementState::WALKING)
 			isMoving = true;

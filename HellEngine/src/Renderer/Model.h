@@ -19,7 +19,6 @@ namespace HellEngine
 		void LoadMeshDataToGL();
 		void Draw(Shader* shader, glm::mat4 modelMatrix);
 		void DrawMesh(Shader* shader, int meshIndex, glm::mat4 modelMatrix);
-		void CalculateAnimation(std::string animName, FbxTime currentTime);
 		void SetMeshMaterialByName(const char* meshName, unsigned int materialID);
 		void SetMaterial(unsigned int materialID);
 		void GetSceneCameraVectors(fbxsdk::FbxVector4& pos, fbxsdk::FbxVector4& lookAt, fbxsdk::FbxVector4& upVec) const;

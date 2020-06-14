@@ -186,23 +186,7 @@ namespace HellEngine
 
 	void Mesh::Draw()
 	{
-		if (std::strcmp(name, "Arms") == 0)
-			AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Hands"));
-			
-		if ((std::strcmp(name, "TriggerGuard_low") == 0) ||
-			(std::strcmp(name, "Elevator_low") == 0) ||
-			(std::strcmp(name, "BarrelSlide_low") == 0) ||
-			(std::strcmp(name, "Storage_low") == 0) ||
-			(std::strcmp(name, "ForeEnd_low") == 0) ||
-			(std::strcmp(name, "Trigger_low") == 0) ||
-			(std::strcmp(name, "Shell") == 0) ||
-			(std::strcmp(name, "Body_low") == 0) ||
-			(std::strcmp(name, "Stock_low") == 0) ||
-			(std::strcmp(name, "Bolt_low") == 0) ||
-			(std::strcmp(name, "Shell001") == 0) ||
-			(std::strcmp(name, "Barrel_low") == 0))
-			AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shotgun"));
-			
+					
 		glBindVertexArray(VAO);
 
 

@@ -80,7 +80,7 @@
       <PrecompiledHeaderFile>hellpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HELL_PLATFORM_WINDOWS;HELL_BUILD_DLL;GLFW_INCLUDE_NONE;HELL_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\FbxSDK\include;vendor\FbxSDK\include\fbxsdk;vendor\bullet;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -90,8 +90,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;libfbxsdk-md.lib;assimp-vc142-mt.lib;assimp-vc142-mtd.lib;Bullet3Dynamics_RelWithDebugInfo.lib;BulletDynamics_RelWithDebugInfo.lib;BulletCollision_RelWithDebugInfo.lib;LinearMath_RelWithDebugInfo.lib;SDL2.lib;soloud_static_x64_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>vendor\FbxSDK\lib\x64\debug;vendor\bullet\bullet\lib\RelWithDebInfo;vendor\assimp\lib;vendor\soloud\lib;vendor\sdl\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;assimp-vc142-mt.lib;assimp-vc142-mtd.lib;Bullet3Dynamics_RelWithDebugInfo.lib;BulletDynamics_RelWithDebugInfo.lib;BulletCollision_RelWithDebugInfo.lib;LinearMath_RelWithDebugInfo.lib;SDL2.lib;soloud_static_x64_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>vendor\bullet\bullet\lib\RelWithDebInfo;vendor\assimp\lib;vendor\soloud\lib;vendor\sdl\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -100,7 +100,7 @@
       <PrecompiledHeaderFile>hellpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HELL_PLATFORM_WINDOWS;HELL_BUILD_DLL;GLFW_INCLUDE_NONE;HELL_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\FbxSDK\include;vendor\FbxSDK\include\fbxsdk;vendor\bullet;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -114,8 +114,8 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;libfbxsdk-md.lib;assimp-vc142-mt.lib;assimp-vc142-mtd.lib;Bullet3Dynamics_RelWithDebugInfo.lib;BulletDynamics_RelWithDebugInfo.lib;BulletCollision_RelWithDebugInfo.lib;LinearMath_RelWithDebugInfo.lib;SDL2.lib;soloud_static_x64_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>vendor\FbxSDK\lib\x64\debug;vendor\bullet\bullet\lib\RelWithDebInfo;vendor\assimp\lib;vendor\soloud\lib;vendor\sdl\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;assimp-vc142-mt.lib;assimp-vc142-mtd.lib;Bullet3Dynamics_RelWithDebugInfo.lib;BulletDynamics_RelWithDebugInfo.lib;BulletCollision_RelWithDebugInfo.lib;LinearMath_RelWithDebugInfo.lib;SDL2.lib;soloud_static_x64_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>vendor\bullet\bullet\lib\RelWithDebInfo;vendor\assimp\lib;vendor\soloud\lib;vendor\sdl\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
@@ -124,7 +124,7 @@
       <PrecompiledHeaderFile>hellpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HELL_PLATFORM_WINDOWS;HELL_BUILD_DLL;GLFW_INCLUDE_NONE;HELL_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\FbxSDK\include;vendor\FbxSDK\include\fbxsdk;vendor\bullet;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -138,13 +138,15 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;libfbxsdk-md.lib;assimp-vc142-mt.lib;assimp-vc142-mtd.lib;Bullet3Dynamics_RelWithDebugInfo.lib;BulletDynamics_RelWithDebugInfo.lib;BulletCollision_RelWithDebugInfo.lib;LinearMath_RelWithDebugInfo.lib;SDL2.lib;soloud_static_x64_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>vendor\FbxSDK\lib\x64\debug;vendor\bullet\bullet\lib\RelWithDebInfo;vendor\assimp\lib;vendor\soloud\lib;vendor\sdl\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;assimp-vc142-mt.lib;assimp-vc142-mtd.lib;Bullet3Dynamics_RelWithDebugInfo.lib;BulletDynamics_RelWithDebugInfo.lib;BulletCollision_RelWithDebugInfo.lib;LinearMath_RelWithDebugInfo.lib;SDL2.lib;soloud_static_x64_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>vendor\bullet\bullet\lib\RelWithDebInfo;vendor\assimp\lib;vendor\soloud\lib;vendor\sdl\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Animation\Animation.h" />
     <ClInclude Include="src\Audio\Audio.h" />
     <ClInclude Include="src\Config.h" />
+    <ClInclude Include="src\Core\AnimatedEntity.h" />
     <ClInclude Include="src\Core\Camera.h" />
     <ClInclude Include="src\Core\CoreGL.h" />
     <ClInclude Include="src\Core\CoreImGui.h" />
@@ -172,7 +174,6 @@
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Header.h" />
     <ClInclude Include="src\Helpers\AssetManager.h" />
-    <ClInclude Include="src\Helpers\Importer.h" />
     <ClInclude Include="src\Helpers\Util.h" />
     <ClInclude Include="src\House\Ceiling.h" />
     <ClInclude Include="src\House\Door.h" />
@@ -197,21 +198,27 @@
     <ClInclude Include="src\Physics\RaycastResult.h" />
     <ClInclude Include="src\Renderer\Animator.h" />
     <ClInclude Include="src\Renderer\AssimpModel.h" />
-    <ClInclude Include="src\Renderer\BloodEffect.h" />
     <ClInclude Include="src\Renderer\Cube.h" />
+    <ClInclude Include="src\Renderer\Effects\BloodEffect.h" />
     <ClInclude Include="src\Renderer\Effects\Decal.h" />
+    <ClInclude Include="src\Renderer\Effects\MuzzleFlash.h" />
+    <ClInclude Include="src\Renderer\Effects\Quad.h" />
     <ClInclude Include="src\Renderer\GLDebugDraw.h" />
     <ClInclude Include="src\Renderer\HDRTexture.h" />
     <ClInclude Include="src\Renderer\Material.h" />
     <ClInclude Include="src\Renderer\Mesh.h" />
     <ClInclude Include="src\Renderer\Model.h" />
+    <ClInclude Include="src\Renderer\NumberBlitter.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\Renderer\Shader.h" />
-    <ClInclude Include="src\Renderer\SkinnedMesh.h" />
+    <ClInclude Include="src\Renderer\SkinnedModel.h" />
     <ClInclude Include="src\Renderer\TextBlitter.h" />
     <ClInclude Include="src\Renderer\Texture.h" />
     <ClInclude Include="src\Renderer\Transform.h" />
+    <ClInclude Include="src\Renderer\math_3d.h" />
+    <ClInclude Include="src\Renderer\ogldev_types.h" />
     <ClInclude Include="src\Renderer\stb_image.h" />
+    <ClInclude Include="src\Renderer\util.h" />
     <ClInclude Include="src\hellpch.h" />
     <ClInclude Include="vendor\fmod\include\common.h" />
     <ClInclude Include="vendor\fmod\include\common_platform.h" />
@@ -594,8 +601,10 @@
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Animation\Animation.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Audio\Audio.cpp" />
+    <ClCompile Include="src\Core\AnimatedEntity.cpp" />
     <ClCompile Include="src\Core\Camera.cpp" />
     <ClCompile Include="src\Core\CoreGL.cpp" />
     <ClCompile Include="src\Core\CoreImGui.cpp" />
@@ -620,7 +629,6 @@
     <ClCompile Include="src\GL\ShadowMap.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Helpers\AssetManager.cpp" />
-    <ClCompile Include="src\Helpers\Importer.cpp" />
     <ClCompile Include="src\Helpers\Util.cpp" />
     <ClCompile Include="src\House\Ceiling.cpp" />
     <ClCompile Include="src\House\Door.cpp" />
@@ -659,20 +667,24 @@
     <ClCompile Include="src\Physics\RaycastResult.cpp" />
     <ClCompile Include="src\Renderer\Animator.cpp" />
     <ClCompile Include="src\Renderer\AssimpModel.cpp" />
-    <ClCompile Include="src\Renderer\BloodEffect.cpp" />
     <ClCompile Include="src\Renderer\Cube.cpp" />
+    <ClCompile Include="src\Renderer\Effects\BloodEffect.cpp" />
     <ClCompile Include="src\Renderer\Effects\Decal.cpp" />
+    <ClCompile Include="src\Renderer\Effects\MuzzleFlash.cpp" />
+    <ClCompile Include="src\Renderer\Effects\Quad.cpp" />
     <ClCompile Include="src\Renderer\GLDebugDraw.cpp" />
     <ClCompile Include="src\Renderer\HDRTexture.cpp" />
     <ClCompile Include="src\Renderer\Material.cpp" />
     <ClCompile Include="src\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Renderer\Model.cpp" />
+    <ClCompile Include="src\Renderer\NumberBlitter.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Renderer\Shader.cpp" />
-    <ClCompile Include="src\Renderer\SkinnedMesh.cpp" />
+    <ClCompile Include="src\Renderer\SkinnedModel.cpp" />
     <ClCompile Include="src\Renderer\TextBlitter.cpp" />
     <ClCompile Include="src\Renderer\Texture.cpp" />
     <ClCompile Include="src\Renderer\Transform.cpp" />
+    <ClCompile Include="src\Renderer\math_3d.cpp" />
     <ClCompile Include="src\hellpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

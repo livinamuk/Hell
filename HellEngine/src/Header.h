@@ -158,6 +158,7 @@ enum RunningAnimationState { STARTING, LOOPING, ENDING, NOT_RUNNING};
 
 enum GunState { FIRING, IDLE, RELOADING};
 enum ReloadState { FROM_IDLE, SINGLE_RELOAD, DOUBLE_RELOAD, BACK_TO_IDLE, NOT_RELOADING };
+enum IronSightState { NOT_IRON_SIGHTING, BEGIN_IRON_SIGHTING, IRON_SIGHTING, END_IRON_SIGHTING};
 
 enum DoorWayType { DOOR, STAIRCASE_OPENING };
 
@@ -176,3 +177,16 @@ struct AssetInfo {
 	std::string fileExtension;
 };
 
+
+// Physics time step stuff
+struct State
+{
+	float x;      // position
+	float v;      // velocity
+};
+
+struct Derivative
+{
+	float dx;      // dx/dt = velocity
+	float dv;      // dv/dt = acceleration
+};

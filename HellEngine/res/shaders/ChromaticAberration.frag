@@ -53,7 +53,7 @@ void main()
     }
 	vec3 finalColor = vec3(accumulator / float(sampleCount));
 
-    // Grain
+    // Film grain
     float amount = 0.05;
 	finalColor = ApplyGrain(destCoord, finalColor, amount); 
 

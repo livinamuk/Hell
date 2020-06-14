@@ -22,6 +22,16 @@ namespace HellEngine
 		return trans.to_mat4();
 	}
 
+	std::string Util::Mat4ToString(glm::mat4 m)
+	{
+		std::string s = "";
+		s += "(" + std::to_string(m[0][0]) + ", " + std::to_string(m[0][1]) + ", " + std::to_string(m[0][2]) + ", " + std::to_string(m[0][3]) + ")\n";
+		s += "(" + std::to_string(m[1][0]) + ", " + std::to_string(m[1][1]) + ", " + std::to_string(m[1][2]) + ", " + std::to_string(m[1][3]) + ")\n";
+		s += "(" + std::to_string(m[2][0]) + ", " + std::to_string(m[2][1]) + ", " + std::to_string(m[2][2]) + ", " + std::to_string(m[2][3]) + ")\n";
+		s += "(" + std::to_string(m[3][0]) + ", " + std::to_string(m[3][1]) + ", " + std::to_string(m[3][2]) + ", " + std::to_string(m[3][3]) + ")\n";
+		return s;
+	}
+
 	void Util::TranslatePosition(glm::vec3* position, glm::mat4 translation)
 	{
 		glm::vec4 newPos = translation * glm::vec4(*position, 1.0f);
@@ -452,12 +462,14 @@ namespace HellEngine
 
 	glm::mat4 Util::Mat4InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ)
 	{
-		glm::mat4 m = glm::mat4(1);
+	/*	glm::mat4 m = glm::mat4(1);
 		m[0][0] = ScaleX; m[0][1] = 0.0f;   m[0][2] = 0.0f;   m[0][3] = 0.0f;
 		m[1][0] = 0.0f;   m[1][1] = ScaleY; m[1][2] = 0.0f;   m[1][3] = 0.0f;
 		m[2][0] = 0.0f;   m[2][1] = 0.0f;   m[2][2] = ScaleZ; m[2][3] = 0.0f;
 		m[3][0] = 0.0f;   m[3][1] = 0.0f;   m[3][2] = 0.0f;   m[3][3] = 1.0f;
-		return m;
+		return m;*/
+
+		return glm::scale(glm::mat4(1.0), glm::vec3(ScaleX, ScaleY, ScaleZ));
 	}
 
 	glm::mat4 Util::Mat4InitRotateTransform(float RotateX, float RotateY, float RotateZ)
@@ -489,17 +501,27 @@ namespace HellEngine
 	}
 
 	glm::mat4 Util::Mat4InitTranslationTransform(float x, float y, float z)
-	{
+	{/*
 		glm::mat4 m = glm::mat4(1);
 		m[0][0] = 1.0f; m[0][1] = 0.0f; m[0][2] = 0.0f; m[0][3] = x;
 		m[1][0] = 0.0f; m[1][1] = 1.0f; m[1][2] = 0.0f; m[1][3] = y;
 		m[2][0] = 0.0f; m[2][1] = 0.0f; m[2][2] = 1.0f; m[2][3] = z;
 		m[3][0] = 0.0f; m[3][1] = 0.0f; m[3][2] = 0.0f; m[3][3] = 1.0f;
 		return m;
+		*/
+		return  glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
 	}
 
 	glm::mat4 Util::aiMatrix4x4ToGlm(const aiMatrix4x4& from)
 	{
+		/*glm::mat4 to;
+		//the a,b,c,d in assimp is the row ; the 1,2,3,4 is the column
+		to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = from.a4;
+		to[0][1] = from.b1; to[1][1] = from.b2; to[2][1] = from.b3; to[3][1] = from.b4;
+		to[0][2] = from.c1; to[1][2] = from.c2; to[2][2] = from.c3; to[3][2] = from.c4;
+		to[0][3] = from.d1; to[1][3] = from.d2; to[2][3] = from.d3; to[3][3] = from.d4;
+		return to;*/
+
 		glm::mat4 to;
 		//the a,b,c,d in assimp is the row ; the 1,2,3,4 is the column
 		to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = from.a4;
@@ -511,14 +533,24 @@ namespace HellEngine
 
 	glm::mat4 Util::aiMatrix3x3ToGlm(const aiMatrix3x3& from)
 	{
-		glm::mat4 m;
-		m[0][0] = from.a1; m[0][1] = from.a2; m[0][2] = from.a3; m[0][3] = 0.0f;
-		m[1][0] = from.b1; m[1][1] = from.b2; m[1][2] = from.b3; m[1][3] = 0.0f;
-		m[2][0] = from.c1; m[2][1] = from.c2; m[2][2] = from.c3; m[2][3] = 0.0f;
-		m[3][0] = 0.0f; m[3][1] = 0.0f; m[3][2] = 0.0f; m[3][3] = 1.0f;
-		return m;
+		glm::mat4 to;
+		to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = 0.0;
+		to[0][1] = from.b1; to[1][1] = from.b2; to[2][1] = from.b3; to[3][1] = 0.0;
+		to[0][2] = from.c1; to[1][2] = from.c2; to[2][2] = from.c3; to[3][2] = 0.0;
+		to[0][3] = 0.0; to[1][3] = 0.0; to[2][3] = 0.0; to[3][3] = 1.0;
+		return to;
 	}
 
+	/*void Util::RemoveTranslation(glm::mat4& matrix)
+	{
+		//glm::mat4 to;
+		//to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = 0.0;
+		//to[0][1] = from.b1; to[1][1] = from.b2; to[2][1] = from.b3; to[3][1] = 0.0;
+		//to[0][2] = from.c1; to[1][2] = from.c2; to[2][2] = from.c3; to[3][2] = 0.0;
+		matrix[3][0] = 0.0f; matrix[3][1] = 0.0; matrix[3][2] = 0.0;// to[3][3] = 1.0;
+		//return to;
+	}
+	*/
 	void Util::PrintMat4(glm::mat4 m)
 	{
 		std::cout << "(" << m[0][0] << ", " << m[0][1] << ", " << m[0][2] << ", " << m[0][3] << ")\n";
@@ -582,5 +614,50 @@ namespace HellEngine
 	void Util::EraseFirstLine(std::string* str)
 	{
 		str->erase(0, str->find("\n") + 1);
+	}   
+	
+	Derivative Util::evaluate(const State& initial,	double t, float dt, const Derivative& d)
+	{
+		State state;
+		state.x = initial.x + d.dx * dt;
+		state.v = initial.v + d.dv * dt;
+
+		Derivative output;
+		output.dx = state.v;
+		output.dv = acceleration(state, t + dt);
+		return output;
+	}
+
+	float Util::acceleration(const State& state, double t)
+	{
+		const float k = 15.0f;
+		const float b = 0.1f;
+		return -k * state.x - b * state.v;
+	}
+
+	void Util::integrate(State& state, double t, float dt)
+	{
+		Derivative a, b, c, d;
+
+		a = evaluate(state, t, 0.0f, Derivative());
+		b = evaluate(state, t, dt * 0.5f, a);
+		c = evaluate(state, t, dt * 0.5f, b);
+		d = evaluate(state, t, dt, c);
+
+		float dxdt = 1.0f / 6.0f *
+			(a.dx + 2.0f * (b.dx + c.dx) + d.dx);
+
+		float dvdt = 1.0f / 6.0f *
+			(a.dv + 2.0f * (b.dv + c.dv) + d.dv);
+
+		state.x = state.x + dxdt * dt;
+		state.v = state.v + dvdt * dt;
+	}
+	glm::vec3 Util::TranslationFromMat4(glm::mat4& matrix)
+	{
+		float x = matrix[3][0];
+		float y = matrix[3][1];
+		float z = matrix[3][2];
+		return glm::vec3(x, y, z);
 	}
 }

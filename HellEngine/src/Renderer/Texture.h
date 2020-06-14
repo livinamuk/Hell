@@ -19,9 +19,10 @@ public: // fields
 	std::string filetype;
 	bool m_readFromDisk = false;
 	bool m_loadedToGL = false;
+	int width, height;
 
 private: // fields
 	unsigned char* data;
-	int width, height, nrChannels;
+	int nrChannels;
 };
 

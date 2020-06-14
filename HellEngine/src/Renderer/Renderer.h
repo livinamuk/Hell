@@ -12,8 +12,10 @@
 #include "GL/CameraEnvMap.h"
 #include "TextBlitter.h"
 #include "House/Light.h"
-#include "BloodEffect.h"
-#include "SkinnedMesh.h"
+#include "Effects/BloodEffect.h"
+#include "Effects/MuzzleFlash.h"
+#include "SkinnedModel.h"
+#include "NumberBlitter.h"
 
 namespace HellEngine
 {
@@ -35,7 +37,9 @@ namespace HellEngine
 		static void ChromaticAberrationPass(Shader* shader);
 		static void FXAAPass(Shader* shader);
 		static void DOFPass(Shader* shader);
+		static void EffectsPass(Game* game, Shader* shader);
 		static void DecalPass(Game* game, Shader* shader);
+		static void HUDPass(Game* game, Shader* shader);
 
 		static void ShadowMapPass(Game* game, Shader* shader);
 
@@ -49,9 +53,9 @@ namespace HellEngine
 		static void ViewCubeMap(Game* , Shader* shader, unsigned int CubeMapID);
 		static void CreateBRDFLut();
 
-		static void DrawPoint(Shader* shader, glm::vec3 position);
+		static void DrawPoint(Shader* shader, glm::vec3 position, glm::vec3 color);
 		static void DrawLine(Shader* shader, Line line, glm::mat4 modelMatrix);
-		static void DrawSkeleton(Shader* shader, SkinnedMesh* skinnedMesh, Transform* transform);
+		static void DrawSkeleton(Shader* shader, SkinnedModel* skinnedModel, Transform* transform);
 
 	public: // functions
 		static void TextBlitPlass(Shader* shader);
@@ -117,6 +121,9 @@ namespace HellEngine
 		static Transform s_hitPoint;
 		static unsigned int s_pointVAO;
 		static BloodEffect s_bloodEffect;
+		static MuzzleFlash s_muzzleFlash;
+
+		static std::string s_debugString;
 
 	};
 }

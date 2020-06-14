@@ -18,5 +18,17 @@ namespace HellEngine
 		static inline float DOF_gain = 2.0;				//highlight gain;
 		static inline float DOF_bias = 0.5;				//bokeh edge bias
 		static inline float DOF_fringe = 0.7;			//bokeh chromatic aberration/fringing
+
+		static inline float SWAY_AMOUNT = 0.25f;
+		static inline float SMOOTH_AMOUNT =4.0f;
+		static inline float SWAY_MIN_X = -3;
+		static inline float SWAY_MAX_X = 3;
+		static inline float SWAY_MIN_Y = -1;
+		static inline float SWAY_MAX_Y = 0.5f;
+
+		static inline float TEST_FLOAT = 0.99f;
+		static inline float TEST_FLOAT2 = 0.2f;
+		static inline float TEST_FLOAT3 = 5.0f;
+
 	};
 }

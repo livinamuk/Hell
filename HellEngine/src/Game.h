@@ -10,10 +10,11 @@
 #include "Renderer/Model.h"
 #include "Renderer/Cube.h"
 #include "Renderer/Renderer.h"
-#include "Renderer/SkinnedMesh.h"
+#include "Renderer/SkinnedModel.h"
 #include "Renderer/AssimpModel.h"
 #include "Renderer/Effects/Decal.h"
 #include "Misc/Shell.h"
+#include "Core/AnimatedEntity.h"
 
 namespace HellEngine
 {
@@ -29,28 +30,32 @@ namespace HellEngine
 		void RebuildMap();
 
 	public: // Fields
-		double currentFrame, lastFrame;
+		double currentTime, lastFrame;
 		Camera camera;
 		House house;
-		Transform m_shotgunTransform;
+		//Transform m_shotgunTransform;
 		RaycastResult m_cameraRaycast;
 		Transform m_doorTrans;
 		Player m_player;
 		Entity m_HUDshotgun;
+
 		Transform testTrans; 
 
-		SkinnedMesh m_skinnedMesh;
-		SkinnedMesh m_srinivasMesh;
-		SkinnedMesh m_ZombieBoyMesh;
+		SkinnedModel m_skinnedMesh;
+		//SkinnedModel m_skinnedShotgunMesh;
+		SkinnedModel m_ZombieBoyMesh;
 
-		std::vector<glm::mat4> m_animatedTransforms;
-		std::vector<glm::mat4> m_ZombieBoyAnimatedTransforms;
-		std::vector<glm::mat4> m_srinivasdAnimatedTransforms; 
+		AnimatedEntity m_shotgunAnimatedEntity;
 
-		std::vector<Decal> m_decals;
-		std::vector<Shell> m_shells;
+	//	std::vector<glm::mat4> m_animatedTransforms;
+	//	std::vector<glm::mat4> m_ZombieBoyAnimatedTransforms;
+//		std::vector<glm::mat4> m_srinivasdAnimatedTransforms; 
+
+		//std::vector<Decal> m_decals;
+		float m_deltaTime;
 
 		static bool s_dontLoadShotgun;
+
 
 	};
 }

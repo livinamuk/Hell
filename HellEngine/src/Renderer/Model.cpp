@@ -111,7 +111,7 @@ namespace HellEngine
 	}
 
 	
-	void Model::SetMeshMaterialByName(const char* meshName, unsigned int materialID)
+	/*void Model::SetMeshMaterialByName(const char* meshName, unsigned int materialID)
 	{
 		for (size_t i = 0; i < m_meshes.size(); i++)
 			if (std::string(m_meshes[i]->name) == std::string(meshName))
@@ -122,5 +122,5 @@ namespace HellEngine
 	{
 		for (size_t i = 0; i < m_meshes.size(); i++)
 			m_meshes[i]->materialID = materialID;
-	}
+	}*/
 }

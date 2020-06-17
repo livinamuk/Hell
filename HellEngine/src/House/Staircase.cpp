@@ -433,7 +433,7 @@ namespace HellEngine
 				Transform trans, indentTrans;
 			//	trans.position.z = stairIndent;
 				if (!m_turnsLeft) trans.rotation.y = ROTATE_90;
-				AssetManager::GetModelByName("StaircaseLanding")->SetMaterial(AssetManager::GetMaterialIDByName("Trims"));
+				//AssetManager::GetModelByName("StaircaseLanding")->SetMaterial(AssetManager::GetMaterialIDByName("Trims"));
 				AssetManager::GetModelByName("StaircaseLanding")->Draw(shader, m_rootTransform.to_mat4() * m_landingTransform.to_mat4() * indentTrans.to_mat4() * trans.to_mat4());
 			}
 

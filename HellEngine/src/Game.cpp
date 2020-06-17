@@ -8,6 +8,7 @@
 #include "Audio/Audio.h"
 #include "Logic/ShotgunLogic.h"
 #include "Config.h"
+#include "Core/EnemyCharacter.h"
 
 namespace HellEngine
 {
@@ -57,24 +58,39 @@ namespace HellEngine
 		this->RebuildMap();
 
 
+		m_shotgunAnimatedEntity.SetSkinnedModel("Shotgun.fbx");
 
-	//Entity e("Boy");
-	//	e.m_modelID = 1;
-	//	e.m_materialID = 1;
-	//	house.m_entities.push_back(e);
 
+		m_testAnimatedEnttity.SetSkinnedModel("Shotgun.fbx");
+		m_testAnimatedEnttity.m_currentAnimationIndex = 3;
+
+
+
+		m_zombieGuy.SetSkinnedModel("Zombie.fbx");
+
+		m_zombieGuy.SetModelScale(0.00925f);
+		m_zombieGuy.FlipModelUpAxis(true);
+		m_zombieGuy.FlipSkeletonUpAxis(true);
+		m_zombieGuy.m_worldTransform.rotation.y = HELL_PI / 2;
+
+		m_zombieGuy.SetAnimationToBindPose();
+		m_zombieGuy.NewRagdollFromAnimatedTransforms();
+
+		std::cout << "\n";
+		AssetManager::PrintSkinnedModelMeshNames("Zombie.fbx");
+		std::cout << "\n";
+		AssetManager::PrintSkinnedModelBoneNames("Zombie.fbx");
+		std::cout << "\n";
 	}
 
 	void Game::OnUpdate()
 	{
-		if (Input::s_keyPressed[HELL_KEY_O])
+
+	/*	if (Input::s_keyPressed[HELL_KEY_O])
 			m_shotgunAnimatedEntity.m_currentAnimationIndex -= 1;
 		if (Input::s_keyPressed[HELL_KEY_P])
 			m_shotgunAnimatedEntity.m_currentAnimationIndex += 1;
-
-
-	
-
+			*/
 		// Keypresses
 		Input::HandleKeypresses();
 		if (Input::s_keyPressed[HELL_KEY_E])
@@ -91,12 +107,18 @@ namespace HellEngine
 		deltaTime = min(deltaTime, MAX_FRAME_DELTA);
 		m_deltaTime = deltaTime;
 
+
+		for (Shell& shell : Shell::s_shells)
+			shell.Update(deltaTime);
+
+
 		// Update in discrete steps
 	//	for (int i = 0; i < deltaTime / 100; i++)
 		{
 
 			Renderer::s_bloodEffect.Update(deltaTime);
 			Renderer::s_muzzleFlash.Update(deltaTime);
+			Renderer::s_bloodWallSplatter.Update(deltaTime);
 
 			TextBlitter::UpdateBlitter(deltaTime);
 
@@ -113,7 +135,13 @@ namespace HellEngine
 			m_cameraRaycast = ShotgunLogic::m_raycast;
 
 
+			m_testAnimatedEnttity.Update(deltaTime);
 			m_shotgunAnimatedEntity.Update(deltaTime);
+			//m_zombieGuy.Update(deltaTime);
+			m_zombieGuy.SetAnimationToBindPose();
+
+
+			m_zombieGuy.m_animatedTransforms[23] = Renderer::s_DebugTransform2.to_mat4();
 
 
 			// Camera
@@ -129,18 +157,14 @@ namespace HellEngine
 			camera.m_zoomFactor = std::min(camera.m_zoomFactor, camera.m_zoomLimit);
 			camera.m_zoomFactor = std::max(camera.m_zoomFactor, 0.0f);
 
-
 			camera.Update(deltaTime);
 			camera.m_weaponCameraMatrix = m_shotgunAnimatedEntity.GetCameraMatrix();
-			//	camera.m_weaponCameraMatrix = glm::mat4(1);// m_skinnedShotgunMesh.m_CameraMatrix;
 			camera.CalculateMatrices(m_player.m_characterController.GetWorldPosition());
 			camera.CalculateProjectionMatrix((float)SCR_WIDTH, (float)SCR_HEIGHT);
+			camera.CalculateWeaponSwayTransform(deltaTime);
 
 			// Camera ray cast
 			m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);
-
-
-
 		}
 
 		Physics::Update(deltaTime);

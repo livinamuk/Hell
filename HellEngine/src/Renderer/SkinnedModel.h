@@ -9,6 +9,7 @@
 
 #include "header.h"
 #include "Animation/Animation.h"
+#include "Renderer/Mesh.h"
 
 using namespace std;
 
@@ -24,17 +25,17 @@ namespace HellEngine
         bool LoadMesh(const string& Filename);
         bool LoadAnimation(const char* Filename);
         void Render(Shader* shader, const glm::mat4& modelMatrix);
-        void SetCamereaMatrix(const aiNode* pNode);
 
         glm::mat4 m_CameraMatrix = glm::mat4(1);
-        std::vector<glm::mat4> m_animatedTransforms;
+        std::vector<glm::mat4> m_BindPoseTransforms;
 
         const char* m_filename;
 
-       //std::vector<Animation> m_animations;
         std::vector<Animation*> m_animations;
 
-        void BoneTransform(float TimeInSeconds, vector<glm::mat4>& Transforms);
+        void BoneTransform(float Time, vector<glm::mat4>& Transforms, vector<glm::mat4>& DebugAnimatedTransforms);
+        
+        void FindBindPoseTransforms(const aiNode* pNode); // for debugging
 
     private:
 
@@ -42,13 +43,16 @@ namespace HellEngine
         {
             glm::mat4 BoneOffset;
             glm::mat4 FinalTransformation;
-            glm::mat4 TangentSpaceDebugMatrix;
+            glm::mat4 DebugMatrix_AnimatedTransform;
+            glm::mat4 DebugMatrix_BindPose;
             std::string BoneName;
 
             BoneInfo()
             {
                 BoneOffset = glm::mat4(0);
                 FinalTransformation = glm::mat4(0);
+                DebugMatrix_BindPose = glm::mat4(1);
+                DebugMatrix_AnimatedTransform = glm::mat4(1);
             }
         };
 
@@ -80,6 +84,9 @@ namespace HellEngine
         const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string NodeName);
         void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform);
         bool InitFromScene(const aiScene* pScene, const string& Filename);
+
+        std::vector<Vertex> m_vertices;
+
         void InitMesh(unsigned int MeshIndex,
             const aiMesh* paiMesh,
             vector<glm::vec3>& Positions,
@@ -87,6 +94,7 @@ namespace HellEngine
             vector<glm::vec2>& TexCoords,
             vector<VertexBoneData>& Bones,
             vector<unsigned int>& Indices);
+        
         void LoadBones(unsigned int MeshIndex, const aiMesh* paiMesh, vector<VertexBoneData>& Bones);
         bool InitMaterials(const aiScene* pScene, const string& Filename);
         void Clear();
@@ -121,9 +129,10 @@ namespace HellEngine
             std::string MeshName;
         };
 
-        vector<MeshEntry> m_Entries;
+       // std::vector<Mesh*> m_meshes;
 
     public:
+        vector<MeshEntry> m_meshEntries;
         map<string, unsigned int> m_BoneMapping; // maps a bone name to its index
 
     public:
@@ -132,14 +141,7 @@ namespace HellEngine
         glm::mat4 m_GlobalInverseTransform;
 
         const aiScene* m_pScene;
-   //     const aiScene* m_pAnimationScene;
         Assimp::Importer m_Importer;
-   //     Assimp::Importer m_AnimationImporter;
-
-
-       // std::vector<const aiScene*> m_animatedScenes;
-
-      //  std::vector<aiAnimation*> m_animations;
         unsigned int currentAnimationIndex = 0;
     };
 }

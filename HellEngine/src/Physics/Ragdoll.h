@@ -16,10 +16,13 @@
 #include "bullet/src/BulletDynamics/Character/btKinematicCharacterController.h"
 
 
+#include <glm/gtx/quaternion.hpp>
+
 namespace HellEngine
 {
 	class Ragdoll
 	{
+	public:
 		enum
 		{
 			BODYPART_PELVIS = 0,
@@ -68,13 +71,11 @@ namespace HellEngine
 		btRigidBody* localCreateRigidBody(btScalar mass, const btTransform& startTransform, btCollisionShape* shape);
 	
 	public:
-		Ragdoll(btDynamicsWorld* ownerWorld,
-			const btVector3& positionOffset,
-			btScalar scale_ragdoll = btScalar(1.0));
+		Ragdoll();
+		Ragdoll(const btVector3& positionOffset, float modelScale, glm::mat4 worldMatrix);
 
 		~Ragdoll();
 
-		// public
 		btRigidBody* m_bodies[BODYPART_COUNT];
 	};
 }

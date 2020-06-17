@@ -1,29 +1,29 @@
 #include "hellpch.h"
-#include "MuzzleFlash.h"
+#include "BloodWallSplatter.h"
 #include "Helpers/AssetManager.h"
 #include "Config.h"
 
 namespace HellEngine
 {
-	MuzzleFlash::MuzzleFlash()
+	BloodWallSplatter::BloodWallSplatter()
 	{
 	}
 
-	void MuzzleFlash::Init()
+	void BloodWallSplatter::Init()
 	{
-		CountRaw = 5;
+		CountRaw = 8;
 		CountColumn = 4;
 		AnimationSeconds = 1.0f;
 		m_pQuad = std::make_unique<Quad>();
 	}
 
-	void MuzzleFlash::CreateFlash(glm::vec3 worldPosition)
+	void BloodWallSplatter::CreateFlash(glm::vec3 worldPosition)
 	{
 		m_worldPos = worldPosition;
 		m_CurrentTime = 0;
 	}
 
-	void MuzzleFlash::Update(float deltaTime)
+	void BloodWallSplatter::Update(float deltaTime)
 	{
 		//if (m_CurrentTime >= AnimationSeconds)
 		//		m_CurrentTime = 0.0f;
@@ -33,14 +33,14 @@ namespace HellEngine
 
 		m_FrameIndex = std::floorf(m_CurrentTime / dt);
 		m_Interpolate = (m_CurrentTime - m_FrameIndex * dt) / dt;
-		m_CurrentTime += deltaTime * 7.5f;// Config::TEST_FLOAT;
+		m_CurrentTime += deltaTime *  Config::TEST_FLOAT;
 
 	}
 
-	void MuzzleFlash::Draw(Shader* shader, Transform& global)
+	void BloodWallSplatter::Draw(Shader* shader, Transform& global)
 	{
 		if (m_CurrentTime >= AnimationSeconds)
-			return;
+			m_CurrentTime = 0;// return;
 
 		glDepthMask(false);
 		glEnable(GL_BLEND);
@@ -61,9 +61,13 @@ namespace HellEngine
 		scale.scale = glm::vec3(0.25f, 0.125f, 1);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, HellEngine::AssetManager::GetTexIDByName("Muzzle1"));
+		glBindTexture(GL_TEXTURE_2D, HellEngine::AssetManager::GetTexIDByName("BloodWallSplatter1"));
+		//glBindTexture(GL_TEXTURE_2D, HellEngine::AssetManager::GetTexIDByName("Muzzle1"));
 		shader->setMat4("u_MatrixWorld", global.to_mat4() * scale.to_mat4());
+
+		shader->setBool("u_isBlood", true);	
 		m_pQuad->Draw();
+		shader->setBool("u_isBlood", false);
 
 		glDepthMask(true);
 		glDisable(GL_BLEND);

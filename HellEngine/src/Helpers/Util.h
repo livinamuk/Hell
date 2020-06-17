@@ -17,6 +17,7 @@ namespace HellEngine
 	{
 	public:
 	//	static void RemoveTranslation(glm::mat4& matrix);
+		static bool CompareVertexPosition(Vertex v1, Vertex v2);
 		static glm::mat4 btScalar2mat4(btScalar* matrix);
 		static glm::mat4 Get_Mat4_From_Vec3(glm::vec3 position);
 		static void TranslatePosition(glm::vec3* position, glm::mat4 translation);
@@ -66,6 +67,8 @@ namespace HellEngine
 		static void integrate(State& state, double t, float dt);
 
 		static glm::vec3 TranslationFromMat4(glm::mat4& matrix);
+
+		static btVector3 GetRelPosBetween2Vectors(glm::vec3 vecA, glm::vec3 vecB);
 	
 	private:
 			static unsigned int upFacingPlaneVAO;

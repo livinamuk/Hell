@@ -293,29 +293,10 @@ namespace HellEngine
 		if (m_gunState == GunState::FIRING && p_model->m_currentAnimationTime > 0.53f)
 		{
 			s_awaitingShell = false;
-			Transform trans;
-			trans.scale = glm::vec3(0.002f);
-			trans.position = p_camera->m_viewPos;
-			trans.rotation = p_camera->m_transform.rotation;
-
-			trans.position += p_camera->m_Up * glm::vec3(-0.005f);
-			trans.position += p_camera->m_Right * glm::vec3(0.025f);
-			trans.position += p_camera->m_Front * glm::vec3(0.16f);
-
-			//trans.position += camera.m_Up * glm::vec3(Renderer::s_DebugTransform.scale.x);
-		//	trans.position += camera.m_Right * glm::vec3(Renderer::s_DebugTransform2.scale.x);
-		//	trans.position += camera.m_Front * glm::vec3(Renderer::s_DebugTransform2.scale.y);
-
-			SkinnedModel* model = AssetManager::skinnedModels[0];
-			unsigned int BoneIndex = model->m_BoneMapping["Bolt_bone"];
-		//	Renderer::s_DebugTransform.position = p_camera->m_Front;
-		//	Renderer::s_DebugTransform2.position = p_camera->m_Right * glm::vec3(-1);
-
-			glm::mat4 worldMatrix = trans.to_mat4() * model->m_BoneInfo[BoneIndex].FinalTransformation;
-			glm::vec3 v = Util::TranslationFromMat4(worldMatrix);
+		
 
 			Transform t;
-			t.position = v;
+			t.position = GetShotgunShellSpawnWorldPosition();
 			t.rotation = p_camera->m_transform.rotation;
 
 			glm::vec3 initialVelocity;
@@ -332,13 +313,31 @@ namespace HellEngine
 		camTrans.position = p_camera->m_viewPos;
 		camTrans.rotation = p_camera->m_transform.rotation;
 
-		SkinnedModel* model = AssetManager::skinnedModels[0];
+		SkinnedModel* model = AssetManager::skinnedModels[AssetManager::GetSkinnedModelIDByName("Shotgun.fbx")];
 		unsigned int BoneIndex = model->m_BoneMapping["ShotgunMain_bone"];
 
 		Transform hardcodedLocatorTransform;
 		hardcodedLocatorTransform.position = glm::vec3(0, -73, 6);
 
-		glm::mat4 worldMatrix = camTrans.to_mat4() * model->m_BoneInfo[BoneIndex].FinalTransformation * hardcodedLocatorTransform.to_mat4();
+		glm::mat4 worldMatrix = camTrans.to_mat4() * p_camera->m_weaponSwayTransform.to_mat4() * model->m_BoneInfo[BoneIndex].FinalTransformation * hardcodedLocatorTransform.to_mat4();
+		return Util::TranslationFromMat4(worldMatrix);
+	}
+
+	glm::vec3 ShotgunLogic::GetShotgunShellSpawnWorldPosition()
+	{
+		Transform trans;
+		trans.scale = glm::vec3(0.002f);
+		trans.position = p_camera->m_viewPos;
+		trans.rotation = p_camera->m_transform.rotation;
+
+		trans.position += p_camera->m_Up * glm::vec3(-0.005f);
+		trans.position += p_camera->m_Right * glm::vec3(0.02f);
+		trans.position += p_camera->m_Front * glm::vec3(0.16f);
+
+		SkinnedModel* model = AssetManager::skinnedModels[AssetManager::GetSkinnedModelIDByName("Shotgun.fbx")];
+		unsigned int BoneIndex = model->m_BoneMapping["Bolt_bone"];
+
+		glm::mat4 worldMatrix = trans.to_mat4() * p_camera->m_weaponSwayTransform.to_mat4() * model->m_BoneInfo[BoneIndex].FinalTransformation;
 		return Util::TranslationFromMat4(worldMatrix);
 	}
 }

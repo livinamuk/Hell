@@ -10,6 +10,7 @@ namespace HellEngine
 		Camera();
 		void CalculateMatrices(glm::vec3 worldPos);
 		void CalculateProjectionMatrix(int screenWidth, int screenHeight);
+		void CalculateWeaponSwayTransform(float deltatime);
 		void Update(float deltaTime);
 
 	private: // Methods
@@ -41,9 +42,12 @@ namespace HellEngine
 		glm::vec3 m_viewPos = glm::vec3(0);
 		float m_viewHeight = 1.0f;
 
+
+		// Weapon sway
 		float m_zoomLimit = 0.2f;
 		float m_zoomSpeed = 2;
 		float m_zoomFactor;
+		Transform m_weaponSwayTransform;
 
 	};
 }

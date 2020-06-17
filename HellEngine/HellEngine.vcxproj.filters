@@ -1455,6 +1455,8 @@
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h">
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\EnemyCharacter.h" />
+    <ClInclude Include="src\Renderer\Effects\BloodWallSplatter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\Animation.cpp">
@@ -1679,6 +1681,8 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\EnemyCharacter.cpp" />
+    <ClCompile Include="src\Renderer\Effects\BloodWallSplatter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">

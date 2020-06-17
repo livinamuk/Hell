@@ -33,6 +33,7 @@ namespace HellEngine
             assert(0);
         }
 	}
+
     Animation::~Animation()
     {
     }

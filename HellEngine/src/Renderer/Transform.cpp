@@ -1,8 +1,9 @@
 #include "hellpch.h"
 #include "Transform.h"
-#include<glm/gtc/quaternion.hpp>
-#include<glm/common.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/common.hpp>
 #include <math.h>
+
 
 glm::mat4 Transform::to_mat4()
 {
@@ -17,6 +18,8 @@ glm::mat4 Transform::to_mat4()
 	m *= glm::mat4_cast(qt);
 	m = glm::scale(m, scale);
 	return m;
+
+	
 
 	
 //	glm::mat4 TranslationMatrix = glm::translate(glm::mat4(1), position);

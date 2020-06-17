@@ -14,7 +14,7 @@
 #include "Renderer/AssimpModel.h"
 #include "Renderer/Effects/Decal.h"
 #include "Misc/Shell.h"
-#include "Core/AnimatedEntity.h"
+#include "Core/EnemyCharacter.h"
 
 namespace HellEngine
 {
@@ -45,7 +45,6 @@ namespace HellEngine
 		//SkinnedModel m_skinnedShotgunMesh;
 		SkinnedModel m_ZombieBoyMesh;
 
-		AnimatedEntity m_shotgunAnimatedEntity;
 
 	//	std::vector<glm::mat4> m_animatedTransforms;
 	//	std::vector<glm::mat4> m_ZombieBoyAnimatedTransforms;
@@ -56,6 +55,10 @@ namespace HellEngine
 
 		static bool s_dontLoadShotgun;
 
+		AnimatedEntity m_shotgunAnimatedEntity;
+		AnimatedEntity m_testAnimatedEnttity;
+
+		EnemyCharacter m_zombieGuy;
 
 	};
 }

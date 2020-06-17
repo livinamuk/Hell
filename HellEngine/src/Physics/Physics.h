@@ -12,6 +12,7 @@
 #include "Renderer/GLDebugDraw.h"
 #include "Renderer/Cube.h"
 #include "House/House.h"
+#include "Core/AnimatedEntity.h"
 
 #include "Ragdoll.h"
 #include <set>
@@ -61,6 +62,8 @@ namespace HellEngine
 		//static void AddRigidBody(btRigidBody* rigidBody);
 
 		static void AddEntityToPhysicsWorld(Entity* entity);
+		static void AddAnimatedEntityToPhysicsWorld(AnimatedEntity* entity);
+		static void DeleteRigidBody(btRigidBody*& rigidBody);
 
 		static void RebuildPhysicsWorld(House* house);
 
@@ -80,17 +83,17 @@ namespace HellEngine
 
 	};
 
-	class OpenGLMotionState : public btDefaultMotionState {
-	/*ADD*/	public:
-		/*ADD*/		OpenGLMotionState(const btTransform& transform) : btDefaultMotionState(transform) {}
-		/*ADD*/
-		/*ADD*/		void GetWorldTransform(btScalar* transform) {
-			/*ADD*/			btTransform trans;
-			/*ADD*/			getWorldTransform(trans);
-			/*ADD*/			trans.getOpenGLMatrix(transform);
-			/*ADD*/
+	class OpenGLMotionState : public btDefaultMotionState 
+	{
+		public:
+			OpenGLMotionState(const btTransform& transform) : btDefaultMotionState(transform) {}
+		
+			void GetWorldTransform(btScalar* transform) 
+			{
+				btTransform trans;
+				getWorldTransform(trans);
+				trans.getOpenGLMatrix(transform);
 		}
-		/*ADD*/
 	};
 
 }

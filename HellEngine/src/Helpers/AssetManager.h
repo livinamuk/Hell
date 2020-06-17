@@ -34,8 +34,8 @@ namespace HellEngine
 
 		//static int GetTextureWidthByName(int textureID);
 		//static int GetTextureHeightByName(int textureID);
-		static void SetModelMaterialIDByModelID(unsigned int modelID, unsigned int materialID);
-		static void SetModelMaterialIDByModelIDMeshName(unsigned int modelID, std::string meshName, unsigned int materialID);
+		//static void SetModelMaterialIDByModelID(unsigned int modelID, unsigned int materialID);
+		//static void SetModelMaterialIDByModelIDMeshName(unsigned int modelID, std::string meshName, unsigned int materialID);
 		static unsigned int GetTexIDByName(std::string textureName);
 		static Texture* GetTextureByName(char* name);
 		static int GetModelIDByName(std::string textureName);
@@ -52,6 +52,9 @@ namespace HellEngine
 		static unsigned int GetMaterialIDByName(std::string name);
 		static void BindMaterial(unsigned int materialID);
 		static std::string GetMaterialNameByID(unsigned int materialID);
+
+		static void PrintSkinnedModelMeshNames(const char* name);
+		static void PrintSkinnedModelBoneNames(const char* name);
 
 		//static AssimpModel LoadFromFile(std::string const& path);		
 		//static void processNode(aiNode* node, const aiScene* scene, MeshList* meshList);

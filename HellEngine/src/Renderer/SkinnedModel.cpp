@@ -111,19 +111,35 @@ namespace HellEngine
 
         if (m_pScene->mNumCameras > 0)
             aiCamera* m_camera = m_pScene->mCameras[0];
+       
 
+        
+        //if (m_NumBones == 0)
+      //      return;
 
+ //       m_BindPoseTransforms.resize(m_NumBones);
+        FindBindPoseTransforms(m_pScene->mRootNode); // only used for debugging at this point
 
-
-        // Make sure the VAO is not changed from the outside
-        glBindVertexArray(0);
-
+        std::cout << "BONEINFO SIZEEEEE: " << m_BoneInfo.size() << "\n";
         return Ret;
+    }
+
+    void SkinnedModel::FindBindPoseTransforms(const aiNode* pNode)
+    {
+        std::string NodeName(pNode->mName.data);
+
+        if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) {
+            unsigned int BoneIndex = m_BoneMapping[NodeName];
+            m_BoneInfo[BoneIndex].DebugMatrix_BindPose = inverse(m_BoneInfo[BoneIndex].BoneOffset);
+        }
+
+        for (unsigned int i = 0; i < pNode->mNumChildren; i++)
+            FindBindPoseTransforms(pNode->mChildren[i]);
     }
 
     bool SkinnedModel::InitFromScene(const aiScene* pScene, const string& Filename)
     {
-        m_Entries.resize(pScene->mNumMeshes);
+        m_meshEntries.resize(pScene->mNumMeshes);
 
         std::cout << "MESH COUNT: " << pScene->mNumMeshes << "\n";
 
@@ -137,15 +153,15 @@ namespace HellEngine
         unsigned int NumIndices = 0;
 
         // Count the number of vertices and indices
-        for (unsigned int i = 0; i < m_Entries.size(); i++) {
-            m_Entries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
-            m_Entries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
-            m_Entries[i].BaseVertex = NumVertices;
-            m_Entries[i].BaseIndex = NumIndices;
-            m_Entries[i].MeshName = pScene->mMeshes[i]->mName.C_Str();
+        for (unsigned int i = 0; i < m_meshEntries.size(); i++) {
+            m_meshEntries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
+            m_meshEntries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
+            m_meshEntries[i].BaseVertex = NumVertices;
+            m_meshEntries[i].BaseIndex = NumIndices;
+            m_meshEntries[i].MeshName = pScene->mMeshes[i]->mName.C_Str();
 
             NumVertices += pScene->mMeshes[i]->mNumVertices;
-            NumIndices += m_Entries[i].NumIndices;
+            NumIndices += m_meshEntries[i].NumIndices;
         }
 
         // Reserve space in the vectors for the vertex attributes and indices
@@ -155,8 +171,10 @@ namespace HellEngine
         Bones.resize(NumVertices);
         Indices.reserve(NumIndices);
 
+
+
         // Initialize the meshes in the scene one by one
-        for (unsigned int i = 0; i < m_Entries.size(); i++) {
+        for (unsigned int i = 0; i < m_meshEntries.size(); i++) {
             const aiMesh* paiMesh = pScene->mMeshes[i];
             InitMesh(i, paiMesh, Positions, Normals, TexCoords, Bones, Indices);
         }
@@ -220,6 +238,18 @@ namespace HellEngine
             Positions.push_back(glm::vec3(pPos->x, pPos->y, pPos->z));
             Normals.push_back(glm::vec3(pNormal->x, pNormal->y, pNormal->z));
             TexCoords.push_back(glm::vec2(pTexCoord->x, pTexCoord->y));
+
+
+            // this is my shit. my own copy of the data. 
+            // umm deal with this later. as in removing all reliance on assimp data structures..
+            // Also keep in mind this is only half complete and doesn't have bone shit.
+            // you are just using it to add the mesh to bullet for blood lol.
+
+            Vertex v;
+            v.Position = Positions[i];
+            v.Normal = Normals[i];
+            v.TexCoords = TexCoords[i];
+            m_vertices.push_back(v);
         }
 
         LoadBones(MeshIndex, paiMesh, Bones);
@@ -262,7 +292,7 @@ namespace HellEngine
             }
 
             for (unsigned int j = 0; j < pMesh->mBones[i]->mNumWeights; j++) {
-                unsigned int VertexID = m_Entries[MeshIndex].BaseVertex + pMesh->mBones[i]->mWeights[j].mVertexId;
+                unsigned int VertexID = m_meshEntries[MeshIndex].BaseVertex + pMesh->mBones[i]->mWeights[j].mVertexId;
                 float Weight = pMesh->mBones[i]->mWeights[j].mWeight;
                 Bones[VertexID].AddBoneData(BoneIndex, Weight);
             }
@@ -295,7 +325,7 @@ namespace HellEngine
     {
         glBindVertexArray(m_VAO);
         shader->setMat4("model", modelMatrix);
-        for (MeshEntry& mesh : m_Entries) {
+        for (MeshEntry& mesh : m_meshEntries) {
 
             if (mesh.MeshName == "Arms")
                 AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Hands"));
@@ -306,7 +336,7 @@ namespace HellEngine
 
             glDrawElementsBaseVertex(GL_TRIANGLES, mesh.NumIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh.BaseIndex), mesh.BaseVertex);
         }
-        shader->setMat4("bindPoseMatrix", glm::mat4(1));
+       // shader->setMat4("bindPoseMatrix", glm::mat4(1));
     }
 
     int SkinnedModel::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
@@ -472,31 +502,32 @@ namespace HellEngine
 
     void SkinnedModel::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
     {
-
-        aiAnimation* animation = m_animations[currentAnimationIndex]->m_pAnimationScene->mAnimations[0];
-
+        // Get the node and its um bind pose transform?
         string NodeName(pNode->mName.data);
         glm::mat4 NodeTransformation(Util::aiMatrix4x4ToGlm(pNode->mTransformation));
-        const aiAnimation* pAnimation = animation;
-        const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
 
+        // Calculate any animation
+        if (m_animations.size() > 0) 
+        {
+            aiAnimation* animation = m_animations[currentAnimationIndex]->m_pAnimationScene->mAnimations[0];
+            const aiAnimation* pAnimation = animation;
+            const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
 
-
-        if (pNodeAnim) {
-            aiVector3D Scaling;
-            CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-            glm::mat4 ScalingM;
-            ScalingM = Util::Mat4InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
-            aiQuaternion RotationQ;
-            CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
-            glm::mat4 RotationM = Util::aiMatrix3x3ToGlm(RotationQ.GetMatrix());
-            aiVector3D Translation;
-            CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
-            glm::mat4 TranslationM;
-            TranslationM = Util::Mat4InitTranslationTransform(Translation.x, Translation.y, Translation.z);
-            NodeTransformation = TranslationM * RotationM * ScalingM;
+            if (pNodeAnim) {
+                aiVector3D Scaling;
+                CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
+                glm::mat4 ScalingM;
+                ScalingM = Util::Mat4InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
+                aiQuaternion RotationQ;
+                CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
+                glm::mat4 RotationM = Util::aiMatrix3x3ToGlm(RotationQ.GetMatrix());
+                aiVector3D Translation;
+                CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
+                glm::mat4 TranslationM;
+                TranslationM = Util::Mat4InitTranslationTransform(Translation.x, Translation.y, Translation.z);
+                NodeTransformation = TranslationM * RotationM * ScalingM;
+            }
         }
-
 
         glm::mat4 GlobalTransformation = ParentTransform * NodeTransformation;
 
@@ -512,7 +543,13 @@ namespace HellEngine
         if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) {
             unsigned int BoneIndex = m_BoneMapping[NodeName];
             m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
-            m_BoneInfo[BoneIndex].TangentSpaceDebugMatrix = GlobalTransformation;
+            m_BoneInfo[BoneIndex].DebugMatrix_AnimatedTransform = GlobalTransformation;
+           // m_BoneInfo[BoneIndex].DebugMatrix_BindPose = inverse(m_BoneInfo[BoneIndex].BoneOffset);
+
+
+            // If there is no bind pose, then just use bind pose
+            if (m_animations.size() == 0)
+                m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
         }
 
         for (unsigned int i = 0; i < pNode->mNumChildren; i++)
@@ -520,22 +557,24 @@ namespace HellEngine
     }
 
 
-    void SkinnedModel::BoneTransform(float TimeInSeconds, vector<glm::mat4>& Transforms)
+    void SkinnedModel::BoneTransform(float TimeInSeconds, vector<glm::mat4>& Transforms, vector<glm::mat4>& DebugAnimatedTransforms)
     {
+        // Get the animation time
+        float AnimationTime = 0;
+        if (m_animations.size() > 0) {
+            aiAnimation* animation = m_animations[currentAnimationIndex]->m_pAnimationScene->mAnimations[0];
 
-        aiAnimation* animation = m_animations[currentAnimationIndex]->m_pAnimationScene->mAnimations[0];
+            float TicksPerSecond = (float)(animation->mTicksPerSecond != 0 ? animation->mTicksPerSecond : 25.0f);
+            float TimeInTicks = TimeInSeconds * TicksPerSecond;
+            AnimationTime = fmod(TimeInTicks, (float)animation->mDuration);
+        }
 
-        float TicksPerSecond = (float)(animation->mTicksPerSecond != 0 ? animation->mTicksPerSecond : 25.0f);
-        float TimeInTicks = TimeInSeconds * TicksPerSecond;
-        float AnimationTime = fmod(TimeInTicks, (float)animation->mDuration);
-
+        // Climb down the tree and build the transforms. You retreuve them just below see, from m_BoneInfo.
         ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, glm::mat4(1));
-
-        Transforms.clear();
-        Transforms.resize(m_NumBones);
 
         for (unsigned int i = 0; i < m_NumBones; i++) {
             Transforms[i] = m_BoneInfo[i].FinalTransformation;
+            DebugAnimatedTransforms[i] = m_BoneInfo[i].DebugMatrix_AnimatedTransform;
         }
     }
 

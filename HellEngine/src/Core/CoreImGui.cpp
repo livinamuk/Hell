@@ -75,6 +75,11 @@ namespace HellEngine
 		ImGui::BeginTabBar("MASTER_TAB_BAR", tab_bar_flags);
 		ImGui::Text("\n");
 
+		if (ImGui::BeginTabItem("Ragdoll")) {
+			ShowRagdollMenu(game);
+			ImGui::EndTabItem();
+		}
+
 		if (ImGui::BeginTabItem("Scene")) {
 			ShowSceneMenu(game);
 			ImGui::EndTabItem();
@@ -584,5 +589,18 @@ namespace HellEngine
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
+	}
+
+	void CoreImGui::ShowRagdollMenu(Game* game)
+	{
+		Ragdoll* ragdoll = game->m_zombieGuy.m_ragdoll;
+		
+		for (int i = 0; i < Ragdoll::BODYPART_COUNT; i++)
+		{
+			btRigidBody* rigidBody = ragdoll->m_bodies[i];
+			glm::mat4 worldMatrix = Physics::GetModelMatrixFromRigidBody(rigidBody);
+
+			Util::Mat4ToString(worldMatrix);
+		}
 	}
 }

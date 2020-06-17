@@ -85,78 +85,9 @@ namespace HellEngine
 
 	void Physics::CreateWorld()
 	{
-
-		// Create the ground
-		/*btBoxShape* groundShape = new btBoxShape(btVector3(btScalar(20.), btScalar(20.), btScalar(20.)));
-		s_collisionShapes.push_back(groundShape);
-		btTransform groundTransform;
-		groundTransform.setIdentity();
-		groundTransform.setOrigin(btVector3(0, -20.00, 0));
-		btRigidBody* floor;
-
-		btScalar mass(0.);
-		int group = CollisionGroups::HOUSE;
-		int mask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
-		floor = createRigidBody(mass, groundTransform, groundShape, 1.0f, group, mask);
-		floor->setCustomDebugColor(DEBUG_COLOR_GROUND);
-
-
-		EntityData* entityData = new EntityData();
-		entityData->name = "TERRAIN";
-		entityData->vectorIndex = 0;
-		floor->setUserPointer(entityData);
-
-		btBoxShape* collisionShape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
-		collisionShape->setLocalScaling(btVector3(0.015, 0.15, 0.15));
-		s_collisionShapes.push_back(collisionShape);
-		*/
-
-
-
-
-		/// Create Dynamic Objects
-		btTransform startTransform;
-		startTransform.setIdentity();
-
-	//	float mass = 1.f;
-		float friction = 0.5f;
-
-		//rigidbody is dynamic if and only if mass is non zero, otherwise static
-		//bool isDynamic = (mass != 0.f);
-
-		
-
-
-
-
-
-
-
-
-
-
-
-
-
-		/*
-		// STACK OF BOXES
-		for (int k = 0; k < 6; k++) {
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 3; j++) {
-					startTransform.setOrigin(btVector3(
-						btScalar(4.9f + 0.2 * i),
-						btScalar(0.1f + .2 * k),
-						btScalar(2.0f + 0.2 * j)));
-
-					m_rigidBodies.push_back(createRigidBody(mass, startTransform, collisionShape, friction));
-				}
-			}
-		}*/
-
-
-
 		s_debugDraw.setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 		s_dynamicsWorld->setDebugDrawer(&s_debugDraw);
+		s_dynamicsWorld->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawWireframe + btIDebugDraw::DBG_DrawConstraints + btIDebugDraw::DBG_DrawConstraintLimits);
 	}
 
 	void Physics::AddFloorsAndCeilingsToPhysicsWorld(House* house)
@@ -543,6 +474,79 @@ namespace HellEngine
 		s_collisionObjects.push_back(collisionObject);
 
 		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	}
+
+
+
+
+	void Physics::AddAnimatedEntityToPhysicsWorld(AnimatedEntity* entity)
+	{
+		// this is a duplicate of the above. combined them somehow.
+		// this is a duplicate of the above. combined them somehow.
+		// this is a duplicate of the above. combined them somehow.
+		// this is a duplicate of the above. combined them somehow.
+		// this is a duplicate of the above. combined them somehow.
+/*
+		btTriangleMesh* triangleMesh = new btTriangleMesh();
+
+		int indexCount = AssetManager::models[entity->m_modelID].m_meshes[0]->indices.size();
+
+
+		for (int i = 0; i < indexCount; i += 3)
+		{
+			std::vector<Vertex>* vertices = &AssetManager::models[entity->m_modelID].m_meshes[0]->vertices;
+			std::vector<unsigned int>* indices = &AssetManager::models[entity->m_modelID].m_meshes[0]->indices;
+
+			glm::vec3 scale = entity->m_transform.scale;
+			btVector3 vertA = Util::glmVec3_to_btVec3(vertices->at(indices->at(i)).Position * scale);
+			btVector3 vertB = Util::glmVec3_to_btVec3(vertices->at(indices->at(i + 1)).Position * scale);
+			btVector3 vertC = Util::glmVec3_to_btVec3(vertices->at(indices->at(i + 2)).Position * scale);
+			triangleMesh->addTriangle(vertA, vertB, vertC);
+		}
+
+
+		btBvhTriangleMeshShape* triangleMeshShape = new btBvhTriangleMeshShape(triangleMesh, true, true);
+
+		s_collisionShapes.push_back(triangleMeshShape);
+
+		btTransform meshTransform;
+		meshTransform.setIdentity();
+		meshTransform.setOrigin(Util::glmVec3_to_btVec3(entity->m_transform.position));
+
+		btQuaternion q = btQuaternion(entity->m_transform.rotation.y, 0, 0); // this is not always going to work. only for y it does.
+		meshTransform.setRotation((q));
+
+		//meshTransform.setFromOpenGLMatrix(glm::value_ptr(entity->m_transform.to_mat4()));
+
+		btCollisionObject* collisionObject = new btCollisionObject();
+		collisionObject->setCollisionShape(triangleMeshShape);
+		collisionObject->setWorldTransform(meshTransform);
+		collisionObject->setFriction(0);
+		collisionObject->setCustomDebugColor(btVector3(1, 0, 0));
+		EntityData* entityData = new EntityData();
+		entityData->name = "NEW MESH";
+		entityData->vectorIndex = 0;
+		collisionObject->setUserPointer(entityData);
+
+		int group = CollisionGroups::HOUSE;
+		int mask = CollisionGroups::ENTITY | CollisionGroups::ENEMY;
+
+		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
+
+		s_collisionObjects.push_back(collisionObject);
+
+		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);*/
+	}
+
+
+
+	void Physics::DeleteRigidBody(btRigidBody*& rigidBody)
+	{
+		delete rigidBody->getMotionState();
+		delete rigidBody->getCollisionShape();
+		s_dynamicsWorld->removeRigidBody(rigidBody);
+		delete rigidBody;
+		rigidBody = nullptr;
 	}
 
 

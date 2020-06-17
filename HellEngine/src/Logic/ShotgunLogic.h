@@ -21,6 +21,7 @@ namespace HellEngine
 		static void EndIronSighting();
 		static void SpawnShellIfRequired();
 		static glm::vec3 GetShotgunBarrelHoleWorldPosition();
+		static glm::vec3 GetShotgunShellSpawnWorldPosition();
 
 	public:	// static variables
 		

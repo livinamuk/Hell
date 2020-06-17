@@ -15,9 +15,9 @@ namespace HellEngine
 		void Update(float deltaTime);
 		void Draw(Shader* shader);
 
-		btRigidBody* m_rigidBody;
-
-		float shellScale = 1.6f;
+		btRigidBody* m_rigidBody; 
+		glm::mat4 m_modelMatrix;
+		float m_shellScale = 1.6f;
 
 		static std::vector<Shell> s_shells;
 	};

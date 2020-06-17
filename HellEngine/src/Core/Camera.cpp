@@ -51,6 +51,23 @@ namespace HellEngine
 	void Camera::CalculateProjectionMatrix(int screenWidth, int screenHeight)
 	{
 		m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, FAR_PLANE);
+
+		m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, 250.0f);
+	}
+
+	void Camera::CalculateWeaponSwayTransform(float deltatime)
+	{
+		float movementX = - m_xoffset * Config::SWAY_AMOUNT;
+		float movementY = -m_yoffset * Config::SWAY_AMOUNT;
+
+		movementX = std::min(movementX, Config::SWAY_MAX_X);
+		movementX = std::max(movementX, Config::SWAY_MIN_X);
+		movementY = std::min(movementY, Config::SWAY_MAX_Y);
+		movementY = std::max(movementY, Config::SWAY_MIN_Y);
+
+		glm::vec3 finalPosition = glm::vec3(movementX, movementY, 0);
+
+		m_weaponSwayTransform.position = Util::Vec3InterpTo(m_weaponSwayTransform.position, finalPosition, deltatime, Config::SMOOTH_AMOUNT);
 	}
 
 	void Camera::Update(float deltaTime)

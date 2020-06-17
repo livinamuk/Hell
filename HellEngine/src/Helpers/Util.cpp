@@ -7,6 +7,12 @@ namespace HellEngine
 	unsigned int Util::upFacingPlaneVAO = INVALID_VALUE;
 	unsigned int Util::downFacingPlaneVAO = INVALID_VALUE;
 
+	bool Util::CompareVertexPosition(Vertex v1, Vertex v2)
+	{
+		float eps = 0.00001;
+		return ((fabs(v1.Position.x - v2.Position.x) < eps) && (fabs(v1.Position.y - v2.Position.y) > eps) && (fabs(v1.Position.z - v2.Position.z) > eps));
+	}
+
 	glm::mat4 Util::btScalar2mat4(btScalar* matrix) {
 		return glm::mat4(
 			matrix[0], matrix[1], matrix[2], matrix[3],
@@ -659,5 +665,10 @@ namespace HellEngine
 		float y = matrix[3][1];
 		float z = matrix[3][2];
 		return glm::vec3(x, y, z);
+	}
+	btVector3 Util::GetRelPosBetween2Vectors(glm::vec3 vecA, glm::vec3 vecB)
+	{
+		glm::vec3 relativePos = (vecA + vecB) * glm::vec3(0.5f);
+		return Util::glmVec3_to_btVec3(relativePos);
 	}
 }

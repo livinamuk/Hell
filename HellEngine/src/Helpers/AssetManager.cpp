@@ -123,8 +123,9 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Mannequin.obj"));
 		models.emplace_back(Model("res/models/Shell.obj"));
 
-		skinnedModels.emplace_back(new SkinnedModel("Shotgun.fbx"));
+		skinnedModels.emplace_back(new SkinnedModel("Zombie.fbx"));
 
+		skinnedModels.emplace_back(new SkinnedModel("Shotgun.fbx"));
 		LoadAnimation("Shotgun.fbx", "Shotgun_Idle.fbx");
 		LoadAnimation("Shotgun.fbx", "Shotgun_Walk.fbx");
 		LoadAnimation("Shotgun.fbx", "Shotgun_Fire.fbx");
@@ -224,22 +225,17 @@ namespace HellEngine
 
 	void AssetManager::AssignHardcodedModelMaterials()
 	{
-		SetModelMaterialIDByModelID(GetModelIDByName("Shotgun"), GetMaterialIDByName("Shotgun"));
-		SetModelMaterialIDByModelIDMeshName(GetModelIDByName("Shotgun"), "Arms", GetMaterialIDByName("Hands"));
-		SetModelMaterialIDByModelIDMeshName(GetModelIDByName("Shotgun"), "Shell", GetMaterialIDByName("Shell"));
-		SetModelMaterialIDByModelIDMeshName(GetModelIDByName("Shotgun"), "Shell001", GetMaterialIDByName("Shell"));
-
-		SetModelMaterialIDByModelID(GetModelIDByName("Door"), GetMaterialIDByName("Door"));
-		SetModelMaterialIDByModelID(GetModelIDByName("DoorFrame"), GetMaterialIDByName("DoorFrame"));
-		SetModelMaterialIDByModelID(GetModelIDByName("sphere"), GetMaterialIDByName("Red"));
+		//SetModelMaterialIDByModelID(GetModelIDByName("Door"), GetMaterialIDByName("Door"));
+		//SetModelMaterialIDByModelID(GetModelIDByName("DoorFrame"), GetMaterialIDByName("DoorFrame"));
+		//SetModelMaterialIDByModelID(GetModelIDByName("sphere"), GetMaterialIDByName("Red"));
 
 		AssetManager::s_MaterialID_FloorBoards = GetMaterialIDByName("FloorBoards");
 		AssetManager::s_MaterialID_PlasterCeiling = GetMaterialIDByName("PlasterCeiling");
 		AssetManager::s_MaterialID_WallPaper = GetMaterialIDByName("WallPaper");
 
-		SetModelMaterialIDByModelID(GetModelIDByName("sphere"), GetMaterialIDByName("Red"));
-		SetModelMaterialIDByModelID(GetModelIDByName("TrimFloor"), GetMaterialIDByName("Trims"));
-		SetModelMaterialIDByModelID(GetModelIDByName("TrimCeiling"), GetMaterialIDByName("Trims"));
+		//SetModelMaterialIDByModelID(GetModelIDByName("sphere"), GetMaterialIDByName("Red"));
+		//SetModelMaterialIDByModelID(GetModelIDByName("TrimFloor"), GetMaterialIDByName("Trims"));
+		//SetModelMaterialIDByModelID(GetModelIDByName("TrimCeiling"), GetMaterialIDByName("Trims"));
 
 		AssetManager::s_ModelID_CeilingTrim = AssetManager::GetModelIDByName("TrimCeiling");
 		AssetManager::s_ModelID_FloorTrim = AssetManager::GetModelIDByName("TrimFloor");
@@ -249,11 +245,11 @@ namespace HellEngine
 		AssetManager::s_ModelID_StaircaseCeilingTrimStraight = AssetManager::GetModelIDByName("StaircaseCeilingTrimStraight");
 		AssetManager::s_ModelID_Staircase = AssetManager::GetModelIDByName("Staircase");
 
-		SetModelMaterialIDByModelID(s_ModelID_Staircase, GetMaterialIDByName("Stairs01"));
-		SetModelMaterialIDByModelID(s_ModelID_StaircaseCeilingTrimStraight, GetMaterialIDByName("Trims"));	
+		//SetModelMaterialIDByModelID(s_ModelID_Staircase, GetMaterialIDByName("Stairs01"));
+		//SetModelMaterialIDByModelID(s_ModelID_StaircaseCeilingTrimStraight, GetMaterialIDByName("Trims"));	
 	}
 
-	void AssetManager::SetModelMaterialIDByModelID(unsigned int modelID, unsigned int materialID)
+	/*void AssetManager::SetModelMaterialIDByModelID(unsigned int modelID, unsigned int materialID)
 	{
 		if (modelID < 0 || modelID >= models.size())
 			return;
@@ -261,8 +257,8 @@ namespace HellEngine
 		for (Mesh* mesh : models[modelID].m_meshes)
 			mesh->materialID = materialID;
 		return;
-	}
-
+	}*/
+	/*
 	void AssetManager::SetModelMaterialIDByModelIDMeshName(unsigned int modelID, std::string meshName, unsigned int materialID)
 	{
 		if (modelID < 0 || modelID >= models.size())
@@ -274,7 +270,7 @@ namespace HellEngine
 				return;
 			}
 		}
-	}
+	}*/
 
 	unsigned int AssetManager::GetTexIDByName(std::string textureName)
 	{
@@ -311,6 +307,8 @@ namespace HellEngine
 	{
 		for (size_t i = 0; i < skinnedModels.size(); i++)
 		{
+			//std::cout << name << " x " << skinnedModels[i]->m_filename << "\n";
+
 			if (std::strcmp(skinnedModels[i]->m_filename, name) == 0)
 				return i;
 		}
@@ -372,6 +370,32 @@ namespace HellEngine
 			return "OUT OF RANGE MATERIAL ID";
 		else
 			return materials[materialID].name;
+	}
+
+	void AssetManager::PrintSkinnedModelMeshNames(const char* skinnedModelName)
+	{
+		int ID = GetSkinnedModelIDByName(skinnedModelName);
+		
+		if (ID == -1) 
+			return;
+
+		std::cout << skinnedModelName << " MESH NAMES:\n";
+
+			for (int i = 0; i < skinnedModels[ID]->m_meshEntries.size(); i++)
+			std::cout << " - " << skinnedModels[ID]->m_meshEntries[i].MeshName << "\n";
+	}
+
+	void AssetManager::PrintSkinnedModelBoneNames(const char* skinnedModelName)
+	{
+		int ID = GetSkinnedModelIDByName(skinnedModelName);
+
+		if (ID == -1)
+			return;
+
+		std::cout << skinnedModelName << " BONE NAMES\n";
+
+		for (int i = 0; i < skinnedModels[ID]->m_BoneInfo.size(); i++)
+			std::cout << " " << i << ": " << skinnedModels[ID]->m_BoneInfo[i].BoneName << "\n";
 	}
 
 	void AssetManager::BindMaterial(unsigned int materialID)

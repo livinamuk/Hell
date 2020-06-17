@@ -31,7 +31,7 @@ void main()
 	 vec2 destCoord = TexCoords;
      int sampleCount = 50;
     float blur = 0.25; 
-    float falloff = 5.0; 
+    float falloff = 05.0; 
 
     vec2 direction = normalize(destCoord - 0.5); 
     vec2 velocity = direction * blur * pow(length(destCoord - 0.5), falloff);

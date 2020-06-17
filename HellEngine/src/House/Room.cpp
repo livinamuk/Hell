@@ -153,7 +153,7 @@ namespace HellEngine
 		// DO NOT HARDCODE THIS. IT'S ALSO IN WALLMESH.CPP
 
 		float wallWidth;
-		float ROOM_Y = m_story * STORY_HEIGHT;
+		float ROOM_Y = (m_story * STORY_HEIGHT);
 		float bias = 0.01; // to hide cracks
 		
 		// Front walls		
@@ -162,7 +162,7 @@ namespace HellEngine
 		for (int i = 0; i < m_doorWaysXFrontWall.size(); i++) 
 		{
 			wallWidth = m_doorWaysXFrontWall[i].position.x - cursorX - (DOOR_WIDTH / 2);
-			m_wallMesh.AddQuad(glm::vec3(cursorX, FLOOR_TRIM_HEIGHT + ROOM_Y - bias, cursorZ), glm::vec3(cursorX + wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), POS_X); // wall
+			m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX + wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), POS_X); // wall
 			AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), 0, wallWidth);
 			AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), 0, wallWidth);
 			cursorX += wallWidth + DOOR_WIDTH;
@@ -172,7 +172,7 @@ namespace HellEngine
 		//	}
 		}
 		wallWidth = high_x - cursorX;
-		m_wallMesh.AddQuad(glm::vec3(cursorX, FLOOR_TRIM_HEIGHT + ROOM_Y - bias, cursorZ), glm::vec3(cursorX + wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), POS_X); // wall
+		m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX + wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), POS_X); // wall
 		AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), 0, wallWidth);
 		AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), 0, wallWidth);
 
@@ -181,7 +181,7 @@ namespace HellEngine
 		cursorZ = high_z;
 		for (int i = 0; i < m_doorWaysXBackWall.size(); i++)	{
 			float wallWidth = cursorX - m_doorWaysXBackWall[i].position.x - (DOOR_WIDTH / 2);
-			m_wallMesh.AddQuad(glm::vec3(cursorX, FLOOR_TRIM_HEIGHT + ROOM_Y - bias, cursorZ), glm::vec3(cursorX - wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), NEG_X); // wall
+			m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX - wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), NEG_X); // wall
 			AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_180, wallWidth);
 			AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_180, wallWidth);
 			cursorX -= wallWidth + DOOR_WIDTH;
@@ -191,7 +191,7 @@ namespace HellEngine
 		//	}
 		}
 		wallWidth = cursorX - low_x;
-		m_wallMesh.AddQuad(glm::vec3(cursorX, FLOOR_TRIM_HEIGHT + ROOM_Y - bias, cursorZ), glm::vec3(cursorX - wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), NEG_X); // wall
+		m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX - wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), NEG_X); // wall
 		AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_180, wallWidth);
 		AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_180, wallWidth);
 
@@ -200,7 +200,7 @@ namespace HellEngine
 		cursorX = low_x;
 		for (int i = 0; i < m_doorWaysZLeftWall.size(); i++) {
 			float wallWidth = cursorZ - m_doorWaysZLeftWall[i].position.z - (DOOR_WIDTH / 2);
-			m_wallMesh.AddQuad(glm::vec3(cursorX, FLOOR_TRIM_HEIGHT + ROOM_Y - bias, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ - wallWidth), POS_Z); // wall
+			m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ - wallWidth), POS_Z); // wall
 			AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_90, wallWidth);
 			AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_90, wallWidth);
 			cursorZ -= wallWidth + DOOR_WIDTH;
@@ -210,7 +210,7 @@ namespace HellEngine
 			//}
 		}
 		wallWidth = cursorZ - low_z;
-		m_wallMesh.AddQuad(glm::vec3(cursorX, FLOOR_TRIM_HEIGHT + ROOM_Y - bias, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ - wallWidth), POS_Z); // wall
+		m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ - wallWidth), POS_Z); // wall
 		AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_90, wallWidth);
 		AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_90, wallWidth);
 
@@ -220,7 +220,7 @@ namespace HellEngine
 		for (int i = 0; i < m_doorWaysZRightWall.size(); i++)
 		{
 			float wallWidth = m_doorWaysZRightWall[i].position.z - cursorZ - (DOOR_WIDTH / 2);
-			m_wallMesh.AddQuad(glm::vec3(cursorX, FLOOR_TRIM_HEIGHT + ROOM_Y - bias, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ + wallWidth), NEG_Z); // wall
+			m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ + wallWidth), NEG_Z); // wall
 			AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_270, wallWidth);
 			AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_270, wallWidth);
 			cursorZ += wallWidth + DOOR_WIDTH;
@@ -230,7 +230,7 @@ namespace HellEngine
 			//}
 		}
 		wallWidth = high_z - cursorZ;
-		m_wallMesh.AddQuad(glm::vec3(cursorX, FLOOR_TRIM_HEIGHT + ROOM_Y - bias, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ + wallWidth), NEG_Z); // wall
+		m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ + wallWidth), NEG_Z); // wall
 		AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_270, wallWidth);
 		AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_270, wallWidth);
 

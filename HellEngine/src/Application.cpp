@@ -72,16 +72,14 @@ int main()
 	return 0;
 
 	{
-		Opp r = Opp(1400);
+		Opp r = Opp(900);
 
-		Opp m = Opp(750);
+		Opp m = Opp(275);
+		m = Opp(275);
+		m = Opp(275);
+		m = Opp(275);
+		m = Opp(50);
 
-		Opp c = Opp(2400);
-		c.Deduct(300);
-		c.Deduct(300);
-		c.Deduct(300);
-		c.Deduct(300);
-		c.Deduct(300);
-		c.Deduct(300);
+		Opp c = Opp(2000);
 	}
 }

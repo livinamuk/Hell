@@ -15,6 +15,7 @@ namespace HellEngine
 		static void InitImGui();
 		static void Render(Game* game);
 
+		static void ShowRagdollMenu(Game* game);
 		static void ShowMapMenu(Game* game);
 		static void ShowOtherMenu(Game* game);
 		static void ShowPlayerMenu(Game* game);

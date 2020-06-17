@@ -28,7 +28,7 @@ void main()
 	vec4 worldPos;
 	vec4 totalLocalPos = vec4(0.0);
 	vec4 totalNormal = vec4(0.0);
-    mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
+    mat3 normalMatrix = transpose(inverse(mat3(modelMatrix))); // do this on the cpu. its fucking slow.
 	
 	vec4 vertexPosition =  vec4(aPos, 1.0);
 	vec4 vertexNormal = vec4(aNormal, 0.0);

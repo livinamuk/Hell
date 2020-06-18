@@ -17,6 +17,7 @@
 
 
 #include <glm/gtx/quaternion.hpp>
+#include "Renderer/SkinnedModel.h"
 
 namespace HellEngine
 {
@@ -44,7 +45,7 @@ namespace HellEngine
 			BODYPART_COUNT
 		};
 
-		enum
+		enum RAGDOLL_JOINT
 		{
 			JOINT_PELVIS_SPINE = 0,
 			JOINT_SPINE_HEAD,
@@ -66,16 +67,25 @@ namespace HellEngine
 
 		btDynamicsWorld* m_ownerWorld;
 		btCollisionShape* m_shapes[BODYPART_COUNT];
-		btTypedConstraint* m_joints[JOINT_COUNT];
+		//btTypedConstraint* m_joints[JOINT_COUNT];
+		btGeneric6DofConstraint* m_joints[JOINT_COUNT];
 
 		btRigidBody* localCreateRigidBody(btScalar mass, const btTransform& startTransform, btCollisionShape* shape);
 	
 	public:
 		Ragdoll();
 		Ragdoll(const btVector3& positionOffset, float modelScale, glm::mat4 worldMatrix);
-
 		~Ragdoll();
 
+		void UpdateBoneTransform(SkinnedModel* skinnedModel, vector<glm::mat4>& Transforms, vector<glm::mat4>& DebugAnimatedTransforms);
+		void ReadNodeHeirarchy(SkinnedModel* skinnedModel, const aiNode* pNode, const glm::mat4& ParentTransform);
+
 		btRigidBody* m_bodies[BODYPART_COUNT];
+
+		Transform* p_worldTransform;
+		Transform* p_modelTransform;
+
+		glm::mat4 GetJointWorldMatrix(int jointIndex);
+		glm::vec3 GetJointWorldPosition(int jointIndex);
 	};
 }

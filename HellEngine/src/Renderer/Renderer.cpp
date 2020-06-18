@@ -362,7 +362,7 @@ namespace HellEngine
 			DrawTangentDebugAxis(shader, worldMatrix * boneMatrix);
 
 			glm::vec3 v = Util::TranslationFromMat4(worldMatrix * boneMatrix);
-			DrawPoint(&s_solidColorShader, v, glm::vec3(1, 1, 1));
+			//DrawPoint(&s_solidColorShader, v, glm::vec3(1, 1, 1));
 		}
 	}
 
@@ -537,6 +537,7 @@ namespace HellEngine
 	//	if (!s_demo)
 	//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
 		DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
+	//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
 
 		//DrawSkeleton(&s_solidColorShader, AssetManager::skinnedModels[game->m_testAnimatedEnttity.m_skinnedModelID], &trans3);
 		
@@ -552,31 +553,9 @@ namespace HellEngine
 
 		for (int i = 0; i < ragdoll->JOINT_COUNT; i++)
 		{
-
-			glm::vec3 posA = Util::btVec3_to_glmVec3(ragdoll->m_joints[i]->getRigidBodyA().getWorldTransform().getOrigin());
-			glm::vec3 posB = Util::btVec3_to_glmVec3(ragdoll->m_joints[i]->getRigidBodyB().getWorldTransform().getOrigin());
-
-			glm::vec3 relativePos = (posA + posB) * glm::vec3(0.5f);
-
-		//	DrawPoint(&s_solidColorShader, posA, glm::vec3(1, 0, 1));
-		//	DrawPoint(&s_solidColorShader, posB, glm::vec3(0, 1, 1));
-			DrawPoint(&s_solidColorShader, relativePos, glm::vec3(1, 1, 1));
-
-
-			//btVector3 pivotAInW = m_rbA.getCenterOfMassTransform() * m_rbAFrame.getOrigin();
-			//btVector3 pivotBInW = m_rbB.getCenterOfMassTransform() * m_rbBFrame.getOrigin();
-			//btVector3 relPos = pivotBInW - pivotAInW;
-
-			/*ragdoll->m_joints[i]->setDbgDrawSize(2);
-			btGeneric6DofConstraint* dof = (btGeneric6DofConstraint*)ragdoll->m_joints[i];
-
-			dof->calculateTransforms();
-
-			btScalar x = dof->getRelativePivotPosition(0);
-			btScalar y = dof->getRelativePivotPosition(1);
-			btScalar z = dof->getRelativePivotPosition(2);
-
-			DrawPoint(&s_solidColorShader, glm::vec3(x,y,z), glm::vec3(1, 1, 1));*/
+		//	glm::vec3 jointWorldPos = ragdoll->GetJointWorldPosition(i);
+			glm::vec3 jointWorldPos = Util::GetTranslationFromMatrix(ragdoll->GetJointWorldMatrix(i));
+			DrawPoint(&s_solidColorShader, jointWorldPos, glm::vec3(1, 0, 1));
 		}
 
 

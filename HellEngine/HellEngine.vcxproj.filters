@@ -1457,6 +1457,7 @@
     </ClInclude>
     <ClInclude Include="src\Core\EnemyCharacter.h" />
     <ClInclude Include="src\Renderer\Effects\BloodWallSplatter.h" />
+    <ClInclude Include="src\Physics\RagdollJoint.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\Animation.cpp">
@@ -1683,6 +1684,7 @@
     </ClCompile>
     <ClCompile Include="src\Core\EnemyCharacter.cpp" />
     <ClCompile Include="src\Renderer\Effects\BloodWallSplatter.cpp" />
+    <ClCompile Include="src\Physics\RagdollJoint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">

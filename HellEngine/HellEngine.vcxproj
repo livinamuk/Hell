@@ -196,6 +196,7 @@
     <ClInclude Include="src\Physics\CharacterController.h" />
     <ClInclude Include="src\Physics\Physics.h" />
     <ClInclude Include="src\Physics\Ragdoll.h" />
+    <ClInclude Include="src\Physics\RagdollJoint.h" />
     <ClInclude Include="src\Physics\RaycastResult.h" />
     <ClInclude Include="src\Renderer\Animator.h" />
     <ClInclude Include="src\Renderer\AssimpModel.h" />
@@ -667,6 +668,7 @@
     <ClCompile Include="src\Physics\CharacterController.cpp" />
     <ClCompile Include="src\Physics\Physics.cpp" />
     <ClCompile Include="src\Physics\Ragdoll.cpp" />
+    <ClCompile Include="src\Physics\RagdollJoint.cpp" />
     <ClCompile Include="src\Physics\RaycastResult.cpp" />
     <ClCompile Include="src\Renderer\Animator.cpp" />
     <ClCompile Include="src\Renderer\AssimpModel.cpp" />

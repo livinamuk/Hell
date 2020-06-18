@@ -138,8 +138,8 @@ namespace HellEngine
 			m_testAnimatedEnttity.Update(deltaTime);
 			m_shotgunAnimatedEntity.Update(deltaTime);
 			//m_zombieGuy.Update(deltaTime);
-			m_zombieGuy.SetAnimationToBindPose();
-
+			//m_zombieGuy.SetAnimationToBindPose();
+			m_zombieGuy.AnimatedFromRagdoll();
 
 			m_zombieGuy.m_animatedTransforms[23] = Renderer::s_DebugTransform2.to_mat4();
 

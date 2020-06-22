@@ -555,8 +555,8 @@ namespace HellEngine
 		int maxSubSteps = 1;
 		btScalar fixedTimeStep = btScalar(1.) / btScalar(60.);
 
-		maxSubSteps = 10;
-		fixedTimeStep = 1.0 / 240.0;
+		//maxSubSteps = 10;
+		//fixedTimeStep = 1.0 / 240.0;
 		s_dynamicsWorld->stepSimulation(deltaTime , maxSubSteps, fixedTimeStep);
 
 		CheckForCollisionEvents();

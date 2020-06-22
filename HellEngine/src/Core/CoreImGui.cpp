@@ -492,6 +492,8 @@ namespace HellEngine
 		ImGui::InputFloat("##Gadfsdasd", &Config::TEST_FLOAT2, 0.0f, 9.0f, 10.0f);
 		ImGui::Text("TEST_FLOAT3"); ImGui::SameLine();
 		ImGui::InputFloat("##Gasdasdfsd", &Config::TEST_FLOAT3, 0.0f, 9.0f, 10.0f);
+		ImGui::Text("TEST_FLOAT4"); ImGui::SameLine();
+		ImGui::InputFloat("##GasdDFasdfsd", &Config::TEST_FLOAT4, 0.0f, 9.0f, 10.0f);
 
 		ImGui::Text("\n");
 		ImGui::Text("sway amount"); ImGui::SameLine();

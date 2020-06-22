@@ -32,12 +32,16 @@ namespace HellEngine
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
+
+		//glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
+
 		s_window = glfwCreateWindow(windowWidth, windowHeight, "Window", NULL, NULL);
 		if (s_window == NULL) {
 			std::cout << "Failed to create GLFW window" << std::endl;
 			glfwTerminate();
 		}
 
+	
 		glfwMakeContextCurrent(s_window);
 		glfwSetFramebufferSizeCallback(s_window, framebuffer_size_callback);
 		glfwSetCursorPosCallback(s_window, mouse_callback);

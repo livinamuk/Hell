@@ -41,7 +41,7 @@ namespace HellEngine
 		btPairCachingGhostObject* ghostObject_;
 		btKinematicCharacterController* bulletController_;
 
-		float m_walkingSpeed = 0.9f;// 3.75f; //2.875f;// 1.833f;
+		float m_walkingSpeed = 2.5f;// 3.75f; //2.875f;// 1.833f;
 		
 		float m_deceleration;
 		float m_maxSpeed;

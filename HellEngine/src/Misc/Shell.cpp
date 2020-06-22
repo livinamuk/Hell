@@ -30,8 +30,7 @@ namespace HellEngine
 		int group = CollisionGroups::PROJECTILES;
 		int mask = CollisionGroups::HOUSE;
 
-		//float mass = Config::TEST_FLOAT3;
-		float mass = 4;//
+		float mass = 4;
 
 		btVector3 localInertia(0, 0, 0);
 		collisionShape->calculateLocalInertia(mass, localInertia);
@@ -41,13 +40,15 @@ namespace HellEngine
 		btRigidBody::btRigidBodyConstructionInfo rbInfo(1.0f, m_pMotionState, collisionShape, localInertia);
 		rbInfo.m_restitution = 1;
 
-		//rbInfo.m_angularDamping = Config::TEST_FLOAT;
-		rbInfo.m_angularDamping = 0.999f;// Config::TEST_FLOAT;
+		//rbInfo.m_angularDamping = 0.999f;// Config::TEST_FLOAT;
 
 		this->m_rigidBody = new btRigidBody(rbInfo);
 
 		this->m_rigidBody->setFriction(0.7); 
-		//this->m_rigidBody->setFriction(Config::TEST_FLOAT2);
+
+		//this->m_rigidBody->setDeactivationTime(Config::TEST_FLOAT);
+		//this->m_rigidBody->setSleepingThresholds(Config::TEST_FLOAT2, Config::TEST_FLOAT3);
+		//this->m_rigidBody->setContactProcessingThreshold(Config::TEST_FLOAT4);
 
 		//this->m_rigidBody->setCcdMotionThreshold(1e-6);						// This
 		this->m_rigidBody->setCcdMotionThreshold(0.0103f * m_shellScale);						// This
@@ -80,6 +81,11 @@ namespace HellEngine
 	{
 		if (m_rigidBody == nullptr)
 			return;
+
+		// Ok try and check for slow speed, and then disable
+		float speed = this->m_rigidBody->getLinearVelocity().length();
+		if (speed < Config::TEST_FLOAT)
+			this->m_rigidBody->setLinearVelocity(btVector3(0, 0, 0));
 
 		// Remove rigid body if at rest or fell through floor
 		if ((m_rigidBody->getActivationState() != ACTIVE_TAG) || (Util::GetTranslationFromMatrix(m_modelMatrix).y < -5)) {

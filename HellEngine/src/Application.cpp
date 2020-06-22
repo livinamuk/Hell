@@ -51,20 +51,63 @@ int main()
 
 	Game game = Game();
 
+	int frames = 0;
+	double frameCounter = 0;
+	double lastTime = CoreGL::GetGLTime();
+	double unprocessedTime = 0;
+	double desiredFrameRate = 60;
+	game.m_frameTime = 1.0 / desiredFrameRate;
+
+
+	CoreGL::SetVSync(true);
+
 	// Main game loop
 	while (CoreGL::IsRunning() && !Input::s_keyDown[HELL_KEY_ESCAPE])
 	{
-		AssetManager::LoadNextReadyAssetToGL();
-		CoreGL::ProcessInput();
-		CoreGL::OnUpdate();
-		
-		game.OnUpdate();
-		game.OnRender();
+		bool render = false;
+		double startTime = CoreGL::GetGLTime();
+		double passedTime = startTime - lastTime;
+		lastTime = startTime;
 
-		if (Renderer::m_showImGui)
-			CoreImGui::Render(&game);
+		unprocessedTime += passedTime;
+		frameCounter += passedTime;
+
+		while (unprocessedTime > game.m_frameTime)
+		{
+			render = true;
+
+			unprocessedTime -= game.m_frameTime;
+
+			CoreGL::ProcessInput();
+			CoreGL::OnUpdate();
+
+			game.OnUpdate();
+
+
+			if (frameCounter >= 1.0)
+			{
+				std::cout << "frames: " << frames << "\n";//System.out.println(frames);
+				frames = 0;
+				frameCounter = 0;
+			}
+		}
+		if (render)
+		{
+			//m_game.Render(m_renderingEngine);
+			//Window.Render();
+
+			game.OnRender(); 
+			frames++;
+
+			if (Renderer::m_showImGui)
+				CoreImGui::Render(&game);
+
+			CoreGL::SwapBuffersAndPollEvents();
+		}
+
+
+
 		
-		CoreGL::SwapBuffersAndPollEvents();
 	}
 
 	CoreGL::Terminate();

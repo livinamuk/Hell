@@ -15,7 +15,19 @@ namespace HellEngine
 		float m_viewHeightStanding = 1.55f;
 		float m_viewHeightCrouching = 1.0f;
 		float m_crouchDownSpeed = 17.5f;
+
+		float m_movementSpeedWalking = 2.5f;
+		float m_movementSpeedCrouching = 1.75f;
+		float m_movementSpeedRunning = 3.5f;
+
+		float m_jumpStrength = 3.125f;
+
+		float radius = 0.25f;
+		float height = 0.9f;
+		float mass = 5;
+
 		float m_currentViewHeight;
+		float m_currentMovementSpeed;
 		bool m_isCrouching;
 
 	private:
@@ -32,11 +44,6 @@ namespace HellEngine
 		btPairCachingGhostObject* ghostObject_;
 		btKinematicCharacterController* bulletController_;
 
-		float radius = 0.25f;
-		float height = 0.9f;
-		float mass = 5;
-
-		float m_walkingSpeed = 2.5f;
 
 		CharacterController();
 		CharacterController(const glm::vec3 spawnPos);

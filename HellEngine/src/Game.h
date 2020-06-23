@@ -24,6 +24,8 @@ namespace HellEngine
 		Game();
 		void OnLoad();
 		void OnUpdate();
+
+		void UpdateSkeletalAnimation();
 		void OnRender();
 		void OnInteract();
 ;

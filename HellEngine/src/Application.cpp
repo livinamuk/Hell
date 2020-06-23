@@ -57,13 +57,15 @@ int main()
 	double unprocessedTime = 0;
 	double desiredFrameRate = 60;
 	game.m_frameTime = 1.0 / desiredFrameRate;
-
+	double MAX_UPDATE_TIME = game.m_frameTime * 60;
 
 	//CoreGL::SetVSync(true);
 
 	// Main game loop
 	while (CoreGL::IsRunning() && !Input::s_keyDown[HELL_KEY_ESCAPE])
 	{
+		MAX_UPDATE_TIME = Config::TEST_FLOAT;
+
 		bool render = false;
 		double startTime = CoreGL::GetGLTime();
 		double passedTime = startTime - lastTime;
@@ -74,10 +76,14 @@ int main()
 
 		while (unprocessedTime > game.m_frameTime)
 		{
-			render = true;
-
 			unprocessedTime -= game.m_frameTime;
 
+			if (unprocessedTime > MAX_UPDATE_TIME)
+				unprocessedTime = 0;
+
+			render = true;
+
+			
 			CoreGL::ProcessInput();
 			CoreGL::OnUpdate();
 
@@ -86,17 +92,15 @@ int main()
 
 			if (frameCounter >= 1.0)
 			{
-				std::cout << "frames: " << frames << "\n";//System.out.println(frames);
+				std::cout << "frames: " << frames << "  unprocssed time: " << unprocessedTime << "\n";//System.out.println(frames);
 				frames = 0;
 				frameCounter = 0;
 			}
 		}
 		if (render)
 		{
-			//m_game.Render(m_renderingEngine);
-			//Window.Render();
-
-			//game.OnRender(); 
+			game.UpdateSkeletalAnimation();
+			game.OnRender(); 
 			frames++;
 
 			if (Renderer::m_showImGui)

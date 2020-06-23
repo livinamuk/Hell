@@ -92,14 +92,8 @@ namespace HellEngine
 		m_cameraRaycast = ShotgunLogic::m_raycast;
 
 		
-		m_testAnimatedEnttity.Update(m_frameTime);
-		/*m_shotgunAnimatedEntity.Update(m_frameTime);
-		//m_zombieGuy.Update(deltaTime);
-		//m_zombieGuy.SetAnimationToBindPose();
-		m_zombieGuy.AnimatedFromRagdoll();
 
 
-		
 
 		
 		// Camera
@@ -117,8 +111,27 @@ namespace HellEngine
 		camera.CalculateProjectionMatrix((float)SCR_WIDTH, (float)SCR_HEIGHT);
 		camera.CalculateWeaponSwayTransform(m_frameTime);
 
-		m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);*/
+		m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);
 
+	}
+
+	void Game::UpdateSkeletalAnimation()
+	{
+		// Init time
+		static float currentFrame = CoreGL::GetGLTime();
+		static float lastFrame = currentFrame;	
+
+		// Calculate deltaTime
+		currentFrame = CoreGL::GetGLTime();
+		float deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		// Update all skeletal meshes
+		m_testAnimatedEnttity.Update(deltaTime);
+		m_shotgunAnimatedEntity.Update(deltaTime);
+		//m_zombieGuy.Update(deltaTime);
+		//m_zombieGuy.SetAnimationToBindPose();
+		m_zombieGuy.AnimatedFromRagdoll();
 	}
 
 	void Game::OnRender()

@@ -468,10 +468,19 @@ namespace HellEngine
 		else
 			ImGui::Text("Movement State: ERROR");
 
-		ImGui::InputFloat("Scale", &Staircase::trimScale, 0.1f, 1.0f, "%0.5f");
-		ImGui::InputFloat("Offset", &Staircase::yOffset, 0.1f, 1.0f, "%0.5f");
-		ImGui::InputFloat("Walking Speed", &game->m_player.m_characterController.m_walkingSpeed, 0.1f, 1.0f, "%0.5f");
-		ImGui::InputFloat("View height", &game->camera.m_viewHeight, 0.1f, 1.0f, "%0.5f");
+
+		ImGui::PushItemWidth(100);
+
+		//ImGui::InputFloat("Scale", &Staircase::trimScale, 0.1f, 1.0f, "%0.5f");
+		//ImGui::InputFloat("Offset", &Staircase::yOffset, 0.1f, 1.0f, "%0.5f");
+
+		ImGui::InputFloat("Walk Speed", &game->m_player.m_characterController.m_movementSpeedWalking, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Run Speed", &game->m_player.m_characterController.m_movementSpeedRunning, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Crouch Speed", &game->m_player.m_characterController.m_movementSpeedCrouching, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Jump Strength", &game->m_player.m_characterController.m_jumpStrength, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Standing height", &game->m_player.m_characterController.m_viewHeightStanding, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Crouching height", &game->m_player.m_characterController.m_viewHeightCrouching, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Crouch Down Speed", &game->m_player.m_characterController.m_crouchDownSpeed, 0.1f, 1.0f, "%0.2f");
 	}
 
 	void CoreImGui::ShowOtherMenu(Game* game)

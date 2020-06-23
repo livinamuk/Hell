@@ -80,7 +80,7 @@
       <PrecompiledHeaderFile>hellpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HELL_PLATFORM_WINDOWS;HELL_BUILD_DLL;GLFW_INCLUDE_NONE;HELL_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\bullet\bullet\src;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -100,7 +100,7 @@
       <PrecompiledHeaderFile>hellpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HELL_PLATFORM_WINDOWS;HELL_BUILD_DLL;GLFW_INCLUDE_NONE;HELL_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\bullet\bullet\src;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -124,7 +124,7 @@
       <PrecompiledHeaderFile>hellpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HELL_PLATFORM_WINDOWS;HELL_BUILD_DLL;GLFW_INCLUDE_NONE;HELL_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\bullet\bullet\src;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>

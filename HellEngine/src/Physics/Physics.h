@@ -1,6 +1,6 @@
 #pragma once
 #include "bullet/src/btBulletCollisionCommon.h"
-#include "bullet/src/btBulletDynamicsCommon.h"
+#include "bullet/src/btBulletCollisionCommon.h"
 #include "bullet/src/LinearMath/btVector3.h"
 #include "bullet/src/LinearMath/btAlignedObjectArray.h"
 #include "bullet/src/BulletCollision/CollisionDispatch/btGhostObject.h"

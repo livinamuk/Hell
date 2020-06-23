@@ -379,7 +379,7 @@ namespace HellEngine
 		int group = CollisionGroups::HOUSE;
 		int mask = CollisionGroups::PLAYER | CollisionGroups::ENEMY | CollisionGroups::PROJECTILES;
 
-		//s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
+		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
 		s_collisionObjects.push_back(collisionObject);
 		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	}

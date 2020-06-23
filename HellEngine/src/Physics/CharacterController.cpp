@@ -57,9 +57,9 @@ namespace HellEngine
 		// Jumping //
 		/////////////
 		
-		if (Input::s_keyDown[HELL_KEY_SPACE] && bulletController_->canJump())
+		if (Input::s_keyPressed[HELL_KEY_SPACE] && bulletController_->canJump())
 		{
-			bulletController_->setJumpSpeed(2.8);// Config::TEST_FLOAT); 
+			bulletController_->setJumpSpeed(m_jumpStrength);
 			bulletController_->jump(); 
 		}
 
@@ -83,7 +83,14 @@ namespace HellEngine
 			targetVelocity += camera->m_Right * deltaTime;
 		}
 
-		glm::vec3 vector = targetVelocity * m_walkingSpeed;
+		if (Input::s_keyDown[HELL_KEY_LEFT_SHIFT] || Input::s_keyDown[HELL_KEY_RIGHT_SHIFT])
+			m_currentMovementSpeed = m_movementSpeedRunning;		
+		else if (m_isCrouching)
+			m_currentMovementSpeed = m_movementSpeedCrouching;
+		else
+			m_currentMovementSpeed = m_movementSpeedWalking;
+
+		glm::vec3 vector = targetVelocity * m_currentMovementSpeed;
 		bulletController_->setWalkDirection(Util::glmVec3_to_btVec3(vector));
 	}
 

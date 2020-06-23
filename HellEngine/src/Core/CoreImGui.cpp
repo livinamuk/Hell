@@ -554,18 +554,6 @@ namespace HellEngine
 
 		ImGui::Text("\nRaycast:  %s", game->m_cameraRaycast.m_name);
 		ImGui::Text("Distance: %f", game->m_cameraRaycast.m_distance);
-
-		/*ImGui::Text("\nCHARACTER\nVelocity: %f, %f, %f",
-			game->m_player.m_characterController.GetVelocity().x,
-			game->m_player.m_characterController.GetVelocity().y,
-			game->m_player.m_characterController.GetVelocity().z);*/
-		ImGui::Text("Manual Velocity: %f, %f, %f",
-			game->m_player.m_characterController.m_manualVelocity.x,
-			game->m_player.m_characterController.m_manualVelocity.y,
-			game->m_player.m_characterController.m_manualVelocity.z);
-		ImGui::Text("Deceleration: %f", game->m_player.m_characterController.m_deceleration);
-		ImGui::Text("IsOnGround(): %i", game->m_player.m_characterController.IsOnGround());
-
 	}
 
 	void CoreImGui::ShowShaderMenu(Game* game)

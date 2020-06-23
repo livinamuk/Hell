@@ -12,53 +12,36 @@ namespace HellEngine
 		glm::vec3 GetWorldPosition();
 		glm::mat4 GetWorldMatrix();
 
+		float m_viewHeightStanding = 1.55f;
+		float m_viewHeightCrouching = 1.0f;
+		float m_crouchDownSpeed = 17.5f;
+		float m_currentViewHeight;
+		bool m_isCrouching;
+
 	private:
 		btCollisionShape* m_pCollisionShape;
 		btDefaultMotionState* m_pMotionState;
 		btRigidBody* m_pRigidBody;
-		//btCollisionObject* m_collisionObject;
 		btPairCachingGhostObject* m_pGhostObject;
-		bool m_onGround;
-		bool m_hittingWall;
-		float m_bottomYOffset;
-		float m_bottomRoundedRegionYOffset;
-		float m_stepHeight;
-		btTransform m_motionTransform;
-		std::vector<glm::vec3> m_surfaceHitNormals;
-		btVector3 m_previousPosition;
-
-		float m_jumpRechargeTimer;
-
-	
-
 		
 
 		void reposition(btVector3 position);
-
 
 	public:
 
 		btPairCachingGhostObject* ghostObject_;
 		btKinematicCharacterController* bulletController_;
 
-		float m_walkingSpeed = 2.5f;// 3.75f; //2.875f;// 1.833f;
-		
-		float m_deceleration;
-		float m_maxSpeed;
-		float m_jumpImpulse;
-		float m_jumpRechargeTime;
-		glm::vec3 m_manualVelocity; // made public to print in imgui
+		float radius = 0.25f;
+		float height = 0.9f;
+		float mass = 5;
 
-		glm::vec3 newPosition;
+		float m_walkingSpeed = 2.5f;
 
 		CharacterController();
 		CharacterController(const glm::vec3 spawnPos);
 	
 		void Update(float deltaTime, Camera* camera);
-	//	void Jump();
-
-		void CheckCollisions();
-
-		bool IsOnGround() const;
+		glm::vec3 GetViewPosition();
 	};
 }

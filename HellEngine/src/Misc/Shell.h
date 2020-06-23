@@ -19,6 +19,8 @@ namespace HellEngine
 		glm::mat4 m_modelMatrix;
 		float m_shellScale = 1.6f;
 
+		float m_timeSinceHitTheGround = 0;
+
 		static std::vector<Shell> s_shells;
 	};
 }

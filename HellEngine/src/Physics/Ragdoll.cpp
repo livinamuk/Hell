@@ -93,8 +93,8 @@ namespace HellEngine
 		transform.setRotation(rot);
 		m_bodies[BODYPART_PELVIS] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_PELVIS]);
 
-
-
+		// from DEVSH
+		//(cos(2 * theta), sin(2 * theta) * rotationAxis) and (sin(2 * theta) * rotationAxis, cos(2 * theta))
 
 		transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(spine_01, neck_01));
@@ -467,6 +467,9 @@ namespace HellEngine
 		rbInfo.m_additionalDamping = true;
 		btRigidBody* body = new btRigidBody(rbInfo);
 
+		EntityData* entityData = new EntityData();
+		entityData->name = "RAGDOLL";
+		body->setUserPointer(entityData);
 
 		int group = CollisionGroups::ENEMY;
 		int mask = CollisionGroups::HOUSE | CollisionGroups::PLAYER;

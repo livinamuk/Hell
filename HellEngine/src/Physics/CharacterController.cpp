@@ -7,10 +7,6 @@ namespace HellEngine
 
 	CharacterController::CharacterController(const glm::vec3 spawnPos)
 	{
-		float radius = 0.25f;
-		float height = 0.6f;
-		float mass = 5;
-
 		btTransform startTransform;
 		startTransform.setIdentity();
 		startTransform.setOrigin(btVector3(spawnPos.x, spawnPos.y, spawnPos.z));
@@ -30,7 +26,7 @@ namespace HellEngine
 		ghostObject_->setUserPointer(entityData);
 
 		//ghostObject_->getCollisionShape()->setMargin(0.04);
-		bulletController_ = new btKinematicCharacterController(ghostObject_, capsule, 0.3f, btVector3(0, 0, 1));
+		bulletController_ = new btKinematicCharacterController(ghostObject_, capsule, 0.3f);
 		bulletController_->setGravity(Physics::s_dynamicsWorld->getGravity());
 
 		int group = CollisionGroups::PLAYER;
@@ -38,11 +34,39 @@ namespace HellEngine
 
 		Physics::s_dynamicsWorld->addCollisionObject(ghostObject_, group, mask);
 		Physics::s_dynamicsWorld->addAction(bulletController_);
-		bulletController_->setMaxJumpHeight(1.5);
 	}
 	
 	void CharacterController::Update(float deltaTime, Camera* camera)
 	{
+		///////////////
+		// Crouching //
+		///////////////
+
+		if (Input::s_keyDown[HELL_KEY_LEFT_CONTROL])
+			m_isCrouching = true;
+		else
+			m_isCrouching = false;
+
+		float target = m_isCrouching ? m_viewHeightCrouching : m_viewHeightStanding;
+		m_currentViewHeight = Util::FInterpTo(m_currentViewHeight, target, deltaTime, m_crouchDownSpeed);
+
+		btVector3 capsuleScaling = m_isCrouching ? btVector3(1, 0.5f, 1) : btVector3(1, 1, 1);;
+		ghostObject_->getCollisionShape()->setLocalScaling(capsuleScaling);
+
+		/////////////
+		// Jumping //
+		/////////////
+		
+		if (Input::s_keyDown[HELL_KEY_SPACE] && bulletController_->canJump())
+		{
+			bulletController_->setJumpSpeed(2.8);// Config::TEST_FLOAT); 
+			bulletController_->jump(); 
+		}
+
+		//////////////
+		// Movement //
+		//////////////
+
 		glm::vec3 targetVelocity = glm::vec3(0, 0, 0);
 		glm::vec3 Forward = glm::normalize(glm::vec3(camera->m_Front.x, 0, camera->m_Front.z));
 
@@ -61,10 +85,6 @@ namespace HellEngine
 
 		glm::vec3 vector = targetVelocity * m_walkingSpeed;
 		bulletController_->setWalkDirection(Util::glmVec3_to_btVec3(vector));
-
-		btTransform t;
-		//t = bulletController_->getGhostObject()->getWorldTransform();
-		//bulletController_->getGhostObject()->setWorldTransform(t);
 	}
 
 	void CharacterController::reposition(btVector3 position) 
@@ -93,8 +113,17 @@ namespace HellEngine
 		return trans.to_mat4();
 	}
 
-	bool CharacterController::IsOnGround() const
+	/*bool CharacterController::IsOnGround() const
 	{
 		return m_onGround;
+	}*/
+
+	glm::vec3 CharacterController::GetViewPosition()
+	{
+		glm::vec3 worldPos = Util::btVec3_to_glmVec3(bulletController_->getGhostObject()->getWorldTransform().getOrigin());
+		float capsuleScaling = ghostObject_->getCollisionShape()->getLocalScaling().getY();
+		float bottomOfCapsuleYPosition = worldPos.y - (height * capsuleScaling * 0.5f) - radius;
+		worldPos.y = bottomOfCapsuleYPosition + m_currentViewHeight;
+		return worldPos;
 	}
 }

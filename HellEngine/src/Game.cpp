@@ -64,8 +64,11 @@ namespace HellEngine
 		if (Input::s_keyPressed[HELL_KEY_E])
 			OnInteract();
 
-		Physics::Update(m_frameTime);
+		m_player.Update(m_frameTime);
+		m_player.m_characterController.Update(m_frameTime, &camera);
 
+		
+		Physics::Update(m_frameTime);
 
 
 
@@ -80,11 +83,7 @@ namespace HellEngine
 
 		TextBlitter::UpdateBlitter(m_frameTime);
 
-		// Player
-		m_player.Update(m_frameTime);
-		m_player.m_characterController.Update(m_frameTime, &camera);
-
-
+		
 		// Doors
 		for (Door& door : house.m_doors)
 			door.Update(m_frameTime);
@@ -92,16 +91,17 @@ namespace HellEngine
 		ShotgunLogic::Update(m_frameTime);
 		m_cameraRaycast = ShotgunLogic::m_raycast;
 
-
+		
 		m_testAnimatedEnttity.Update(m_frameTime);
-		m_shotgunAnimatedEntity.Update(m_frameTime);
+		/*m_shotgunAnimatedEntity.Update(m_frameTime);
 		//m_zombieGuy.Update(deltaTime);
 		//m_zombieGuy.SetAnimationToBindPose();
 		m_zombieGuy.AnimatedFromRagdoll();
 
-		//m_zombieGuy.m_animatedTransforms[23] = Renderer::s_DebugTransform2.to_mat4();
 
+		
 
+		
 		// Camera
 		if (Input::s_rightMouseDown)
 			camera.m_zoomFactor += m_frameTime * camera.m_zoomSpeed;
@@ -113,11 +113,11 @@ namespace HellEngine
 
 		camera.Update(m_frameTime);
 		camera.m_weaponCameraMatrix = m_shotgunAnimatedEntity.GetCameraMatrix();
-		camera.CalculateMatrices(m_player.m_characterController.GetWorldPosition());
+		camera.CalculateMatrices(m_player.m_characterController.GetViewPosition());
 		camera.CalculateProjectionMatrix((float)SCR_WIDTH, (float)SCR_HEIGHT);
 		camera.CalculateWeaponSwayTransform(m_frameTime);
 
-		m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);
+		m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);*/
 
 	}
 

@@ -872,6 +872,10 @@ bool btKinematicCharacterController::canJump() const
 
 void btKinematicCharacterController::jump(const btVector3& v)
 {
+	//m_verticalVelocity = m_jumpSpeed;
+
+
+
 	m_jumpSpeed = v.length2() == 0 ? m_SetjumpSpeed : v.length();
 	m_verticalVelocity = m_jumpSpeed;
 	m_wasJumping = true;

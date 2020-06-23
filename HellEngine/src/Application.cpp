@@ -59,7 +59,7 @@ int main()
 	game.m_frameTime = 1.0 / desiredFrameRate;
 
 
-	CoreGL::SetVSync(true);
+	//CoreGL::SetVSync(true);
 
 	// Main game loop
 	while (CoreGL::IsRunning() && !Input::s_keyDown[HELL_KEY_ESCAPE])
@@ -96,7 +96,7 @@ int main()
 			//m_game.Render(m_renderingEngine);
 			//Window.Render();
 
-			game.OnRender(); 
+			//game.OnRender(); 
 			frames++;
 
 			if (Renderer::m_showImGui)

@@ -46,6 +46,9 @@ namespace HellEngine
 
 		this->m_rigidBody->setFriction(0.7); 
 
+	//	this->m_rigidBody->setMaxCoordinateVelocity();
+
+
 		//this->m_rigidBody->setDeactivationTime(Config::TEST_FLOAT);
 		//this->m_rigidBody->setSleepingThresholds(Config::TEST_FLOAT2, Config::TEST_FLOAT3);
 		//this->m_rigidBody->setContactProcessingThreshold(Config::TEST_FLOAT4);
@@ -57,6 +60,7 @@ namespace HellEngine
 
 		EntityData* entityData = new EntityData();
 		entityData->name = "SHELL";
+		//entityData->vectorIndex = s_shells.size() - 1;
 		m_rigidBody->setUserPointer(entityData);
 
 		Physics::s_dynamicsWorld->addRigidBody(this->m_rigidBody, group, mask);
@@ -82,15 +86,18 @@ namespace HellEngine
 		if (m_rigidBody == nullptr)
 			return;
 
-		// Ok try and check for slow speed, and then disable
-		float speed = this->m_rigidBody->getLinearVelocity().length();
-		if (speed < Config::TEST_FLOAT)
-			this->m_rigidBody->setLinearVelocity(btVector3(0, 0, 0));
+		// Once the shell hits the ground (UserIndex == 1), then this counter increases
+		// and after a fixed time, angular velocity cuts. This stops shells rolling forever.
+		if (m_rigidBody->getUserIndex() == 1)
+			m_timeSinceHitTheGround += deltaTime;
+
+		if (m_timeSinceHitTheGround > 0.15f) {
+			this->m_rigidBody->setAngularVelocity(btVector3(0, 0, 0));
+		}
 
 		// Remove rigid body if at rest or fell through floor
 		if ((m_rigidBody->getActivationState() != ACTIVE_TAG) || (Util::GetTranslationFromMatrix(m_modelMatrix).y < -5)) {
 			Physics::DeleteRigidBody(m_rigidBody);
-			//m_rigidBody = nullptr;
 		}
 	}
 }

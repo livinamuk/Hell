@@ -625,6 +625,16 @@ namespace HellEngine
 
 		text += s_debugString;
 
+		if (Shell::s_shells.size() > 0)
+		{
+			/*int index = Shell::s_shells.size() - 1;
+			btVector3 vel = Shell::s_shells[index].m_rigidBody->getAngularVelocity();
+			text += "\n";
+			text += Util::Vec3_to_String(Util::btVec3_to_glmVec3(vel));
+			text += "\n";
+			text += std::to_string(vel.length());*/
+		}
+
 		TextBlitter::BlitText(text, false);
 		TextBlitPlass(&s_quadShader);
 	}

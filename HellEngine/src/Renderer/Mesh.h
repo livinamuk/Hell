@@ -14,13 +14,13 @@ namespace HellEngine
 		void SetupMesh();
 
 	public: // fields
+		const char* name;
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
 		unsigned int VAO = 0;
-		const char* name;
-		//unsigned int materialID = 0;
-
-	private: // fields
-		unsigned int VBO, EBO;
+		unsigned int VBO = 0;
+		unsigned int EBO = 0;
+		unsigned int baseVertex;
+		unsigned int baseIndex;
 	};
 }

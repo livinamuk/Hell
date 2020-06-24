@@ -89,7 +89,7 @@ namespace HellEngine
         std::string filepath = "res/models/";
         filepath += Filename;
 
-        const aiScene* tempScene = m_Importer.ReadFile(filepath.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+        const aiScene* tempScene = m_Importer.ReadFile(filepath.c_str(), aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
 
         //Getting corrupted later. So deep copying now.
         m_pScene = new aiScene(*tempScene);
@@ -172,11 +172,20 @@ namespace HellEngine
         Indices.reserve(NumIndices);
 
 
+        NumVertices = 0;
+        NumIndices = 0;
 
         // Initialize the meshes in the scene one by one
-        for (unsigned int i = 0; i < m_meshEntries.size(); i++) {
+        for (unsigned int i = 0; i < m_meshEntries.size(); i++) 
+        {
             const aiMesh* paiMesh = pScene->mMeshes[i];
             InitMesh(i, paiMesh, Positions, Normals, TexCoords, Bones, Indices);
+
+          //  m_meshes.push_back(ProcessMesh(pScene->mMeshes[i], NumVertices, NumIndices));
+            
+            // count the vertices and indicies, used to extract bone weights in ProcessMesh()
+          //  NumVertices += pScene->mMeshes[i]->mNumVertices;
+         //   NumIndices += m_meshEntries[i].NumIndices;
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
@@ -300,26 +309,6 @@ namespace HellEngine
     }
 
 
-    bool SkinnedModel::InitMaterials(const aiScene* pScene, const string& Filename)
-    {
-        // Extract the directory part from the file name
-        string::size_type SlashIndex = Filename.find_last_of("/");
-        string Dir;
-
-        if (SlashIndex == string::npos) {
-            Dir = ".";
-        }
-        else if (SlashIndex == 0) {
-            Dir = "/";
-        }
-        else {
-            Dir = Filename.substr(0, SlashIndex);
-        }
-
-        bool Ret = true;
-        return Ret;
-    }
-
 
     void SkinnedModel::Render(Shader* shader, const glm::mat4& modelMatrix)
     {
@@ -336,8 +325,24 @@ namespace HellEngine
 
             glDrawElementsBaseVertex(GL_TRIANGLES, mesh.NumIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh.BaseIndex), mesh.BaseVertex);
         }
-       // shader->setMat4("bindPoseMatrix", glm::mat4(1));
+  
+
+        /*
+        for (Mesh* mesh : m_meshes)
+        {
+            if (mesh->name == "Arms")
+                AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Hands"));
+            if (mesh->name == "Shotgun Mesh")
+                AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shotgun"));
+            if (mesh->name == "Shell Mesh")
+                AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shell"));
+
+            mesh->Draw();
+        }*/
     }
+
+   
+
 
     int SkinnedModel::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
     {

@@ -26,6 +26,10 @@ namespace HellEngine
         bool LoadAnimation(const char* Filename);
         void Render(Shader* shader, const glm::mat4& modelMatrix);
 
+    //    Mesh* ProcessMesh(aiMesh* aiMesh, unsigned int baseVertex, unsigned int baseIndex);
+
+        std::vector<Mesh*> m_meshes;
+
         glm::mat4 m_CameraMatrix = glm::mat4(1);
         std::vector<glm::mat4> m_BindPoseTransforms;
 
@@ -129,7 +133,7 @@ namespace HellEngine
             std::string MeshName;
         };
 
-       // std::vector<Mesh*> m_meshes;
+
 
     public:
         vector<MeshEntry> m_meshEntries;

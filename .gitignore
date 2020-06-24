@@ -17,11 +17,11 @@
 mono_crash.*
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-!HellEngine/vendor/bullet/bullet/lib/Release
-[Rr]eleases/
+#[Dd]ebug/
+#[Dd]ebugPublic/
+#[Rr]elease/
+#!HellEngine/vendor/bullet/bullet/lib/Release
+#[Rr]eleases/
 #x64/
 #!HellEngine/vendor/fmod/lib/x64
 #x86/

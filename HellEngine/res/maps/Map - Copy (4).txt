@@ -1,0 +1,283 @@
+{
+    "ENTITIES": [
+        {
+            "Position": [
+                2.0,
+                0.0,
+                0.0
+            ],
+            "Rotation": [
+                0.0,
+                -1.5700000524520875,
+                0.0
+            ],
+            "Scale": [
+                0.07000000029802323,
+                0.07000000029802323,
+                0.07000000029802323
+            ],
+            "ModelID": 13,
+            "MaterialID": 0,
+            "Tag": "TheCouch"
+        },
+        {
+            "Position": [
+                0.4000000059604645,
+                0.0,
+                -0.6000000238418579
+            ],
+            "Rotation": [
+                0.0,
+                1.5,
+                0.0
+            ],
+            "Scale": [
+                0.0010000000474974514,
+                0.0008999999845400453,
+                0.0010000000474974514
+            ],
+            "ModelID": 14,
+            "MaterialID": 13,
+            "Tag": "grlimaawsstim"
+        }
+    ],
+    "ROOMS": [
+        {
+            "Position": [
+                0.8000001311302185,
+                0.0
+            ],
+            "Size": [
+                3.4000024795532228,
+                4.0
+            ],
+            "Story": 0
+        },
+        {
+            "Position": [
+                1.5499995946884156,
+                2.7500009536743166
+            ],
+            "Size": [
+                4.900000095367432,
+                1.3000017404556275
+            ],
+            "Story": 0
+        },
+        {
+            "Position": [
+                0.0,
+                -6.900000095367432
+            ],
+            "Size": [
+                2.799999952316284,
+                4.0
+            ],
+            "Story": 1
+        },
+        {
+            "Position": [
+                1.4999996423721314,
+                5.5500030517578129
+            ],
+            "Size": [
+                2.000001907348633,
+                4.099999904632568
+            ],
+            "Story": 0
+        },
+        {
+            "Position": [
+                7.600010871887207,
+                -2.4999988079071047
+            ],
+            "Size": [
+                1.4000017642974854,
+                12.000011444091797
+            ],
+            "Story": 1
+        }
+    ],
+    "DOORS": [
+        {
+            "Position": [
+                0.0,
+                0.0,
+                2.049999952316284
+            ],
+            "Story": 0,
+            "Axis": "NEG_X",
+            "RotateFloorTexture": false
+        },
+        {
+            "Position": [
+                1.5,
+                0.0,
+                3.450000047683716
+            ],
+            "Story": 0,
+            "Axis": "POS_X",
+            "RotateFloorTexture": false
+        },
+        {
+            "Position": [
+                -0.949999988079071,
+                0.0,
+                0.0
+            ],
+            "Story": 0,
+            "Axis": "NEG_Z",
+            "RotateFloorTexture": true
+        }
+    ],
+    "LIGHTS": [
+        {
+            "Position": [
+                1.5,
+                0.6000000238418579,
+                1.5
+            ],
+            "ModelPosition": [
+                0.10000000149011612,
+                -0.6000000238418579,
+                0.0
+            ],
+            "ModelRotation": [
+                3.140000104904175,
+                0.0,
+                0.0
+            ],
+            "ModelScale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Color": [
+                1.0,
+                0.7840830087661743,
+                0.529411792755127
+            ],
+            "Radius": 11.0,
+            "Strength": 20.0,
+            "Magic": 8.0
+        },
+        {
+            "Position": [
+                0.0,
+                2.200000047683716,
+                2.75
+            ],
+            "ModelPosition": [
+                0.0,
+                0.2549999952316284,
+                0.0
+            ],
+            "ModelRotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ModelScale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Color": [
+                1.0,
+                0.7799999713897705,
+                0.5289999842643738
+            ],
+            "Radius": 11.0,
+            "Strength": 10.0,
+            "Magic": 4.0
+        },
+        {
+            "Position": [
+                1.5,
+                2.200000047683716,
+                7.0
+            ],
+            "ModelPosition": [
+                0.0,
+                0.24500000476837159,
+                0.0
+            ],
+            "ModelRotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ModelScale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Color": [
+                0.9803921580314636,
+                0.0,
+                0.0
+            ],
+            "Radius": 8.0,
+            "Strength": 111.0,
+            "Magic": 10.0
+        },
+        {
+            "Position": [
+                -0.5,
+                2.200000047683716,
+                -1.5
+            ],
+            "ModelPosition": [
+                0.0,
+                0.24500000476837159,
+                0.0
+            ],
+            "ModelRotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ModelScale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Color": [
+                1.0,
+                0.7799999713897705,
+                0.5289999842643738
+            ],
+            "Radius": 6.0,
+            "Strength": 10.0,
+            "Magic": 4.0
+        }
+    ],
+    "STAIRCASES": [
+        {
+            "Position": [
+                0.0,
+                -2.0
+            ],
+            "Story": 0,
+            "Axis": "NEG_X",
+            "FirstSetCount": 18,
+            "TurnsLeft": true,
+            "FloorRotateBottom": false,
+            "FloorRotateTop": false,
+            "FloorRotateLanding": false
+        },
+        {
+            "Position": [
+                4.0,
+                2.75
+            ],
+            "Story": 0,
+            "Axis": "POS_Z",
+            "FirstSetCount": 18,
+            "TurnsLeft": false,
+            "FloorRotateBottom": false,
+            "FloorRotateTop": false,
+            "FloorRotateLanding": false
+        }
+    ]
+}

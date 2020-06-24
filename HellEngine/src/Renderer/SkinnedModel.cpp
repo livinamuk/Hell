@@ -153,8 +153,8 @@ namespace HellEngine
         unsigned int NumIndices = 0;
 
         // Count the number of vertices and indices
-        for (unsigned int i = 0; i < m_meshEntries.size(); i++) {
-            m_meshEntries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
+        for (unsigned int i = 0; i < m_meshEntries.size(); i++) 
+        {
             m_meshEntries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
             m_meshEntries[i].BaseVertex = NumVertices;
             m_meshEntries[i].BaseIndex = NumIndices;
@@ -249,7 +249,7 @@ namespace HellEngine
             v.Position = Positions[i];
             v.Normal = Normals[i];
             v.TexCoords = TexCoords[i];
-            m_vertices.push_back(v);
+            //m_vertices.push_back(v);
         }
 
         LoadBones(MeshIndex, paiMesh, Bones);
@@ -300,26 +300,6 @@ namespace HellEngine
     }
 
 
-    bool SkinnedModel::InitMaterials(const aiScene* pScene, const string& Filename)
-    {
-        // Extract the directory part from the file name
-        string::size_type SlashIndex = Filename.find_last_of("/");
-        string Dir;
-
-        if (SlashIndex == string::npos) {
-            Dir = ".";
-        }
-        else if (SlashIndex == 0) {
-            Dir = "/";
-        }
-        else {
-            Dir = Filename.substr(0, SlashIndex);
-        }
-
-        bool Ret = true;
-        return Ret;
-    }
-
 
     void SkinnedModel::Render(Shader* shader, const glm::mat4& modelMatrix)
     {
@@ -336,7 +316,6 @@ namespace HellEngine
 
             glDrawElementsBaseVertex(GL_TRIANGLES, mesh.NumIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh.BaseIndex), mesh.BaseVertex);
         }
-       // shader->setMat4("bindPoseMatrix", glm::mat4(1));
     }
 
     int SkinnedModel::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
@@ -344,29 +323,6 @@ namespace HellEngine
         // bail if current animation time is earlier than the this nodes first keyframe time
         if (AnimationTime < (float)pNodeAnim->mPositionKeys[0].mTime)
             return -1;
-
-        /*
-        if (pNodeAnim->mNumPositionKeys == 4)
-        {
-            std::cout << "ANIM TIME:   " << AnimationTime << "\n";
-            std::cout << pNodeAnim->mNodeName.C_Str() << "\n";
-            std::cout << "NUM OF KEYS: " << pNodeAnim->mNumPositionKeys << "\n\n";
-
-            for (unsigned int i = 0; i < pNodeAnim->mNumPositionKeys; i++)
-            {
-
-                std::cout << "key: " << (float)pNodeAnim->mPositionKeys[i].mTime << "\n\n";
-
-                //if (AnimationTime < (float)pNodeAnim->mPositionKeys[i + 1].mTime) {
-                 //   return i;
-               // }
-            }
-        }
-        */
-        /*  if (pNodeAnim->mNodeName.data == "Pumpslide_bone")
-              std::cout << "Pumpslide_bone " << pNodeAnim->mNumPositionKeys << "\n";
-          if (pNodeAnim->mNodeName.data == "ShotgunMain_bone")
-              std::cout << "ShotgunMain_bone " << pNodeAnim->mNumPositionKeys << "\n";*/
 
         for (unsigned int i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++) {
             if (AnimationTime < (float)pNodeAnim->mPositionKeys[i + 1].mTime) {

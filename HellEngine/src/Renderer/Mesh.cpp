@@ -14,15 +14,6 @@ namespace HellEngine
 		SetupMesh();
 	}
 
-	bool AreSame(double a, double b)
-	{
-		float EPSILON = 0.001f;
-		return fabs(a - b) < EPSILON;
-	}
-
-	typedef std::pair<Vertex, int> VPair;
-
-
 	void Mesh::Draw()
 	{
 		glBindVertexArray(VAO);

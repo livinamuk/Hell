@@ -31,6 +31,8 @@ namespace HellEngine
 
         const char* m_filename;
 
+        std::vector<Mesh*> m_meshes;
+
         std::vector<Animation*> m_animations;
 
         void BoneTransform(float Time, vector<glm::mat4>& Transforms, vector<glm::mat4>& DebugAnimatedTransforms);
@@ -85,8 +87,6 @@ namespace HellEngine
         void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform);
         bool InitFromScene(const aiScene* pScene, const string& Filename);
 
-        std::vector<Vertex> m_vertices;
-
         void InitMesh(unsigned int MeshIndex,
             const aiMesh* paiMesh,
             vector<glm::vec3>& Positions,
@@ -96,7 +96,6 @@ namespace HellEngine
             vector<unsigned int>& Indices);
         
         void LoadBones(unsigned int MeshIndex, const aiMesh* paiMesh, vector<VertexBoneData>& Bones);
-        bool InitMaterials(const aiScene* pScene, const string& Filename);
         void Clear();
 
         enum VB_TYPES {
@@ -125,7 +124,6 @@ namespace HellEngine
             unsigned int NumIndices;
             unsigned int BaseVertex;
             unsigned int BaseIndex;
-            unsigned int MaterialIndex;
             std::string MeshName;
         };
 

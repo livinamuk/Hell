@@ -18,7 +18,6 @@ namespace HellEngine
 		std::vector<unsigned int> indices;
 		unsigned int VAO = 0;
 		const char* name;
-		//unsigned int materialID = 0;
 
 	private: // fields
 		unsigned int VBO, EBO;

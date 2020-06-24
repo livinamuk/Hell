@@ -18,17 +18,14 @@ mono_crash.*
 
 # Build results
 [Dd]ebug/
-!HellEngine/vendor/FbxSDK/lib/x64/debug
 [Dd]ebugPublic/
 [Rr]elease/
 !HellEngine/vendor/bullet/bullet/lib/Release
-!HellEngine/vendor/FbxSDK/lib/x64/release
 [Rr]eleases/
-x64/
-!HellEngine/vendor/fmod/lib/x64
-!HellEngine/vendor/FbxSDK/lib/x64
-x86/
-!HellEngine/vendor/fmod/lib/x86
+#x64/
+#!HellEngine/vendor/fmod/lib/x64
+#x86/
+#!HellEngine/vendor/fmod/lib/x86
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/

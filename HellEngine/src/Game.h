@@ -24,6 +24,8 @@ namespace HellEngine
 		Game();
 		void OnLoad();
 		void OnUpdate();
+
+		void UpdateSkeletalAnimation();
 		void OnRender();
 		void OnInteract();
 ;
@@ -51,7 +53,7 @@ namespace HellEngine
 //		std::vector<glm::mat4> m_srinivasdAnimatedTransforms; 
 
 		//std::vector<Decal> m_decals;
-		float m_deltaTime;
+		float m_frameTime;
 
 		static bool s_dontLoadShotgun;
 

@@ -51,20 +51,67 @@ int main()
 
 	Game game = Game();
 
+	int frames = 0;
+	double frameCounter = 0;
+	double lastTime = CoreGL::GetGLTime();
+	double unprocessedTime = 0;
+	double desiredFrameRate = 60;
+	game.m_frameTime = 1.0 / desiredFrameRate;
+	double MAX_UPDATE_TIME = game.m_frameTime * 60;
+
+	//CoreGL::SetVSync(true);
+
 	// Main game loop
 	while (CoreGL::IsRunning() && !Input::s_keyDown[HELL_KEY_ESCAPE])
 	{
-		AssetManager::LoadNextReadyAssetToGL();
-		CoreGL::ProcessInput();
-		CoreGL::OnUpdate();
-		
-		game.OnUpdate();
-		game.OnRender();
+		MAX_UPDATE_TIME = Config::TEST_FLOAT;
 
-		if (Renderer::m_showImGui)
-			CoreImGui::Render(&game);
+		bool render = false;
+		double startTime = CoreGL::GetGLTime();
+		double passedTime = startTime - lastTime;
+		lastTime = startTime;
+
+		unprocessedTime += passedTime;
+		frameCounter += passedTime;
+
+		while (unprocessedTime > game.m_frameTime)
+		{
+			unprocessedTime -= game.m_frameTime;
+
+			if (unprocessedTime > MAX_UPDATE_TIME)
+				unprocessedTime = 0;
+
+			render = true;
+
+			
+			CoreGL::ProcessInput();
+			CoreGL::OnUpdate();
+
+			game.OnUpdate();
+
+
+			if (frameCounter >= 1.0)
+			{
+				std::cout << "frames: " << frames << "  unprocssed time: " << unprocessedTime << "\n";//System.out.println(frames);
+				frames = 0;
+				frameCounter = 0;
+			}
+		}
+		if (render)
+		{
+			game.UpdateSkeletalAnimation();
+			game.OnRender(); 
+			frames++;
+
+			if (Renderer::m_showImGui)
+				CoreImGui::Render(&game);
+
+			CoreGL::SwapBuffersAndPollEvents();
+		}
+
+
+
 		
-		CoreGL::SwapBuffersAndPollEvents();
 	}
 
 	CoreGL::Terminate();

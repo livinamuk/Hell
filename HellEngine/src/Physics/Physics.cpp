@@ -225,7 +225,7 @@ namespace HellEngine
 		int group = CollisionGroups::HOUSE;
 		int mask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
 
-		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
+	//	s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
 
 		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	}
@@ -298,7 +298,7 @@ namespace HellEngine
 		int group = CollisionGroups::HOUSE;
 		int mask = CollisionGroups::PLAYER | CollisionGroups::ENEMY;
 
-		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
+	//	s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
 
 		s_collisionObjects.push_back(collisionObject);
 
@@ -555,8 +555,8 @@ namespace HellEngine
 		int maxSubSteps = 1;
 		btScalar fixedTimeStep = btScalar(1.) / btScalar(60.);
 
-		maxSubSteps = 10;
-		fixedTimeStep = 1.0 / 240.0;
+		//maxSubSteps = 10;
+		//fixedTimeStep = 1.0 / 240.0;
 		s_dynamicsWorld->stepSimulation(deltaTime , maxSubSteps, fixedTimeStep);
 
 		CheckForCollisionEvents();
@@ -639,36 +639,54 @@ namespace HellEngine
 		// set their colors to white
 		pObj0->SetColor(btVector3(1.0, 1.0, 1.0));
 		pObj1->SetColor(btVector3(1.0, 1.0, 1.0));*/
-		std::string name1, name2;
+		char* name0;
+		char* name1;
 
 		EntityData* entityData = (EntityData*)pBody0->getUserPointer();
 		if (entityData) {
-			name1 = entityData->name;
+			name0 = entityData->name;
 		}
 		EntityData* entityData1 = (EntityData*)pBody1->getUserPointer();
 		if (entityData1) {
-			name2 = entityData1->name;
+			name1 = entityData1->name;
 		}
 
-		bool shell = false;
+		bool shellCollision = false;
 		bool floor = false;
 		bool wall = false;
 
-		if (name1 == "SHELL" || name2 == "SHELL")
-			shell = true;
-		if (name1 == "FLOOR" || name2 == "FLOOR")
+		if (name0 == "SHELL" || name1 == "SHELL")
+			shellCollision = true;
+
+		if (name0 == "FLOOR" || name1 == "FLOOR")
 			floor = true;
-		if (name1 == "WALL" || name2 == "WALL")
-			wall = true;
-		if (name1 == "DOOR" || name2 == "DOOR")
+
+		if (name0 == "WALL" || name1 == "WALL")
 			wall = true;
 
-		std::cout << "Collision between [" << name1 << "] and [" << name2 << "]\n";
+		if (name0 == "DOOR" || name1 == "DOOR")
+			wall = true;
 
-		if (shell && wall)
-			Audio::PlayAudio("ShellWallBounce.wav", 0.4f);
-		if (shell && floor)
-			Audio::PlayAudio("ShellFloorBounce.wav", 0.4f);
+		std::cout << "Collision between [" << name0 << "] and [" << name1 << "]\n";
+
+		if (shellCollision)
+		{
+			if (wall)
+				Audio::PlayAudio("ShellWallBounce.wav", 0.4f);
+
+			if (floor) {
+				Audio::PlayAudio("ShellFloorBounce.wav", 0.4f);		
+
+				// This index of 1 is used to simulate rolling friction from this moment
+				if (name0 == "SHELL")
+					pBody0->setUserIndex(1); 
+				if (name1 == "SHELL")
+					pBody1->setUserIndex(1);
+			}
+		}
+
+
+
 	}
 
 	void Physics::SeparationEvent(btRigidBody* pBody0, btRigidBody* pBody1) 

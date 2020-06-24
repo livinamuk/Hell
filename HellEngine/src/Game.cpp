@@ -64,68 +64,74 @@ namespace HellEngine
 		if (Input::s_keyPressed[HELL_KEY_E])
 			OnInteract();
 
-		// Time		
-		const float MAX_FRAME_DELTA = 2;
+		m_player.Update(m_frameTime);
+		m_player.m_characterController.Update(m_frameTime, &camera);
+
 		
-		currentTime = CoreGL::GetGLTime();
-		float deltaTime = currentTime - lastFrame;
-		lastFrame = currentTime;
-			
-		// Clamp.
-		deltaTime = min(deltaTime, MAX_FRAME_DELTA);
-		m_deltaTime = deltaTime;
+		Physics::Update(m_frameTime);
+
+
 
 
 		for (Shell& shell : Shell::s_shells)
-			shell.Update(deltaTime);
+			shell.Update(m_frameTime);
 
 
-		Renderer::s_bloodEffect.Update(deltaTime);
-		Renderer::s_muzzleFlash.Update(deltaTime);
-		Renderer::s_bloodWallSplatter.Update(deltaTime);
+		Renderer::s_bloodEffect.Update(m_frameTime);
+		Renderer::s_muzzleFlash.Update(m_frameTime);
+		Renderer::s_bloodWallSplatter.Update(m_frameTime);
 
-		TextBlitter::UpdateBlitter(deltaTime);
+		TextBlitter::UpdateBlitter(m_frameTime);
 
-		// Player
-		m_player.Update(deltaTime);
-		m_player.m_characterController.Update(deltaTime, &camera);
-
-
+		
 		// Doors
 		for (Door& door : house.m_doors)
-			door.Update(deltaTime);
+			door.Update(m_frameTime);
 
-		ShotgunLogic::Update(deltaTime);
+		ShotgunLogic::Update(m_frameTime);
 		m_cameraRaycast = ShotgunLogic::m_raycast;
 
+		
 
+
+
+		
+		// Camera
+		if (Input::s_rightMouseDown)
+			camera.m_zoomFactor += m_frameTime * camera.m_zoomSpeed;
+		else
+			camera.m_zoomFactor -= m_frameTime * camera.m_zoomSpeed;
+
+		camera.m_zoomFactor = std::min(camera.m_zoomFactor, camera.m_zoomLimit);
+		camera.m_zoomFactor = std::max(camera.m_zoomFactor, 0.0f);
+
+		camera.Update(m_frameTime);
+		camera.m_weaponCameraMatrix = m_shotgunAnimatedEntity.GetCameraMatrix();
+		camera.CalculateMatrices(m_player.m_characterController.GetViewPosition());
+		camera.CalculateProjectionMatrix((float)SCR_WIDTH, (float)SCR_HEIGHT);
+		camera.CalculateWeaponSwayTransform(m_frameTime);
+
+		m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);
+
+	}
+
+	void Game::UpdateSkeletalAnimation()
+	{
+		// Init time
+		static float currentFrame = CoreGL::GetGLTime();
+		static float lastFrame = currentFrame;	
+
+		// Calculate deltaTime
+		currentFrame = CoreGL::GetGLTime();
+		float deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		// Update all skeletal meshes
 		m_testAnimatedEnttity.Update(deltaTime);
 		m_shotgunAnimatedEntity.Update(deltaTime);
 		//m_zombieGuy.Update(deltaTime);
 		//m_zombieGuy.SetAnimationToBindPose();
 		m_zombieGuy.AnimatedFromRagdoll();
-
-		//m_zombieGuy.m_animatedTransforms[23] = Renderer::s_DebugTransform2.to_mat4();
-
-
-		// Camera
-		if (Input::s_rightMouseDown)
-			camera.m_zoomFactor += deltaTime * camera.m_zoomSpeed;
-		else
-			camera.m_zoomFactor -= deltaTime * camera.m_zoomSpeed;
-
-		camera.m_zoomFactor = std::min(camera.m_zoomFactor, camera.m_zoomLimit);
-		camera.m_zoomFactor = std::max(camera.m_zoomFactor, 0.0f);
-
-		camera.Update(deltaTime);
-		camera.m_weaponCameraMatrix = m_shotgunAnimatedEntity.GetCameraMatrix();
-		camera.CalculateMatrices(m_player.m_characterController.GetWorldPosition());
-		camera.CalculateProjectionMatrix((float)SCR_WIDTH, (float)SCR_HEIGHT);
-		camera.CalculateWeaponSwayTransform(deltaTime);
-
-		m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);
-
-		Physics::Update(deltaTime);
 	}
 
 	void Game::OnRender()

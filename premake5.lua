@@ -59,6 +59,7 @@ project "HellEngine"
 		"%{prj.name}/vendor/imguizmo",
 		"%{prj.name}/vendor/glm",
 		"%{prj.name}/vendor/bullet",
+		"%{prj.name}/vendor/bullet/bullet/src",
 		"%{prj.name}/vendor/assimp/include",
 		"%{prj.name}/vendor/rapidjson/include",
 		"%{prj.name}/vendor/sdl/include",

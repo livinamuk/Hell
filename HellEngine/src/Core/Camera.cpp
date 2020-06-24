@@ -19,11 +19,11 @@ namespace HellEngine
 		Input::s_mouseY = m_oldY;
 	}
 
-	void Camera::CalculateMatrices(glm::vec3 worldPos)
+	void Camera::CalculateMatrices(glm::vec3 viewPosition)
 	{
 
-		m_transform.position = worldPos;
-		m_transform.position.y += m_viewHeight;
+		m_transform.position = viewPosition;
+		//m_transform.position.y += m_viewHeight;
 		m_viewMatrix = inverse(m_weaponCameraMatrix) * glm::inverse(m_transform.to_mat4());
 
 		m_inverseViewMatrix = glm::inverse(m_viewMatrix);
@@ -51,8 +51,6 @@ namespace HellEngine
 	void Camera::CalculateProjectionMatrix(int screenWidth, int screenHeight)
 	{
 		m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, FAR_PLANE);
-
-		m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, 250.0f);
 	}
 
 	void Camera::CalculateWeaponSwayTransform(float deltatime)

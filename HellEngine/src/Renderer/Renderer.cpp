@@ -340,6 +340,9 @@ namespace HellEngine
 
 	void Renderer::DrawAnimatedEntityDebugBones_Animated(Shader* shader, AnimatedEntity* animatedEnitty)
 	{
+		if (s_demo)
+			return;
+
 		glm::mat4 worldMatrix = animatedEnitty->m_worldTransform.to_mat4() * animatedEnitty->m_modelTransform.to_mat4() * animatedEnitty->m_skeletonTransform.to_mat4() ;
 
 		for (int i = 0; i < animatedEnitty->m_animatedDebugTransforms_Animated.size(); i++) 
@@ -352,6 +355,9 @@ namespace HellEngine
 	
 	void Renderer::DrawAnimatedEntityDebugBones_BindPose(Shader* shader, AnimatedEntity* animatedEnitty)
 	{
+		if (s_demo)
+			return;
+
 		glm::mat4 worldMatrix = animatedEnitty->m_worldTransform.to_mat4() * animatedEnitty->m_modelTransform.to_mat4() * animatedEnitty->m_skeletonTransform.to_mat4();
 
 		SkinnedModel* skinnedModel = AssetManager::skinnedModels[animatedEnitty->m_skinnedModelID];
@@ -530,34 +536,38 @@ namespace HellEngine
 
 		glDisable(GL_DEPTH_TEST);
 
-	//	DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_testAnimatedEnttity);
-		
-	//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_testAnimatedEnttity);
-	
-	//	if (!s_demo)
-	//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
-		DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
-	//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
+		//	DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_testAnimatedEnttity);
 
-		//DrawSkeleton(&s_solidColorShader, AssetManager::skinnedModels[game->m_testAnimatedEnttity.m_skinnedModelID], &trans3);
-		
-		
-//		DrawPoint(&s_solidColorShader, ShotgunLogic::GetShotgunBarrelHoleWorldPosition(), glm::vec3(1, 1, 1));
-//		DrawPoint(&s_solidColorShader, ShotgunLogic::GetShotgunShellSpawnWorldPosition(), glm::vec3(1, 1, 1));
+		//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_testAnimatedEnttity);
 
+		//	if (!s_demo)
+		//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
+
+		if (!s_demo)
+			DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
+
+		//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
+
+			//DrawSkeleton(&s_solidColorShader, AssetManager::skinnedModels[game->m_testAnimatedEnttity.m_skinnedModelID], &trans3);
 
 
-		// try draw ragdoll joints!!!
+	//		DrawPoint(&s_solidColorShader, ShotgunLogic::GetShotgunBarrelHoleWorldPosition(), glm::vec3(1, 1, 1));
+	//		DrawPoint(&s_solidColorShader, ShotgunLogic::GetShotgunShellSpawnWorldPosition(), glm::vec3(1, 1, 1));
 
-		Ragdoll* ragdoll = game->m_zombieGuy.m_ragdoll;
 
-		for (int i = 0; i < ragdoll->JOINT_COUNT; i++)
+
+			// try draw ragdoll joints!!!
+		if (!s_demo)
 		{
-		//	glm::vec3 jointWorldPos = ragdoll->GetJointWorldPosition(i);
-			glm::vec3 jointWorldPos = Util::GetTranslationFromMatrix(ragdoll->GetJointWorldMatrix(i));
-			DrawPoint(&s_solidColorShader, jointWorldPos, glm::vec3(1, 0, 1));
-		}
+			Ragdoll* ragdoll = game->m_zombieGuy.m_ragdoll;
 
+			for (int i = 0; i < ragdoll->JOINT_COUNT; i++)
+			{
+				//	glm::vec3 jointWorldPos = ragdoll->GetJointWorldPosition(i);
+				glm::vec3 jointWorldPos = Util::GetTranslationFromMatrix(ragdoll->GetJointWorldMatrix(i));
+				DrawPoint(&s_solidColorShader, jointWorldPos, glm::vec3(1, 0, 1));
+			}
+		}
 
 
 		glm::mat4 camMat = game->m_shotgunAnimatedEntity.GetCameraMatrix();
@@ -614,6 +624,16 @@ namespace HellEngine
 			text += "NOT_IRON_SIGHTING\n";
 
 		text += s_debugString;
+
+		if (Shell::s_shells.size() > 0)
+		{
+			/*int index = Shell::s_shells.size() - 1;
+			btVector3 vel = Shell::s_shells[index].m_rigidBody->getAngularVelocity();
+			text += "\n";
+			text += Util::Vec3_to_String(Util::btVec3_to_glmVec3(vel));
+			text += "\n";
+			text += std::to_string(vel.length());*/
+		}
 
 		TextBlitter::BlitText(text, false);
 		TextBlitPlass(&s_quadShader);

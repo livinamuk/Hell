@@ -108,6 +108,9 @@
     <ClInclude Include="src\Core\CoreImGui.h">
       <Filter>src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\EnemyCharacter.h">
+      <Filter>src\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Core\Entity.h">
       <Filter>src\Core</Filter>
     </ClInclude>
@@ -243,6 +246,9 @@
     <ClInclude Include="src\Physics\Ragdoll.h">
       <Filter>src\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="src\Physics\RagdollJoint.h">
+      <Filter>src\Physics</Filter>
+    </ClInclude>
     <ClInclude Include="src\Physics\RaycastResult.h">
       <Filter>src\Physics</Filter>
     </ClInclude>
@@ -256,6 +262,9 @@
       <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Effects\BloodEffect.h">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\Effects\BloodWallSplatter.h">
       <Filter>src\Renderer\Effects</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Effects\Decal.h">
@@ -1455,9 +1464,6 @@
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h">
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\EnemyCharacter.h" />
-    <ClInclude Include="src\Renderer\Effects\BloodWallSplatter.h" />
-    <ClInclude Include="src\Physics\RagdollJoint.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\Animation.cpp">
@@ -1479,6 +1485,9 @@
       <Filter>src\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\CoreImGui.cpp">
+      <Filter>src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\EnemyCharacter.cpp">
       <Filter>src\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Entity.cpp">
@@ -1607,6 +1616,9 @@
     <ClCompile Include="src\Physics\Ragdoll.cpp">
       <Filter>src\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="src\Physics\RagdollJoint.cpp">
+      <Filter>src\Physics</Filter>
+    </ClCompile>
     <ClCompile Include="src\Physics\RaycastResult.cpp">
       <Filter>src\Physics</Filter>
     </ClCompile>
@@ -1620,6 +1632,9 @@
       <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Effects\BloodEffect.cpp">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Effects\BloodWallSplatter.cpp">
       <Filter>src\Renderer\Effects</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Effects\Decal.cpp">
@@ -1682,9 +1697,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\EnemyCharacter.cpp" />
-    <ClCompile Include="src\Renderer\Effects\BloodWallSplatter.cpp" />
-    <ClCompile Include="src\Physics\RagdollJoint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">

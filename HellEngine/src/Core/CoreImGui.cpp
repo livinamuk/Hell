@@ -468,10 +468,19 @@ namespace HellEngine
 		else
 			ImGui::Text("Movement State: ERROR");
 
-		ImGui::InputFloat("Scale", &Staircase::trimScale, 0.1f, 1.0f, "%0.5f");
-		ImGui::InputFloat("Offset", &Staircase::yOffset, 0.1f, 1.0f, "%0.5f");
-		ImGui::InputFloat("Walking Speed", &game->m_player.m_characterController.m_walkingSpeed, 0.1f, 1.0f, "%0.5f");
-		ImGui::InputFloat("View height", &game->camera.m_viewHeight, 0.1f, 1.0f, "%0.5f");
+
+		ImGui::PushItemWidth(100);
+
+		//ImGui::InputFloat("Scale", &Staircase::trimScale, 0.1f, 1.0f, "%0.5f");
+		//ImGui::InputFloat("Offset", &Staircase::yOffset, 0.1f, 1.0f, "%0.5f");
+
+		ImGui::InputFloat("Walk Speed", &game->m_player.m_characterController.m_movementSpeedWalking, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Run Speed", &game->m_player.m_characterController.m_movementSpeedRunning, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Crouch Speed", &game->m_player.m_characterController.m_movementSpeedCrouching, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Jump Strength", &game->m_player.m_characterController.m_jumpStrength, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Standing height", &game->m_player.m_characterController.m_viewHeightStanding, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Crouching height", &game->m_player.m_characterController.m_viewHeightCrouching, 0.1f, 1.0f, "%0.2f");
+		ImGui::InputFloat("Crouch Down Speed", &game->m_player.m_characterController.m_crouchDownSpeed, 0.1f, 1.0f, "%0.2f");
 	}
 
 	void CoreImGui::ShowOtherMenu(Game* game)
@@ -492,6 +501,8 @@ namespace HellEngine
 		ImGui::InputFloat("##Gadfsdasd", &Config::TEST_FLOAT2, 0.0f, 9.0f, 10.0f);
 		ImGui::Text("TEST_FLOAT3"); ImGui::SameLine();
 		ImGui::InputFloat("##Gasdasdfsd", &Config::TEST_FLOAT3, 0.0f, 9.0f, 10.0f);
+		ImGui::Text("TEST_FLOAT4"); ImGui::SameLine();
+		ImGui::InputFloat("##GasdDFasdfsd", &Config::TEST_FLOAT4, 0.0f, 9.0f, 10.0f);
 
 		ImGui::Text("\n");
 		ImGui::Text("sway amount"); ImGui::SameLine();
@@ -552,18 +563,6 @@ namespace HellEngine
 
 		ImGui::Text("\nRaycast:  %s", game->m_cameraRaycast.m_name);
 		ImGui::Text("Distance: %f", game->m_cameraRaycast.m_distance);
-
-		/*ImGui::Text("\nCHARACTER\nVelocity: %f, %f, %f",
-			game->m_player.m_characterController.GetVelocity().x,
-			game->m_player.m_characterController.GetVelocity().y,
-			game->m_player.m_characterController.GetVelocity().z);*/
-		ImGui::Text("Manual Velocity: %f, %f, %f",
-			game->m_player.m_characterController.m_manualVelocity.x,
-			game->m_player.m_characterController.m_manualVelocity.y,
-			game->m_player.m_characterController.m_manualVelocity.z);
-		ImGui::Text("Deceleration: %f", game->m_player.m_characterController.m_deceleration);
-		ImGui::Text("IsOnGround(): %i", game->m_player.m_characterController.IsOnGround());
-
 	}
 
 	void CoreImGui::ShowShaderMenu(Game* game)

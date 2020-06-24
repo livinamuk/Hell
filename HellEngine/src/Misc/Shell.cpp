@@ -30,8 +30,7 @@ namespace HellEngine
 		int group = CollisionGroups::PROJECTILES;
 		int mask = CollisionGroups::HOUSE;
 
-		//float mass = Config::TEST_FLOAT3;
-		float mass = 4;//
+		float mass = 4;
 
 		btVector3 localInertia(0, 0, 0);
 		collisionShape->calculateLocalInertia(mass, localInertia);
@@ -41,13 +40,18 @@ namespace HellEngine
 		btRigidBody::btRigidBodyConstructionInfo rbInfo(1.0f, m_pMotionState, collisionShape, localInertia);
 		rbInfo.m_restitution = 1;
 
-		//rbInfo.m_angularDamping = Config::TEST_FLOAT;
-		rbInfo.m_angularDamping = 0.999f;// Config::TEST_FLOAT;
+		//rbInfo.m_angularDamping = 0.999f;// Config::TEST_FLOAT;
 
 		this->m_rigidBody = new btRigidBody(rbInfo);
 
 		this->m_rigidBody->setFriction(0.7); 
-		//this->m_rigidBody->setFriction(Config::TEST_FLOAT2);
+
+	//	this->m_rigidBody->setMaxCoordinateVelocity();
+
+
+		//this->m_rigidBody->setDeactivationTime(Config::TEST_FLOAT);
+		//this->m_rigidBody->setSleepingThresholds(Config::TEST_FLOAT2, Config::TEST_FLOAT3);
+		//this->m_rigidBody->setContactProcessingThreshold(Config::TEST_FLOAT4);
 
 		//this->m_rigidBody->setCcdMotionThreshold(1e-6);						// This
 		this->m_rigidBody->setCcdMotionThreshold(0.0103f * m_shellScale);						// This
@@ -56,6 +60,7 @@ namespace HellEngine
 
 		EntityData* entityData = new EntityData();
 		entityData->name = "SHELL";
+		//entityData->vectorIndex = s_shells.size() - 1;
 		m_rigidBody->setUserPointer(entityData);
 
 		Physics::s_dynamicsWorld->addRigidBody(this->m_rigidBody, group, mask);
@@ -81,10 +86,18 @@ namespace HellEngine
 		if (m_rigidBody == nullptr)
 			return;
 
+		// Once the shell hits the ground (UserIndex == 1), then this counter increases
+		// and after a fixed time, angular velocity cuts. This stops shells rolling forever.
+		if (m_rigidBody->getUserIndex() == 1)
+			m_timeSinceHitTheGround += deltaTime;
+
+		if (m_timeSinceHitTheGround > 0.15f) {
+			this->m_rigidBody->setAngularVelocity(btVector3(0, 0, 0));
+		}
+
 		// Remove rigid body if at rest or fell through floor
 		if ((m_rigidBody->getActivationState() != ACTIVE_TAG) || (Util::GetTranslationFromMatrix(m_modelMatrix).y < -5)) {
 			Physics::DeleteRigidBody(m_rigidBody);
-			//m_rigidBody = nullptr;
 		}
 	}
 }

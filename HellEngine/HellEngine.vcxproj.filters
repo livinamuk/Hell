@@ -1464,6 +1464,9 @@
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h">
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
+    <ClInclude Include="src\GL\GpuProfiling.h">
+      <Filter>src\GL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\Animation.cpp">
@@ -1696,6 +1699,9 @@
     </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GL\GpuProfiling.cpp">
+      <Filter>src\GL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

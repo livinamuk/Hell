@@ -1,6 +1,7 @@
 #include "hellpch.h"
 #include "BloodEffect.h"
 #include "Helpers/AssetManager.h"
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -39,6 +40,7 @@ namespace HellEngine
 		if (m_CurrentTime >= AnimationSeconds)
 			return;
 
+		GpuProfiler g("BloodEffect");
 		glDepthMask(false);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

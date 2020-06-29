@@ -19,6 +19,7 @@ namespace HellEngine
 
 	void House::Draw(Shader* shader, bool envMapPass)
 	{
+		GpuProfiler g("House");
 		for (Room& room : m_rooms)
 			room.Draw(shader);
 

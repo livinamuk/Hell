@@ -2,6 +2,7 @@
 #include "Staircase.h"
 #include "Helpers/Util.h"
 #include "Helpers/AssetManager.h"
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -380,6 +381,7 @@ namespace HellEngine
 
 	void Staircase::Draw(Shader* shader)
 	{
+		GpuProfiler g("StairCase");
 		/*
 		Transform transform;
 		//AssetManager::GetModelByName("StaircaseNew")->Draw(shader, m_rootTransform.to_mat4());

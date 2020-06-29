@@ -35,6 +35,7 @@ namespace HellEngine
 
 	void Door::Draw(Shader* shader)
 	{
+		GpuProfiler g("Door");
 		//Transform shadowTransform;
 		//shadowTransform.scale = glm::vec3(1.1);
 

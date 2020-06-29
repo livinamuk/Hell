@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -166,6 +166,7 @@
     <ClInclude Include="src\GL\FXAABuffer.h" />
     <ClInclude Include="src\GL\FinalImageBuffer.h" />
     <ClInclude Include="src\GL\GBuffer.h" />
+    <ClInclude Include="src\GL\GpuProfiling.h" />
     <ClInclude Include="src\GL\LightProbe.h" />
     <ClInclude Include="src\GL\LightVolume.h" />
     <ClInclude Include="src\GL\LightVolumeDoorway.h" />
@@ -625,6 +626,7 @@
     <ClCompile Include="src\GL\FXAABuffer.cpp" />
     <ClCompile Include="src\GL\FinalImageBuffer.cpp" />
     <ClCompile Include="src\GL\GBuffer.cpp" />
+    <ClCompile Include="src\GL\GpuProfiling.cpp" />
     <ClCompile Include="src\GL\LightProbe.cpp" />
     <ClCompile Include="src\GL\LightVolume.cpp" />
     <ClCompile Include="src\GL\LightVolumeDoorWay.cpp" />

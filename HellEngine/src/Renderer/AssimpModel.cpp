@@ -2,7 +2,7 @@
 #include "Renderer/Mesh.h"
 #include "Header.h"
 #include "AssimpModel.h"
-
+#include "GL/GpuProfiling.h"
 namespace HellEngine
 {
 	AssimpModel::AssimpModel()
@@ -21,6 +21,7 @@ namespace HellEngine
 
 	void AssimpModel::Draw(Shader* shader)//, glm::mat4 * model = NULL)
 	{
+		GpuProfiler g("AssimpModel");
 		Transform trans;
 		glm::mat4 modelMatrix = trans.to_mat4();
 		shader->setMat4("model", modelMatrix);

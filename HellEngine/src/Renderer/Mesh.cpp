@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "Helpers/AssetManager.h"
 #include <set>
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -16,6 +17,7 @@ namespace HellEngine
 
 	void Mesh::Draw()
 	{
+		GpuProfiler g("Mesh");
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
 	}

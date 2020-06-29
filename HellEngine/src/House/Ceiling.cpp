@@ -2,6 +2,7 @@
 #include "Ceiling.h"
 #include "Helpers/Util.h"
 #include "Helpers/AssetManager.h"
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -30,6 +31,7 @@ namespace HellEngine
 
 	void Ceiling::Draw(Shader* shader)
 	{
+		GpuProfiler g("Ceiling");
 		if (m_rotateTexture)
 			shader->setInt("TEXTURE_FLAG", 3);
 		else

@@ -27,11 +27,11 @@ namespace HellEngine
         void Render(Shader* shader, const glm::mat4& modelMatrix);
 
         glm::mat4 m_CameraMatrix = glm::mat4(1);
-        std::vector<glm::mat4> m_BindPoseTransforms;
+       // std::vector<glm::mat4> m_BindPoseTransforms;
 
         const char* m_filename;
 
-        std::vector<Mesh*> m_meshes;
+       
 
         std::vector<Animation*> m_animations;
 

@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "Core/CoreGL.h"
 #include "GL/Quad2D.h"
+#include "GL/GpuProfiling.h"
 #include "Config.h"
 #include "Effects/Decal.h"
 #include "Logic/ShotgunLogic.h"
@@ -418,33 +419,79 @@ namespace HellEngine
 			}
 			test = true;
 		}
-		EnvMapPass(game, &s_reflection_Map_Shader, &s_SphericalH_Harmonics_Shader);
+		{
+			GpuProfiler g("EnvMapPass");
+			EnvMapPass(game, &s_reflection_Map_Shader, &s_SphericalH_Harmonics_Shader);
+		}
+
 		////////////////////////////////////////////
+		{
+			GpuProfiler g("ShadowmapPass");
+			ShadowMapPass(game, &s_ShadowMapShader);
+		}
+		{
+			GpuProfiler g("GeometryPass");
+			GeometryPass(game, &s_geometryShader);
+		}
 
-		ShadowMapPass(game, &s_ShadowMapShader);
-		GeometryPass(game, &s_geometryShader);
-		DecalPass(game, &s_DecalShader);
-		LightingPass(game, &s_StencilShader, &s_lightingShader);
-		EffectsPass(game, &s_BloodShader);
-		BlurPass(&s_blurVerticalShader, &s_blurHorizontalShader);
-		CompositePass(game, &s_compositeShader);
-		FXAAPass(&s_FXAAShader);
-		DOFPass(&s_DOFShader);
-		ChromaticAberrationPass(&s_ChromaticAberrationShader);
+		{
+			GpuProfiler g("DecalPass");
+			DecalPass(game, &s_DecalShader);
+		}
+		{
+			GpuProfiler g("LightingPass");
+			LightingPass(game, &s_StencilShader, &s_lightingShader);
+		}
 
-		// Render Final image to screen
-		if (!Input::s_keyDown[HELL_KEY_CAPS_LOCK])
-			//RenderFinalImage(&s_quadShader, s_FinalImageBuffer.TexID);
-			RenderFinalImage(&s_quadShader, s_ChromaticAbberationBuffer.TexID);
-		else
-			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
-			RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, game->house.m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
-		//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
+		{
+			GpuProfiler g("EffectsPass");
+			EffectsPass(game, &s_BloodShader);
+		}
+
+		{
+			GpuProfiler g("BlurPass");
+			BlurPass(&s_blurVerticalShader, &s_blurHorizontalShader);
+		}
+
+		{
+			GpuProfiler g("CompositePass");
+			CompositePass(game, &s_compositeShader);
+		}
+
+		{
+			GpuProfiler g("FXAAPass");
+			FXAAPass(&s_FXAAShader);
+		}
+
+		{
+			GpuProfiler g("DOFPass");
+			DOFPass(&s_DOFShader);
+		}
+		{
+			GpuProfiler g("ChromaticAberrationPass");
+			ChromaticAberrationPass(&s_ChromaticAberrationShader);
+		}
+
+		{
+			GpuProfiler g("RenderFinalImage");
+			// Render Final image to screen
+			if (!Input::s_keyDown[HELL_KEY_CAPS_LOCK])
+				//RenderFinalImage(&s_quadShader, s_FinalImageBuffer.TexID);
+				RenderFinalImage(&s_quadShader, s_ChromaticAbberationBuffer.TexID);
+			else
+				//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
+				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, game->house.m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
+			//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
+		}
 
 
 		// Bullet Debug
 		if (m_showBulletDebug)
+		{
+			GpuProfiler g("ShadowmapPass");
 			BulletDebugDraw(game, &s_solidColorShader);
+		}
+	
 
 		// Show a cubemap
 		/*if (Input::s_keyDown[HELL_KEY_1]) {
@@ -478,8 +525,14 @@ namespace HellEngine
 			}
 		}
 
-		TextBlitPlass(&s_quadShader);
-		HUDPass(game, &s_quadShader);
+		{
+			GpuProfiler g("TextBlitPlass");
+			TextBlitPlass(&s_quadShader);
+		}
+		{
+			GpuProfiler g("HUDPass");
+			HUDPass(game, &s_quadShader);
+		}
 
 		if (Input::s_keyDown[HELL_KEY_L])
 		{
@@ -544,7 +597,10 @@ namespace HellEngine
 		//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
 
 		if (!s_demo)
+		{
+			GpuProfiler g("DrawAnimatedEntityDebugBones_Animated");
 			DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
+		}
 
 		//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
 
@@ -559,6 +615,8 @@ namespace HellEngine
 			// try draw ragdoll joints!!!
 		if (!s_demo)
 		{
+			GpuProfiler g("ragdoll");
+
 			Ragdoll* ragdoll = game->m_zombieGuy.m_ragdoll;
 
 			for (int i = 0; i < ragdoll->JOINT_COUNT; i++)
@@ -636,7 +694,10 @@ namespace HellEngine
 		}
 
 		TextBlitter::BlitText(text, false);
-		TextBlitPlass(&s_quadShader);
+		{
+			GpuProfiler g("TextBlitPlass");
+			TextBlitPlass(&s_quadShader);
+		}
 	}
 
 	void Renderer::ShadowMapPass(Game* game, Shader* shader)
@@ -1441,7 +1502,7 @@ namespace HellEngine
 		// First pesron weapon
 		if (s_RenderSettings.DrawWeapon)
 		{
-		
+			GpuProfiler g("Weapon");
 
 			static Transform trans;
 			trans.position = game->camera.m_viewPos;

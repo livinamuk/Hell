@@ -2,7 +2,9 @@
 
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
-#include <assimp/postprocess.h>     // Post processing flags
+#include<assimp/postprocess.h>     // Post processing flags
+
+#include "AnimationFrame.h"
 
 namespace HellEngine
 {
@@ -17,5 +19,13 @@ namespace HellEngine
         const char* m_filename;
         aiScene* m_pAnimationScene;
         Assimp::Importer m_AnimationImporter;
+
+
+        // replace these later
+        //const char* m_name;
+        //float m_duration;
+        std::vector<AnimationFrame> m_animationFrames;
+
+        
     };
 }

@@ -17,7 +17,7 @@
 #include "Effects/MuzzleFlash.h"
 #include "Effects/BloodWallSplatter.h"
 
-#include "SkinnedModel.h"
+#include "Animation/SkinnedModel.h"
 #include "NumberBlitter.h"
 #include "Core/AnimatedEntity.h"
 
@@ -44,6 +44,7 @@ namespace HellEngine
 		static void EffectsPass(Game* game, Shader* shader);
 		static void DecalPass(Game* game, Shader* shader);
 		static void HUDPass(Game* game, Shader* shader);
+		static void InventoryPass(Game* game);
 
 		static void ShadowMapPass(Game* game, Shader* shader);
 
@@ -94,6 +95,8 @@ namespace HellEngine
 		static Shader s_BloodShader;
 		static Shader s_DecalShader;
 
+		static Shader s_GunInspectShader;
+
 		static std::vector<BlurBuffer> s_BlurBuffers;
 
 		static bool s_demo;
@@ -123,6 +126,10 @@ namespace HellEngine
 		static RenderSettings s_RenderSettings;
 		static Transform s_DebugTransform;
 		static Transform s_DebugTransform2;
+		static Transform s_DebugTransform3;
+
+		static Transform s_Inv_GlockTransform;
+
 		static float s_polygonFactor;
 		static float s_polygonUnits;
 

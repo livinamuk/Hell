@@ -144,6 +144,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Animation\Animation.h" />
+    <ClInclude Include="src\Animation\AnimationFrame.h" />
+    <ClInclude Include="src\Animation\SQT.h" />
+    <ClInclude Include="src\Animation\Skeleton.h" />
+    <ClInclude Include="src\Animation\SkeletonJoint.h" />
+    <ClInclude Include="src\Animation\SkinnedModel.h" />
     <ClInclude Include="src\Audio\Audio.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\Core\AnimatedEntity.h" />
@@ -214,7 +219,6 @@
     <ClInclude Include="src\Renderer\NumberBlitter.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\Renderer\Shader.h" />
-    <ClInclude Include="src\Renderer\SkinnedModel.h" />
     <ClInclude Include="src\Renderer\TextBlitter.h" />
     <ClInclude Include="src\Renderer\Texture.h" />
     <ClInclude Include="src\Renderer\Transform.h" />
@@ -605,6 +609,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\Animation.cpp" />
+    <ClCompile Include="src\Animation\AnimationFrame.cpp" />
+    <ClCompile Include="src\Animation\SQT.cpp" />
+    <ClCompile Include="src\Animation\Skeleton.cpp" />
+    <ClCompile Include="src\Animation\SkeletonJoint.cpp" />
+    <ClCompile Include="src\Animation\SkinnedModel.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Audio\Audio.cpp" />
     <ClCompile Include="src\Core\AnimatedEntity.cpp" />
@@ -686,7 +695,6 @@
     <ClCompile Include="src\Renderer\NumberBlitter.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Renderer\Shader.cpp" />
-    <ClCompile Include="src\Renderer\SkinnedModel.cpp" />
     <ClCompile Include="src\Renderer\TextBlitter.cpp" />
     <ClCompile Include="src\Renderer\Texture.cpp" />
     <ClCompile Include="src\Renderer\Transform.cpp" />
@@ -711,6 +719,8 @@
     <None Include="res\shaders\DOF.vert" />
     <None Include="res\shaders\FXAA.frag" />
     <None Include="res\shaders\FXAA.vert" />
+    <None Include="res\shaders\GunInspect.frag" />
+    <None Include="res\shaders\GunInspect.vert" />
     <None Include="res\shaders\SH.frag" />
     <None Include="res\shaders\SH.vert" />
     <None Include="res\shaders\Shader.vert" />

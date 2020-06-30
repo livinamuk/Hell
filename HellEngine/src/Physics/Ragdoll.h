@@ -17,7 +17,7 @@
 
 
 #include <glm/gtx/quaternion.hpp>
-#include "Renderer/SkinnedModel.h"
+#include "Animation/SkinnedModel.h"
 
 namespace HellEngine
 {

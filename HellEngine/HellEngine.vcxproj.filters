@@ -90,6 +90,21 @@
     <ClInclude Include="src\Animation\Animation.h">
       <Filter>src\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="src\Animation\AnimationFrame.h">
+      <Filter>src\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Animation\SQT.h">
+      <Filter>src\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Animation\Skeleton.h">
+      <Filter>src\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Animation\SkeletonJoint.h">
+      <Filter>src\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Animation\SkinnedModel.h">
+      <Filter>src\Animation</Filter>
+    </ClInclude>
     <ClInclude Include="src\Audio\Audio.h">
       <Filter>src\Audio</Filter>
     </ClInclude>
@@ -298,9 +313,6 @@
       <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Shader.h">
-      <Filter>src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Renderer\SkinnedModel.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\TextBlitter.h">
@@ -1469,6 +1481,21 @@
     <ClCompile Include="src\Animation\Animation.cpp">
       <Filter>src\Animation</Filter>
     </ClCompile>
+    <ClCompile Include="src\Animation\AnimationFrame.cpp">
+      <Filter>src\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\SQT.cpp">
+      <Filter>src\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\Skeleton.cpp">
+      <Filter>src\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\SkeletonJoint.cpp">
+      <Filter>src\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\SkinnedModel.cpp">
+      <Filter>src\Animation</Filter>
+    </ClCompile>
     <ClCompile Include="src\Application.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -1670,9 +1697,6 @@
     <ClCompile Include="src\Renderer\Shader.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\SkinnedModel.cpp">
-      <Filter>src\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\TextBlitter.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
@@ -1715,6 +1739,12 @@
       <Filter>res\shaders</Filter>
     </None>
     <None Include="res\shaders\FXAA.vert">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\GunInspect.frag">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\GunInspect.vert">
       <Filter>res\shaders</Filter>
     </None>
     <None Include="res\shaders\SH.frag">

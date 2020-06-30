@@ -2,7 +2,7 @@
 #include "Renderer/Texture.h"
 #include "Renderer/Material.h"
 #include "Renderer/Model.h"
-#include "Renderer/SkinnedModel.h"
+#include "Animation/SkinnedModel.h"
 #include <vector>
 #include <future>
 

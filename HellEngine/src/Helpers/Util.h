@@ -17,6 +17,7 @@ namespace HellEngine
 	{
 	public:
 	//	static void RemoveTranslation(glm::mat4& matrix);
+		static bool StrCmp(const char* queryA, const char* queryB);
 		static bool CompareVertexPosition(Vertex v1, Vertex v2);
 		static glm::mat4 btScalar2mat4(btScalar* matrix);
 		static glm::mat4 Get_Mat4_From_Vec3(glm::vec3 position);

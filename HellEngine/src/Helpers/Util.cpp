@@ -7,6 +7,14 @@ namespace HellEngine
 	unsigned int Util::upFacingPlaneVAO = INVALID_VALUE;
 	unsigned int Util::downFacingPlaneVAO = INVALID_VALUE;
 
+	bool Util::StrCmp(const char* queryA, const char* queryB)
+	{
+		if (strcmp(queryA, queryB) == 0)
+			return true;
+		else 
+			return false;
+	}
+
 	bool Util::CompareVertexPosition(Vertex v1, Vertex v2)
 	{
 		float eps = 0.00001;

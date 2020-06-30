@@ -492,7 +492,8 @@ namespace HellEngine
 		ImGui::Text("Front:    (%f, %f, %f)", game->camera.m_Front.x, game->camera.m_Front.y, game->camera.m_Front.z);
 
 
-
+		ImGui::Text("\n");
+		ImGui::InputFloat("##inspectfloaat", &Config::INSPECT_FOV, 0.0f, 9.0f, 10.0f);
 
 		ImGui::Text("\n");
 		ImGui::Text("TEST_FLOAT"); ImGui::SameLine();
@@ -538,6 +539,10 @@ namespace HellEngine
 		ImGui::InputFloat3("Poso2", glm::value_ptr(Renderer::s_DebugTransform2.position));
 		ImGui::InputFloat3("Rota2", glm::value_ptr(Renderer::s_DebugTransform2.rotation));
 		ImGui::InputFloat3("Scla2", glm::value_ptr(Renderer::s_DebugTransform2.scale));
+		ImGui::Text("\nDEBUG TRANSFORM3");
+		ImGui::InputFloat3("Poso3", glm::value_ptr(Renderer::s_DebugTransform3.position));
+		ImGui::InputFloat3("Rota3", glm::value_ptr(Renderer::s_DebugTransform3.rotation));
+		ImGui::InputFloat3("Scla3", glm::value_ptr(Renderer::s_DebugTransform3.scale));
 
 		ImGui::Text("WIP"); ImGui::SameLine(); ImGui::Checkbox("##checkBoxq9", &Renderer::s_demo);
 		ImGui::Text("Render Door Way Volumes"); ImGui::SameLine(); ImGui::Checkbox("##checkBo1123xq9", &Renderer::b_renderDoorWayVolumes);

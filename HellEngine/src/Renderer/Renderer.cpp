@@ -32,6 +32,7 @@ namespace HellEngine
 	Shader Renderer::s_StencilShader;
 	Shader Renderer::s_BloodShader;
 	Shader Renderer::s_DecalShader;
+	Shader Renderer::s_GunInspectShader;
 
 	std::string Renderer::s_debugString;
 
@@ -39,7 +40,7 @@ namespace HellEngine
 	MuzzleFlash Renderer::s_muzzleFlash;
 	BloodWallSplatter Renderer::s_bloodWallSplatter;
 
-	bool Renderer::s_demo = false;
+	bool Renderer::s_demo = true;
 
 	Transform Renderer::s_hitPoint;
 	unsigned int Renderer::s_pointVAO;
@@ -47,6 +48,9 @@ namespace HellEngine
 	RenderSettings Renderer::s_RenderSettings;
 	Transform Renderer::s_DebugTransform;
 	Transform Renderer::s_DebugTransform2;
+	Transform Renderer::s_DebugTransform3;
+
+	Transform Renderer::s_Inv_GlockTransform;
 
 	float Renderer::s_polygonFactor;
 	float Renderer::s_polygonUnits;
@@ -104,6 +108,8 @@ namespace HellEngine
 		s_BloodShader = Shader("Blood", "blood.vert", "blood.frag", "NONE");
 		s_DecalShader = Shader("Decal", "decals.vert", "decals.frag", "NONE");
 
+		s_GunInspectShader = Shader("GunInspect", "GunInspect.vert", "GunInspect.frag", "NONE");
+
 		SetTextureBindings();
 
 		s_gBuffer = GBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
@@ -127,7 +133,9 @@ namespace HellEngine
 		s_bloodEffect.Init();
 		s_muzzleFlash.Init();
 		s_bloodWallSplatter.Init();
-		
+	
+		// Inventory gun examination transforms
+		s_Inv_GlockTransform.position = glm::vec3(0, -1, -10);
 	}
 
 	void Renderer::CreateBRDFLut()
@@ -480,6 +488,7 @@ namespace HellEngine
 
 		TextBlitPlass(&s_quadShader);
 		HUDPass(game, &s_quadShader);
+		//InventoryPass(game);
 
 		if (Input::s_keyDown[HELL_KEY_L])
 		{
@@ -625,15 +634,10 @@ namespace HellEngine
 
 		text += s_debugString;
 
-		if (Shell::s_shells.size() > 0)
-		{
-			/*int index = Shell::s_shells.size() - 1;
-			btVector3 vel = Shell::s_shells[index].m_rigidBody->getAngularVelocity();
-			text += "\n";
-			text += Util::Vec3_to_String(Util::btVec3_to_glmVec3(vel));
-			text += "\n";
-			text += std::to_string(vel.length());*/
-		}
+
+
+		text = "FPS: ";
+		text += std::to_string(game->m_fps);
 
 		TextBlitter::BlitText(text, false);
 		TextBlitPlass(&s_quadShader);
@@ -1245,6 +1249,29 @@ namespace HellEngine
 		// Reset color tint bruvva
 	}
 
+	void Renderer::InventoryPass(Game* game)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+	//	glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		glm::mat4 identity = glm::mat4(1);
+		glm::mat4 projection = glm::perspective(Config::INSPECT_FOV, (float)CoreGL::s_windowWidth / (float)CoreGL::s_windowHeight, NEAR_PLANE, FAR_PLANE);
+
+		s_GunInspectShader.use();
+		s_GunInspectShader.setMat4("projection", identity);
+		s_GunInspectShader.setMat4("view", projection);
+	
+		s_Inv_GlockTransform.rotation.y += 0.01f;
+
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, game->house.m_lights[0].m_LightProbe.SH_TexID);
+
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Glock"));
+		AssetManager::GetModelByName("Glock")->Draw(&s_GunInspectShader, s_Inv_GlockTransform.to_mat4());
+	}
+
 	void Renderer::RenderEnvMap(Game* game, Shader* shader, Light* light)
 	{
 		glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -1463,6 +1490,12 @@ namespace HellEngine
 		shader->setInt("hasAnimation", true);
 		//game->m_testAnimatedEnttity.Draw(shader, glm::mat4(1));
 		shader->setInt("hasAnimation", false);
+
+		// Glass
+		/*Transform transform;
+		transform = s_DebugTransform;
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("White"));
+		AssetManager::GetModelByName("Glass")->Draw(shader, transform.to_mat4 ()); */
 	}
 
 	void Renderer::BulletDebugDraw(Game* game, Shader* shader)

@@ -27,6 +27,7 @@ namespace HellEngine
 		SkinnedModel* skinnedModel = AssetManager::skinnedModels[m_skinnedModelID];
 
 		shader->setInt("hasAnimation", true);
+		skinnedModel->currentAnimationIndex = m_currentAnimationIndex; // this fixes the weird bug where if two animated entities have the same skinned model. But it doesn't make any sense because Render() doesn't even make use of this. Try and find out one day, or look here if u have problems later.
 		skinnedModel->Render(shader, modelMatrix * m_worldTransform.to_mat4() * m_modelTransform.to_mat4());
 
 		shader->setInt("hasAnimation", false);

@@ -122,6 +122,8 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Couch.obj"));
 		models.emplace_back(Model("res/models/Mannequin.obj"));
 		models.emplace_back(Model("res/models/Shell.obj"));
+		models.emplace_back(Model("res/models/Glock.obj"));
+		models.emplace_back(Model("res/models/Glass.obj"));
 
 		skinnedModels.emplace_back(new SkinnedModel("Zombie.fbx"));
 

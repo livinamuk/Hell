@@ -10,7 +10,7 @@
 #include "Renderer/Model.h"
 #include "Renderer/Cube.h"
 #include "Renderer/Renderer.h"
-#include "Renderer/SkinnedModel.h"
+#include "Animation/SkinnedModel.h"
 #include "Renderer/AssimpModel.h"
 #include "Renderer/Effects/Decal.h"
 #include "Misc/Shell.h"
@@ -54,6 +54,7 @@ namespace HellEngine
 
 		//std::vector<Decal> m_decals;
 		float m_frameTime;
+		int m_fps;
 
 		static bool s_dontLoadShotgun;
 

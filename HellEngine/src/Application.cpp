@@ -92,7 +92,8 @@ int main()
 
 			if (frameCounter >= 1.0)
 			{
-				std::cout << "frames: " << frames << "  unprocssed time: " << unprocessedTime << "\n";//System.out.println(frames);
+				game.m_fps = frames;
+				//std::cout << "frames: " << frames << "  unprocssed time: " << unprocessedTime << "\n";//System.out.println(frames);
 				frames = 0;
 				frameCounter = 0;
 			}

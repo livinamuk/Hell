@@ -1488,7 +1488,7 @@ namespace HellEngine
 		game->m_testAnimatedEnttity.m_worldTransform.scale = glm::vec3(0.0125f);
 
 		shader->setInt("hasAnimation", true);
-		//game->m_testAnimatedEnttity.Draw(shader, glm::mat4(1));
+		game->m_testAnimatedEnttity.Draw(shader, glm::mat4(1));
 		shader->setInt("hasAnimation", false);
 
 		// Glass

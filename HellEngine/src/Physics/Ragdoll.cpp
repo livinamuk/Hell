@@ -483,13 +483,15 @@ namespace HellEngine
 
 	void Ragdoll::UpdateBoneTransform(SkinnedModel* skinnedModel, vector<glm::mat4>& Transforms, vector<glm::mat4>& DebugAnimatedTransforms)
 	{
+		/*
+
 		// Climb down the tree and build the transforms. You retreuve them just below see, from m_BoneInfo.
 		ReadNodeHeirarchy(skinnedModel, skinnedModel->m_pScene->mRootNode, glm::mat4(1));
 
 		for (unsigned int i = 0; i < skinnedModel->m_NumBones; i++) {
 			Transforms[i] = skinnedModel->m_BoneInfo[i].FinalTransformation;
 			DebugAnimatedTransforms[i] = skinnedModel->m_BoneInfo[i].DebugMatrix_AnimatedTransform;
-		}
+		}*/
 	}
 
 	void Ragdoll::ReadNodeHeirarchy(SkinnedModel* skinnedModel, const aiNode* pNode, const glm::mat4& ParentTransform)

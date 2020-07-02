@@ -38,7 +38,7 @@ namespace HellEngine
 
 
 		m_testAnimatedEnttity.SetSkinnedModel("Shotgun.fbx");
-		m_testAnimatedEnttity.m_currentAnimationIndex = 2;
+		m_testAnimatedEnttity.m_currentAnimationIndex = 5;
 
 
 		m_zombieGuy.SetSkinnedModel("Zombie.fbx");
@@ -47,8 +47,10 @@ namespace HellEngine
 		m_zombieGuy.FlipSkeletonUpAxis(true);
 		m_zombieGuy.m_worldTransform.rotation.y = HELL_PI / 2;
 
-		m_zombieGuy.SetAnimationToBindPose();
-		m_zombieGuy.NewRagdollFromAnimatedTransforms();
+		//m_zombieGuy.SetAnimationToBindPose();
+		//m_zombieGuy.NewRagdollFromAnimatedTransforms();
+
+		AssetManager::PrintSkinnedModelMeshNames("Shotgun.fbx");
 
 		/*std::cout << "\n";
 		AssetManager::PrintSkinnedModelMeshNames("Zombie.fbx");
@@ -78,6 +80,7 @@ namespace HellEngine
 
 
 
+	
 
 		for (Shell& shell : Shell::s_shells)
 			shell.Update(m_frameTime);

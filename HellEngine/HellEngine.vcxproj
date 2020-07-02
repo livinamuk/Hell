@@ -143,8 +143,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Animation\AnimatedNode.h" />
     <ClInclude Include="src\Animation\Animation.h" />
-    <ClInclude Include="src\Animation\AnimationFrame.h" />
     <ClInclude Include="src\Animation\SQT.h" />
     <ClInclude Include="src\Animation\Skeleton.h" />
     <ClInclude Include="src\Animation\SkeletonJoint.h" />
@@ -180,6 +180,7 @@
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Header.h" />
     <ClInclude Include="src\Helpers\AssetManager.h" />
+    <ClInclude Include="src\Helpers\FileImporter.h" />
     <ClInclude Include="src\Helpers\Util.h" />
     <ClInclude Include="src\House\Ceiling.h" />
     <ClInclude Include="src\House\Door.h" />
@@ -203,7 +204,6 @@
     <ClInclude Include="src\Physics\Ragdoll.h" />
     <ClInclude Include="src\Physics\RagdollJoint.h" />
     <ClInclude Include="src\Physics\RaycastResult.h" />
-    <ClInclude Include="src\Renderer\Animator.h" />
     <ClInclude Include="src\Renderer\AssimpModel.h" />
     <ClInclude Include="src\Renderer\Cube.h" />
     <ClInclude Include="src\Renderer\Effects\BloodEffect.h" />
@@ -608,8 +608,8 @@
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Animation\AnimatedNode.cpp" />
     <ClCompile Include="src\Animation\Animation.cpp" />
-    <ClCompile Include="src\Animation\AnimationFrame.cpp" />
     <ClCompile Include="src\Animation\SQT.cpp" />
     <ClCompile Include="src\Animation\Skeleton.cpp" />
     <ClCompile Include="src\Animation\SkeletonJoint.cpp" />
@@ -642,6 +642,7 @@
     <ClCompile Include="src\GL\ShadowMap.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Helpers\AssetManager.cpp" />
+    <ClCompile Include="src\Helpers\FileImporter.cpp" />
     <ClCompile Include="src\Helpers\Util.cpp" />
     <ClCompile Include="src\House\Ceiling.cpp" />
     <ClCompile Include="src\House\Door.cpp" />
@@ -679,7 +680,6 @@
     <ClCompile Include="src\Physics\Ragdoll.cpp" />
     <ClCompile Include="src\Physics\RagdollJoint.cpp" />
     <ClCompile Include="src\Physics\RaycastResult.cpp" />
-    <ClCompile Include="src\Renderer\Animator.cpp" />
     <ClCompile Include="src\Renderer\AssimpModel.cpp" />
     <ClCompile Include="src\Renderer\Cube.cpp" />
     <ClCompile Include="src\Renderer\Effects\BloodEffect.cpp" />

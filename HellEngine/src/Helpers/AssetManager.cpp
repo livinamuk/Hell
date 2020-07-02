@@ -6,6 +6,7 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 #include "assimp/matrix4x4.h"
+#include "Helpers/FileImporter.h"
 
 namespace HellEngine
 {
@@ -75,7 +76,8 @@ namespace HellEngine
 		{
 			if (std::strcmp(skinnedModel->m_filename, skinnedModelName) == 0)
 			{
-				skinnedModel->LoadAnimation(filename);
+				FileImporter::LoadAnimation(skinnedModel, filename);
+				//skinnedModel->LoadAnimation(filename);
 				return;
 			}
 		}
@@ -125,9 +127,21 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Glock.obj"));
 		models.emplace_back(Model("res/models/Glass.obj"));
 
-		skinnedModels.emplace_back(new SkinnedModel("Zombie.fbx"));
 
-		skinnedModels.emplace_back(new SkinnedModel("Shotgun.fbx"));
+
+		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("Zombie.fbx"));
+		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("Shotgun.fbx"));
+
+
+		/*skinnedModels.emplace_back(new SkinnedModel());
+		FileImporter::LoadSkinnedModel(skinnedModels[0], "Zombie.fbx");
+
+		skinnedModels.emplace_back(new SkinnedModel());
+		FileImporter::LoadSkinnedModel(skinnedModels[1], "Shotgun.fbx");*/
+
+		//skinnedModels.emplace_back(new SkinnedModel("Zombie.fbx"));
+		//skinnedModels.emplace_back(new SkinnedModel("Shotgun.fbx"));
+
 		LoadAnimation("Shotgun.fbx", "Shotgun_Idle.fbx");
 		LoadAnimation("Shotgun.fbx", "Shotgun_Walk.fbx");
 		LoadAnimation("Shotgun.fbx", "Shotgun_Fire.fbx");

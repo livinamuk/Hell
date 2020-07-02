@@ -89,6 +89,8 @@ namespace HellEngine
 
 	void AnimatedEntity::UpdateAnimation(float deltatime)
 	{
+		//deltatime *= 0.1f;
+
 		if (m_skinnedModelID == -1) return;
 		SkinnedModel* skinnedModel = AssetManager::skinnedModels[m_skinnedModelID];
 

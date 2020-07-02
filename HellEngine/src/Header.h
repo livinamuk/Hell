@@ -180,3 +180,22 @@ struct Derivative
 	float dx;      // dx/dt = velocity
 	float dv;      // dv/dt = acceleration
 };
+
+enum VB_TYPES {
+	INDEX_BUFFER,
+	POS_VB,
+	NORMAL_VB,
+	TEXCOORD_VB,
+	TANGENT_VB,
+	BITANGENT_VB,
+	BONE_VB,
+	NUM_VBs
+};    
+
+#define POSITION_LOCATION    0
+#define NORMAL_LOCATION		 1
+#define TEX_COORD_LOCATION   2
+#define TANGENT_LOCATION     3
+#define BITANGENT_LOCATION   4
+#define BONE_ID_LOCATION     5
+#define BONE_WEIGHT_LOCATION 6

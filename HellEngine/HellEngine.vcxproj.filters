@@ -87,12 +87,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Animation\Animation.h">
-      <Filter>src\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Animation\AnimationFrame.h">
-      <Filter>src\Animation</Filter>
-    </ClInclude>
     <ClInclude Include="src\Animation\SQT.h">
       <Filter>src\Animation</Filter>
     </ClInclude>
@@ -266,9 +260,6 @@
     </ClInclude>
     <ClInclude Include="src\Physics\RaycastResult.h">
       <Filter>src\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Renderer\Animator.h">
-      <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\AssimpModel.h">
       <Filter>src\Renderer</Filter>
@@ -1476,14 +1467,13 @@
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h">
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
+    <ClInclude Include="src\Animation\AnimatedNode.h" />
+    <ClInclude Include="src\Animation\Animation.h">
+      <Filter>src\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helpers\FileImporter.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Animation\Animation.cpp">
-      <Filter>src\Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Animation\AnimationFrame.cpp">
-      <Filter>src\Animation</Filter>
-    </ClCompile>
     <ClCompile Include="src\Animation\SQT.cpp">
       <Filter>src\Animation</Filter>
     </ClCompile>
@@ -1649,9 +1639,6 @@
     <ClCompile Include="src\Physics\RaycastResult.cpp">
       <Filter>src\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Animator.cpp">
-      <Filter>src\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\AssimpModel.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
@@ -1721,6 +1708,11 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Animation\AnimatedNode.cpp" />
+    <ClCompile Include="src\Animation\Animation.cpp">
+      <Filter>src\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Helpers\FileImporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">

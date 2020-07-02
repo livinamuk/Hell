@@ -7,6 +7,53 @@ namespace HellEngine
 	unsigned int Util::upFacingPlaneVAO = INVALID_VALUE;
 	unsigned int Util::downFacingPlaneVAO = INVALID_VALUE;
 
+	const char* Util::CopyConstChar(const char* text)
+	{
+		char* b = new char[strlen(text) + 1]{};
+		std::copy(text, text + strlen(text), b);
+		return b;
+	}
+
+	void Util::InterpolateQuaternion(glm::quat& Out, const glm::quat& Start, const glm::quat& End, float pFactor)
+	{
+		// calc cosine theta
+		float cosom = Start.x * End.x + Start.y * End.y + Start.z * End.z + Start.w * End.w;
+
+		// adjust signs (if necessary)
+		glm::quat end = End;
+		if (cosom < static_cast<float>(0.0))
+		{
+			cosom = -cosom;
+			end.x = -end.x;   // Reverse all signs
+			end.y = -end.y;
+			end.z = -end.z;
+			end.w = -end.w;
+		}
+
+		// Calculate coefficients
+		float sclp, sclq;
+		if ((static_cast<float>(1.0) - cosom) > static_cast<float>(0.0001)) // 0.0001 -> some epsillon
+		{
+			// Standard case (slerp)
+			float omega, sinom;
+			omega = std::acos(cosom); // extract theta from dot product's cos theta
+			sinom = std::sin(omega);
+			sclp = std::sin((static_cast<float>(1.0) - pFactor) * omega) / sinom;
+			sclq = std::sin(pFactor * omega) / sinom;
+		}
+		else
+		{
+			// Very close, do linear interp (because it's faster)
+			sclp = static_cast<float>(1.0) - pFactor;
+			sclq = pFactor;
+		}
+
+		Out.x = sclp * Start.x + sclq * end.x;
+		Out.y = sclp * Start.y + sclq * end.y;
+		Out.z = sclp * Start.z + sclq * end.z;
+		Out.w = sclp * Start.w + sclq * end.w;
+	}
+
 	bool Util::StrCmp(const char* queryA, const char* queryB)
 	{
 		if (strcmp(queryA, queryB) == 0)

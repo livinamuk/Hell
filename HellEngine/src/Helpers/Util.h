@@ -16,6 +16,8 @@ namespace HellEngine
 	class Util
 	{
 	public:
+		static const char* CopyConstChar(const char* text);
+		static void InterpolateQuaternion(glm::quat& pOut, const glm::quat& Start, const glm::quat& End, float Factor);
 	//	static void RemoveTranslation(glm::mat4& matrix);
 		static bool StrCmp(const char* queryA, const char* queryB);
 		static bool CompareVertexPosition(Vertex v1, Vertex v2);

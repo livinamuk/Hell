@@ -4,7 +4,7 @@
 #include <assimp/scene.h>           // Output data structure
 #include<assimp/postprocess.h>     // Post processing flags
 
-#include "AnimationFrame.h"
+#include "AnimatedNode.h"
 
 namespace HellEngine
 {
@@ -14,18 +14,18 @@ namespace HellEngine
         Animation(const char* Filename);
         ~Animation();
 
-    public: // fields
-        double m_duration;
-        const char* m_filename;
-        aiScene* m_pAnimationScene;
-        Assimp::Importer m_AnimationImporter;
-
-
-        // replace these later
-        //const char* m_name;
-        //float m_duration;
-        std::vector<AnimationFrame> m_animationFrames;
-
+    public: // fields        
         
+        float m_duration;
+        float m_ticksPerSecond;
+        const char* m_filename;
+
+        //aiScene* m_pAnimationScene;
+        //Assimp::Importer m_AnimationImporter;
+
+
+        std::vector<AnimatedNode> m_animatedNodes;
+        std::map<const char*, unsigned int> m_NodeMapping; // maps a node name to its index
+     
     };
 }

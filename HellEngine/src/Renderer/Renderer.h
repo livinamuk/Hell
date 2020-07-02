@@ -10,6 +10,7 @@
 #include "GL/FXAABuffer.h"
 #include "GL/ChromaticAbberationBuffer.h"
 #include "GL/CameraEnvMap.h"
+#include "GL/GpuProfiling.h"
 #include "TextBlitter.h"
 #include "House/Light.h"
 

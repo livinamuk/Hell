@@ -2,6 +2,7 @@
 #include "Room.h"
 #include "Helpers/Util.h"
 #include "Helpers/AssetManager.h"
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -52,6 +53,7 @@ namespace HellEngine
 
 	void Room::Draw(Shader* shader)
 	{
+		GpuProfiler g("Room");
 		// Draw Floor
 		AssetManager::BindMaterial(AssetManager::s_MaterialID_FloorBoards);
 		m_floor.Draw(shader);

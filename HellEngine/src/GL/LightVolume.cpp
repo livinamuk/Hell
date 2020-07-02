@@ -1,5 +1,6 @@
 #include "hellpch.h"
 #include "LightVolume.h"
+#include "GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -152,6 +153,7 @@ namespace HellEngine
 
 	void LightVolume::Draw(Shader* shader)
 	{
+		GpuProfiler g("LightVolume");
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		shader->setMat4("model", modelMatrix);
 		glBindVertexArray(VAO);

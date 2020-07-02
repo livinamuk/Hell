@@ -1467,11 +1467,17 @@
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h">
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="src\Animation\AnimatedNode.h" />
     <ClInclude Include="src\Animation\Animation.h">
       <Filter>src\Animation</Filter>
     </ClInclude>
     <ClInclude Include="src\Helpers\FileImporter.h" />
+=======
+    <ClInclude Include="src\GL\GpuProfiling.h">
+      <Filter>src\GL</Filter>
+    </ClInclude>
+>>>>>>> 0c1086a1dabd1dd4b0834f9bb71574f2820126da
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\SQT.cpp">
@@ -1708,11 +1714,17 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="src\Animation\AnimatedNode.cpp" />
     <ClCompile Include="src\Animation\Animation.cpp">
       <Filter>src\Animation</Filter>
     </ClCompile>
     <ClCompile Include="src\Helpers\FileImporter.cpp" />
+=======
+    <ClCompile Include="src\GL\GpuProfiling.cpp">
+      <Filter>src\GL</Filter>
+    </ClCompile>
+>>>>>>> 0c1086a1dabd1dd4b0834f9bb71574f2820126da
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">

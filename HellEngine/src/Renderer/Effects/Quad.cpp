@@ -1,5 +1,6 @@
 #include "hellpch.h"
 #include "Quad.h"
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -34,6 +35,7 @@ namespace HellEngine
 
 	void Quad::Draw()
 	{
+		GpuProfiler g("Quad");
 		glBindVertexArray(m_VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}

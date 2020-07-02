@@ -3,6 +3,7 @@
 #include "Renderer/Cube.h"
 #include "Helpers/Util.h"
 #include "Helpers/AssetManager.h"
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -21,6 +22,7 @@ namespace HellEngine
 
 	void Decal::Draw(Shader* shader, bool blackOnly)
 	{
+		GpuProfiler g("Decal");
 		// Calculate rotation
 		glm::mat4 modelMatrix = glm::translate(glm::mat4(1), transform.position);
 		glm::vec3 squareNormal = glm::vec3(0, 0, 1);

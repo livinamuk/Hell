@@ -1,6 +1,8 @@
 #include "hellpch.h"
 #include "LightVolumeDoorWay.h"
 #include "Helpers/Util.h"
+#include "GpuProfiling.h"
+
 namespace HellEngine
 {
 	LightVolumeDoorWay::LightVolumeDoorWay(DoorWay& doorWay, glm::vec3 lightPosition, float lightRadius, float roomEdge)
@@ -120,6 +122,7 @@ namespace HellEngine
 
 	void LightVolumeDoorWay::Draw(Shader* shader)
 	{
+		GpuProfiler g("LightVolumeDoorway");
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		shader->setMat4("model", modelMatrix);
 		glBindVertexArray(VAO);

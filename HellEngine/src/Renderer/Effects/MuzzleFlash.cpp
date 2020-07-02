@@ -2,6 +2,7 @@
 #include "MuzzleFlash.h"
 #include "Helpers/AssetManager.h"
 #include "Config.h"
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -41,7 +42,7 @@ namespace HellEngine
 	{
 		if (m_CurrentTime >= AnimationSeconds)
 			return;
-
+		GpuProfiler g("MuzzleFlash");
 		glDepthMask(false);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

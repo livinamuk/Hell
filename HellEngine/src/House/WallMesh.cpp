@@ -1,6 +1,7 @@
 #include "hellpch.h"
 #include "WallMesh.h"
 #include "Helpers/Util.h"
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -121,6 +122,7 @@ namespace HellEngine
 
 	void WallMesh::Draw(Shader* shader)
 	{
+		GpuProfiler g("WallMesh");
 		shader->setMat4("model", transform.to_mat4());
 
 		if (VAO == 0)

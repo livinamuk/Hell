@@ -1,6 +1,7 @@
 #include "hellpch.h"
 #include "EnemyCharacter.h"
 #include "Helpers/Util.h"
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -11,6 +12,7 @@ namespace HellEngine
 
 	void EnemyCharacter::Draw(Shader* shader, glm::mat4 modelMatrix)
 	{
+		GpuProfiler g("EnemyCharacter");
 		if (m_skinnedModelID == -1) return;
 
 		for (unsigned int i = 0; i < m_animatedTransforms.size(); i++)

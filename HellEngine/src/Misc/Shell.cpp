@@ -4,6 +4,7 @@
 #include "Helpers/AssetManager.h"
 #include "Helpers/Util.h"
 #include "Config.h"
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -68,6 +69,7 @@ namespace HellEngine
 
 	void Shell::Draw(Shader* shader)
 	{
+		GpuProfiler g("Shell");
 		static int modelID = AssetManager::GetModelIDByName("Shell");
 		static int materialID = AssetManager::GetMaterialIDByName("Shell");
 		AssetManager::BindMaterial(materialID);

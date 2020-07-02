@@ -2,6 +2,7 @@
 #include "Model.h"
 #include "Helpers/AssetManager.h"
 #include "Helpers/Util.h"
+#include "GL/GpuProfiling.h"
 
 #include <assert.h>
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -96,6 +97,7 @@ namespace HellEngine
 
 	void Model::Draw(Shader* shader, glm::mat4 modelMatrix)
 	{
+		GpuProfiler g("Model");
 		for (int i = 0; i < m_meshes.size(); ++i)
 			DrawMesh(shader, i, modelMatrix);
 	}

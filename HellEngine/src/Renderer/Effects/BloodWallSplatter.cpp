@@ -2,6 +2,7 @@
 #include "BloodWallSplatter.h"
 #include "Helpers/AssetManager.h"
 #include "Config.h"
+#include "GL/GpuProfiling.h"
 
 namespace HellEngine
 {
@@ -41,7 +42,7 @@ namespace HellEngine
 	{
 		if (m_CurrentTime >= AnimationSeconds)
 			m_CurrentTime = 0;// return;
-
+		GpuProfiler g("BloodWallSplatter");
 		glDepthMask(false);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

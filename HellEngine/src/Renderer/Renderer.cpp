@@ -305,7 +305,7 @@ namespace HellEngine
 		}
 	}*/
 
-	void Renderer::DrawTangentDebugAxis(Shader* shader, glm::mat4 modelMatrix)
+	void Renderer::DrawTangentDebugAxis(Shader* shader, glm::mat4 modelMatrix, float lineLength)
 	{
 		static unsigned int VAO = 0;
 
@@ -316,21 +316,20 @@ namespace HellEngine
 			glGenBuffers(1, &VBO);
 
 			glm::vec3 vertices[12];
-			float lineScale = 5;
 
 			vertices[0] = (glm::vec3(0, 0, 0)); // origin
 			vertices[1] = (glm::vec3(1, 0, 0)); // red
-			vertices[2] = (glm::vec3(lineScale, 0, 0)); // X Axis
+			vertices[2] = (glm::vec3(lineLength, 0, 0)); // X Axis
 			vertices[3] = (glm::vec3(1, 0, 0)); // red
 
 			vertices[4] = (glm::vec3(0, 0, 0)); // origin
 			vertices[5] = (glm::vec3(0, 1, 0)); // green
-			vertices[6] = (glm::vec3(0, lineScale, 0)); // Y Axis
+			vertices[6] = (glm::vec3(0, lineLength, 0)); // Y Axis
 			vertices[7] = (glm::vec3(0, 1, 0)); // green
 
 			vertices[8] = (glm::vec3(0, 0, 0)); // origin
 			vertices[9] = (glm::vec3(0, 0, 1)); // green
-			vertices[10] = (glm::vec3(0, 0, lineScale)); // Z Axis
+			vertices[10] = (glm::vec3(0, 0, lineLength)); // Z Axis
 			vertices[11] = (glm::vec3(0, 0, 1)); // green
 
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -349,36 +348,79 @@ namespace HellEngine
 
 	void Renderer::DrawAnimatedEntityDebugBones_Animated(Shader* shader, AnimatedEntity* animatedEnitty)
 	{
-		if (s_demo)
-			return;
+		//if (s_demo)
+		//	return;
 
-		glm::mat4 worldMatrix = animatedEnitty->m_worldTransform.to_mat4() * animatedEnitty->m_modelTransform.to_mat4() * animatedEnitty->m_skeletonTransform.to_mat4() ;
+		glm::mat4 worldMatrix = animatedEnitty->m_worldTransform.to_mat4() * animatedEnitty->m_modelTransform.to_mat4();// *animatedEnitty->m_skeletonTransform.to_mat4();
 
 		for (int i = 0; i < animatedEnitty->m_animatedDebugTransforms_Animated.size(); i++) 
 		{
 			glm::mat4 boneMatrix = animatedEnitty->m_animatedDebugTransforms_Animated[i];
 		//	glm::mat4 boneMatrix = animatedEnitty->m_animatedTransforms[i];
-			DrawTangentDebugAxis(shader, worldMatrix * boneMatrix);
+			DrawTangentDebugAxis(shader, worldMatrix * boneMatrix, 0.1f);
 		}
 	}
 	
 	void Renderer::DrawAnimatedEntityDebugBones_BindPose(Shader* shader, AnimatedEntity* animatedEnitty)
 	{
-		if (s_demo)
-			return;
+		//if (s_demo)
+		//	return;
 
-		glm::mat4 worldMatrix = animatedEnitty->m_worldTransform.to_mat4() * animatedEnitty->m_modelTransform.to_mat4() * animatedEnitty->m_skeletonTransform.to_mat4();
-
+		glm::mat4 worldMatrix = animatedEnitty->m_worldTransform.to_mat4() * animatedEnitty->m_modelTransform.to_mat4();// *animatedEnitty->m_skeletonTransform.to_mat4();
+		worldMatrix = glm::mat4(1);
 		SkinnedModel* skinnedModel = AssetManager::skinnedModels[animatedEnitty->m_skinnedModelID];
 
 		for (int i = 0; i < skinnedModel->m_BoneInfo.size(); i++)
 		{
 			glm::mat4 boneMatrix = skinnedModel->m_BoneInfo[i].DebugMatrix_BindPose;
-			DrawTangentDebugAxis(shader, worldMatrix * boneMatrix);
+			DrawTangentDebugAxis(shader, worldMatrix * boneMatrix, 0.05f);
 
 			glm::vec3 v = Util::TranslationFromMat4(worldMatrix * boneMatrix);
-			//DrawPoint(&s_solidColorShader, v, glm::vec3(1, 1, 1));
 		}
+
+
+		/*
+		float modelScale = 1;
+		glm::vec3 upperarm_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_l"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 lowerarm_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_l"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 hand_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["hand_l"]].DebugMatrix_BindPose) * modelScale;
+
+		glm::vec3 upperarm_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_r"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 lowerarm_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_r"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 hand_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["hand_r"]].DebugMatrix_BindPose) * modelScale;
+
+		glm::vec3 thigh_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_l"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 calf_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_l"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 foot_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["foot_l"]].DebugMatrix_BindPose) * modelScale;
+
+		glm::vec3 thigh_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_r"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 calf_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_r"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 foot_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["foot_r"]].DebugMatrix_BindPose) * modelScale;
+
+		glm::vec3 pelvis = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["pelvis"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 spine_01 = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["spine_01"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 neck_01 = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["neck_01"]].DebugMatrix_BindPose) * modelScale;
+
+		glm::vec3 Eye_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["Eye_l"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 Eye_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["Eye_r"]].DebugMatrix_BindPose) * modelScale;
+
+		DrawPoint(&s_solidColorShader, upperarm_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, lowerarm_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, hand_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, upperarm_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, lowerarm_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, hand_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, thigh_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, calf_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, foot_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, thigh_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, calf_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, foot_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, pelvis, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, spine_01, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, neck_01, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, Eye_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, Eye_r, glm::vec3(1, 1, 1));*/
 	}
 
 
@@ -533,20 +575,20 @@ namespace HellEngine
 			}
 		}
 
-<<<<<<< HEAD
+//<<<<<<< HEAD
 		TextBlitPlass(&s_quadShader);
 		HUDPass(game, &s_quadShader);
 		//InventoryPass(game);
-=======
+//=======
 		{
-			GpuProfiler g("TextBlitPlass");
+//			GpuProfiler g("TextBlitPlass");
 			TextBlitPlass(&s_quadShader);
 		}
 		{
-			GpuProfiler g("HUDPass");
+//			GpuProfiler g("HUDPass");
 			HUDPass(game, &s_quadShader);
 		}
->>>>>>> 0c1086a1dabd1dd4b0834f9bb71574f2820126da
+//>>>>>>> 0c1086a1dabd1dd4b0834f9bb71574f2820126da
 
 		if (Input::s_keyDown[HELL_KEY_L])
 		{
@@ -610,13 +652,16 @@ namespace HellEngine
 		//	if (!s_demo)
 		//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
 
-		if (!s_demo)
+		//DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_NurseGuy);
+		//DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_NurseGuy);
+
+		//if (!s_demo)
 		{
 			GpuProfiler g("DrawAnimatedEntityDebugBones_Animated");
-			DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
+		//	DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
 		}
 
-		//	DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
+			DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
 
 			//DrawSkeleton(&s_solidColorShader, AssetManager::skinnedModels[game->m_testAnimatedEnttity.m_skinnedModelID], &trans3);
 
@@ -804,6 +849,7 @@ namespace HellEngine
 
 	void Renderer::EffectsPass(Game* game, Shader* shader)
 	{
+		//return;
 		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
 		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 
@@ -818,7 +864,7 @@ namespace HellEngine
 		shader->setMat4("u_MatrixProjection", game->camera.m_projectionMatrix);
 		shader->setMat4("u_MatrixView", game->camera.m_viewMatrix);
 
-		SkinnedModel* model = AssetManager::skinnedModels[0];
+		SkinnedModel* model = AssetManager::skinnedModels[AssetManager::GetSkinnedModelIDByName("Shotgun.fbx")];
 		unsigned int BoneIndex = model->m_BoneMapping["Bolt_bone"];
 		//Renderer::s_DebugTransform.position = p_camera->m_Front;
 		//Renderer::s_DebugTransform2.position = p_camera->m_Right * glm::vec3(-1);
@@ -1493,7 +1539,7 @@ namespace HellEngine
 
 
 
-		game->m_zombieGuy.m_worldTransform = s_DebugTransform;
+	//	game->m_zombieGuy.m_worldTransform = s_DebugTransform;
 		//Util::PrintMat4(trans5.to_mat4());
 	//	std::cout << "\n";
 	//	Util::PrintMat4(game->m_zombieGuy.m_worldTransform.to_mat4());
@@ -1523,12 +1569,15 @@ namespace HellEngine
 	//		shader->setMat4("skinningMats[" + std::to_string(i) + "]", skinnedModel->m_BoneInfo[i].DebugMatrix_BindPose);
 
 
-		if (!s_demo)
+		//if (!s_demo)
 			game->m_zombieGuy.Draw(shader, glm::mat4(1));
 
 	//	s_debugString += "\nmodelTransform\n";
 	//	s_debugString += Util::Mat4ToString(game->m_zombieGuy.m_modelTransform.to_mat4());
 
+		//shader->setInt("hasAnimation", true);
+		//game->m_NurseGuy.Draw(shader, glm::mat4(1));
+		//shader->setInt("hasAnimation", false);
 
 
 		// First pesron weapon
@@ -1554,8 +1603,20 @@ namespace HellEngine
 		game->m_testAnimatedEnttity.m_worldTransform.scale = glm::vec3(0.0125f);
 
 		shader->setInt("hasAnimation", true);
-		game->m_testAnimatedEnttity.Draw(shader, glm::mat4(1));
+	//	game->m_testAnimatedEnttity.Draw(shader, glm::mat4(1));
 		shader->setInt("hasAnimation", false);
+
+/*
+		game->m_testAnimatedEnttity2.m_worldTransform = Renderer::s_DebugTransform2;
+//		game->m_testAnimatedEnttity2.m_worldTransform.position = glm::vec3(1, 1.25f, 0);
+//		game->m_testAnimatedEnttity2.m_worldTransform.rotation = glm::vec3(0, 0, 0);
+		game->m_testAnimatedEnttity2.m_worldTransform.scale = glm::vec3(0.0125f);
+
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("White"));
+		//glDisable(GL_DEPTH_TEST);
+		game->m_testAnimatedEnttity2.Draw(shader, glm::mat4(1));
+		shader->setInt("hasAnimation", false);
+		*/
 
 		// Glass
 		/*Transform transform;

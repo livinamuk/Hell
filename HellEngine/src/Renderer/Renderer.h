@@ -62,7 +62,7 @@ namespace HellEngine
 		static void DrawPoint(Shader* shader, glm::vec3 position, glm::vec3 color);
 		static void DrawLine(Shader* shader, Line line, glm::mat4 modelMatrix);
 		//static void DrawSkeleton(Shader* shader, SkinnedModel* skinnedModel, Transform* transform);
-		static void DrawTangentDebugAxis(Shader* shader, glm::mat4 modelMatrix);
+		static void DrawTangentDebugAxis(Shader* shader, glm::mat4 modelMatrix, float lineLength);
 
 		static void DrawAnimatedEntityDebugBones_Animated(Shader* shader, AnimatedEntity* animatedEnitty);
 		static void DrawAnimatedEntityDebugBones_BindPose(Shader* shader, AnimatedEntity* animatedEnitty);

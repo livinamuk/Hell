@@ -120,14 +120,7 @@ int main()
 	return 0;
 
 	{
-		Opp r = Opp(900);
-
-		Opp m = Opp(275);
-		m = Opp(275);
-		m = Opp(275);
-		m = Opp(275);
-		m = Opp(50);
-
-		Opp c = Opp(2000);
+		Opp r = Opp(2400 + 300);
+		Opp m = Opp(850);
 	}
 }

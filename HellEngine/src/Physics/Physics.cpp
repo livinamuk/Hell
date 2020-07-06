@@ -542,8 +542,12 @@ namespace HellEngine
 
 	void Physics::DeleteRigidBody(btRigidBody*& rigidBody)
 	{
-		delete rigidBody->getMotionState();
-		delete rigidBody->getCollisionShape();
+		//if (rigidBody->getMotionState())
+			delete rigidBody->getMotionState();
+
+		//if (rigidBody->getCollisionShape())
+			delete rigidBody->getCollisionShape();
+
 		s_dynamicsWorld->removeRigidBody(rigidBody);
 		delete rigidBody;
 		rigidBody = nullptr;

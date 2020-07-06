@@ -16,7 +16,8 @@ namespace HellEngine
 	class Util
 	{
 	public:
-		static const char* CopyConstChar(const char* text);
+		static btQuaternion GetQuatBetween2Points(glm::vec3 a, glm::vec3 b);
+		static const char* CopyConstChar(const char* text);;
 		static void InterpolateQuaternion(glm::quat& pOut, const glm::quat& Start, const glm::quat& End, float Factor);
 	//	static void RemoveTranslation(glm::mat4& matrix);
 		static bool StrCmp(const char* queryA, const char* queryB);
@@ -72,6 +73,8 @@ namespace HellEngine
 		static glm::vec3 TranslationFromMat4(glm::mat4& matrix);
 
 		static btVector3 GetRelPosBetween2Vectors(glm::vec3 vecA, glm::vec3 vecB);
+
+		static glm::mat4 FlipAxis(glm::mat4& matrix);
 	
 	private:
 			static unsigned int upFacingPlaneVAO;

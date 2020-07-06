@@ -50,7 +50,8 @@ namespace HellEngine
 
 	void Camera::CalculateProjectionMatrix(int screenWidth, int screenHeight)
 	{
-		m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, FAR_PLANE);
+		//m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, FAR_PLANE);
+		m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, 1000.0f);
 	}
 
 	void Camera::CalculateWeaponSwayTransform(float deltatime)

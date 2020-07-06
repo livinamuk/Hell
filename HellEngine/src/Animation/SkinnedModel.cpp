@@ -40,8 +40,10 @@ namespace HellEngine
                 AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shotgun"));
             if (mesh.MeshName == "shotgunshells")
                 AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shell"));
+            
 
-            glDrawElementsBaseVertex(GL_TRIANGLES, mesh.NumIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh.BaseIndex), mesh.BaseVertex);
+           // glDrawElements(GL_TRIANGLES, (GLsizei)mesh.NumIndices, GL_UNSIGNED_INT, 0);
+          glDrawElementsBaseVertex(GL_TRIANGLES, mesh.NumIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh.BaseIndex), mesh.BaseVertex);
         }
     }
 

@@ -495,6 +495,17 @@ namespace HellEngine
 		ImGui::Text("\n");
 		ImGui::InputFloat("##inspectfloaat", &Config::INSPECT_FOV, 0.0f, 9.0f, 10.0f);
 
+
+		ImGui::Text("\n");
+		ImGui::Text("TEST_QUAT");
+		ImGui::PushItemWidth(50);
+		ImGui::InputFloat("w", &Config::TEST_QUAT.w, 0.0f, 9.0f, 10.0f);
+		ImGui::SameLine(); ImGui::InputFloat("x", &Config::TEST_QUAT.x, 0.0f, 9.0f, 10.0f);
+		ImGui::SameLine(); ImGui::InputFloat("y", &Config::TEST_QUAT.y, 0.0f, 9.0f, 10.0f);
+		ImGui::SameLine(); ImGui::InputFloat("z", &Config::TEST_QUAT.z, 0.0f, 9.0f, 10.0f);
+		ImGui::Text("(%f, %f, %f, %f)", Config::TEST_QUAT.w, Config::TEST_QUAT.x, Config::TEST_QUAT.y, Config::TEST_QUAT.z);
+		ImGui::PushItemWidth(100);
+
 		ImGui::Text("\n");
 		ImGui::Text("TEST_FLOAT"); ImGui::SameLine();
 		ImGui::InputFloat("##Gasdasd", &Config::TEST_FLOAT, 0.0f, 9.0f, 10.0f);
@@ -597,6 +608,8 @@ namespace HellEngine
 
 	void CoreImGui::ShowRagdollMenu(Game* game)
 	{
+		return;
+
 		Ragdoll* ragdoll = game->m_zombieGuy.m_ragdoll;
 		
 		for (int i = 0; i < Ragdoll::BODYPART_COUNT; i++)

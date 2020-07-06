@@ -6,8 +6,8 @@ namespace HellEngine
 {
 
 
-    const aiScene* FileImporter::m_pScene;
-    Assimp::Importer FileImporter::m_Importer;
+    //const aiScene* FileImporter::m_pScene;
+   // Assimp::Importer FileImporter::m_Importer;
 
     void FileImporter::VertexBoneData::AddBoneData(unsigned int BoneID, float Weight)
     {
@@ -26,6 +26,9 @@ namespace HellEngine
 
 	SkinnedModel* FileImporter::LoadSkinnedModel(const char* filename)
 	{
+        const aiScene* m_pScene;
+        Assimp::Importer m_Importer;
+
         SkinnedModel* skinnedModel = new SkinnedModel();
 
 		skinnedModel->m_VAO = 0;
@@ -49,23 +52,40 @@ namespace HellEngine
 
         const aiScene* tempScene = m_Importer.ReadFile(filepath.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
 
+        // aiProcess_OptimizeMeshes USE WITH BELOW 
+        // aiProcess_OptimizeGraph 
+
+        // aiProcess_PreTransformVertices
+
         //Getting corrupted later. So deep copying now.
         m_pScene = new aiScene(*tempScene);
 
         if (m_pScene) 
         {
             skinnedModel->m_GlobalInverseTransform = Util::aiMatrix4x4ToGlm(m_pScene->mRootNode->mTransformation);
+
             skinnedModel->m_GlobalInverseTransform = glm::inverse(skinnedModel->m_GlobalInverseTransform);
+
+
 
             Ret = InitFromScene(skinnedModel, m_pScene, filename);
         }
         else {
-           // printf("Error parsing '%s': '%s'\n", filename.c_str(), m_Importer.GetErrorString());
+            printf("Error parsing '%s': '%s'\n", filename, m_Importer.GetErrorString());
         }
 
-        std::cout << "Loaded: " << filename << "\n";
+        std::cout << "\nLoaded: " << filename << "\n";
         std::cout << " " << m_pScene->mNumMeshes << " meshes\n";
-        std::cout << " " << skinnedModel->m_NumBones << " bones\n\n";
+        std::cout << " " << skinnedModel->m_NumBones << " bones\n";
+
+        for (int i = 0; i < skinnedModel->m_meshEntries.size(); i++)  {
+            std::cout << " -" << skinnedModel->m_meshEntries[i].MeshName << ": " << skinnedModel->m_meshEntries[i].NumIndices << " indices " << skinnedModel->m_meshEntries[i].BaseIndex << " base index " << skinnedModel->m_meshEntries[i].BaseVertex << " base vertex\n";
+        }
+
+
+        Util::PrintMat4(glm::inverse(skinnedModel->m_GlobalInverseTransform));
+
+        
 
         if (m_pScene->mNumCameras > 0)
             aiCamera* m_camera = m_pScene->mCameras[0];
@@ -74,10 +94,10 @@ namespace HellEngine
 
         GrabSkeleton(skinnedModel, m_pScene->mRootNode, -1);
 
-        std::cout << "BONEINFO SIZEEEEE: " << skinnedModel->m_BoneInfo.size() << "\n";
+   //     std::cout << "BONEINFO SIZEEEEE: " << skinnedModel->m_BoneInfo.size() << "\n";
         
 
-       m_Importer.FreeScene();
+        m_Importer.FreeScene();
 
         return skinnedModel;
 	}
@@ -86,7 +106,6 @@ namespace HellEngine
     {
             skinnedModel->m_meshEntries.resize(pScene->mNumMeshes);
 
-            std::cout << "MESH COUNT: " << pScene->mNumMeshes << "\n";
 
             vector<glm::vec3> Positions;
             vector<glm::vec3> Normals;
@@ -117,12 +136,12 @@ namespace HellEngine
             Indices.reserve(NumIndices);
 
 
-
             // Initialize the meshes in the scene one by one
             for (unsigned int i = 0; i < skinnedModel->m_meshEntries.size(); i++) {
                 const aiMesh* paiMesh = pScene->mMeshes[i];
                 InitMesh(skinnedModel, i, paiMesh, Positions, Normals, TexCoords, Bones, Indices);
             }
+
 
             glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[POS_VB]);
             glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
@@ -159,7 +178,7 @@ namespace HellEngine
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skinnedModel->m_Buffers[INDEX_BUFFER]);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
 
-            std::cout << "INDICES.size: " << Indices.size() << "\n";
+            //std::cout << "INDICES.size: " << Indices.size() << "\n";
 
             return true;
         }
@@ -174,6 +193,9 @@ namespace HellEngine
         vector<unsigned int>& Indices)
     {
         const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+        
+
+
 
         // Populate the vertex attribute vectors
         for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
@@ -272,6 +294,7 @@ namespace HellEngine
 
         if (skinnedModel->m_BoneMapping.find(NodeName) != skinnedModel->m_BoneMapping.end()) {
             unsigned int BoneIndex = skinnedModel->m_BoneMapping[NodeName];
+           // skinnedModel->m_BoneInfo[BoneIndex].DebugMatrix_BindPose = Util::FlipAxis(inverse(skinnedModel->m_BoneInfo[BoneIndex].BoneOffset));
             skinnedModel->m_BoneInfo[BoneIndex].DebugMatrix_BindPose = inverse(skinnedModel->m_BoneInfo[BoneIndex].BoneOffset);
         }
 

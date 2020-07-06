@@ -7,6 +7,50 @@ namespace HellEngine
 	unsigned int Util::upFacingPlaneVAO = INVALID_VALUE;
 	unsigned int Util::downFacingPlaneVAO = INVALID_VALUE;
 
+	glm::vec3 orthogonal(glm::vec3 v)
+	{
+		float x = abs(v.x);
+		float y = abs(v.y);
+		float z = abs(v.z);
+
+		glm::vec3 X_AXIS = glm::vec3(1, 0, 0);
+		glm::vec3 Y_AXIS = glm::vec3(0, 1, 0);
+		glm::vec3 Z_AXIS = glm::vec3(0, 0, 1);
+
+		glm::vec3 other = x < y ? (x < z ? X_AXIS : Z_AXIS) : (y < z ? Y_AXIS : Z_AXIS);
+		return cross(v, other);
+	}
+
+	btQuaternion Util::GetQuatBetween2Points(glm::vec3 u, glm::vec3 v)
+	{
+	/*	glm::vec3 cross = glm::cross(a, b);
+		float x = cross.x;
+		float y = cross.y;
+		float z = cross.z;
+		float w = sqrt((glm::length(a) * glm::length(a)) * (glm::length(b) * glm::length(b))) + glm::dot(a, b);
+
+	//	float theta = glm::dot(a, b);
+	//	glm::vec3 rotationAxis = glm::vec3(0, 1, 0);
+	//	w = std::sin(2 * theta)* rotationAxis, std::(2 * theta));
+	
+	//	(sin(2*theta)*rotationAxis,cos(2*theta)) 
+		return btQuaternion(x, y, z, w);*/
+
+
+		float k_cos_theta = glm::dot(u, v);
+		float k = sqrt((glm::length(u) * glm::length(u)) * (glm::length(v) * glm::length(v)));
+
+		if (k_cos_theta / k == -1)
+		{
+			// 180 degree rotation around any orthogonal vector
+			glm::quat q = glm::quat(0, glm::normalize(orthogonal(u)));
+			return btQuaternion(q.x, q.y, q.z, q.w);
+		}
+
+		glm::quat q = glm::normalize(glm::quat(k_cos_theta + k, cross(u, v)));
+		return btQuaternion(q.x, q.y, q.z, q.w);
+	}
+
 	const char* Util::CopyConstChar(const char* text)
 	{
 		char* b = new char[strlen(text) + 1]{};
@@ -721,9 +765,21 @@ namespace HellEngine
 		float z = matrix[3][2];
 		return glm::vec3(x, y, z);
 	}
+
 	btVector3 Util::GetRelPosBetween2Vectors(glm::vec3 vecA, glm::vec3 vecB)
 	{
 		glm::vec3 relativePos = (vecA + vecB) * glm::vec3(0.5f);
 		return Util::glmVec3_to_btVec3(relativePos);
+	}
+
+	glm::mat4 Util::FlipAxis(glm::mat4& matrix)
+	{
+		glm::mat4 flip;
+		flip[0][0] = 1; flip[1][0] = 0; flip[2][0] = 0; flip[3][0] = 0;
+		flip[0][1] = 0; flip[1][1] = 0; flip[2][1] = 1; flip[3][1] = 0;
+		flip[0][2] = 0; flip[1][2] =-1; flip[2][2] = 0; flip[3][2] = 0;
+		flip[0][3] = 0; flip[1][3] = 0; flip[2][3] = 0; flip[3][3] = 1;
+
+		return flip * matrix;
 	}
 }

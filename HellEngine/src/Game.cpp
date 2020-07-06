@@ -40,17 +40,22 @@ namespace HellEngine
 		m_testAnimatedEnttity.SetSkinnedModel("Shotgun.fbx");
 		m_testAnimatedEnttity.m_currentAnimationIndex = 5;
 
+		m_testAnimatedEnttity2.SetSkinnedModel("Glock.fbx");
+		m_testAnimatedEnttity2.m_currentAnimationIndex = 0;
+
+		AssetManager::PrintSkinnedModelMeshNames("Glock.fbx");
+
+		m_NurseGuy.SetSkinnedModel("NurseGuy.fbx");
+		m_NurseGuy.SetModelScale(0.01f);
+		m_NurseGuy.m_currentAnimationIndex = 1;
+
 
 		m_zombieGuy.SetSkinnedModel("Zombie.fbx");
-		m_zombieGuy.SetModelScale(0.00925f);
-		m_zombieGuy.FlipModelUpAxis(true);
-		m_zombieGuy.FlipSkeletonUpAxis(true);
-		m_zombieGuy.m_worldTransform.rotation.y = HELL_PI / 2;
+		m_zombieGuy.SetAnimationToBindPose();
+		m_zombieGuy.NewRagdollFromAnimatedTransforms();
 
-		//m_zombieGuy.SetAnimationToBindPose();
-		//m_zombieGuy.NewRagdollFromAnimatedTransforms();
 
-		AssetManager::PrintSkinnedModelMeshNames("Shotgun.fbx");
+		//AssetManager::PrintSkinnedModelMeshNames("Shotgun.fbx");
 
 		/*std::cout << "\n";
 		AssetManager::PrintSkinnedModelMeshNames("Zombie.fbx");
@@ -67,6 +72,10 @@ namespace HellEngine
 
 	void Game::OnUpdate()
 	{
+		
+
+		//m_NurseGuy.m_worldTransform = Renderer::s_DebugTransform;
+
 		// Keypresses
 		Input::HandleKeypresses();
 		if (Input::s_keyPressed[HELL_KEY_E])
@@ -80,7 +89,18 @@ namespace HellEngine
 
 
 
-	
+
+		if (Input::s_keyPressed[HELL_KEY_R])
+		{
+			for (int i = 0; i < 11; ++i)
+			{
+				Physics::s_dynamicsWorld->removeRigidBody(m_zombieGuy.m_ragdoll->m_bodies[i]);
+				//Physics::DeleteRigidBody(m_bodies[i]);
+			}
+			m_zombieGuy.NewRagdollFromAnimatedTransforms();
+
+		}
+			
 
 		for (Shell& shell : Shell::s_shells)
 			shell.Update(m_frameTime);
@@ -137,7 +157,9 @@ namespace HellEngine
 
 		// Update all skeletal meshes
 		m_testAnimatedEnttity.Update(deltaTime);
+		m_testAnimatedEnttity2.Update(deltaTime);
 		m_shotgunAnimatedEntity.Update(deltaTime);
+		m_NurseGuy.Update(deltaTime);
 		//m_zombieGuy.Update(deltaTime);
 		//m_zombieGuy.SetAnimationToBindPose();
 		m_zombieGuy.AnimatedFromRagdoll();

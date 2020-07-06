@@ -61,6 +61,10 @@ namespace HellEngine
 		AnimatedEntity m_shotgunAnimatedEntity;
 		AnimatedEntity m_testAnimatedEnttity;
 
+		AnimatedEntity m_testAnimatedEnttity2;
+
+		AnimatedEntity m_NurseGuy;
+
 		EnemyCharacter m_zombieGuy;
 
 	};

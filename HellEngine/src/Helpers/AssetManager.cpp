@@ -124,14 +124,21 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Couch.obj"));
 		models.emplace_back(Model("res/models/Mannequin.obj"));
 		models.emplace_back(Model("res/models/Shell.obj"));
-		models.emplace_back(Model("res/models/Glock.obj"));
-		models.emplace_back(Model("res/models/Glass.obj"));
+		//models.emplace_back(Model("res/models/Glock.obj"));
+		//models.emplace_back(Model("res/models/Glass.obj"));
 
 
+		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("NurseGuy.fbx"));
+		LoadAnimation("NurseGuy.fbx", "NurseGuyWalk.fbx");
+		LoadAnimation("NurseGuy.fbx", "NurseGuyRun.fbx");
 
 		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("Zombie.fbx"));
 		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("Shotgun.fbx"));
 
+
+		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("Glock.fbx"));
+		LoadAnimation("Glock.fbx", "Glock_Idle.fbx");
+	
 
 		/*skinnedModels.emplace_back(new SkinnedModel());
 		FileImporter::LoadSkinnedModel(skinnedModels[0], "Zombie.fbx");

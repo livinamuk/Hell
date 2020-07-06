@@ -31,6 +31,8 @@ namespace HellEngine
 		static inline float TEST_FLOAT3 = 5.0f;
 		static inline float TEST_FLOAT4 = 0.0f;
 
+		static inline glm::quat TEST_QUAT = glm::quat(1, 0, 0, 0);
+
 		static inline float INSPECT_FOV = 1.0f;
 
 	};

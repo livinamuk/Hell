@@ -167,19 +167,11 @@ namespace HellEngine
 		m_modelTransform.scale = glm::vec3(scale);
 	}
 
-	void AnimatedEntity::FlipModelUpAxis(bool flip) // This includes the skeleton btw
+	/*void AnimatedEntity::FlipModelUpAxis(bool flip) 
 	{
 		if (flip)
 			m_modelTransform.rotation = glm::vec3(HELL_PI / -2, 0, 0);
 		else
 			m_modelTransform.rotation = glm::vec3(0);
-	}
-
-	void AnimatedEntity::FlipSkeletonUpAxis(bool flip)
-	{
-		if (flip)
-			m_skeletonTransform.rotation = glm::vec3(HELL_PI / 2, 0, 0);
-		else
-			m_skeletonTransform.rotation = glm::vec3(0);
-	}
+	}*/
 }

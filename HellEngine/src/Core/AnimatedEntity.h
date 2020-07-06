@@ -19,14 +19,13 @@ namespace HellEngine
 		void ResetAnimationTimer();
 		void PauseOnFinalFrame();
 		void SetModelScale(float scale);
-		void FlipModelUpAxis(bool flip);
-		void FlipSkeletonUpAxis(bool flip);
+		//void FlipModelUpAxis(bool flip);
 		void SetAnimationToBindPose();
 
 	public:	// fields
 		Transform m_worldTransform;
 		Transform m_modelTransform;
-		Transform m_skeletonTransform;
+		//Transform m_skeletonTransform;
 		int m_skinnedModelID = -1;
 		std::vector<int> m_meshMaterialIDs;
 		std::vector<glm::mat4> m_animatedTransforms;
@@ -42,7 +41,6 @@ namespace HellEngine
 	private: // fields
 		bool m_loopCurrentAnimation;
 		float m_animationSpeed;
-		//Transform m_worldTransform;
 		bool m_animationIsComplete;
 		
 	};

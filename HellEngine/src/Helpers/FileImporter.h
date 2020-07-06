@@ -54,8 +54,8 @@ namespace HellEngine
         static void LoadAnimation(SkinnedModel* skinnedModel, const char* Filename);
 
     public: // static variables
-        static const aiScene* m_pScene;
-        static Assimp::Importer m_Importer;
+       // static const aiScene* m_pScene;
+       // static Assimp::Importer m_Importer;
 
 
         

@@ -356,8 +356,58 @@ namespace HellEngine
 		for (int i = 0; i < animatedEnitty->m_animatedDebugTransforms_Animated.size(); i++) 
 		{
 			glm::mat4 boneMatrix = animatedEnitty->m_animatedDebugTransforms_Animated[i];
-		//	glm::mat4 boneMatrix = animatedEnitty->m_animatedTransforms[i];
-			DrawTangentDebugAxis(shader, worldMatrix * boneMatrix, 0.1f);
+			DrawTangentDebugAxis(shader, worldMatrix * boneMatrix, 0.05f);
+		}
+
+		SkinnedModel* skinnedModel = AssetManager::skinnedModels[animatedEnitty->m_skinnedModelID];
+		/*worldMatrix = glm::mat4(1);
+		float modelScale = 1;
+		glm::vec3 upperarm_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 lowerarm_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 hand_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["hand_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+
+		glm::vec3 upperarm_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_r"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 lowerarm_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_r"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 hand_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["hand_r"]].DebugMatrix_AnimatedTransform) * modelScale;
+
+		glm::vec3 thigh_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 calf_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 foot_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["foot_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+
+		glm::vec3 thigh_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_r"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 calf_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_r"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 foot_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["foot_r"]].DebugMatrix_AnimatedTransform) * modelScale;
+
+		glm::vec3 pelvis = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["pelvis"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 spine_01 = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["spine_01"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 neck_01 = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["neck_01"]].DebugMatrix_AnimatedTransform) * modelScale;
+
+		glm::vec3 Eye_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["Eye_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 Eye_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["Eye_r"]].DebugMatrix_AnimatedTransform) * modelScale;
+
+		DrawPoint(&s_solidColorShader, upperarm_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, lowerarm_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, hand_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, upperarm_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, lowerarm_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, hand_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, thigh_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, calf_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, foot_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, thigh_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, calf_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, foot_r, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, pelvis, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, spine_01, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, neck_01, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, Eye_l, glm::vec3(1, 1, 1));
+		DrawPoint(&s_solidColorShader, Eye_r, glm::vec3(1, 1, 1));
+		*/
+
+		for (int i = 0; i < skinnedModel->m_NumBones; i++)
+		{
+			glm::vec3 p = Util::GetTranslationFromMatrix(skinnedModel->m_BoneInfo[i].DebugMatrix_AnimatedTransform); 
+			DrawPoint(&s_solidColorShader, p, glm::vec3(1, 1, 1));
 		}
 	}
 	
@@ -377,50 +427,6 @@ namespace HellEngine
 
 			glm::vec3 v = Util::TranslationFromMat4(worldMatrix * boneMatrix);
 		}
-
-
-		/*
-		float modelScale = 1;
-		glm::vec3 upperarm_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_l"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 lowerarm_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_l"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 hand_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["hand_l"]].DebugMatrix_BindPose) * modelScale;
-
-		glm::vec3 upperarm_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_r"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 lowerarm_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_r"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 hand_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["hand_r"]].DebugMatrix_BindPose) * modelScale;
-
-		glm::vec3 thigh_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_l"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 calf_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_l"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 foot_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["foot_l"]].DebugMatrix_BindPose) * modelScale;
-
-		glm::vec3 thigh_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_r"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 calf_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_r"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 foot_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["foot_r"]].DebugMatrix_BindPose) * modelScale;
-
-		glm::vec3 pelvis = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["pelvis"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 spine_01 = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["spine_01"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 neck_01 = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["neck_01"]].DebugMatrix_BindPose) * modelScale;
-
-		glm::vec3 Eye_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["Eye_l"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 Eye_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["Eye_r"]].DebugMatrix_BindPose) * modelScale;
-
-		DrawPoint(&s_solidColorShader, upperarm_l, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, lowerarm_l, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, hand_l, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, upperarm_r, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, lowerarm_r, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, hand_r, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, thigh_l, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, calf_l, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, foot_l, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, thigh_r, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, calf_r, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, foot_r, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, pelvis, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, spine_01, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, neck_01, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, Eye_l, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, Eye_r, glm::vec3(1, 1, 1));*/
 	}
 
 
@@ -658,10 +664,10 @@ namespace HellEngine
 		//if (!s_demo)
 		{
 			GpuProfiler g("DrawAnimatedEntityDebugBones_Animated");
-		//	DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
+			DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
 		}
 
-			DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
+			//DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
 
 			//DrawSkeleton(&s_solidColorShader, AssetManager::skinnedModels[game->m_testAnimatedEnttity.m_skinnedModelID], &trans3);
 
@@ -1575,9 +1581,12 @@ namespace HellEngine
 	//	s_debugString += "\nmodelTransform\n";
 	//	s_debugString += Util::Mat4ToString(game->m_zombieGuy.m_modelTransform.to_mat4());
 
-		//shader->setInt("hasAnimation", true);
-		//game->m_NurseGuy.Draw(shader, glm::mat4(1));
-		//shader->setInt("hasAnimation", false);
+
+		///////////////
+		// NURSE GUY //
+		///////////////
+		
+		game->m_NurseGuy.Draw(shader, glm::mat4(1));
 
 
 		// First pesron weapon

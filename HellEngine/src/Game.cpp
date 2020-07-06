@@ -46,6 +46,7 @@ namespace HellEngine
 		AssetManager::PrintSkinnedModelMeshNames("Glock.fbx");
 
 		m_NurseGuy.SetSkinnedModel("NurseGuy.fbx");
+		m_NurseGuy.m_worldTransform.position.x = 1;
 		m_NurseGuy.SetModelScale(0.01f);
 		m_NurseGuy.m_currentAnimationIndex = 1;
 
@@ -160,9 +161,10 @@ namespace HellEngine
 		m_testAnimatedEnttity2.Update(deltaTime);
 		m_shotgunAnimatedEntity.Update(deltaTime);
 		m_NurseGuy.Update(deltaTime);
+		
 		//m_zombieGuy.Update(deltaTime);
-		//m_zombieGuy.SetAnimationToBindPose();
-		m_zombieGuy.AnimatedFromRagdoll();
+		m_zombieGuy.SetAnimationToBindPose();
+	//	m_zombieGuy.AnimatedFromRagdoll();
 	}
 
 	void Game::OnRender()

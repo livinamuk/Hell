@@ -21,34 +21,20 @@ namespace HellEngine
 		return cross(v, other);
 	}
 
-	btQuaternion Util::GetQuatBetween2Points(glm::vec3 u, glm::vec3 v)
+	btQuaternion Util::GetQuatBetween2Points(glm::vec3 P0, glm::vec3 P1)
 	{
-	/*	glm::vec3 cross = glm::cross(a, b);
-		float x = cross.x;
-		float y = cross.y;
-		float z = cross.z;
-		float w = sqrt((glm::length(a) * glm::length(a)) * (glm::length(b) * glm::length(b))) + glm::dot(a, b);
+		glm::vec3 u = glm::normalize(P1 - P0);
+		glm::vec3 v = glm::vec3(0, 1, 0);
 
-	//	float theta = glm::dot(a, b);
-	//	glm::vec3 rotationAxis = glm::vec3(0, 1, 0);
-	//	w = std::sin(2 * theta)* rotationAxis, std::(2 * theta));
-	
-	//	(sin(2*theta)*rotationAxis,cos(2*theta)) 
-		return btQuaternion(x, y, z, w);*/
+		glm::vec3 H = u + v;
+		H = glm::normalize(H);
 
-
-		float k_cos_theta = glm::dot(u, v);
-		float k = sqrt((glm::length(u) * glm::length(u)) * (glm::length(v) * glm::length(v)));
-
-		if (k_cos_theta / k == -1)
-		{
-			// 180 degree rotation around any orthogonal vector
-			glm::quat q = glm::quat(0, glm::normalize(orthogonal(u)));
-			return btQuaternion(q.x, q.y, q.z, q.w);
-		}
-
-		glm::quat q = glm::normalize(glm::quat(k_cos_theta + k, cross(u, v)));
-		return btQuaternion(q.x, q.y, q.z, q.w);
+		float w = glm::dot(H, u);
+		float x = u.y * H.z - u.z * H.y;
+		float y = u.z * H.x - u.x * H.z;
+		float z = u.x * H.y - u.y * H.x;
+		
+		return btQuaternion(0, 1, 0, 0) * btQuaternion(x, y, z, w);
 	}
 
 	const char* Util::CopyConstChar(const char* text)

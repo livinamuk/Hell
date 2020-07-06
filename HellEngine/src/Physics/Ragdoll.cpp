@@ -20,30 +20,30 @@ namespace HellEngine
 		// Get world positions of model skeleton
 		SkinnedModel* skinnedModel = AssetManager::skinnedModels[AssetManager::GetSkinnedModelIDByName("Zombie.fbx")];
 
-		//worldMatrix = glm::mat4(1);
+		worldMatrix = glm::mat4(1);
 
-		glm::vec3 upperarm_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_l"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 lowerarm_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_l"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 hand_l = Util::GetTranslationFromMatrix(worldMatrix* skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["hand_l"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 upperarm_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 lowerarm_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 hand_l = Util::GetTranslationFromMatrix(worldMatrix* skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["hand_l"]].DebugMatrix_AnimatedTransform) * modelScale;
 	
-		glm::vec3 upperarm_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_r"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 lowerarm_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_r"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 hand_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["hand_r"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 upperarm_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_r"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 lowerarm_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_r"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 hand_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["hand_r"]].DebugMatrix_AnimatedTransform) * modelScale;
 		
-		glm::vec3 thigh_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_l"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 calf_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_l"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 foot_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["foot_l"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 thigh_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 calf_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 foot_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["foot_l"]].DebugMatrix_AnimatedTransform) * modelScale;
 	
-		glm::vec3 thigh_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_r"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 calf_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_r"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 foot_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["foot_r"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 thigh_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_r"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 calf_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_r"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 foot_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["foot_r"]].DebugMatrix_AnimatedTransform) * modelScale;
 
-		glm::vec3 pelvis = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["pelvis"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 spine_01 = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["spine_01"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 neck_01 = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["neck_01"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 pelvis = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["pelvis"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 spine_01 = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["spine_01"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 neck_01 = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["neck_01"]].DebugMatrix_AnimatedTransform) * modelScale;
 		
-		glm::vec3 Eye_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["Eye_l"]].DebugMatrix_BindPose) * modelScale;
-		glm::vec3 Eye_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["Eye_r"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 Eye_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["Eye_l"]].DebugMatrix_AnimatedTransform) * modelScale;
+		glm::vec3 Eye_r = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["Eye_r"]].DebugMatrix_AnimatedTransform) * modelScale;
 
 		
 
@@ -74,13 +74,14 @@ namespace HellEngine
 		// Setup all the rigid bodies
 		btTransform offset;
 		offset.setIdentity();
-		offset.setOrigin(positionOffset);
+		//offset.setOrigin(positionOffset);
 	//	offset.setRotation(btQuaternion(Config::TEST_QUAT.x, Config::TEST_QUAT.y, Config::TEST_QUAT.z, Config::TEST_QUAT.w));
 	//	offset.setRotation(btQuaternion(0.7071, -0.7071, 0, 0));
 
 		btTransform transform;
 		glm::mat4 boneMatrix;
 		glm::quat rotate90 = glm::quat(0.7071, 0, 0, 0.7071);
+		rotate90 = glm::quat(1, 0, 0, 0);
 		glm::quat q;
 		btQuaternion rot;
 
@@ -129,14 +130,7 @@ namespace HellEngine
 		m_bodies[BODYPART_HEAD] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_HEAD]);
 
 
-	/*	transform.setIdentity();
-		transform.setOrigin(Util::GetRelPosBetween2Vectors(thigh_l, calf_l));
-		boneMatrix = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_l"]].DebugMatrix_BindPose;
-		q = glm::quat_cast(boneMatrix) * rotate90;
-		rot = btQuaternion(q.x, q.y, q.z, q.w);
-		transform.setRotation(rot);
-		m_bodies[BODYPART_LEFT_UPPER_LEG] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_LEFT_UPPER_LEG]);
-*/
+
 		transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(thigh_l, calf_l));
 		transform.setRotation(Util::GetQuatBetween2Points(calf_l, thigh_l));
@@ -144,65 +138,39 @@ namespace HellEngine
 
 		transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(thigh_r, calf_r));
-		boneMatrix = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_r"]].DebugMatrix_BindPose;
-		q = glm::quat_cast(boneMatrix) * rotate90;
-		rot = btQuaternion(q.x, q.y, q.z, q.w);
-		transform.setRotation(rot);
+		transform.setRotation(Util::GetQuatBetween2Points(calf_r, thigh_r));
 		m_bodies[BODYPART_RIGHT_UPPER_LEG] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_RIGHT_UPPER_LEG]);
-
-
 
 		transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(foot_l, calf_l));
-		boneMatrix = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_l"]].DebugMatrix_BindPose;
-		q = glm::quat_cast(boneMatrix) * rotate90;
-		rot = btQuaternion(q.x, q.y, q.z, q.w);
-		transform.setRotation(rot);
+		transform.setRotation(Util::GetQuatBetween2Points(calf_l, foot_l));
 		m_bodies[BODYPART_LEFT_LOWER_LEG] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_LEFT_LOWER_LEG]);
 
 		transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(foot_r, calf_r));
-		boneMatrix = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_r"]].DebugMatrix_BindPose;
-		q = glm::quat_cast(boneMatrix) * rotate90;
-		rot = btQuaternion(q.x, q.y, q.z, q.w);
-		transform.setRotation(rot);
+		transform.setRotation(Util::GetQuatBetween2Points(foot_r, calf_r));
 		m_bodies[BODYPART_RIGHT_LOWER_LEG] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_RIGHT_LOWER_LEG]);
-
-
-
 
 		transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(lowerarm_l, upperarm_l));
-		boneMatrix = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_l"]].DebugMatrix_BindPose;
-		q = glm::quat_cast(boneMatrix) * rotate90;
-		rot = btQuaternion(q.x, q.y, q.z, q.w);
-		transform.setRotation(rot);
+		transform.setRotation(Util::GetQuatBetween2Points(upperarm_l, lowerarm_l));
 		m_bodies[BODYPART_LEFT_UPPER_ARM] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_LEFT_UPPER_ARM]);
-
+		
 		transform.setIdentity();
-		transform.setOrigin(Util::GetRelPosBetween2Vectors(hand_l, lowerarm_l));
-		boneMatrix = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_l"]].DebugMatrix_BindPose;
-		q = glm::quat_cast(boneMatrix) * rotate90;
-		rot = btQuaternion(q.x, q.y, q.z, q.w);
-		transform.setRotation(rot);
+		transform.setOrigin(Util::GetRelPosBetween2Vectors(lowerarm_l, hand_l));
+		transform.setRotation(Util::GetQuatBetween2Points(lowerarm_l, hand_l));
 		m_bodies[BODYPART_LEFT_LOWER_ARM] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_LEFT_LOWER_ARM]);
-
 
 		transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(lowerarm_r, upperarm_r));
-		boneMatrix = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_r"]].DebugMatrix_BindPose;
-		q = glm::quat_cast(boneMatrix) * rotate90;
-		rot = btQuaternion(q.x, q.y, q.z, q.w);
-		transform.setRotation(rot);
+		transform.setRotation(Util::GetQuatBetween2Points(upperarm_r, lowerarm_r));
 		m_bodies[BODYPART_RIGHT_UPPER_ARM] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_RIGHT_UPPER_ARM]);
 
 		transform.setIdentity();
-		transform.setOrigin(Util::GetRelPosBetween2Vectors(hand_r, lowerarm_r));
-		boneMatrix = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_r"]].DebugMatrix_BindPose;
-		q = glm::quat_cast(boneMatrix) * rotate90;
-		rot = btQuaternion(q.x, q.y, q.z, q.w);
-		transform.setRotation(rot);
+		transform.setOrigin(Util::GetRelPosBetween2Vectors(lowerarm_r, hand_r));
+		transform.setRotation(Util::GetQuatBetween2Points(lowerarm_r, hand_r));
 		m_bodies[BODYPART_RIGHT_LOWER_ARM] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_RIGHT_LOWER_ARM]);
+
 
 
 		// Setup some damping on the m_bodies

@@ -87,6 +87,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Animation\AnimatedNode.h">
+      <Filter>src\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Animation\Animation.h">
+      <Filter>src\Animation</Filter>
+    </ClInclude>
     <ClInclude Include="src\Animation\SQT.h">
       <Filter>src\Animation</Filter>
     </ClInclude>
@@ -165,6 +171,9 @@
     <ClInclude Include="src\GL\GBuffer.h">
       <Filter>src\GL</Filter>
     </ClInclude>
+    <ClInclude Include="src\GL\GpuProfiling.h">
+      <Filter>src\GL</Filter>
+    </ClInclude>
     <ClInclude Include="src\GL\LightProbe.h">
       <Filter>src\GL</Filter>
     </ClInclude>
@@ -190,6 +199,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Helpers\AssetManager.h">
+      <Filter>src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helpers\FileImporter.h">
       <Filter>src\Helpers</Filter>
     </ClInclude>
     <ClInclude Include="src\Helpers\Util.h">
@@ -1467,19 +1479,14 @@
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h">
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
-<<<<<<< HEAD
-    <ClInclude Include="src\Animation\AnimatedNode.h" />
-    <ClInclude Include="src\Animation\Animation.h">
-      <Filter>src\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Helpers\FileImporter.h" />
-=======
-    <ClInclude Include="src\GL\GpuProfiling.h">
-      <Filter>src\GL</Filter>
-    </ClInclude>
->>>>>>> 0c1086a1dabd1dd4b0834f9bb71574f2820126da
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Animation\AnimatedNode.cpp">
+      <Filter>src\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\Animation.cpp">
+      <Filter>src\Animation</Filter>
+    </ClCompile>
     <ClCompile Include="src\Animation\SQT.cpp">
       <Filter>src\Animation</Filter>
     </ClCompile>
@@ -1552,6 +1559,9 @@
     <ClCompile Include="src\GL\GBuffer.cpp">
       <Filter>src\GL</Filter>
     </ClCompile>
+    <ClCompile Include="src\GL\GpuProfiling.cpp">
+      <Filter>src\GL</Filter>
+    </ClCompile>
     <ClCompile Include="src\GL\LightProbe.cpp">
       <Filter>src\GL</Filter>
     </ClCompile>
@@ -1574,6 +1584,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Helpers\AssetManager.cpp">
+      <Filter>src\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Helpers\FileImporter.cpp">
       <Filter>src\Helpers</Filter>
     </ClCompile>
     <ClCompile Include="src\Helpers\Util.cpp">
@@ -1714,17 +1727,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="src\Animation\AnimatedNode.cpp" />
-    <ClCompile Include="src\Animation\Animation.cpp">
-      <Filter>src\Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Helpers\FileImporter.cpp" />
-=======
-    <ClCompile Include="src\GL\GpuProfiling.cpp">
-      <Filter>src\GL</Filter>
-    </ClCompile>
->>>>>>> 0c1086a1dabd1dd4b0834f9bb71574f2820126da
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">

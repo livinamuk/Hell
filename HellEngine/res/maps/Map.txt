@@ -23,11 +23,7 @@
         {
             "Position": [
                 0.4000000059604645,
-<<<<<<< Updated upstream
                 3.0,
-=======
-                0.0,
->>>>>>> Stashed changes
                 -0.6000000238418579
             ],
             "Rotation": [

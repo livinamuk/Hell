@@ -159,18 +159,48 @@ namespace HellEngine
 		transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(lowerarm_l, hand_l));
 		transform.setRotation(Util::GetQuatBetween2Points(lowerarm_l, hand_l));
+
+	/*	boneMatrix = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_l"]].DebugMatrix_AnimatedTransform;
+		q = glm::quat_cast(boneMatrix);
+		//rot = btQuaternion(q.x, q.y, q.z, q.w) * btQuaternion(Config::TEST_QUAT.x, Config::TEST_QUAT.y, Config::TEST_QUAT.z, Config::TEST_QUAT.w) * btQuaternion(Config::TEST_QUAT2.x, Config::TEST_QUAT2.y, Config::TEST_QUAT2.z, Config::TEST_QUAT2.w);
+		rot = btQuaternion(q.x, q.y, q.z, q.w) * btQuaternion(0.7071, -0.7071, 0, 0);
+		transform.setRotation(rot);
+		*/
+
 		m_bodies[BODYPART_LEFT_LOWER_ARM] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_LEFT_LOWER_ARM]);
 
+		/*
 		transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(lowerarm_r, upperarm_r));
 		transform.setRotation(Util::GetQuatBetween2Points(upperarm_r, lowerarm_r));
 		m_bodies[BODYPART_RIGHT_UPPER_ARM] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_RIGHT_UPPER_ARM]);
-
-		transform.setIdentity();
+		*/
+		/*transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(lowerarm_r, hand_r));
 		transform.setRotation(Util::GetQuatBetween2Points(lowerarm_r, hand_r));
 		m_bodies[BODYPART_RIGHT_LOWER_ARM] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_RIGHT_LOWER_ARM]);
 
+		*/
+		transform.setIdentity();
+		transform.setOrigin(Util::GetRelPosBetween2Vectors(hand_r, lowerarm_r));
+		boneMatrix = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["lowerarm_r"]].DebugMatrix_AnimatedTransform;
+		q = glm::quat_cast(boneMatrix);
+		//rot = btQuaternion(Config::TEST_QUAT.x, Config::TEST_QUAT.y, Config::TEST_QUAT.z, Config::TEST_QUAT.w) *btQuaternion(q.x, q.y, q.z, q.w);
+		rot = btQuaternion(q.x, q.y, q.z, q.w) * btQuaternion(0.7071, -0.7071, 0, 0);
+		transform.setRotation(rot);
+		m_bodies[BODYPART_RIGHT_LOWER_ARM] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_RIGHT_LOWER_ARM]);
+
+
+		transform.setIdentity();
+		transform.setOrigin(Util::GetRelPosBetween2Vectors(lowerarm_r, upperarm_r));
+		boneMatrix = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_r"]].DebugMatrix_AnimatedTransform;
+		q = glm::quat_cast(boneMatrix);
+		//rot = btQuaternion(q.x, q.y, q.z, q.w) * btQuaternion(Config::TEST_QUAT.x, Config::TEST_QUAT.y, Config::TEST_QUAT.z, Config::TEST_QUAT.w) * btQuaternion(Config::TEST_QUAT2.x, Config::TEST_QUAT2.y, Config::TEST_QUAT2.z, Config::TEST_QUAT2.w);
+
+		//rot = btQuaternion(Config::TEST_QUAT.x, Config::TEST_QUAT.y, Config::TEST_QUAT.z, Config::TEST_QUAT.w) * btQuaternion(q.x, q.y, q.z, q.w); 
+		rot = btQuaternion(q.x, q.y, q.z, q.w) * btQuaternion(0.7071, -0.7071, 0, 0);
+		transform.setRotation(rot);
+		m_bodies[BODYPART_RIGHT_UPPER_ARM] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_RIGHT_UPPER_ARM]);
 
 
 		// Setup some damping on the m_bodies
@@ -213,6 +243,8 @@ namespace HellEngine
 		/// *************************** ///
 
 
+		// ok so seems like LOCAL A is the offset from the ragdoll center (the pelvis pretty sure) for when it's limping about
+		// and that LOCAL B is the position of the constraint on the caspule
 
 
 		/// ******* LEFT SHOULDER ******** ///
@@ -220,9 +252,11 @@ namespace HellEngine
 			localA.setIdentity(); localB.setIdentity();
 
 			localA.setOrigin(btVector3(btScalar(-0.2 * scale_ragdoll), btScalar(0.15 * scale_ragdoll), btScalar(0.)));
+			//localA.setOrigin(btVector3(btScalar(0 * scale_ragdoll), btScalar(0 * scale_ragdoll), btScalar(0.)));
 
 			localB.getBasis().setEulerZYX(SIMD_HALF_PI, 0, -SIMD_HALF_PI);
-			localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.18 * scale_ragdoll), btScalar(0.)));
+			//localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.18 * scale_ragdoll), btScalar(0.)));
+			localB.setOrigin(btVector3(btScalar(0.), btScalar(-length_upperarm * 0.5), btScalar(0.)));
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_SPINE], *m_bodies[BODYPART_LEFT_UPPER_ARM], localA, localB, useLinearReferenceFrameA);
 
@@ -237,21 +271,17 @@ namespace HellEngine
 
 		/// ******* RIGHT SHOULDER ******** ///
 		{
-			localA.setIdentity(); localB.setIdentity();
-
+			localA.setIdentity(); 
 			localA.setOrigin(btVector3(btScalar(0.2 * scale_ragdoll), btScalar(0.15 * scale_ragdoll), btScalar(0.)));
+
+			localB.setIdentity();
 			localB.getBasis().setEulerZYX(0, 0, SIMD_HALF_PI);
-			localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.18 * scale_ragdoll), btScalar(0.)));
+			localB.setOrigin(btVector3(btScalar(0.), btScalar(-length_upperarm * 0.5), btScalar(0.)));
+		
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_SPINE], *m_bodies[BODYPART_RIGHT_UPPER_ARM], localA, localB, useLinearReferenceFrameA);
-
-#ifdef RIGID
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
-#else
-
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.8f, -SIMD_EPSILON, -SIMD_PI * 0.5f));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.8f, SIMD_EPSILON, SIMD_PI * 0.5f));
-#endif
+
 			m_joints[JOINT_RIGHT_SHOULDER] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_RIGHT_SHOULDER], true);
 		}
@@ -263,7 +293,7 @@ namespace HellEngine
 			localA.setOrigin(btVector3(btScalar(0.), btScalar(0.18 * scale_ragdoll), btScalar(0.)));
 
 			localB.setIdentity();
-			localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.14 * scale_ragdoll), btScalar(0.)));
+			localB.setOrigin(btVector3(btScalar(0.), btScalar(-length_lowerarm * 0.5), btScalar(0.)));
 			
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_LEFT_UPPER_ARM], *m_bodies[BODYPART_LEFT_LOWER_ARM], localA, localB, useLinearReferenceFrameA);
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
@@ -277,19 +307,15 @@ namespace HellEngine
 
 		/// ******* RIGHT ELBOW ******** ///
 		{
-			localA.setIdentity(); localB.setIdentity();
-
+			localA.setIdentity(); 
 			localA.setOrigin(btVector3(btScalar(0.), btScalar(0.18 * scale_ragdoll), btScalar(0.)));
-			localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.14 * scale_ragdoll), btScalar(0.)));
-			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_RIGHT_UPPER_ARM], *m_bodies[BODYPART_RIGHT_LOWER_ARM], localA, localB, useLinearReferenceFrameA);
 
-#ifdef RIGID
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
-#else
+			localB.setIdentity();
+			localB.setOrigin(btVector3(btScalar(0.), btScalar(-length_lowerarm * 0.5), btScalar(0.)));
+
+			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_RIGHT_UPPER_ARM], *m_bodies[BODYPART_RIGHT_LOWER_ARM], localA, localB, useLinearReferenceFrameA);
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.7, SIMD_EPSILON, SIMD_EPSILON));
-#endif
 
 			m_joints[JOINT_RIGHT_ELBOW] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_RIGHT_ELBOW], true);
@@ -449,7 +475,7 @@ namespace HellEngine
 		body->setUserPointer(entityData);
 
 		int group = CollisionGroups::ENEMY;
-		int mask = CollisionGroups::HOUSE | CollisionGroups::PLAYER;
+		int mask = CollisionGroups::HOUSE;// | CollisionGroups::PLAYER;
 
 
 		m_ownerWorld->addRigidBody(body, group, mask);
@@ -483,16 +509,42 @@ namespace HellEngine
 				skinnedModel->m_BoneInfo[BoneIndex].DebugMatrix_AnimatedTransform = GlobalTransformation;
 							
 
-				if (Util::StrCmp(NodeName, "upperarm_r"))
-				{
-					//glm::mat4 modelMatirx = p_worldTransform->to_mat4() * p_modelTransform->to_mat4();
-					//glm::mat4 modelMatirx = p_worldTransform->to_mat4();
-					glm::mat4 jointWorldMatrix = GetJointWorldMatrix(JOINT_RIGHT_SHOULDER);
-					//glm::mat4 jointWorldMatrix = Transform(GetJointWorldPosition(JOINT_RIGHT_SHOULDER)).to_mat4();
+				if (!DisableSkinning) {
+					if (Util::StrCmp(NodeName, "upperarm_r"))
+					{
+						btGeneric6DofConstraint* constraint = m_joints[JOINT_RIGHT_SHOULDER];
+						constraint->calculateTransforms();
+						btTransform transform = constraint->getCalculatedTransformB();
 
-					//skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = jointWorldMatrix * glm::inverse(modelMatirx) * skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
-					
-					skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = jointWorldMatrix;// *skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
+						btVector3 pos = transform.getOrigin();
+						//btQuaternion rot = btQuaternion(Config::TEST_QUAT2.x, Config::TEST_QUAT2.y, Config::TEST_QUAT2.z, Config::TEST_QUAT2.w) * transform.getRotation();;
+						btQuaternion rot = transform.getRotation() * btQuaternion(0, 1, 0, 0);
+
+						glm::vec3 posGL = glm::vec3(pos.x(), pos.y(), pos.z());
+						glm::quat rotQL = glm::quat(rot.w(), rot.x(), rot.y(), rot.z());
+
+						glm::mat4 m = glm::translate(glm::mat4(1), posGL);
+						m *= glm::mat4_cast(rotQL);
+						skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = m * skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
+					}
+
+					if (Util::StrCmp(NodeName, "lowerarm_r"))
+					{
+						btGeneric6DofConstraint* constraint = m_joints[JOINT_RIGHT_ELBOW];
+						constraint->calculateTransforms();
+						btTransform transform = constraint->getCalculatedTransformB();
+
+						btVector3 pos = transform.getOrigin();
+						//btQuaternion rot = btQuaternion(Config::TEST_QUAT2.x, Config::TEST_QUAT2.y, Config::TEST_QUAT2.z, Config::TEST_QUAT2.w) * transform.getRotation();;
+						btQuaternion rot = transform.getRotation() * btQuaternion(0, 1, 0, 0);
+
+						glm::vec3 posGL = glm::vec3(pos.x(), pos.y(), pos.z());
+						glm::quat rotQL = glm::quat(rot.w(), rot.x(), rot.y(), rot.z());
+
+						glm::mat4 m = glm::translate(glm::mat4(1), posGL);
+						m *= glm::mat4_cast(rotQL);
+						skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = m * skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
+					}
 				}
 			}
 
@@ -516,76 +568,6 @@ namespace HellEngine
 		}*/
 	}
 
-	void Ragdoll::ReadNodeHeirarchy(SkinnedModel* skinnedModel, const aiNode* pNode, const glm::mat4& ParentTransform)
-	{
-		// Get the node and its um bind pose transform?
-		string NodeName(pNode->mName.data);
-		glm::mat4 NodeTransformation(Util::aiMatrix4x4ToGlm(pNode->mTransformation));
-
-
-		
-		// Check every node, and if the name matches up to one of the joints.
-		// Then we use that joints world position
-		// Otherwise we use the matrix that gets the child to where it needs to be relative to it's parent
-		// Now remember: you'll need to add a bool flag that ignores the model world transform when being animted by the ragdoll
-		// Because the ragdoll exists in world space not model space.
-
-
-
-		// Calculate any animation
-	/*	if (m_animations.size() > 0)
-		{
-			aiAnimation* animation = m_animations[currentAnimationIndex]->m_pAnimationScene->mAnimations[0];
-			const aiAnimation* pAnimation = animation;
-			const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
-
-			if (pNodeAnim) {
-				aiVector3D Scaling;
-				CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-				glm::mat4 ScalingM;
-				ScalingM = Util::Mat4InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
-				aiQuaternion RotationQ;
-				CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
-				glm::mat4 RotationM = Util::aiMatrix3x3ToGlm(RotationQ.GetMatrix());
-				aiVector3D Translation;
-				CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
-				glm::mat4 TranslationM;
-				TranslationM = Util::Mat4InitTranslationTransform(Translation.x, Translation.y, Translation.z);
-				NodeTransformation = TranslationM * RotationM * ScalingM;
-			}
-		}*/
-
-		glm::mat4 GlobalTransformation = ParentTransform * NodeTransformation;
-
-
-
-		/* std::cout << NodeName << "\n";
-		 Util::PrintMat4(GlobalTransformation);
-		 std::cout << "\n";*/
-
-
-		if (skinnedModel->m_BoneMapping.find(NodeName) != skinnedModel->m_BoneMapping.end()) {
-			unsigned int BoneIndex = skinnedModel->m_BoneMapping[NodeName];
-			skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
-			skinnedModel->m_BoneInfo[BoneIndex].DebugMatrix_AnimatedTransform = GlobalTransformation;
-
-
-			if (NodeName == "upperarm_r")
-			{
-				//glm::mat4 modelMatirx = p_worldTransform->to_mat4() * p_modelTransform->to_mat4();
-				glm::mat4 modelMatirx = p_worldTransform->to_mat4();
-				glm::mat4 jointWorldMatrix = GetJointWorldMatrix(JOINT_RIGHT_SHOULDER);
-				//glm::mat4 jointWorldMatrix = Transform(GetJointWorldPosition(JOINT_RIGHT_SHOULDER)).to_mat4();
-
-				skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = jointWorldMatrix * glm::inverse(modelMatirx)  * skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
-				skinnedModel->m_BoneInfo[BoneIndex].DebugMatrix_AnimatedTransform = jointWorldMatrix * glm::inverse(modelMatirx);
-			}
-		}
-
-		for (unsigned int i = 0; i < pNode->mNumChildren; i++)
-			ReadNodeHeirarchy(skinnedModel, pNode->mChildren[i], GlobalTransformation);
-	}
-
 	glm::vec3 Ragdoll::GetJointWorldPosition(int jointIndex)
 	{
 		if (jointIndex < 0 || jointIndex >= JOINT_COUNT)
@@ -604,12 +586,17 @@ namespace HellEngine
 		if (jointIndex < 0 || jointIndex >= JOINT_COUNT)
 			return glm::mat4(1);
 
-btGeneric6DofConstraint* constraint = m_joints[jointIndex];
-constraint->calculateTransforms();		
-btTransform transform = constraint->getCalculatedTransformB();
+		//glm::vec3 position = GetJointWorldPosition(jointIndex);
+
+
+		
+		btGeneric6DofConstraint* constraint = m_joints[jointIndex];
+		constraint->calculateTransforms();
+		btTransform transform = constraint->getCalculatedTransformB();
+		btTransform transform2 = constraint->getCalculatedTransformA();
 
 		btVector3 pos = transform.getOrigin();
-		btQuaternion rot = transform.getRotation();
+		btQuaternion rot = btQuaternion(Config::TEST_QUAT.x, Config::TEST_QUAT.y, Config::TEST_QUAT.z, Config::TEST_QUAT.w) * transform2.getRotation();
 
 		glm::vec3 posGL = glm::vec3(pos.x(), pos.y(), pos.z());
 		glm::quat rotQL = glm::quat(rot.w(), rot.x(), rot.y(), rot.z());

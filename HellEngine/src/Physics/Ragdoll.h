@@ -77,6 +77,8 @@ namespace HellEngine
 		btRigidBody* localCreateRigidBody(btScalar mass, const btTransform& startTransform, btCollisionShape* shape);
 	
 	public:
+		bool DisableSkinning;
+
 		Ragdoll();
 		Ragdoll(const btVector3& positionOffset, float modelScale, glm::mat4 worldMatrix);
 		~Ragdoll();

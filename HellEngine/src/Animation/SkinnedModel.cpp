@@ -188,7 +188,7 @@ namespace HellEngine
                     m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
 
 
-                if (Util::StrCmp(NodeName, "upperarm_r"))
+             /*   if (Util::StrCmp(NodeName, "upperarm_r"))
                 {
                     //glm::mat4 modelMatirx = p_worldTransform->to_mat4() * p_modelTransform->to_mat4();
                     //glm::mat4 modelMatirx = p_worldTransform->to_mat4();
@@ -198,7 +198,7 @@ namespace HellEngine
                     trans.position.z = Config::TEST_FLOAT3;
                     m_BoneInfo[BoneIndex].FinalTransformation = trans.to_mat4() * m_BoneInfo[BoneIndex].BoneOffset;
                     m_BoneInfo[BoneIndex].DebugMatrix_AnimatedTransform = trans.to_mat4();// *m_BoneInfo[BoneIndex].FinalTransformation;
-                }
+                }*/
             }
         }
 

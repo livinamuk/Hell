@@ -504,6 +504,18 @@ namespace HellEngine
 		ImGui::SameLine(); ImGui::InputFloat("y", &Config::TEST_QUAT.y, 0.0f, 9.0f, 10.0f);
 		ImGui::SameLine(); ImGui::InputFloat("z", &Config::TEST_QUAT.z, 0.0f, 9.0f, 10.0f);
 		ImGui::Text("(%f, %f, %f, %f)", Config::TEST_QUAT.w, Config::TEST_QUAT.x, Config::TEST_QUAT.y, Config::TEST_QUAT.z);
+		
+		ImGui::Text("TEST_QUAT2");
+		ImGui::PushItemWidth(50);
+		ImGui::InputFloat("w_", &Config::TEST_QUAT2.w, 0.0f, 9.0f, 10.0f);
+		ImGui::SameLine(); ImGui::InputFloat("x_", &Config::TEST_QUAT2.x, 0.0f, 9.0f, 10.0f);
+		ImGui::SameLine(); ImGui::InputFloat("y_", &Config::TEST_QUAT2.y, 0.0f, 9.0f, 10.0f);
+		ImGui::SameLine(); ImGui::InputFloat("z_", &Config::TEST_QUAT2.z, 0.0f, 9.0f, 10.0f);
+		ImGui::Text("(%f, %f, %f, %f)", Config::TEST_QUAT2.w, Config::TEST_QUAT2.x, Config::TEST_QUAT2.y, Config::TEST_QUAT2.z);
+
+		glm::quat q = Config::TEST_QUAT * Config::TEST_QUAT2;
+		ImGui::Text("(%f, %f, %f, %f)", q.w, q.x, q.y, q.z);
+		
 		ImGui::PushItemWidth(100);
 
 		ImGui::Text("\n");

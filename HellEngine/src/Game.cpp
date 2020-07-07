@@ -90,14 +90,21 @@ namespace HellEngine
 
 
 
+	//	if (Input::s_keyPressed[HELL_KEY_P])
+	//		m_zombieGuy.SetAnimationToBindPose();
+
+		if (Input::s_keyPressed[HELL_KEY_L])
+			m_zombieGuy.m_ragdoll->DisableSkinning = !m_zombieGuy.m_ragdoll->DisableSkinning;
+
 
 		if (Input::s_keyPressed[HELL_KEY_R])
 		{
-			for (int i = 0; i < 11; ++i)
-			{
+			for (int i = 0; i < Ragdoll::BODYPART_COUNT; ++i)
 				Physics::s_dynamicsWorld->removeRigidBody(m_zombieGuy.m_ragdoll->m_bodies[i]);
-				//Physics::DeleteRigidBody(m_bodies[i]);
-			}
+
+			for (int i = 0; i < Ragdoll::JOINT_COUNT; ++i)
+				Physics::s_dynamicsWorld->removeConstraint(m_zombieGuy.m_ragdoll->m_joints[i]);
+
 			m_zombieGuy.NewRagdollFromAnimatedTransforms();
 
 		}
@@ -163,8 +170,8 @@ namespace HellEngine
 		m_NurseGuy.Update(deltaTime);
 		
 		//m_zombieGuy.Update(deltaTime);
-		m_zombieGuy.SetAnimationToBindPose();
-	//	m_zombieGuy.AnimatedFromRagdoll();
+		//m_zombieGuy.SetAnimationToBindPose();
+		m_zombieGuy.AnimatedFromRagdoll();
 	}
 
 	void Game::OnRender()

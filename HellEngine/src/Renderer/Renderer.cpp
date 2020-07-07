@@ -667,6 +667,41 @@ namespace HellEngine
 			DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
 		}
 
+		//
+	
+		// draw ragdoll joints
+	for (int i = 0; i < Ragdoll::JOINT_COUNT; i++)
+	{
+		glm::vec3 p = game->m_zombieGuy.m_ragdoll->GetJointWorldPosition(i);
+		DrawPoint(&s_solidColorShader, p, glm::vec3(1, 0, 1));
+	}
+
+
+
+	// find magic matrix
+	Ragdoll* ragdoll = game->m_zombieGuy.m_ragdoll;
+	btGeneric6DofConstraint* constraint = ragdoll->m_joints[Ragdoll::JOINT_RIGHT_SHOULDER];
+	constraint->calculateTransforms();
+	btTransform transform = constraint->getCalculatedTransformB();
+
+	btVector3 pos = transform.getOrigin();
+	//btQuaternion rot = transform.getRotation() * btQuaternion(Config::TEST_QUAT2.x, Config::TEST_QUAT2.y, Config::TEST_QUAT2.z, Config::TEST_QUAT2.w) ;
+	btQuaternion rot = transform.getRotation() * btQuaternion(0, 1, 0, 0);
+
+	glm::vec3 posGL = glm::vec3(pos.x(), pos.y(), pos.z());
+	glm::quat rotQL = glm::quat(rot.w(), rot.x(), rot.y(), rot.z());
+
+	glm::mat4 m = glm::translate(glm::mat4(1), posGL);
+	m *= glm::mat4_cast(rotQL);
+
+	DrawTangentDebugAxis(&s_solidColorShader, m, 0.05f);
+
+
+
+
+
+
+
 			//DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
 
 			//DrawSkeleton(&s_solidColorShader, AssetManager::skinnedModels[game->m_testAnimatedEnttity.m_skinnedModelID], &trans3);

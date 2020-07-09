@@ -82,6 +82,34 @@ namespace HellEngine
 		if (Input::s_keyPressed[HELL_KEY_E])
 			OnInteract();
 
+
+
+
+		if (Input::s_keyPressed[HELL_KEY_M])
+		{
+			SkinnedModel* skinnedModel = AssetManager::skinnedModels[m_zombieGuy.m_skinnedModelID];
+			glm::mat4 m = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_r"]].ModelSpace_AnimatedTransform;
+
+			std::cout << "\n\noriginal matrix:\n";
+			Util::PrintMat4(m);
+
+			glm::quat q = q = glm::quat_cast(m);
+			m = glm::mat4_cast(q);
+
+			std::cout << "\nnew matrix:\n";
+			Util::PrintMat4(m);
+
+			Ragdoll* ragdoll = m_zombieGuy.m_ragdoll;
+			btGeneric6DofConstraint* constraint = ragdoll->m_joints[Ragdoll::JOINT_RIGHT_HIP];
+			btRigidBody* body = ragdoll->m_bodies[Ragdoll::BODYPART_RIGHT_UPPER_LEG];
+
+		
+
+			constraint->calculateTransforms();
+
+			//constraint.getr
+		}
+
 		m_player.Update(m_frameTime);
 		m_player.m_characterController.Update(m_frameTime, &camera);
 
@@ -97,13 +125,13 @@ namespace HellEngine
 			m_zombieGuy.m_ragdoll->DisableSkinning = !m_zombieGuy.m_ragdoll->DisableSkinning;
 
 
-		if (Input::s_keyPressed[HELL_KEY_R])
+		if (Input::s_keyPressed[HELL_KEY_N])
 		{
 			for (int i = 0; i < Ragdoll::BODYPART_COUNT; ++i)
 				Physics::s_dynamicsWorld->removeRigidBody(m_zombieGuy.m_ragdoll->m_bodies[i]);
 
-			for (int i = 0; i < Ragdoll::JOINT_COUNT; ++i)
-				Physics::s_dynamicsWorld->removeConstraint(m_zombieGuy.m_ragdoll->m_joints[i]);
+		//	for (int i = 0; i < Ragdoll::JOINT_COUNT; ++i)
+		//		Physics::s_dynamicsWorld->removeConstraint(m_zombieGuy.m_ragdoll->m_joints[i]);
 
 			m_zombieGuy.NewRagdollFromAnimatedTransforms();
 

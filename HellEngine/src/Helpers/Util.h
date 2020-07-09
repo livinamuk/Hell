@@ -73,8 +73,11 @@ namespace HellEngine
 		static glm::vec3 TranslationFromMat4(glm::mat4& matrix);
 
 		static btVector3 GetRelPosBetween2Vectors(glm::vec3 vecA, glm::vec3 vecB);
+		static btQuaternion GetRotationFromBoneMatrix(glm::mat4 matrix);
 
 		static glm::mat4 FlipAxis(glm::mat4& matrix);
+
+		static glm::mat4 btTransformToMat4(btTransform& trans);
 	
 	private:
 			static unsigned int upFacingPlaneVAO;

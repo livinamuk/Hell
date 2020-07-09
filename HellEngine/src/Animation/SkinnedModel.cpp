@@ -181,8 +181,8 @@ namespace HellEngine
             if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) {
                 unsigned int BoneIndex = m_BoneMapping[NodeName];
                 m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
-                m_BoneInfo[BoneIndex].DebugMatrix_AnimatedTransform = GlobalTransformation;
-
+                m_BoneInfo[BoneIndex].ModelSpace_AnimatedTransform = GlobalTransformation ;
+                 
                 // If there is no bind pose, then just use bind pose
                 if (m_animations.size() == 0)
                     m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
@@ -204,7 +204,7 @@ namespace HellEngine
 
         for (unsigned int i = 0; i < m_NumBones; i++) {
             Transforms[i] = m_BoneInfo[i].FinalTransformation;
-            DebugAnimatedTransforms[i] = m_BoneInfo[i].DebugMatrix_AnimatedTransform;
+            DebugAnimatedTransforms[i] = m_BoneInfo[i].ModelSpace_AnimatedTransform;
         }
     }
 

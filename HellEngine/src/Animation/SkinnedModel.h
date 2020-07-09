@@ -48,7 +48,7 @@ namespace HellEngine
         {
             glm::mat4 BoneOffset;
             glm::mat4 FinalTransformation;
-            glm::mat4 DebugMatrix_AnimatedTransform;
+            glm::mat4 ModelSpace_AnimatedTransform;
             glm::mat4 DebugMatrix_BindPose;
             std::string BoneName;
 
@@ -57,7 +57,7 @@ namespace HellEngine
                 BoneOffset = glm::mat4(0);
                 FinalTransformation = glm::mat4(0);
                 DebugMatrix_BindPose = glm::mat4(1);
-                DebugMatrix_AnimatedTransform = glm::mat4(1);
+                ModelSpace_AnimatedTransform = glm::mat4(1);
             }
         };
 

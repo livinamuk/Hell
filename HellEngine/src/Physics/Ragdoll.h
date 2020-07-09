@@ -32,7 +32,7 @@ namespace HellEngine
 		{
 			BODYPART_PELVIS = 0,
 			BODYPART_SPINE,
-			BODYPART_HEAD,
+			BODYPART_NECK,
 
 			BODYPART_LEFT_UPPER_LEG,
 			BODYPART_LEFT_LOWER_LEG,
@@ -70,6 +70,8 @@ namespace HellEngine
 		};
 
 		btDynamicsWorld* m_ownerWorld;
+
+		float m_capsuleLengths[BODYPART_COUNT]; 
 		btCollisionShape* m_shapes[BODYPART_COUNT];
 		//btTypedConstraint* m_joints[JOINT_COUNT];
 		btGeneric6DofConstraint* m_joints[JOINT_COUNT];
@@ -84,14 +86,18 @@ namespace HellEngine
 		~Ragdoll();
 
 		void UpdateBoneTransform(SkinnedModel* skinnedModel, vector<glm::mat4>& Transforms, vector<glm::mat4>& DebugAnimatedTransforms);
-		void ReadNodeHeirarchy(SkinnedModel* skinnedModel, const aiNode* pNode, const glm::mat4& ParentTransform);
 
 		btRigidBody* m_bodies[BODYPART_COUNT];
 
 		Transform* p_worldTransform;
 		Transform* p_modelTransform;
 
-		glm::mat4 GetJointWorldMatrix(int jointIndex);
+		//glm::mat4 GetJointWorldMatrix(int jointIndex);
 		glm::vec3 GetJointWorldPosition(int jointIndex);
+		glm::vec3 GetJointWorldPositionA(int jointIndex);
+
+
+		glm::mat4 Get_Top_Joint_World_Matrix(int BodyPartIndex);
+		glm::mat4 Get_Bottom_Joint_World_Matrix(int BodyPartIndex);
 	};
 }

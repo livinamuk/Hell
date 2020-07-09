@@ -406,7 +406,7 @@ namespace HellEngine
 
 		for (int i = 0; i < skinnedModel->m_NumBones; i++)
 		{
-			glm::vec3 p = Util::GetTranslationFromMatrix(skinnedModel->m_BoneInfo[i].DebugMatrix_AnimatedTransform); 
+			glm::vec3 p = Util::GetTranslationFromMatrix(skinnedModel->m_BoneInfo[i].ModelSpace_AnimatedTransform); 
 			DrawPoint(&s_solidColorShader, p, glm::vec3(1, 1, 1));
 		}
 	}
@@ -670,37 +670,142 @@ namespace HellEngine
 		//
 	
 		// draw ragdoll joints
-	for (int i = 0; i < Ragdoll::JOINT_COUNT; i++)
+	/*for (int i = 0; i < Ragdoll::JOINT_COUNT; i++)
 	{
 		glm::vec3 p = game->m_zombieGuy.m_ragdoll->GetJointWorldPosition(i);
-		DrawPoint(&s_solidColorShader, p, glm::vec3(1, 0, 1));
+	//	glm::vec3 p2 = game->m_zombieGuy.m_ragdoll->GetJointWorldPositionA(i);
+	//	DrawPoint(&s_solidColorShader, p, glm::vec3(1, 0, 1));
+	//	DrawPoint(&s_solidColorShader, p2, glm::vec3(0, 1, 1));
+	}*/
+
+
+
+	for (int i = 0; i < Ragdoll::BODYPART_COUNT; i++)
+	{
+		glm::mat4 rot = glm::mat4_cast(Config::TEST_QUAT);
+		glm::mat4 rot2 = glm::mat4_cast(Config::TEST_QUAT2);
+
+		glm::mat4 m = game->m_zombieGuy.m_ragdoll->Get_Top_Joint_World_Matrix(i);
+		DrawPoint(&s_solidColorShader, Util::GetTranslationFromMatrix(m), glm::vec3(1, 0, 0));
+		DrawTangentDebugAxis(&s_solidColorShader, m, 0.025f);
 	}
 
+	/*
+	for (int i = 0; i < Ragdoll::BODYPART_COUNT; i++)
+	{
+		glm::mat4 rot = glm::mat4_cast(Config::TEST_QUAT);
+		glm::mat4 rot2 = glm::mat4_cast(Config::TEST_QUAT2);
+
+		glm::mat4 m = game->m_zombieGuy.m_ragdoll->Get_Bottom_Joint_World_Matrix(i);
+		DrawPoint(&s_solidColorShader, Util::GetTranslationFromMatrix(m), glm::vec3(0, 0, 1));
+		DrawTangentDebugAxis(&s_solidColorShader, m, 0.025f);
+	}*/
+	
+
+//	btTransform trann;
+//	game->m_zombieGuy.m_ragdoll->m_bodies[Ragdoll::BODYPART_RIGHT_LOWER_ARM]->getMotionState()->getWorldTransform(trann);
+//	glm::vec3 p = Util::btVec3_to_glmVec3(trann.getOrigin());
+//	DrawPoint(&s_solidColorShader, p, glm::vec3(0, 1, 1));
 
 
 	// find magic matrix
 	Ragdoll* ragdoll = game->m_zombieGuy.m_ragdoll;
-	btGeneric6DofConstraint* constraint = ragdoll->m_joints[Ragdoll::JOINT_RIGHT_SHOULDER];
-	constraint->calculateTransforms();
-	btTransform transform = constraint->getCalculatedTransformB();
+	{
+		btGeneric6DofConstraint* constraint = ragdoll->m_joints[Ragdoll::JOINT_RIGHT_SHOULDER];
+		constraint->calculateTransforms();
+		btTransform transformA = constraint->getCalculatedTransformA();
+		btTransform transformB = constraint->getCalculatedTransformB();
 
-	btVector3 pos = transform.getOrigin();
-	//btQuaternion rot = transform.getRotation() * btQuaternion(Config::TEST_QUAT2.x, Config::TEST_QUAT2.y, Config::TEST_QUAT2.z, Config::TEST_QUAT2.w) ;
-	btQuaternion rot = transform.getRotation() * btQuaternion(0, 1, 0, 0);
+		btVector3 pos = transformB.getOrigin();
+		//btQuaternion rot = transform.getRotation() * btQuaternion(Config::TEST_QUAT2.x, Config::TEST_QUAT2.y, Config::TEST_QUAT2.z, Config::TEST_QUAT2.w) ;
+		btQuaternion rot = transformB.getRotation() * btQuaternion(0, 1, 0, 0);
 
-	glm::vec3 posGL = glm::vec3(pos.x(), pos.y(), pos.z());
-	glm::quat rotQL = glm::quat(rot.w(), rot.x(), rot.y(), rot.z());
+		glm::vec3 posGL = glm::vec3(pos.x(), pos.y(), pos.z());
+		glm::quat rotQL = glm::quat(rot.w(), rot.x(), rot.y(), rot.z());
 
-	glm::mat4 m = glm::translate(glm::mat4(1), posGL);
-	m *= glm::mat4_cast(rotQL);
+		glm::mat4 m = glm::translate(glm::mat4(1), posGL);
+		m *= glm::mat4_cast(rotQL);
 
-	DrawTangentDebugAxis(&s_solidColorShader, m, 0.05f);
+		//DrawTangentDebugAxis(&s_solidColorShader, m, 0.025f);
+	}
+	{
+		btGeneric6DofConstraint* constraint = ragdoll->m_joints[Ragdoll::JOINT_RIGHT_ELBOW];
+		constraint->calculateTransforms();
+		btTransform transformA = constraint->getCalculatedTransformA();
+		btTransform transformB = constraint->getCalculatedTransformB();
+
+		btVector3 pos = transformB.getOrigin();
+		//btQuaternion rot = transformB.getRotation() * btQuaternion(Config::TEST_QUAT2.x, Config::TEST_QUAT2.y, Config::TEST_QUAT2.z, Config::TEST_QUAT2.w) ;
+		btQuaternion rot = transformB.getRotation() * btQuaternion(0.7071, -0.7071, 0, 0);
+
+		glm::vec3 posGL = glm::vec3(pos.x(), pos.y(), pos.z());
+		glm::quat rotQL = glm::quat(rot.w(), rot.x(), rot.y(), rot.z());
+
+		glm::mat4 m = glm::translate(glm::mat4(1), posGL);
+		m *= glm::mat4_cast(rotQL);
+
+		//DrawTangentDebugAxis(&s_solidColorShader, m, 0.025f);
+	}
+
+	{
+		/*btGeneric6DofConstraint* constraint = ragdoll->m_joints[Ragdoll::JOINT_RIGHT_HIP];
+		constraint->calculateTransforms();
+		btTransform transform = constraint->getCalculatedTransformB();
+		btVector3 pos = transform.getOrigin();
+		btQuaternion rot = transform.getRotation() * btQuaternion(0, 1, 0, 0);
+
+		glm::vec3 posGL = glm::vec3(pos.x(), pos.y(), pos.z());
+		glm::quat rotQL = glm::quat(rot.w(), rot.x(), rot.y(), rot.z());
+
+		glm::mat4 m = glm::translate(glm::mat4(1), posGL);
+		m *= glm::mat4_cast(rotQL);
+
+		DrawTangentDebugAxis(&s_solidColorShader, m, 0.05f);*/
+	}
+
+
+	btTransform trann;
+	game->m_zombieGuy.m_ragdoll->m_bodies[Ragdoll::BODYPART_RIGHT_UPPER_LEG]->getMotionState()->getWorldTransform(trann);
+	glm::vec3 p = Util::btVec3_to_glmVec3(trann.getOrigin());
 
 
 
+	//glm::vec3 p2 = game->m_zombieGuy.m_ragdoll->GetJointWorldPositionA(i);
+	//DrawPoint(&s_solidColorShader, p, glm::vec3(1, 1, 0));
+	//	DrawPoint(&s_solidColorShader, p2, glm::vec3(0, 1, 1));
+
+	SkinnedModel* skinnedModel = AssetManager::skinnedModels[game->m_zombieGuy.m_skinnedModelID];
+	glm::vec3 thigh_r = Util::GetTranslationFromMatrix(skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_r"]].ModelSpace_AnimatedTransform);
+	glm::vec3 calf_r = Util::GetTranslationFromMatrix(skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_r"]].ModelSpace_AnimatedTransform);
+
+	float lA = glm::length(thigh_r - calf_r);
+//	std::cout << "lengthA: " << lA << "\n";
 
 
+	/*glm::vec3 jointTOP = game->m_zombieGuy.m_ragdoll->GetJointWorldPosition(Ragdoll::JOINT_RIGHT_HIP);
+	glm::vec3 jointBOTTOM = game->m_zombieGuy.m_ragdoll->GetJointWorldPosition(Ragdoll::JOINT_RIGHT_KNEE);
+	lA = glm::length(jointTOP - jointBOTTOM);
+	std::cout << "lengthB: " << lA << "\n\n";
 
+	glm::vec3 p3 = Util::btVec3_to_glmVec3(Util::GetRelPosBetween2Vectors(thigh_r, calf_r));
+	glm::vec3 p4 = Util::btVec3_to_glmVec3(Util::GetRelPosBetween2Vectors(jointTOP, jointBOTTOM));
+
+	std::cout << "p3: " << Util::Vec3_to_String(p3) << "\n";
+	std::cout << "p4: " << Util::Vec3_to_String(p4) << "\n";
+	std::cout << "bd: " << Util::Vec3_to_String(p) << "\n\n";
+
+	DrawPoint(&s_solidColorShader, p3, glm::vec3(0, 1, 0));
+	DrawPoint(&s_solidColorShader, p4, glm::vec3(0, 0, 1));
+	//DrawPoint(&s_solidColorShader, p, glm::vec3(1, 0, 0)); // same as green
+
+	DrawPoint(&s_solidColorShader, jointTOP, glm::vec3(1, 0, 0));
+	DrawPoint(&s_solidColorShader, p3, glm::vec3(0, 1, 0));
+	*/
+	//glm::vec3 pevls = game->m_zombieGuy.m_ragdoll->GetJointWorldPosition(Ragdoll::JOINT_PELVIS_SPINE);
+	//DrawPoint(&s_solidColorShader, pevls, glm::vec3(1, 1, 0));
+
+	//glm::vec3 JOINT_RIGHT_KNEE = game->m_zombieGuy.m_ragdoll->GetJointWorldPosition(Ragdoll::JOINT_RIGHT_KNEE);
+	//DrawPoint(&s_solidColorShader, JOINT_RIGHT_KNEE, glm::vec3(0, 1, 0));
 
 			//DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
 
@@ -722,8 +827,8 @@ namespace HellEngine
 			for (int i = 0; i < ragdoll->JOINT_COUNT; i++)
 			{
 				//	glm::vec3 jointWorldPos = ragdoll->GetJointWorldPosition(i);
-				glm::vec3 jointWorldPos = Util::GetTranslationFromMatrix(ragdoll->GetJointWorldMatrix(i));
-				DrawPoint(&s_solidColorShader, jointWorldPos, glm::vec3(1, 0, 1));
+				//glm::vec3 jointWorldPos = Util::GetTranslationFromMatrix(ragdoll->GetJointWorldMatrix(i));
+				//DrawPoint(&s_solidColorShader, jointWorldPos, glm::vec3(1, 0, 1));
 			}
 		}
 
@@ -1611,6 +1716,8 @@ namespace HellEngine
 
 
 		//if (!s_demo)
+
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("NumberGrid"));
 			game->m_zombieGuy.Draw(shader, glm::mat4(1));
 
 	//	s_debugString += "\nmodelTransform\n";

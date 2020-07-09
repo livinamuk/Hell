@@ -489,6 +489,17 @@ namespace HellEngine
 	}
 	glm::vec3 Util::GetTranslationFromMatrix(glm::mat4 matrix)
 	{
+	/*	glm::vec3 scale;
+		glm::quat rotation;
+		glm::vec3 translation;
+		glm::vec3 skew;
+		glm::vec4 perspective;
+		glm::decompose(matrix, scale, rotation, translation, skew, perspective);
+		return translation * scale;*/
+
+		/*glm::vec4 result = glm::vec4(0, 0, 0, 1) * matrix;
+		return glm::vec3(result.x, result.y, result.z);*/
+
 		return glm::vec3(matrix[3][0], matrix[3][1], matrix[3][2]);
 	}
 
@@ -758,6 +769,12 @@ namespace HellEngine
 		return Util::glmVec3_to_btVec3(relativePos);
 	}
 
+	btQuaternion Util::GetRotationFromBoneMatrix(glm::mat4 matrix)
+	{
+		glm::quat q = glm::quat_cast(matrix);
+		return btQuaternion(q.x, q.y, q.z, q.w) * btQuaternion(0.70710678118, -0.70710678118, 0, 0);
+	}
+
 	glm::mat4 Util::FlipAxis(glm::mat4& matrix)
 	{
 		glm::mat4 flip;
@@ -767,5 +784,16 @@ namespace HellEngine
 		flip[0][3] = 0; flip[1][3] = 0; flip[2][3] = 0; flip[3][3] = 1;
 
 		return flip * matrix;
+	}
+
+	glm::mat4 Util::btTransformToMat4(btTransform& trans) // Ignores scale.
+	{
+		btVector3 pos = trans.getOrigin();
+		btQuaternion rot = trans.getRotation();
+		glm::vec3 posGL = glm::vec3(pos.x(), pos.y(), pos.z());
+		glm::quat rotQL = glm::quat(rot.w(), rot.x(), rot.y(), rot.z());
+		glm::mat4 m = glm::translate(glm::mat4(1), posGL);
+		m *= glm::mat4_cast(rotQL);
+		return  m;
 	}
 }

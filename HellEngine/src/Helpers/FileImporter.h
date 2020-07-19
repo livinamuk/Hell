@@ -5,7 +5,6 @@
 #include <assimp/scene.h>           // Output data structure
 #include<assimp/postprocess.h>     // Post processing flags
 
-
 namespace HellEngine
 {
     class FileImporter
@@ -34,18 +33,18 @@ namespace HellEngine
 
     public: // static functions
         static SkinnedModel* LoadSkinnedModel(const char* filename);
-        static bool InitFromScene(SkinnedModel* skinnedModel, const aiScene* pScene, const string& Filename);
+        static bool InitFromScene(SkinnedModel* skinnedModel, const aiScene* pScene, const std::string& Filename);
 
         static void InitMesh(SkinnedModel* skinnedModel, 
             unsigned int MeshIndex,
             const aiMesh* paiMesh,
-            vector<glm::vec3>& Positions,
-            vector<glm::vec3>& Normals,
-            vector<glm::vec2>& TexCoords,
-            vector<VertexBoneData>& Bones,
-            vector<unsigned int>& Indices);
+            std::vector<glm::vec3>& Positions,
+            std::vector<glm::vec3>& Normals,
+            std::vector<glm::vec2>& TexCoords,
+            std::vector<VertexBoneData>& Bones,
+            std::vector<unsigned int>& Indices);
       
-        static void LoadBones(SkinnedModel* skinnedModel, unsigned int MeshIndex, const aiMesh* paiMesh, vector<VertexBoneData>& Bones);
+        static void LoadBones(SkinnedModel* skinnedModel, unsigned int MeshIndex, const aiMesh* paiMesh, std::vector<VertexBoneData>& Bones);
 
         static void GrabSkeleton(SkinnedModel* skinnedModel, const aiNode* pNode, int parentIndex); // does the same as below, but using my new abstraction stuff
         static void FindBindPoseTransforms(SkinnedModel* skinnedModel, const aiNode* pNode); // for debugging

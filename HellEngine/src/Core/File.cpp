@@ -70,8 +70,26 @@ namespace HellEngine {
 
 				house.AddDoor(Door(glm::vec2(position.x, position.z), story, Util::StringToAxis(axis), rotateFloor));
 			}
-		}	
-		
+		}
+
+		// Window
+		if (document.HasMember("WINDOWS"))
+		{
+			const rapidjson::Value& windows = document["WINDOWS"];
+			for (rapidjson::SizeType i = 0; i < windows.Size(); i++)
+			{
+				float xpos = ReadFloat(windows[i], "X_Pos");
+				float zpos= ReadFloat(windows[i], "Z_Pos");
+				float height = ReadFloat(windows[i], "Height");
+				std::string axis = ReadString(windows[i], "Axis");
+				int story = ReadInt(windows[i], "Story");
+
+				house.AddWindow(xpos, zpos, story, height, Util::StringToAxis(axis));
+			}
+		}
+
+
+
 		// Staircases
 		if (document.HasMember("STAIRCASES"))
 		{
@@ -153,6 +171,7 @@ namespace HellEngine {
 		rapidjson::Value lightsArray(rapidjson::kArrayType);
 		rapidjson::Value staircasesArray(rapidjson::kArrayType);
 		rapidjson::Value entitiesArray(rapidjson::kArrayType);
+		rapidjson::Value windowsArray(rapidjson::kArrayType);
 		document.SetObject();
 
 		// Save Entities
@@ -187,6 +206,18 @@ namespace HellEngine {
 			SaveString(&object, "Axis", Util::AxisToString(door.m_axis), allocator);
 			SaveBool(&object, "RotateFloorTexture", door.m_floor.m_rotateTexture, allocator);
 			doorsArray.PushBack(object, allocator);
+		}
+
+		// Save windows
+		for (Window& window : house->m_windows)
+		{
+			rapidjson::Value object(rapidjson::kObjectType);
+			SaveFloat(&object, "X_Pos", window.m_transform.position.x, allocator);
+			SaveFloat(&object, "Z_Pos", window.m_transform.position.z, allocator);
+			SaveInt(&object, "Story", window.m_story, allocator);
+			SaveFloat(&object, "Height", window.m_startHeight, allocator);
+			SaveString(&object, "Axis", Util::AxisToString(window.m_axis), allocator);
+			windowsArray.PushBack(object, allocator);
 		}
 
 		// Save staircases
@@ -225,6 +256,7 @@ namespace HellEngine {
 		document.AddMember("DOORS", doorsArray, allocator);
 		document.AddMember("LIGHTS", lightsArray, allocator);
 		document.AddMember("STAIRCASES", staircasesArray, allocator);
+		document.AddMember("WINDOWS", windowsArray, allocator);
 
 		// Convert JSON document to string
 		rapidjson::StringBuffer strbuf;

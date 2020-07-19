@@ -191,6 +191,7 @@
     <ClInclude Include="src\House\Room.h" />
     <ClInclude Include="src\House\Staircase.h" />
     <ClInclude Include="src\House\WallMesh.h" />
+    <ClInclude Include="src\House\Window.h" />
     <ClInclude Include="src\ImGui\imgui_impl_glfw.h" />
     <ClInclude Include="src\ImGui\imgui_impl_opengl3.h" />
     <ClInclude Include="src\ImGuizmo\AnimationCurve.h" />
@@ -199,6 +200,7 @@
     <ClInclude Include="src\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="src\ImGuizmo\ImSequencer.h" />
     <ClInclude Include="src\Logic\ShotgunLogic.h" />
+    <ClInclude Include="src\Logic\WeaponLogic.h" />
     <ClInclude Include="src\Misc\Shell.h" />
     <ClInclude Include="src\Physics\CharacterController.h" />
     <ClInclude Include="src\Physics\Physics.h" />
@@ -654,6 +656,7 @@
     <ClCompile Include="src\House\Room.cpp" />
     <ClCompile Include="src\House\Staircase.cpp" />
     <ClCompile Include="src\House\WallMesh.cpp" />
+    <ClCompile Include="src\House\Window.cpp" />
     <ClCompile Include="src\ImGui\imgui_impl_glfw.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -676,6 +679,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Logic\ShotgunLogic.cpp" />
+    <ClCompile Include="src\Logic\WeaponLogic.cpp" />
     <ClCompile Include="src\Misc\Shell.cpp" />
     <ClCompile Include="src\Physics\CharacterController.cpp" />
     <ClCompile Include="src\Physics\Physics.cpp" />

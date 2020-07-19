@@ -4,8 +4,7 @@
 #include "SkinnedModel.h"
 #include "Helpers/Util.h"
 #include "Helpers/AssetManager.h"
-
-
+#include "Logic/WeaponLogic.h"
 
 namespace HellEngine
 {
@@ -32,18 +31,9 @@ namespace HellEngine
     {
         glBindVertexArray(m_VAO);
         shader->setMat4("model", modelMatrix);
-        for (MeshEntry& mesh : m_meshEntries) {
 
-            if (mesh.MeshName == "Arms")
-                AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Hands"));
-            if (mesh.MeshName == "Shotgun Mesh")
-                AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shotgun"));
-            if (mesh.MeshName == "shotgunshells")
-                AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shell"));
-            
-
-           // glDrawElements(GL_TRIANGLES, (GLsizei)mesh.NumIndices, GL_UNSIGNED_INT, 0);
-          glDrawElementsBaseVertex(GL_TRIANGLES, mesh.NumIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh.BaseIndex), mesh.BaseVertex);
+        for (int i = 0; i < m_meshEntries.size(); i++) {            
+            glDrawElementsBaseVertex(GL_TRIANGLES, m_meshEntries[i].NumIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * m_meshEntries[i].BaseIndex), m_meshEntries[i].BaseVertex);
         }
     }
 
@@ -122,7 +112,7 @@ namespace HellEngine
     }
 
 
-    void SkinnedModel::BoneTransform(float TimeInSeconds, vector<glm::mat4>& Transforms, vector<glm::mat4>& DebugAnimatedTransforms)
+    void SkinnedModel::BoneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms, std::vector<glm::mat4>& DebugAnimatedTransforms)
     {
         // Get the animation time
         float AnimationTime = 0;
@@ -171,34 +161,24 @@ namespace HellEngine
             glm::mat4 ParentTransformation = (parentIndex == -1) ? glm::mat4(1) : m_skeleton.m_joints[parentIndex].m_currentFinalTransform;
             glm::mat4 GlobalTransformation = ParentTransformation * NodeTransformation;
 
+            // Store the current transformation, so child nodes can access it
             m_skeleton.m_joints[i].m_currentFinalTransform = GlobalTransformation;
 
 
-            if (NodeName == "Camera001") {
-                m_CameraMatrix = GlobalTransformation;
+            if (Util::StrCmp(NodeName, "Camera001") || Util::StrCmp(NodeName, "Camera")) {
+                WeaponLogic::s_AnimatedCameraMatrix = GlobalTransformation;
             }
 
             if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) {
                 unsigned int BoneIndex = m_BoneMapping[NodeName];
                 m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
                 m_BoneInfo[BoneIndex].ModelSpace_AnimatedTransform = GlobalTransformation ;
-                 
+
                 // If there is no bind pose, then just use bind pose
-                if (m_animations.size() == 0)
+                if (m_animations.size() == 0) {
                     m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
-
-
-             /*   if (Util::StrCmp(NodeName, "upperarm_r"))
-                {
-                    //glm::mat4 modelMatirx = p_worldTransform->to_mat4() * p_modelTransform->to_mat4();
-                    //glm::mat4 modelMatirx = p_worldTransform->to_mat4();
-                    Transform trans;
-                   trans.position.x = Config::TEST_FLOAT;
-                    trans.position.y = Config::TEST_FLOAT2;
-                    trans.position.z = Config::TEST_FLOAT3;
-                    m_BoneInfo[BoneIndex].FinalTransformation = trans.to_mat4() * m_BoneInfo[BoneIndex].BoneOffset;
-                    m_BoneInfo[BoneIndex].DebugMatrix_AnimatedTransform = trans.to_mat4();// *m_BoneInfo[BoneIndex].FinalTransformation;
-                }*/
+                    m_BoneInfo[BoneIndex].ModelSpace_AnimatedTransform = GlobalTransformation;
+                }
             }
         }
 

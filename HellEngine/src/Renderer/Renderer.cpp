@@ -10,6 +10,7 @@
 #include "Effects/Decal.h"
 #include "Logic/ShotgunLogic.h"
 #include "Config.h"
+#include "Logic/WeaponLogic.h"
 
 namespace HellEngine
 {
@@ -359,7 +360,7 @@ namespace HellEngine
 			DrawTangentDebugAxis(shader, worldMatrix * boneMatrix, 0.05f);
 		}
 
-		SkinnedModel* skinnedModel = AssetManager::skinnedModels[animatedEnitty->m_skinnedModelID];
+		SkinnedModel* skinnedModel = animatedEnitty->GetSkinnedModel();
 		/*worldMatrix = glm::mat4(1);
 		float modelScale = 1;
 		glm::vec3 upperarm_l = Util::GetTranslationFromMatrix(worldMatrix * skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["upperarm_l"]].DebugMatrix_AnimatedTransform) * modelScale;
@@ -418,7 +419,7 @@ namespace HellEngine
 
 		glm::mat4 worldMatrix = animatedEnitty->m_worldTransform.to_mat4() * animatedEnitty->m_modelTransform.to_mat4();// *animatedEnitty->m_skeletonTransform.to_mat4();
 		worldMatrix = glm::mat4(1);
-		SkinnedModel* skinnedModel = AssetManager::skinnedModels[animatedEnitty->m_skinnedModelID];
+		SkinnedModel* skinnedModel = animatedEnitty->GetSkinnedModel();
 
 		for (int i = 0; i < skinnedModel->m_BoneInfo.size(); i++)
 		{
@@ -664,7 +665,7 @@ namespace HellEngine
 		//if (!s_demo)
 		{
 			GpuProfiler g("DrawAnimatedEntityDebugBones_Animated");
-			DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
+			// THIS WAS WHAT YOU WERE USING TO DEBUG RAGDOLLS DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
 		}
 
 		//
@@ -686,8 +687,9 @@ namespace HellEngine
 		glm::mat4 rot2 = glm::mat4_cast(Config::TEST_QUAT2);
 
 		glm::mat4 m = game->m_zombieGuy.m_ragdoll->Get_Top_Joint_World_Matrix(i);
-		DrawPoint(&s_solidColorShader, Util::GetTranslationFromMatrix(m), glm::vec3(1, 0, 0));
-		DrawTangentDebugAxis(&s_solidColorShader, m, 0.025f);
+		glm::mat4 m2 = game->m_zombieGuy.m_ragdoll->Get_Bottom_Joint_World_Matrix(i);
+	//	WERE USING THIS DrawPoint(&s_solidColorShader, Util::GetTranslationFromMatrix(m), glm::vec3(1, 0, 0));
+	// WERE USING THIS	DrawPoint(&s_solidColorShader, Util::GetTranslationFromMatrix(m2), glm::vec3(0, 1, 0));
 	}
 
 	/*
@@ -707,7 +709,14 @@ namespace HellEngine
 //	glm::vec3 p = Util::btVec3_to_glmVec3(trann.getOrigin());
 //	DrawPoint(&s_solidColorShader, p, glm::vec3(0, 1, 1));
 
+	SkinnedModel* skinnedModel = game->m_zombieGuy.GetSkinnedModel();
 
+	/*for (int i = 0; i < skinnedModel->m_NumBones; i++)
+	{
+		glm::mat4 m = skinnedModel->m_BoneInfo[i].NodeTransformation;
+		DrawTangentDebugAxis(&s_solidColorShader, m, 0.05f);
+	}*/
+	
 	// find magic matrix
 	Ragdoll* ragdoll = game->m_zombieGuy.m_ragdoll;
 	{
@@ -774,7 +783,7 @@ namespace HellEngine
 	//DrawPoint(&s_solidColorShader, p, glm::vec3(1, 1, 0));
 	//	DrawPoint(&s_solidColorShader, p2, glm::vec3(0, 1, 1));
 
-	SkinnedModel* skinnedModel = AssetManager::skinnedModels[game->m_zombieGuy.m_skinnedModelID];
+	//SkinnedModel* skinnedModel = AssetManager::skinnedModels[game->m_zombieGuy.m_skinnedModelID];
 	glm::vec3 thigh_r = Util::GetTranslationFromMatrix(skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_r"]].ModelSpace_AnimatedTransform);
 	glm::vec3 calf_r = Util::GetTranslationFromMatrix(skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["calf_r"]].ModelSpace_AnimatedTransform);
 
@@ -833,10 +842,11 @@ namespace HellEngine
 		}
 
 
-		glm::mat4 camMat = game->m_shotgunAnimatedEntity.GetCameraMatrix();
-		std::string text = Util::Mat4ToString(camMat);
+		//glm::mat4 camMat = game->m_shotgunAnimatedEntity.GetCameraMatrix();
+		std::string text = "";// Util::Mat4ToString(camMat);
 
-		text += "Anim index: ";
+
+	/*	text += "Anim index: ";
 		text += std::to_string(game->m_shotgunAnimatedEntity.m_currentAnimationIndex) + "\n";
 		text += "Anim time: ";
 		text += std::to_string(game->m_shotgunAnimatedEntity.m_currentAnimationTime) + "\n";
@@ -846,9 +856,9 @@ namespace HellEngine
 		if (game->m_shotgunAnimatedEntity.IsAnimationComplete())
 			text += "Anim commplete: TRUE\n";
 		else
-			text += "Anim commplete: FALSE\n";
+			text += "Anim commplete: FALSE\n";*/
 
-		text += "Movement State: ";
+		/*text += "Movement State: ";
 		if (game->m_player.m_movementState == PlayerMovementState::STOPPED)
 			text += "STOPPED\n";
 		if (game->m_player.m_movementState == PlayerMovementState::WALKING)
@@ -884,14 +894,23 @@ namespace HellEngine
 		if (ShotgunLogic::m_ironSightState == IronSightState::IRON_SIGHTING)
 			text += "IRON_SIGHTING\n";
 		if (ShotgunLogic::m_ironSightState == IronSightState::NOT_IRON_SIGHTING)
-			text += "NOT_IRON_SIGHTING\n";
+			text += "NOT_IRON_SIGHTING\n";*/
 
-		text += s_debugString;
+	
 
 
 
 		text = "FPS: ";
 		text += std::to_string(game->m_fps);
+		text += "\n";
+			
+
+		text += "Weapon: ";
+		text += std::to_string(WeaponLogic::s_SelectedWeapon);
+		text += "\n";
+
+		//s_debugString = Util::Mat4ToString(WeaponLogic::s_AnimatedCameraMatrix);
+		//text += s_debugString;
 
 		TextBlitter::BlitText(text, false);
 		{
@@ -1706,7 +1725,7 @@ namespace HellEngine
 
 	//	game->m_zombieAnimatedEntity.SetModelScale(Config::TEST_FLOAT);
 		
-		SkinnedModel* skinnedModel = AssetManager::skinnedModels[game->m_zombieGuy.m_skinnedModelID];
+		SkinnedModel* skinnedModel = game->m_zombieGuy.GetSkinnedModel();
 
 		//for (unsigned int i = 0; i < skinnedModel->m_NumBones; i++)
 		//	shader->setMat4("skinningMats[" + std::to_string(i) + "]", skinnedModel->m_BoneInfo[i].DebugMatrix_BindPose);
@@ -1718,6 +1737,7 @@ namespace HellEngine
 		//if (!s_demo)
 
 		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("NumberGrid"));
+		//AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shell"));
 			game->m_zombieGuy.Draw(shader, glm::mat4(1));
 
 	//	s_debugString += "\nmodelTransform\n";
@@ -1728,22 +1748,13 @@ namespace HellEngine
 		// NURSE GUY //
 		///////////////
 		
-		game->m_NurseGuy.Draw(shader, glm::mat4(1));
+		//game->m_NurseGuy.Draw(shader, glm::mat4(1));
 
 
 		// First pesron weapon
 		if (s_RenderSettings.DrawWeapon)
-		{
-			GpuProfiler g("Weapon");
-
-			static Transform trans;
-			trans.position = game->camera.m_viewPos;
-			trans.rotation = game->camera.m_transform.rotation;
-			trans.scale = glm::vec3(0.002f);
-			glm::mat4 HUD_SHOTGUN_MATRIX = trans.to_mat4() * game->camera.m_weaponSwayTransform.to_mat4();
-
-			AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shotgun"));
-			game->m_shotgunAnimatedEntity.Draw(shader, HUD_SHOTGUN_MATRIX);
+		{			
+			WeaponLogic::RenderCurrentWeapon(shader, &game->camera);
 		}
 
 
@@ -1757,17 +1768,17 @@ namespace HellEngine
 	//	game->m_testAnimatedEnttity.Draw(shader, glm::mat4(1));
 		shader->setInt("hasAnimation", false);
 
-/*
-		game->m_testAnimatedEnttity2.m_worldTransform = Renderer::s_DebugTransform2;
+
+		//game->m_glockAnimatedEntiyty.m_worldTransform = Renderer::s_DebugTransform2;
 //		game->m_testAnimatedEnttity2.m_worldTransform.position = glm::vec3(1, 1.25f, 0);
 //		game->m_testAnimatedEnttity2.m_worldTransform.rotation = glm::vec3(0, 0, 0);
-		game->m_testAnimatedEnttity2.m_worldTransform.scale = glm::vec3(0.0125f);
+		//game->m_glockAnimatedEntiyty.m_worldTransform.scale = glm::vec3(0.0125f);
 
 		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("White"));
 		//glDisable(GL_DEPTH_TEST);
-		game->m_testAnimatedEnttity2.Draw(shader, glm::mat4(1));
+		//game->m_glockAnimatedEntiyty.Draw(shader, glm::mat4(1));
 		shader->setInt("hasAnimation", false);
-		*/
+		
 
 		// Glass
 		/*Transform transform;

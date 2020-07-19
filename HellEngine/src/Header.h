@@ -150,7 +150,7 @@ enum GunState { FIRING, IDLE, RELOADING};
 enum ReloadState { FROM_IDLE, SINGLE_RELOAD, DOUBLE_RELOAD, BACK_TO_IDLE, NOT_RELOADING };
 enum IronSightState { NOT_IRON_SIGHTING, BEGIN_IRON_SIGHTING, IRON_SIGHTING, END_IRON_SIGHTING};
 
-enum DoorWayType { DOOR, STAIRCASE_OPENING };
+enum DoorWayType { DOOR, STAIRCASE_OPENING, WINDOW };
 
 struct DoorWay {
 	DoorWayType type;
@@ -158,6 +158,9 @@ struct DoorWay {
 	Axis axis;
 	int story;
 	void* parent;
+	float bottom_Y;
+	float top_Y;
+	float width;
 };
 
 struct AssetInfo {
@@ -191,6 +194,11 @@ enum VB_TYPES {
 	BONE_VB,
 	NUM_VBs
 };    
+
+enum WEAPON {
+	GLOCK,
+	SHOTGUN
+};
 
 #define POSITION_LOCATION    0
 #define NORMAL_LOCATION		 1

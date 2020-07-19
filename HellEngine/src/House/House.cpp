@@ -20,6 +20,12 @@ namespace HellEngine
 	void House::Draw(Shader* shader, bool envMapPass)
 	{
 		GpuProfiler g("House");
+		for (Window& window : m_windows) {
+			static int floorMaterialID = AssetManager::GetMaterialIDByName("FloorBoards");
+			AssetManager::BindMaterial(floorMaterialID);
+			window.Draw(shader); 
+		}
+
 		for (Room& room : m_rooms)
 			room.Draw(shader);
 
@@ -66,6 +72,11 @@ namespace HellEngine
 		m_staircases.emplace_back(staircase);
 	}
 
+	void House::AddWindow(float x, float z, int story, float height, Axis axis)
+	{
+		m_windows.push_back(Window(x, z, story, height, axis));
+	}
+
 /*	void House::BuildWallMeshes()
 	{
 		for (Room& room : m_rooms) {
@@ -79,7 +90,7 @@ namespace HellEngine
 		// Clear the room vectors, and reconstruc the floors/ceilings etc.
 		for (Room& room : m_rooms) {
 			room.Rebuild(); 
-			room.FindDoors(m_doors, m_staircases);
+			room.FindDoors(m_doors, m_staircases, m_windows);
 			room.BuildWallMesh();
 			room.m_wallMesh.BufferMeshToGL();
 			room.CalculateWorldSpaceBounds();

@@ -124,6 +124,7 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Couch.obj"));
 		models.emplace_back(Model("res/models/Mannequin.obj"));
 		models.emplace_back(Model("res/models/Shell.obj"));
+		models.emplace_back(Model("res/models/Window.obj"));
 		//models.emplace_back(Model("res/models/Glock.obj"));
 		//models.emplace_back(Model("res/models/Glass.obj"));
 
@@ -138,6 +139,7 @@ namespace HellEngine
 
 		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("Glock.fbx"));
 		LoadAnimation("Glock.fbx", "Glock_Idle.fbx");
+		LoadAnimation("Glock.fbx", "Glock_EmptyReload.fbx");
 	
 
 		/*skinnedModels.emplace_back(new SkinnedModel());
@@ -405,7 +407,7 @@ namespace HellEngine
 		std::cout << skinnedModelName << " MESH NAMES:\n";
 
 			for (int i = 0; i < skinnedModels[ID]->m_meshEntries.size(); i++)
-			std::cout << " - " << skinnedModels[ID]->m_meshEntries[i].MeshName << "\n";
+			std::cout << " - " << skinnedModels[ID]->m_meshEntries[i].Name << "\n";
 	}
 
 	void AssetManager::PrintSkinnedModelBoneNames(const char* skinnedModelName)

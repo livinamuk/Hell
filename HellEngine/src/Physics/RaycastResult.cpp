@@ -59,11 +59,14 @@ namespace HellEngine
 			// Find rigid body
 			int RayCastWorldArrayIndex = (int)rayCallback.m_collisionObject->getWorldArrayIndex();
 
-			btRigidBody* rigidBody = (btRigidBody*)rayCallback.m_collisionObject;
 
 			m_hitPoint = Util::btVec3_to_glmVec3(rayCallback.m_hitPointWorld);
 			m_distance = (rayCallback.m_hitPointWorld - Util::glmVec3_to_btVec3(rayOrigin)).length();
 			m_surfaceNormal = Util::btVec3_to_glmVec3(rayCallback.m_hitNormalWorld);
+
+			btRigidBody* rigidBody = (btRigidBody*)rayCallback.m_collisionObject;
+			if (rigidBody)
+				m_rigidBody = rigidBody;
 
 			EntityData* entityData = (EntityData*)rigidBody->getUserPointer();
 			if (entityData) {

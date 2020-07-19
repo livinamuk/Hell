@@ -4,6 +4,7 @@
 #include "House/Door.h"
 #include "House/Floor.h"
 #include "House/Ceiling.h"
+#include "House/Window.h"
 #include "House/Staircase.h"
 //#include "GL/LightVolume.h"
 
@@ -17,7 +18,7 @@ namespace HellEngine
 		void Draw(Shader* shader);
 		void Rebuild();
 
-		void FindDoors(std::vector<Door>& doors, std::vector<Staircase>& staircases);
+		void FindDoors(std::vector<Door>& doors, std::vector<Staircase>& staircases, std::vector<Window>& windows);
 		void BuildWallMesh();
 		void AddFloorTrim(glm::vec3 position, float rotation, float scale);
 		void AddCeilingTrim(glm::vec3 position, float rotation, float scale);

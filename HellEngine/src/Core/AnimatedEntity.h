@@ -12,8 +12,10 @@ namespace HellEngine
 		//void Draw(Shader* shader);
 		void Draw(Shader* shader, glm::mat4 modelMatrix);
 		void SetSkinnedModel(const char* skinnedModelName);
+		void SetMaterial(const char* MeshName, const char* MaterialName);
 		void PlayAnimation(const char* animationName, bool loop);
 		glm::mat4 GetCameraMatrix();
+		SkinnedModel* GetSkinnedModel();
 		bool IsAnimationComplete();
 		bool IsSpecificAnimationComplete(const char* animationName);
 		void ResetAnimationTimer();
@@ -21,13 +23,13 @@ namespace HellEngine
 		void SetModelScale(float scale);
 		//void FlipModelUpAxis(bool flip);
 		void SetAnimationToBindPose();
+		void PauseAnimation();
 
 	public:	// fields
 		Transform m_worldTransform;
 		Transform m_modelTransform;
 		//Transform m_skeletonTransform;
-		int m_skinnedModelID = -1;
-		std::vector<int> m_meshMaterialIDs;
+		std::vector<int> m_MaterialIDs; // one for each mesh
 		std::vector<glm::mat4> m_animatedTransforms;
 		std::vector<glm::mat4> m_animatedDebugTransforms_Animated;
 		//std::vector<glm::mat4> m_animatedDebugTransforms_BindPose;
@@ -42,6 +44,7 @@ namespace HellEngine
 		bool m_loopCurrentAnimation;
 		float m_animationSpeed;
 		bool m_animationIsComplete;
-		
+		int m_skinnedModelID = -1;		
+		bool m_pause = false;
 	};
 }

@@ -301,6 +301,80 @@ namespace HellEngine
 		}
 		ImGui::EndTabBar();
 		ImGui::Text(" ");
+
+
+		/////////////
+		// WINDOWS //
+		///////////// 
+
+		ImGui::BeginTabBar("WINDOWS_TAB_BAR", tab_bar_flags);
+
+		std::vector<std::string> currentWindowAxis;
+		for (int i = 0; i < game->house.m_windows.size(); i++)
+			currentWindowAxis.push_back(Util::AxisToString(game->house.m_windows[i].m_axis));
+
+		for (int i = 0; i < game->house.m_windows.size(); i++)
+		{
+			if (ImGui::BeginTabItem(("Window " + std::to_string(i)).c_str()))
+			{
+				if (ImGui::InputFloat("X Pos", &game->house.m_windows[i].m_transform.position.x)) {
+					game->RebuildMap();
+					game->house.m_windows[i].Reconfigure();
+				}
+				if (ImGui::InputFloat("Z Pos", &game->house.m_windows[i].m_transform.position.z)) {
+					game->RebuildMap();
+					game->house.m_windows[i].Reconfigure();
+				}
+				if (ImGui::InputFloat("height", &game->house.m_windows[i].m_startHeight)) {
+					game->RebuildMap();
+					game->house.m_windows[i].Reconfigure();
+				}
+				if (ImGui::InputInt("Story", &game->house.m_windows[i].m_story)) {
+					game->RebuildMap(); 
+					game->house.m_windows[i].Reconfigure();
+				}
+
+				ImGui::Text("Story");
+				ImGui::SameLine(); if (ImGui::Button("<##A")) {
+					game->house.m_windows[i].m_story -= 1;
+					game->house.m_windows[i].Reconfigure();
+				}
+				ImGui::SameLine(); if (ImGui::Button(">##B")) {
+					game->house.m_windows[i].m_story += 1;
+					game->house.m_windows[i].Reconfigure();
+				}
+			
+				ImGui::Text("Rotation Axis ");
+				const char* axisList[4] = { "POS_X", "NEG_X", "POS_Z", "NEG_Z" };
+				ImGui::SameLine();
+				ImGui::PushItemWidth(100);
+				if (ImGui::BeginCombo("##combo7", currentWindowAxis[i].c_str()))
+				{
+					for (int n = 0; n < 4; n++)
+					{
+						bool is_selected = (currentWindowAxis[i] == axisList[n]);
+						if (ImGui::Selectable(axisList[n], is_selected)) {
+							game->house.m_windows[i].m_axis = Util::StringToAxis(axisList[n]);
+							game->house.m_windows[i].Reconfigure();
+						}
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+				if (ImGui::Button("Delete Window")) {
+					game->house.m_windows.erase(game->house.m_windows.begin() + i);
+					game->RebuildMap();
+				}
+				ImGui::EndTabItem();
+			}
+		}
+		if (ImGui::Button("New Window")) {
+			game->house.m_windows.push_back(Window(0, 0, 0, 0.6f, Axis::POS_X));
+			game->RebuildMap();
+		}
+		ImGui::EndTabBar();
+		ImGui::Text(" ");
 		
 		////////////////
 		// STAIRCASES //

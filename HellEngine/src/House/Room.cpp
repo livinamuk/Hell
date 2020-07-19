@@ -82,7 +82,7 @@ namespace HellEngine
 		shader->setVec2("TEXTURE_SCALE", glm::vec2(1.0, 1.0));
 	}
 
-	void Room::FindDoors(std::vector<Door>& doors, std::vector<Staircase>& staircases)
+	void Room::FindDoors(std::vector<Door>& doors, std::vector<Staircase>& staircases, std::vector<Window>& windows)
 	{
 		float low_x = std::min(m_position.x - (m_size.x / 2), m_position.x + (m_size.x / 2));
 		float high_x = std::max(m_position.x - (m_size.x / 2), m_position.x + (m_size.x / 2));
@@ -96,7 +96,31 @@ namespace HellEngine
 
 		std::vector<DoorWay> potentialConnectedDoorWays;
 
+
+		for (Window& window : windows) {
+			DoorWay doorWay;
+			doorWay.position = window.m_transform.position;
+			doorWay.type = DoorWayType::WINDOW;
+			doorWay.story = window.m_story;
+			doorWay.axis = window.m_axis;
+			doorWay.parent = &window;
+			doorWay.bottom_Y = (window.m_story * ROOM_HEIGHT) + window.m_startHeight - 0.05F;;
+			doorWay.top_Y = (window.m_story * ROOM_HEIGHT) + window.m_startHeight + 1.15f; // hardcoded height of main window model
+			doorWay.width = 0.75; // hardcoded width of main window model
+			potentialConnectedDoorWays.push_back(doorWay);
+		}
+
 		for (Staircase& staircase : staircases) {
+
+			staircase.m_bottomDoorway.width = DOOR_WIDTH;
+			staircase.m_topDoorway.width = DOOR_WIDTH;
+
+			staircase.m_bottomDoorway.bottom_Y = (staircase.m_story * ROOM_HEIGHT);
+			staircase.m_bottomDoorway.top_Y = (staircase.m_story * ROOM_HEIGHT) + DOOR_HEIGHT;
+
+			staircase.m_topDoorway.bottom_Y = ((staircase.m_story + 1) * ROOM_HEIGHT);
+			staircase.m_topDoorway.top_Y = ((staircase.m_story + 1) * ROOM_HEIGHT) + DOOR_HEIGHT;
+
 			potentialConnectedDoorWays.push_back(staircase.m_bottomDoorway);
 			potentialConnectedDoorWays.push_back(staircase.m_topDoorway);
 		}
@@ -107,7 +131,10 @@ namespace HellEngine
 			doorWay.type = DoorWayType::DOOR;
 			doorWay.story = door.m_story;
 			doorWay.axis = door.m_axis;
-			doorWay.parent = &door;
+			doorWay.parent = &door; 
+			doorWay.bottom_Y = (door.m_story * ROOM_HEIGHT);
+			doorWay.top_Y = (door.m_story * ROOM_HEIGHT) + DOOR_HEIGHT;
+			doorWay.width = DOOR_WIDTH;
 			potentialConnectedDoorWays.push_back(doorWay);
 		}
 
@@ -127,14 +154,6 @@ namespace HellEngine
 				if (withinRange(doorWay.position.x, high_x - 0.2f, high_x + 0.2f))
 					m_doorWaysZRightWall.push_back(doorWay);
 			}
-
-			// Falls within Z wall range...
-			/*if (withinRange(doorWay.position.z, low_z, high_z)) {
-				if (sameCoordinate(doorWay.position.x, low_x - 0.05f))
-					m_doorWaysLeftWall.push_back(doorWay);
-				else if (sameCoordinate(doorWay.position.x, high_x + 0.05f))
-					m_doorWaysRightWall.push_back(doorWay);
-			}*/
 		}
 
 		// Sort em
@@ -165,6 +184,8 @@ namespace HellEngine
 		{
 			wallWidth = m_doorWaysXFrontWall[i].position.x - cursorX - (DOOR_WIDTH / 2);
 			m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX + wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), POS_X); // wall
+			
+			
 			AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), 0, wallWidth);
 			AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), 0, wallWidth);
 			cursorX += wallWidth + DOOR_WIDTH;
@@ -201,14 +222,28 @@ namespace HellEngine
 		cursorZ = high_z;
 		cursorX = low_x;
 		for (int i = 0; i < m_doorWaysZLeftWall.size(); i++) {
-			float wallWidth = cursorZ - m_doorWaysZLeftWall[i].position.z - (DOOR_WIDTH / 2);
+
+			DoorWay* doorway = &m_doorWaysZLeftWall[i];
+
+			float wallWidth = cursorZ - m_doorWaysZLeftWall[i].position.z - (doorway->width / 2);
 			m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ - wallWidth), POS_Z); // wall
+		
+
+			
 			AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_90, wallWidth);
 			AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_90, wallWidth);
-			cursorZ -= wallWidth + DOOR_WIDTH;
+			cursorZ -= wallWidth + doorway->width;
+			
+			// Window lower wall part
+			if (doorway->bottom_Y > 0) {
+				m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y, cursorZ + doorway->width), glm::vec3(cursorX, ROOM_Y + doorway->bottom_Y + bias, cursorZ), POS_Z);
+				AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ + doorway->width), ROTATE_90, doorway->width);
+			}
+
+			m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y + DOOR_HEIGHT, cursorZ + doorway->width), glm::vec3(cursorX, ROOM_Y + ROOM_HEIGHT + bias, cursorZ), POS_Z);
+
 			//if (m_doorWaysLeftWall[i].type == DoorWayType::DOOR) {
-				m_wallMesh.AddQuad(glm::vec3(cursorX, DOOR_HEIGHT + ROOM_Y, cursorZ + DOOR_WIDTH), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), POS_Z); // above door
-				AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ + DOOR_WIDTH), ROTATE_90, DOOR_WIDTH);
+				AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ + doorway->width), ROTATE_90, doorway->width);
 			//}
 		}
 		wallWidth = cursorZ - low_z;

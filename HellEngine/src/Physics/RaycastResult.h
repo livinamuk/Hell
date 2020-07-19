@@ -17,6 +17,7 @@ namespace HellEngine
 		float m_distance;
 		glm::vec3 m_hitPoint;
 		glm::vec3 m_surfaceNormal;
+		btRigidBody* m_rigidBody = nullptr;
 		char* m_name;
 	};
 }

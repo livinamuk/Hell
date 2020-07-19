@@ -58,10 +58,8 @@ namespace HellEngine
 
 		static bool s_dontLoadShotgun;
 
-		AnimatedEntity m_shotgunAnimatedEntity;
 		AnimatedEntity m_testAnimatedEnttity;
 
-		AnimatedEntity m_testAnimatedEnttity2;
 
 		AnimatedEntity m_NurseGuy;
 

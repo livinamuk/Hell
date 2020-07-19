@@ -225,7 +225,7 @@ namespace HellEngine
 		int group = CollisionGroups::HOUSE;
 		int mask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
 
-	//	s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
+		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
 
 		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	}
@@ -298,7 +298,7 @@ namespace HellEngine
 		int group = CollisionGroups::HOUSE;
 		int mask = CollisionGroups::PLAYER | CollisionGroups::ENEMY;
 
-	//	s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
+		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
 
 		s_collisionObjects.push_back(collisionObject);
 
@@ -459,7 +459,7 @@ namespace HellEngine
 		btCollisionObject* collisionObject = new btCollisionObject();
 		collisionObject->setCollisionShape(triangleMeshShape);
 		collisionObject->setWorldTransform(meshTransform);
-		collisionObject->setFriction(0);
+		collisionObject->setFriction(0.5);
 		collisionObject->setCustomDebugColor(btVector3(1, 0, 0));
 		EntityData* entityData = new EntityData();
 		entityData->name = "NEW MESH";

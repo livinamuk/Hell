@@ -79,7 +79,7 @@ namespace HellEngine
         std::cout << " " << skinnedModel->m_NumBones << " bones\n";
 
         for (int i = 0; i < skinnedModel->m_meshEntries.size(); i++)  {
-            std::cout << " -" << skinnedModel->m_meshEntries[i].MeshName << ": " << skinnedModel->m_meshEntries[i].NumIndices << " indices " << skinnedModel->m_meshEntries[i].BaseIndex << " base index " << skinnedModel->m_meshEntries[i].BaseVertex << " base vertex\n";
+            std::cout << " -" << skinnedModel->m_meshEntries[i].Name << ": " << skinnedModel->m_meshEntries[i].NumIndices << " indices " << skinnedModel->m_meshEntries[i].BaseIndex << " base index " << skinnedModel->m_meshEntries[i].BaseVertex << " base vertex\n";
         }
 
 
@@ -102,95 +102,94 @@ namespace HellEngine
         return skinnedModel;
 	}
 
-    bool FileImporter::InitFromScene(SkinnedModel* skinnedModel, const aiScene* pScene, const string& Filename)
+    bool FileImporter::InitFromScene(SkinnedModel* skinnedModel, const aiScene* pScene, const std::string& Filename)
     {
-            skinnedModel->m_meshEntries.resize(pScene->mNumMeshes);
+        skinnedModel->m_meshEntries.resize(pScene->mNumMeshes);
 
+        std::vector<glm::vec3> Positions;
+        std::vector<glm::vec3> Normals;
+        std::vector<glm::vec2> TexCoords;
+        std::vector<VertexBoneData> Bones;
+        std::vector<unsigned int> Indices;
 
-            vector<glm::vec3> Positions;
-            vector<glm::vec3> Normals;
-            vector<glm::vec2> TexCoords;
-            vector<VertexBoneData> Bones;
-            vector<unsigned int> Indices;
+        unsigned int NumVertices = 0;
+        unsigned int NumIndices = 0;
 
-            unsigned int NumVertices = 0;
-            unsigned int NumIndices = 0;
+        // Count the number of vertices and indices
+        for (unsigned int i = 0; i < skinnedModel->m_meshEntries.size(); i++)
+        {
+            skinnedModel->m_meshEntries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
+            skinnedModel->m_meshEntries[i].BaseVertex = NumVertices;
+            skinnedModel->m_meshEntries[i].BaseIndex = NumIndices;
+            skinnedModel->m_meshEntries[i].Name = pScene->mMeshes[i]->mName.C_Str();
 
-            // Count the number of vertices and indices
-            for (unsigned int i = 0; i < skinnedModel->m_meshEntries.size(); i++)
-            {
-                skinnedModel->m_meshEntries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
-                skinnedModel->m_meshEntries[i].BaseVertex = NumVertices;
-                skinnedModel->m_meshEntries[i].BaseIndex = NumIndices;
-                skinnedModel->m_meshEntries[i].MeshName = pScene->mMeshes[i]->mName.C_Str();
-
-                NumVertices += pScene->mMeshes[i]->mNumVertices;
-                NumIndices += skinnedModel->m_meshEntries[i].NumIndices;
-            }
-
-            // Reserve space in the vectors for the vertex attributes and indices
-            Positions.reserve(NumVertices);
-            Normals.reserve(NumVertices);
-            TexCoords.reserve(NumVertices);
-            Bones.resize(NumVertices);
-            Indices.reserve(NumIndices);
-
-
-            // Initialize the meshes in the scene one by one
-            for (unsigned int i = 0; i < skinnedModel->m_meshEntries.size(); i++) {
-                const aiMesh* paiMesh = pScene->mMeshes[i];
-                InitMesh(skinnedModel, i, paiMesh, Positions, Normals, TexCoords, Bones, Indices);
-            }
-
-
-            glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[POS_VB]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
-            glEnableVertexAttribArray(POSITION_LOCATION);
-            glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-            glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[NORMAL_VB]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
-            glEnableVertexAttribArray(NORMAL_LOCATION);
-            glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-            glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[TEXCOORD_VB]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], GL_STATIC_DRAW);
-            glEnableVertexAttribArray(TEX_COORD_LOCATION);
-            glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-            glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[TANGENT_VB]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
-            glEnableVertexAttribArray(TANGENT_LOCATION);
-            glVertexAttribPointer(TANGENT_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-            glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[BITANGENT_VB]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
-            glEnableVertexAttribArray(BITANGENT_LOCATION);
-            glVertexAttribPointer(BITANGENT_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-            glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[BONE_VB]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(Bones[0]) * Bones.size(), &Bones[0], GL_STATIC_DRAW);
-            glEnableVertexAttribArray(BONE_ID_LOCATION);
-            glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
-            glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
-            glVertexAttribPointer(BONE_WEIGHT_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16);
-
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skinnedModel->m_Buffers[INDEX_BUFFER]);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
-
-            //std::cout << "INDICES.size: " << Indices.size() << "\n";
-
-            return true;
+            NumVertices += pScene->mMeshes[i]->mNumVertices;
+            NumIndices += skinnedModel->m_meshEntries[i].NumIndices;
         }
+
+        // Reserve space in the vectors for the vertex attributes and indices
+        Positions.reserve(NumVertices);
+        Normals.reserve(NumVertices);
+        TexCoords.reserve(NumVertices);
+        Bones.resize(NumVertices);
+        Indices.reserve(NumIndices);
+
+
+        // Initialize the meshes in the scene one by one
+        for (unsigned int i = 0; i < skinnedModel->m_meshEntries.size(); i++) {
+            const aiMesh* paiMesh = pScene->mMeshes[i];
+            InitMesh(skinnedModel, i, paiMesh, Positions, Normals, TexCoords, Bones, Indices);
+        }
+
+
+        glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[POS_VB]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
+        glEnableVertexAttribArray(POSITION_LOCATION);
+        glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[NORMAL_VB]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
+        glEnableVertexAttribArray(NORMAL_LOCATION);
+        glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[TEXCOORD_VB]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], GL_STATIC_DRAW);
+        glEnableVertexAttribArray(TEX_COORD_LOCATION);
+        glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[TANGENT_VB]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
+        glEnableVertexAttribArray(TANGENT_LOCATION);
+        glVertexAttribPointer(TANGENT_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[BITANGENT_VB]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
+        glEnableVertexAttribArray(BITANGENT_LOCATION);
+        glVertexAttribPointer(BITANGENT_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, skinnedModel->m_Buffers[BONE_VB]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Bones[0]) * Bones.size(), &Bones[0], GL_STATIC_DRAW);
+        glEnableVertexAttribArray(BONE_ID_LOCATION);
+        glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
+        glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
+        glVertexAttribPointer(BONE_WEIGHT_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skinnedModel->m_Buffers[INDEX_BUFFER]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
+
+        //std::cout << "INDICES.size: " << Indices.size() << "\n";
+
+        return true;
+    }
 
 
     void FileImporter::InitMesh(SkinnedModel* skinnedModel, unsigned int MeshIndex,
         const aiMesh* paiMesh,
-        vector<glm::vec3>& Positions,
-        vector<glm::vec3>& Normals,
-        vector<glm::vec2>& TexCoords,
-        vector<VertexBoneData>& Bones,
-        vector<unsigned int>& Indices)
+        std::vector<glm::vec3>& Positions,
+        std::vector<glm::vec3>& Normals,
+        std::vector<glm::vec2>& TexCoords,
+        std::vector<VertexBoneData>& Bones,
+        std::vector<unsigned int>& Indices)
     {
         const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
         
@@ -234,11 +233,11 @@ namespace HellEngine
 
 
 
-    void FileImporter::LoadBones(SkinnedModel* skinnedModel, unsigned int MeshIndex, const aiMesh* pMesh, vector<VertexBoneData>& Bones)
+    void FileImporter::LoadBones(SkinnedModel* skinnedModel, unsigned int MeshIndex, const aiMesh* pMesh, std::vector<VertexBoneData>& Bones)
     {
         for (unsigned int i = 0; i < pMesh->mNumBones; i++) {
             unsigned int BoneIndex = 0;
-            string BoneName(pMesh->mBones[i]->mName.data);
+            std::string BoneName(pMesh->mBones[i]->mName.data);
 
             if (skinnedModel->m_BoneMapping.find(BoneName) == skinnedModel->m_BoneMapping.end()) {
                 // Allocate an index for a new bone

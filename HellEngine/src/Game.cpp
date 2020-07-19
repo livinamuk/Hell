@@ -6,6 +6,7 @@
 #include "Core/CoreGL.h"
 #include "GL/Quad2D.h"
 #include "Audio/Audio.h"
+#include "Logic/WeaponLogic.h"
 #include "Logic/ShotgunLogic.h"
 #include "Config.h"
 #include "Core/EnemyCharacter.h"
@@ -27,21 +28,21 @@ namespace HellEngine
 		// Set up sketchy ass pointers
 		ShotgunLogic::p_camera = &camera;
 		ShotgunLogic::p_player = &m_player;
-		ShotgunLogic::p_model = &m_shotgunAnimatedEntity;
 		
+
 		Physics::Init();
+		WeaponLogic::Init();
 
 		this->house = File::LoadMap("Map.txt");
 		this->RebuildMap();
 
-		m_shotgunAnimatedEntity.SetSkinnedModel("Shotgun.fbx");
+
+	
 
 
 		m_testAnimatedEnttity.SetSkinnedModel("Shotgun.fbx");
 		m_testAnimatedEnttity.m_currentAnimationIndex = 5;
 
-		m_testAnimatedEnttity2.SetSkinnedModel("Glock.fbx");
-		m_testAnimatedEnttity2.m_currentAnimationIndex = 0;
 
 		AssetManager::PrintSkinnedModelMeshNames("Glock.fbx");
 
@@ -55,6 +56,14 @@ namespace HellEngine
 		m_zombieGuy.SetAnimationToBindPose();
 		m_zombieGuy.NewRagdollFromAnimatedTransforms();
 
+
+
+
+
+		m_zombieGuy.SetMaterial("Body_LOD0", "Zombie_Face");
+		m_zombieGuy.SetMaterial("Tshirt_LOD0", "Zombie_Shirt");
+		m_zombieGuy.SetMaterial("Hair_LOD0", "Zombie_Hair");
+		m_zombieGuy.SetMaterial("BTM_LOD0", "Zombie_Jeans");
 
 		//AssetManager::PrintSkinnedModelMeshNames("Shotgun.fbx");
 
@@ -73,7 +82,7 @@ namespace HellEngine
 
 	void Game::OnUpdate()
 	{
-		
+		WeaponLogic::Update(m_frameTime);
 
 		//m_NurseGuy.m_worldTransform = Renderer::s_DebugTransform;
 
@@ -87,25 +96,15 @@ namespace HellEngine
 
 		if (Input::s_keyPressed[HELL_KEY_M])
 		{
-			SkinnedModel* skinnedModel = AssetManager::skinnedModels[m_zombieGuy.m_skinnedModelID];
+		
+			SkinnedModel* skinnedModel = m_zombieGuy.GetSkinnedModel();
 			glm::mat4 m = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_r"]].ModelSpace_AnimatedTransform;
 
-			std::cout << "\n\noriginal matrix:\n";
-			Util::PrintMat4(m);
+			//Ragdoll* ragdoll = m_zombieGuy.m_ragdoll;
+			//btGeneric6DofConstraint* constraint = ragdoll->m_joints[Ragdoll::JOINT_RIGHT_HIP];
+			//btRigidBody* body = ragdoll->m_bodies[Ragdoll::BODYPART_RIGHT_UPPER_LEG];
 
-			glm::quat q = q = glm::quat_cast(m);
-			m = glm::mat4_cast(q);
-
-			std::cout << "\nnew matrix:\n";
-			Util::PrintMat4(m);
-
-			Ragdoll* ragdoll = m_zombieGuy.m_ragdoll;
-			btGeneric6DofConstraint* constraint = ragdoll->m_joints[Ragdoll::JOINT_RIGHT_HIP];
-			btRigidBody* body = ragdoll->m_bodies[Ragdoll::BODYPART_RIGHT_UPPER_LEG];
-
-		
-
-			constraint->calculateTransforms();
+			//constraint->calculateTransforms();
 
 			//constraint.getr
 		}
@@ -113,7 +112,7 @@ namespace HellEngine
 		m_player.Update(m_frameTime);
 		m_player.m_characterController.Update(m_frameTime, &camera);
 
-		
+
 		Physics::Update(m_frameTime);
 
 
@@ -130,9 +129,10 @@ namespace HellEngine
 			for (int i = 0; i < Ragdoll::BODYPART_COUNT; ++i)
 				Physics::s_dynamicsWorld->removeRigidBody(m_zombieGuy.m_ragdoll->m_bodies[i]);
 
-		//	for (int i = 0; i < Ragdoll::JOINT_COUNT; ++i)
-		//		Physics::s_dynamicsWorld->removeConstraint(m_zombieGuy.m_ragdoll->m_joints[i]);
+			//for (int i = 0; i < Ragdoll::JOINT_COUNT; ++i)
+			//	Physics::s_dynamicsWorld->removeConstraint(m_zombieGuy.m_ragdoll->m_joints[i]);
 
+			m_zombieGuy.SetAnimationToBindPose();
 			m_zombieGuy.NewRagdollFromAnimatedTransforms();
 
 		}
@@ -171,12 +171,14 @@ namespace HellEngine
 		camera.m_zoomFactor = std::max(camera.m_zoomFactor, 0.0f);
 
 		camera.Update(m_frameTime);
-		camera.m_weaponCameraMatrix = m_shotgunAnimatedEntity.GetCameraMatrix();
+		camera.m_weaponCameraMatrix = WeaponLogic::GetCameraMatrix();
+
 		camera.CalculateMatrices(m_player.m_characterController.GetViewPosition());
 		camera.CalculateProjectionMatrix((float)SCR_WIDTH, (float)SCR_HEIGHT);
 		camera.CalculateWeaponSwayTransform(m_frameTime);
 
-		m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);
+		if (!Renderer::m_showImGui)
+			m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);
 
 	}
 
@@ -191,10 +193,11 @@ namespace HellEngine
 		float deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		WeaponLogic::UpdateSkeletalAnimation(deltaTime);
+
 		// Update all skeletal meshes
-		m_testAnimatedEnttity.Update(deltaTime);
-		m_testAnimatedEnttity2.Update(deltaTime);
-		m_shotgunAnimatedEntity.Update(deltaTime);
+		//m_testAnimatedEnttity.Update(deltaTime);
+
 		m_NurseGuy.Update(deltaTime);
 		
 		//m_zombieGuy.Update(deltaTime);
@@ -217,8 +220,11 @@ namespace HellEngine
 	{
 		static bool FIRST_BUILD = true;
 		
+
 		house.RebuildAll();
 		Physics::RebuildWorld(&house);
+
+
 
 		// Create player
 		glm::vec3 spawnPos;

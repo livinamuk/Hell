@@ -11,7 +11,7 @@ namespace HellEngine
         EnemyCharacter();
         void NewRagdollFromAnimatedTransforms();
         void AnimatedFromRagdoll();
-        void Draw(Shader* shader, glm::mat4 modelMatrix);
+        //void Draw(Shader* shader, glm::mat4 modelMatrix);
 
         Ragdoll* m_ragdoll;
         bool m_animatedWithRagdoll = true;

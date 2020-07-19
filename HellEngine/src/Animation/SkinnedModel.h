@@ -1,19 +1,11 @@
 #pragma once
-
 #include <map>
 #include <vector>
 #include <assert.h>
-//#include <assimp/Importer.hpp>      // C++ importer interface
-//#include <assimp/scene.h>       // Output data structure
-//#include <assimp/postprocess.h> // Post processing flags
-
 #include "header.h"
-
-#include "Animation/Animation.h"
 #include "Renderer/Mesh.h"
+#include "Animation/Animation.h"
 #include "Animation/Skeleton.h"
-
-using namespace std;
 
 namespace HellEngine
 {
@@ -21,26 +13,20 @@ namespace HellEngine
     {
     public:
         SkinnedModel();
-       // SkinnedModel(const char* filename);
         ~SkinnedModel();
 
-       // bool LoadMesh(const string& Filename);
-   //     bool LoadAnimation(const char* Filename);
         void Render(Shader* shader, const glm::mat4& modelMatrix);
-
+      
         glm::mat4 m_CameraMatrix = glm::mat4(1);
-
         Skeleton m_skeleton;
-
         const char* m_filename;
 
 
 
         std::vector<Animation*> m_animations;
 
-        void BoneTransform(float Time, vector<glm::mat4>& Transforms, vector<glm::mat4>& DebugAnimatedTransforms);
+        void BoneTransform(float Time, std::vector<glm::mat4>& Transforms, std::vector<glm::mat4>& DebugAnimatedTransforms);
    
-
 
     public:
 
@@ -50,6 +36,7 @@ namespace HellEngine
             glm::mat4 FinalTransformation;
             glm::mat4 ModelSpace_AnimatedTransform;
             glm::mat4 DebugMatrix_BindPose;
+            //glm::mat4 NodeTransformation;
             std::string BoneName;
 
             BoneInfo()
@@ -85,24 +72,24 @@ namespace HellEngine
                 NumIndices = 0;
                 BaseVertex = 0;
                 BaseIndex = 0;
-                MeshName = "No name";
+                Name = "";
             }
-
+        public:
             unsigned int NumIndices;
             unsigned int BaseVertex;
             unsigned int BaseIndex;
-            std::string MeshName;
+            std::string Name;
         };
 
     public:
-        vector<MeshEntry> m_meshEntries;
-        map<string, unsigned int> m_BoneMapping; // maps a bone name to its index
+        std::vector<MeshEntry> m_meshEntries;
+        std::map<std::string, unsigned int> m_BoneMapping; // maps a bone name to its index
 
     public:
         unsigned int m_NumBones;
-        vector<BoneInfo> m_BoneInfo;
+        std::vector<BoneInfo> m_BoneInfo;
         glm::mat4 m_GlobalInverseTransform;
 
-        unsigned int currentAnimationIndex = 0;
+        unsigned int currentAnimationIndex = 0; // should probably delete this for safety and pass it in as param from the animated entity
     };
 }

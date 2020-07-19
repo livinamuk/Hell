@@ -31,8 +31,13 @@ namespace HellEngine
 		enum
 		{
 			BODYPART_PELVIS = 0,
-			BODYPART_SPINE,
+
+			BODYPART_SPINE_01,
+			BODYPART_SPINE_02,
+			BODYPART_SPINE_03,
+
 			BODYPART_NECK,
+			BODYPART_HEAD,
 
 			BODYPART_LEFT_UPPER_LEG,
 			BODYPART_LEFT_LOWER_LEG,
@@ -51,8 +56,12 @@ namespace HellEngine
 
 		enum RAGDOLL_JOINT
 		{
-			JOINT_PELVIS_SPINE = 0,
-			JOINT_SPINE_HEAD,
+			JOINT_SPINE_01 = 0,
+			JOINT_SPINE_02,
+			JOINT_SPINE_03,
+
+			JOINT_SPINE_NECK,
+			JOINT_NECK_HEAD,
 
 			JOINT_LEFT_HIP,
 			JOINT_LEFT_KNEE,
@@ -85,7 +94,7 @@ namespace HellEngine
 		Ragdoll(const btVector3& positionOffset, float modelScale, glm::mat4 worldMatrix);
 		~Ragdoll();
 
-		void UpdateBoneTransform(SkinnedModel* skinnedModel, vector<glm::mat4>& Transforms, vector<glm::mat4>& DebugAnimatedTransforms);
+		void UpdateBoneTransform(SkinnedModel* skinnedModel, std::vector<glm::mat4>& Transforms, std::vector<glm::mat4>& DebugAnimatedTransforms);
 
 		btRigidBody* m_bodies[BODYPART_COUNT];
 

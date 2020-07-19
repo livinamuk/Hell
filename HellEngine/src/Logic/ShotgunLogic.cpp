@@ -67,17 +67,32 @@ namespace HellEngine
 
 			for (int i = 0; i < 12; i++)
 			{
-				RaycastResult ray;
-				ray.CastRay(p_camera->m_viewPos, p_camera->m_Front, 10.0f, 0.125f);
-				Decal::s_decals.push_back(Decal(ray.m_hitPoint, ray.m_surfaceNormal));
+				RaycastResult raycastResult;
+				raycastResult.CastRay(p_camera->m_viewPos, p_camera->m_Front, 10.0f, 0.125f);
+				
+				// make bullet hole if it aint the ragdoll
+				if (raycastResult.m_name != "RAGDOLL")
+					Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal));
 
-				if (ray.m_name == "NEW MESH") {
+				// make blood on couches and ragdolls
+				if ((raycastResult.m_name == "NEW MESH") || (raycastResult.m_name == "RAGDOLL")) {
 					Renderer::s_bloodEffect.m_CurrentTime = 0;
 					playFleshSound = true;
 					Renderer::s_hitPoint.position = m_raycast.m_hitPoint;
 					Renderer::s_hitPoint.rotation = p_camera->m_transform.rotation;
 				}
-				m_raycast = ray;
+				m_raycast = raycastResult;
+
+
+				if (raycastResult.m_name == "RAGDOLL") 
+				{
+					float FORCE_SCALING_FACTOR = 5;// Config::TEST_FLOAT;
+					raycastResult.m_rigidBody->activate(true);
+					btVector3 centerOfMass = raycastResult.m_rigidBody->getCenterOfMassPosition();
+					btVector3 hitPoint = Util::glmVec3_to_btVec3(raycastResult.m_hitPoint);
+					btVector3 force = Util::glmVec3_to_btVec3(p_camera->m_Front) * FORCE_SCALING_FACTOR;
+					raycastResult.m_rigidBody->applyImpulse(force, hitPoint - centerOfMass);
+				}
 			}
 
 			if (playFleshSound)

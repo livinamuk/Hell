@@ -108,11 +108,7 @@ int main()
 				CoreImGui::Render(&game);
 
 			CoreGL::SwapBuffersAndPollEvents();
-		}
-
-
-
-		
+		}		
 	}
 
 	CoreGL::Terminate();
@@ -120,7 +116,8 @@ int main()
 	return 0;
 
 	{
-		Opp r = Opp(2400 + 300);
-		Opp m = Opp(850);
+		Opp r = Opp(2000);
+		Opp m = Opp(1650); // reckons there was only 5 the dog
+		Opp c = Opp(2400 - 600);
 	}
 }

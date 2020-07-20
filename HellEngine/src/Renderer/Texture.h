@@ -6,10 +6,14 @@
 
 #include <stb_image.h>
 
+#include "DDS_Helpers.h"
+
+
 class Texture
 {
 public: // Methods
 	Texture(std::string filename, std::string filetype);
+
 	void ReadFromDisk();
 	void LoadToGL();
 
@@ -22,7 +26,9 @@ public: // fields
 	int width, height;
 
 private: // fields
-	unsigned char* data;
+	CMP_Texture				  m_cmpTexture = {};
+	bool					  m_isCompressed = false;
+	unsigned char* data		  = nullptr;
 	int nrChannels;
 };
 

@@ -28,13 +28,24 @@ namespace HellEngine
 	class Ragdoll
 	{
 	public:
+
+		float DIST_FROM_THIGH_L_TO_THIGH_R;
+		float DIST_FROM_PELVIS_TO_SPINE_01;
+		float DIST_FROM_SPINE_01_TO_SPINE_02;
+		float DIST_FROM_SPINE_02_TO_NECK;
+		float DIST_FROM_SHOULDER_L_TO_SHOULDER_R;
+		float DIST_FROM_SHOULDER_TO_ELBOW;
+		float DIST_VERTICALLY_FROM_SHOULDER_TO_SPINE_02;
+		float DIST_FROM_ELBO_TO_HAND;
+		float DIST_FROM_NECK_TO_HEAD;
+		float HEAD_SPHERE_RADIUS;
+
 		enum
 		{
 			BODYPART_PELVIS = 0,
 
-			BODYPART_SPINE_01,
-			BODYPART_SPINE_02,
-			BODYPART_SPINE_03,
+			BODYPART_LOWER_TORSO,
+			BODYPART_UPPER_TORSO,
 
 			BODYPART_NECK,
 			BODYPART_HEAD,
@@ -58,10 +69,9 @@ namespace HellEngine
 		{
 			JOINT_SPINE_01 = 0,
 			JOINT_SPINE_02,
-			JOINT_SPINE_03,
 
 			JOINT_SPINE_NECK,
-			JOINT_NECK_HEAD,
+			JOINT_HEAD,
 
 			JOINT_LEFT_HIP,
 			JOINT_LEFT_KNEE,
@@ -80,7 +90,8 @@ namespace HellEngine
 
 		btDynamicsWorld* m_ownerWorld;
 
-		float m_capsuleLengths[BODYPART_COUNT]; 
+		float m_capsuleHeights[BODYPART_COUNT];
+		float m_capsuleWidths[BODYPART_COUNT];
 		btCollisionShape* m_shapes[BODYPART_COUNT];
 		//btTypedConstraint* m_joints[JOINT_COUNT];
 		btGeneric6DofConstraint* m_joints[JOINT_COUNT];

@@ -86,7 +86,7 @@ namespace HellEngine
 
 				if (raycastResult.m_name == "RAGDOLL") 
 				{
-					float FORCE_SCALING_FACTOR = 5;// Config::TEST_FLOAT;
+					float FORCE_SCALING_FACTOR = 2;// 5;// Config::TEST_FLOAT;
 					raycastResult.m_rigidBody->activate(true);
 					btVector3 centerOfMass = raycastResult.m_rigidBody->getCenterOfMassPosition();
 					btVector3 hitPoint = Util::glmVec3_to_btVec3(raycastResult.m_hitPoint);

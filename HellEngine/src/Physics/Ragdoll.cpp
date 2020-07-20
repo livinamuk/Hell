@@ -61,57 +61,76 @@ namespace HellEngine
 		glm::vec3 Eye_r = Util::GetTranslationFromMatrix(worldMatrix * boneInfo[skinnedModel->m_BoneMapping["Eye_r"]].ModelSpace_AnimatedTransform) * modelScale;
 		glm::vec3 head = Util::GetTranslationFromMatrix(worldMatrix * boneInfo[skinnedModel->m_BoneMapping["head"]].ModelSpace_AnimatedTransform) * modelScale;
 
-		
-		m_capsuleLengths[BODYPART_PELVIS] = glm::length(pelvis - spine_01);
 
-		m_capsuleLengths[BODYPART_SPINE_01] = glm::length(spine_01 - spine_02);
-		m_capsuleLengths[BODYPART_SPINE_02] = glm::length(spine_02 - spine_03);
-		m_capsuleLengths[BODYPART_SPINE_03] = glm::length(spine_03 - neck_01);
 
-		m_capsuleLengths[BODYPART_NECK] = glm::length(head - neck_01);
-		m_capsuleLengths[BODYPART_HEAD] = 0.01f;
+		glm::vec3 spine_02_bindPose = Util::GetTranslationFromMatrix(worldMatrix * boneInfo[skinnedModel->m_BoneMapping["spine_02"]].DebugMatrix_BindPose) * modelScale;
+		glm::vec3 upperarm_r_bindPose = Util::GetTranslationFromMatrix(worldMatrix * boneInfo[skinnedModel->m_BoneMapping["upperarm_r"]].DebugMatrix_BindPose) * modelScale;
 
-		m_capsuleLengths[BODYPART_LEFT_UPPER_LEG] = glm::length(thigh_l - calf_l);
-		m_capsuleLengths[BODYPART_LEFT_LOWER_LEG] = glm::length(thigh_l - calf_l);
-		m_capsuleLengths[BODYPART_RIGHT_UPPER_LEG] = glm::length(thigh_r - calf_r);
-		m_capsuleLengths[BODYPART_RIGHT_LOWER_LEG] = glm::length(thigh_l - calf_l);
+		// Capsule Lengths
+		m_capsuleHeights[BODYPART_PELVIS] = 0.1f;// glm::length(pelvis - spine_01);
 
-		m_capsuleLengths[BODYPART_LEFT_UPPER_ARM] = glm::length(upperarm_l - lowerarm_l);
-		m_capsuleLengths[BODYPART_LEFT_LOWER_ARM] = glm::length(hand_l - lowerarm_l);
-		m_capsuleLengths[BODYPART_RIGHT_UPPER_ARM] = glm::length(upperarm_r - lowerarm_r);
-		m_capsuleLengths[BODYPART_RIGHT_LOWER_ARM] = glm::length(hand_r - lowerarm_r);
+		m_capsuleHeights[BODYPART_LOWER_TORSO] = 0.1f;// glm::length(pelvis - spine_01);// glm::length(spine_01 - spine_02);
+		m_capsuleHeights[BODYPART_UPPER_TORSO] = 0.1f;// glm::length(pelvis - spine_01);// glm::length(spine_02 - spine_03);
 
-		float length_upperarmL = glm::length(upperarm_l - lowerarm_l);
-		float length_upperarmR = glm::length(upperarm_r - lowerarm_r);
-		float length_lowerarmL = glm::length(hand_l - lowerarm_l);
-		float length_lowerarmR = glm::length(hand_r - lowerarm_r);
-		float length_upperlegL = glm::length(thigh_l - calf_l);
-		float length_upperlegR = glm::length(thigh_r - calf_r);
-		float length_lowerlegL = glm::length(calf_l - foot_l);
-		float length_lowerlegR = glm::length(calf_r - foot_r);
-		float length_pelvis = glm::length(pelvis - spine_01);
-		//float length_spine = glm::length(spine_01 - neck_01);
-		//float length_head = 0.1f;
+		m_capsuleHeights[BODYPART_NECK] = glm::length(head - neck_01);
+		m_capsuleHeights[BODYPART_HEAD] = 0;
+
+		m_capsuleHeights[BODYPART_LEFT_UPPER_LEG] = glm::length(thigh_l - calf_l);
+		m_capsuleHeights[BODYPART_LEFT_LOWER_LEG] = glm::length(thigh_l - calf_l);
+		m_capsuleHeights[BODYPART_RIGHT_UPPER_LEG] = glm::length(thigh_r - calf_r);
+		m_capsuleHeights[BODYPART_RIGHT_LOWER_LEG] = glm::length(thigh_l - calf_l);
+
+		m_capsuleHeights[BODYPART_LEFT_UPPER_ARM] = glm::length(upperarm_l - lowerarm_l);
+		m_capsuleHeights[BODYPART_LEFT_LOWER_ARM] = glm::length(hand_l - lowerarm_l);
+		m_capsuleHeights[BODYPART_RIGHT_UPPER_ARM] = glm::length(upperarm_r - lowerarm_r);
+		m_capsuleHeights[BODYPART_RIGHT_LOWER_ARM] = glm::length(hand_r - lowerarm_r);
+
+		// Misc lenghts
+		DIST_FROM_THIGH_L_TO_THIGH_R = glm::length(thigh_l - thigh_r);
+		DIST_FROM_SHOULDER_L_TO_SHOULDER_R = glm::length(upperarm_r - upperarm_l);
+		DIST_FROM_PELVIS_TO_SPINE_01 = glm::length(pelvis - spine_01);
+		DIST_FROM_SPINE_01_TO_SPINE_02 = glm::length(spine_01 - spine_02);
+		DIST_FROM_SPINE_02_TO_NECK = glm::length(spine_02 - neck_01);
+		DIST_FROM_SHOULDER_TO_ELBOW = glm::length(upperarm_l - lowerarm_l);
+		DIST_VERTICALLY_FROM_SHOULDER_TO_SPINE_02 = upperarm_r_bindPose.y - spine_02_bindPose.y;
+		DIST_FROM_ELBO_TO_HAND = glm::length(hand_l - lowerarm_l);
+		DIST_FROM_NECK_TO_HEAD = glm::length(neck_01 - head);
+		HEAD_SPHERE_RADIUS = 0.125;
+
+		//std::cout << "m_capsuleHeights[BODYPART_LOWER_TORSO]: " << m_capsuleHeights[BODYPART_LOWER_TORSO] << "\n";
+	//	std::cout << "DIST_FROM_SPINE_02_TO_NECK: " << DIST_FROM_SPINE_02_TO_NECK << "\n";
+
+		// Capsule Widths
+		m_capsuleWidths[BODYPART_PELVIS] = 0.130f;
+		m_capsuleWidths[BODYPART_LOWER_TORSO] = 0.130f;
+		m_capsuleWidths[BODYPART_UPPER_TORSO] = (DIST_FROM_SPINE_02_TO_NECK * 0.5) + 0.025;
+
+		m_capsuleWidths[BODYPART_LEFT_UPPER_ARM] = 0.05;
+		m_capsuleWidths[BODYPART_RIGHT_UPPER_ARM] = 0.05;
+		m_capsuleWidths[BODYPART_LEFT_LOWER_ARM] = 0.04;
+		m_capsuleWidths[BODYPART_RIGHT_LOWER_ARM] = 0.04;
+		m_capsuleWidths[BODYPART_NECK] = 0.05;
+		m_capsuleWidths[BODYPART_HEAD] = HEAD_SPHERE_RADIUS;
+
+
 
 		// Setup the geometry
-		float scale_ragdoll = 0;
-		float hide = 0;
-		m_shapes[BODYPART_PELVIS] = new btCapsuleShape(btScalar(1 * 0.1), m_capsuleLengths[BODYPART_PELVIS]);
-		m_shapes[BODYPART_SPINE_01] = new btCapsuleShape(btScalar(1 * 0.14 * 0.05), m_capsuleLengths[BODYPART_SPINE_01]);
-		m_shapes[BODYPART_SPINE_02] = new btCapsuleShape(btScalar(1 * 0.16 * hide), m_capsuleLengths[BODYPART_SPINE_02]);
-		m_shapes[BODYPART_SPINE_03] = new btCapsuleShape(btScalar(1 * 0.06 * hide), m_capsuleLengths[BODYPART_SPINE_03]);
-		m_shapes[BODYPART_NECK] = new btCapsuleShape(btScalar(1 * 0.05 * hide), m_capsuleLengths[BODYPART_NECK]);
-		m_shapes[BODYPART_HEAD] = new btCapsuleShape(btScalar(1 * 0.1 * hide), m_capsuleLengths[BODYPART_HEAD]);
+		m_shapes[BODYPART_PELVIS] = new btCapsuleShape(m_capsuleWidths[BODYPART_PELVIS], m_capsuleHeights[BODYPART_PELVIS]);
+		m_shapes[BODYPART_LOWER_TORSO] = new btCapsuleShape(m_capsuleWidths[BODYPART_LOWER_TORSO], m_capsuleHeights[BODYPART_LOWER_TORSO]);
+		m_shapes[BODYPART_UPPER_TORSO] = new btCapsuleShape(m_capsuleWidths[BODYPART_UPPER_TORSO], m_capsuleHeights[BODYPART_UPPER_TORSO]);
+		m_shapes[BODYPART_NECK] = new btCapsuleShape(m_capsuleWidths[BODYPART_NECK], m_capsuleHeights[BODYPART_NECK]);
+		m_shapes[BODYPART_HEAD] = new btCapsuleShape(m_capsuleWidths[BODYPART_HEAD], m_capsuleHeights[BODYPART_HEAD]);
 
-		m_shapes[BODYPART_LEFT_UPPER_LEG] = new btCapsuleShape(btScalar(1 * 0.07), m_capsuleLengths[BODYPART_LEFT_UPPER_LEG]);
-		m_shapes[BODYPART_LEFT_LOWER_LEG] = new btCapsuleShape(btScalar(1 * 0.05), m_capsuleLengths[BODYPART_LEFT_LOWER_LEG]);
-		m_shapes[BODYPART_RIGHT_UPPER_LEG] = new btCapsuleShape(btScalar(1 * 0.07), m_capsuleLengths[BODYPART_RIGHT_UPPER_LEG]);
-		m_shapes[BODYPART_RIGHT_LOWER_LEG] = new btCapsuleShape(btScalar(1 * 0.05), m_capsuleLengths[BODYPART_RIGHT_LOWER_LEG]);
-
-		m_shapes[BODYPART_LEFT_UPPER_ARM] = new btCapsuleShape(btScalar(1 * 0.05 * hide), btScalar(length_upperarmL));
-		m_shapes[BODYPART_LEFT_LOWER_ARM] = new btCapsuleShape(btScalar(1 * 0.04 * hide), btScalar(length_lowerarmL));
-		m_shapes[BODYPART_RIGHT_UPPER_ARM] = new btCapsuleShape(btScalar(1 * 0.05 * hide), btScalar(length_upperarmR));
-		m_shapes[BODYPART_RIGHT_LOWER_ARM] = new btCapsuleShape(btScalar(1 * 0.04 * hide), btScalar(length_lowerarmR));
+		m_shapes[BODYPART_LEFT_UPPER_LEG] = new btCapsuleShape(btScalar(1 * 0.07 ), m_capsuleHeights[BODYPART_LEFT_UPPER_LEG]);
+		m_shapes[BODYPART_LEFT_LOWER_LEG] = new btCapsuleShape(btScalar(1 * 0.05 ), m_capsuleHeights[BODYPART_LEFT_LOWER_LEG]);
+		m_shapes[BODYPART_RIGHT_UPPER_LEG] = new btCapsuleShape(btScalar(1 * 0.07), m_capsuleHeights[BODYPART_RIGHT_UPPER_LEG]);
+		m_shapes[BODYPART_RIGHT_LOWER_LEG] = new btCapsuleShape(btScalar(1 * 0.05), m_capsuleHeights[BODYPART_RIGHT_LOWER_LEG]);
+		
+		m_shapes[BODYPART_LEFT_UPPER_ARM] = new btCapsuleShape(m_capsuleWidths[BODYPART_LEFT_UPPER_ARM], m_capsuleHeights[BODYPART_LEFT_UPPER_ARM]);
+		m_shapes[BODYPART_RIGHT_UPPER_ARM] = new btCapsuleShape(m_capsuleWidths[BODYPART_RIGHT_UPPER_ARM], m_capsuleHeights[BODYPART_RIGHT_UPPER_ARM]);
+	
+		m_shapes[BODYPART_LEFT_LOWER_ARM] = new btCapsuleShape(m_capsuleWidths[BODYPART_LEFT_LOWER_ARM], m_capsuleHeights[BODYPART_LEFT_LOWER_ARM]);
+		m_shapes[BODYPART_RIGHT_LOWER_ARM] = new btCapsuleShape(m_capsuleWidths[BODYPART_RIGHT_LOWER_ARM], m_capsuleHeights[BODYPART_RIGHT_LOWER_ARM]);
 
 		// Setup all the rigid bodies
 		btTransform offset;
@@ -148,6 +167,7 @@ namespace HellEngine
 		btQuaternion rotate_Y_180(0, 1, 0, 0);
 		btQuaternion rotate_Y_NEG_90(0, -0.7070999742, 0, 0.7070999742);
 		btQuaternion rotate_X_90(0.7070999742, 0, 0, 0.7070999742);
+		btQuaternion rotate_X_NEG_90(-0.7070999742, 0, 0, 0.7070999742);
 		btQuaternion rotate_Y_90(0, 0.7070999742, 0, 0.7070999742);
 		btQuaternion rotate_Z_90(0, 0, 0.7070999742, 0.7070999742);
 		btQuaternion rotate_Z_NEG_90(0, 0, 0.7070999742, -0.7070999742);
@@ -159,43 +179,25 @@ namespace HellEngine
 		// PELVIS
 		transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(pelvis, spine_01) );
-		transform.setRotation(Util::GetRotationFromBoneMatrix(boneInfo[skinnedModel->m_BoneMapping["pelvis"]].ModelSpace_AnimatedTransform)* rotate_X_90);// testQuat* testQuat2);// rotate_X_180* rotate_Y_NEG_90);
+		transform.setRotation(Util::GetRotationFromBoneMatrix(boneInfo[skinnedModel->m_BoneMapping["pelvis"]].ModelSpace_AnimatedTransform) * rotate_X_90 * rotate_Y_NEG_90);
 		//transform.setRotation(Util::GetRotationFromBoneMatrix(boneInfo[skinnedModel->m_BoneMapping["pelvis"]].ModelSpace_AnimatedTransform)* rotate_X_180* rotate_Y_NEG_90);
 		m_bodies[BODYPART_PELVIS] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_PELVIS]);
 
 
-		// SPINE
+		// LOWER TORSO
 		transform.setIdentity();
 		transform.setOrigin(Util::GetRelPosBetween2Vectors(spine_01, spine_02));
-		//transform.setRotation(Util::GetRotationFromBoneMatrix(boneInfo[skinnedModel->m_BoneMapping["spine_01"]].ModelSpace_AnimatedTransform) * testQuat* testQuat2);
-
-		/*glm::mat4 matA = boneInfo[skinnedModel->m_BoneMapping["spine_01"]].ModelSpace_AnimatedTransform;
-		glm::mat4 matB = boneInfo[skinnedModel->m_BoneMapping["spine_02"]].ModelSpace_AnimatedTransform;
-		glm::quat qA = glm::quat_cast(matA);
-		glm::quat qB = glm::quat_cast(matB);
-		glm::quat DIFF = glm::inverse(qA) * qB;
-		q = qA * DIFF;
-				
-		transform.setRotation(btQuaternion(q.x, q.y, q.z, q.w)* magic);//*/
-
-		q = glm::quat_cast(boneInfo[skinnedModel->m_BoneMapping["spine_01"]].ModelSpace_AnimatedTransform);
-		transform.setRotation(btQuaternion(q.x, q.y, q.z, q.w) * magic);// *btQuaternion(0.70710678118, -0.70710678118, 0, 0));
-		m_bodies[BODYPART_SPINE_01] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_SPINE_01]);
+		q = glm::quat_cast(boneInfo[skinnedModel->m_BoneMapping["spine_01"]].ModelSpace_AnimatedTransform) ;
+		transform.setRotation(btQuaternion(q.x, q.y, q.z, q.w)* rotate_X_NEG_90);// *btQuaternion(0.70710678118, -0.70710678118, 0, 0));
+		m_bodies[BODYPART_LOWER_TORSO] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_LOWER_TORSO]);
 		
-
-		// SPINE_02
+		// UPPER TORSO
 		transform.setIdentity();
-		transform.setOrigin(Util::GetRelPosBetween2Vectors(spine_02, spine_03));
+		transform.setOrigin(Util::GetRelPosBetween2Vectors(spine_02, neck_01));
 		q = glm::quat_cast(boneInfo[skinnedModel->m_BoneMapping["spine_02"]].ModelSpace_AnimatedTransform);
-		transform.setRotation(btQuaternion(q.x, q.y, q.z, q.w)* magic);
-		m_bodies[BODYPART_SPINE_02] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_SPINE_02]);
+		transform.setRotation(btQuaternion(q.x, q.y, q.z, q.w) * rotate_X_NEG_90);
+		m_bodies[BODYPART_UPPER_TORSO] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_UPPER_TORSO]);
 
-		// SPINE_03
-		transform.setIdentity();
-		transform.setOrigin(Util::GetRelPosBetween2Vectors(spine_03, neck_01));
-		q = glm::quat_cast(boneInfo[skinnedModel->m_BoneMapping["spine_03"]].ModelSpace_AnimatedTransform);
-		transform.setRotation(btQuaternion(q.x, q.y, q.z, q.w)* magic);
-		m_bodies[BODYPART_SPINE_03] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_SPINE_03]);
 
 
 		// NECK
@@ -206,8 +208,10 @@ namespace HellEngine
 		m_bodies[BODYPART_NECK] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_NECK]);
 		
 		// HEAD
+		btVector3 headPosition = Util::GetRelPosBetween2Vectors(neck_01, head);
+		headPosition.setY(headPosition.getY() + HEAD_SPHERE_RADIUS);
 		transform.setIdentity();
-		transform.setOrigin(Util::GetRelPosBetween2Vectors(neck_01, head));
+		transform.setOrigin(headPosition);
 		q = glm::quat_cast(boneInfo[skinnedModel->m_BoneMapping["head"]].ModelSpace_AnimatedTransform);
 		transform.setRotation(btQuaternion(q.x, q.y, q.z, q.w)* rotate_Z_NEG_90);
 		m_bodies[BODYPART_HEAD] = localCreateRigidBody(btScalar(1.), offset * transform, m_shapes[BODYPART_HEAD]);
@@ -270,7 +274,6 @@ namespace HellEngine
 			m_bodies[i]->setFriction(0.8);//
 		}
 
-		scale_ragdoll = 1;
 
 		///////////////////////////// SETTING THE CONSTRAINTS /////////////////////////////////////////////7777
 			// Now setup the constraints
@@ -278,250 +281,231 @@ namespace HellEngine
 		btTransform localA, localB;
 		bool useLinearReferenceFrameA = true;
 
-		/// ******* SPINE NECK ******** ///
+		// Neck
 		{
 			localA.setIdentity();
-			localA.setOrigin(btVector3(btScalar(0.), btScalar(0.30 * scale_ragdoll), btScalar(0.)));
+			localA.setOrigin(btVector3(DIST_FROM_SPINE_02_TO_NECK * 0.5, 0, 0));
 
-			localB.setIdentity();
-			localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.14 * scale_ragdoll), btScalar(0.)));
+			localB.setIdentity(); 
+			localB.getBasis().setEulerZYX(-SIMD_HALF_PI, 0, SIMD_HALF_PI);
+			localB.setOrigin(btVector3(0, DIST_FROM_NECK_TO_HEAD * -0.5, 0));
 
-			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_SPINE_01], *m_bodies[BODYPART_NECK], localA, localB, useLinearReferenceFrameA);
+			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_UPPER_TORSO], *m_bodies[BODYPART_NECK], localA, localB, useLinearReferenceFrameA);
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.3f, -SIMD_EPSILON, -SIMD_PI * 0.3f));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.5f, SIMD_EPSILON, SIMD_PI * 0.3f));
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_SPINE_NECK] = joint6DOF;
-		//	m_ownerWorld->addConstraint(m_joints[JOINT_SPINE_NECK], true); 
+			m_ownerWorld->addConstraint(m_joints[JOINT_SPINE_NECK], true); 
 		}
 		
-		/// ******* NECK HEAD ******** ///
+		// Head
 		{
 			localA.setIdentity();
-			localA.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_NECK] * 0.5, 0));
+			localA.setOrigin(btVector3(0, 0, 0));
 
 			localB.setIdentity();
-			localB.setOrigin(btVector3(0, -m_capsuleLengths[BODYPART_NECK], 0));
+			localB.setOrigin(btVector3(0, -HEAD_SPHERE_RADIUS, 0));
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_NECK], *m_bodies[BODYPART_HEAD], localA, localB, useLinearReferenceFrameA);
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.075f, -SIMD_EPSILON, -SIMD_PI * 0.075f));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.075f, SIMD_EPSILON, SIMD_PI * 0.075f));
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
-			m_joints[JOINT_NECK_HEAD] = joint6DOF;
-		//	m_ownerWorld->addConstraint(m_joints[JOINT_NECK_HEAD], true);
+			m_joints[JOINT_HEAD] = joint6DOF;
+			m_ownerWorld->addConstraint(m_joints[JOINT_HEAD], true);
 		}
 
 
 		glm::vec3 Center_Of_Spine_03 = Util::btVec3_to_glmVec3(Util::GetRelPosBetween2Vectors(spine_03, neck_01));
 		float Length_To_Shoulder = glm::length(Center_Of_Spine_03 - upperarm_l);
 
-		/// ******* LEFT SHOULDER ******** ///
+		// Left shoulder
 		{
-			
 			localA.setIdentity(); 
-			localA.setOrigin(btVector3(-Length_To_Shoulder, 0, 0));
+			localA.setOrigin(btVector3(DIST_VERTICALLY_FROM_SHOULDER_TO_SPINE_02, DIST_FROM_SHOULDER_L_TO_SHOULDER_R * 0.5, 0));
 
 			localB.setIdentity();
-			localB.getBasis().setEulerZYX(SIMD_HALF_PI, 0, -SIMD_HALF_PI);
-			localB.setOrigin(btVector3(btScalar(0.), btScalar(-length_upperarmL * 0.5), btScalar(0.)));
+			localB.setOrigin(btVector3(0, DIST_FROM_SHOULDER_TO_ELBOW * -0.5, 0));
 
-			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_SPINE_03], *m_bodies[BODYPART_LEFT_UPPER_ARM], localA, localB, useLinearReferenceFrameA);
+			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_UPPER_TORSO], *m_bodies[BODYPART_LEFT_UPPER_ARM], localA, localB, useLinearReferenceFrameA);
 
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.8f, -SIMD_EPSILON, -SIMD_PI * 0.5f));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.8f, SIMD_EPSILON, SIMD_PI * 0.5f));
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_LEFT_SHOULDER] = joint6DOF;
-		//	m_ownerWorld->addConstraint(m_joints[JOINT_LEFT_SHOULDER], true);
+			m_ownerWorld->addConstraint(m_joints[JOINT_LEFT_SHOULDER], true);
 		}
 
-		/// ******* RIGHT SHOULDER ******** ///
+		// Right shoulder
 		{
 			localA.setIdentity();
-			localA.setOrigin(btVector3(Length_To_Shoulder, 0, 0));
+			localA.setOrigin(btVector3(DIST_VERTICALLY_FROM_SHOULDER_TO_SPINE_02, DIST_FROM_SHOULDER_L_TO_SHOULDER_R * -0.5, 0));
 
 			localB.setIdentity(); 
-			localB.getBasis().setEulerZYX(0, 0, SIMD_HALF_PI);
-			localB.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_RIGHT_UPPER_ARM] * -0.5, 0));
+			localB.getBasis().setEulerZYX(0, 0, HELL_PI);
+			localB.setOrigin(btVector3(0, DIST_FROM_SHOULDER_TO_ELBOW * -0.5, 0));
 		
-			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_SPINE_03], *m_bodies[BODYPART_RIGHT_UPPER_ARM], localA, localB, useLinearReferenceFrameA);
+			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_UPPER_TORSO], *m_bodies[BODYPART_RIGHT_UPPER_ARM], localA, localB, useLinearReferenceFrameA);
 
 
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.8f, -SIMD_EPSILON, -SIMD_PI * 0.5f));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.8f, SIMD_EPSILON, SIMD_PI * 0.5f));
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_RIGHT_SHOULDER] = joint6DOF;
-		//	m_ownerWorld->addConstraint(m_joints[JOINT_RIGHT_SHOULDER], true);
+			m_ownerWorld->addConstraint(m_joints[JOINT_RIGHT_SHOULDER], true);
 		}
 
-		/// ******* LEFT ELBOW ******** ///
+		// Left Elbow
 		{;
 			localA.setIdentity();
-			localA.setOrigin(btVector3(btScalar(0.), btScalar(0.18 * scale_ragdoll), btScalar(0.)));
+			localA.setOrigin(btVector3(btScalar(0.), btScalar(0.18), btScalar(0.)));
 
 			localB.setIdentity();
-			localB.setOrigin(btVector3(btScalar(0.), btScalar(-length_lowerarmL * 0.5), btScalar(0.)));
+			localB.setOrigin(btVector3(0, -DIST_FROM_ELBO_TO_HAND * 0.5, 0));
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_LEFT_UPPER_ARM], *m_bodies[BODYPART_LEFT_LOWER_ARM], localA, localB, useLinearReferenceFrameA);
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.7f, SIMD_EPSILON, SIMD_EPSILON));
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_LEFT_ELBOW] = joint6DOF;
-		//	m_ownerWorld->addConstraint(m_joints[JOINT_LEFT_ELBOW], true);
+			m_ownerWorld->addConstraint(m_joints[JOINT_LEFT_ELBOW], true);
 		}
 
-		/// ******* RIGHT ELBOW ******** ///
-		{
-
-		
-			
+		// Right Elbow
+		{			
 			localA.setIdentity();
-			localA.setOrigin(btVector3(btScalar(0.), btScalar(0.18 * scale_ragdoll), btScalar(0.)));
+			localA.setOrigin(btVector3(btScalar(0.), btScalar(0.18), btScalar(0.)));
 
 			localB.setIdentity();
-			localB.setOrigin(btVector3(btScalar(0.), btScalar(-length_lowerarmR * 0.5), btScalar(0.)));
+			localB.setOrigin(btVector3(0, -DIST_FROM_ELBO_TO_HAND * 0.5, 0));
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_RIGHT_UPPER_ARM], *m_bodies[BODYPART_RIGHT_LOWER_ARM], localA, localB, useLinearReferenceFrameA);
 
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.7, SIMD_EPSILON, SIMD_EPSILON));
-
-			m_joints[JOINT_RIGHT_ELBOW] = joint6DOF;
-		//	m_ownerWorld->addConstraint(m_joints[JOINT_RIGHT_ELBOW], true);
-		}
-
-		/// ******* SPINE_01 ******** ///
-		{
-			localA.setIdentity();
-	//		localA.getBasis().setRotation(rotate_X_90);
-			localA.getBasis().setEulerZYX(0, 0, SIMD_HALF_PI);
-			localA.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_PELVIS] * 0.5, 0));
-
-			localB.setIdentity();
-			localB.getBasis().setEulerZYX(0, SIMD_HALF_PI, 0);
-			localB.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_PELVIS] * -0.5, 0));
-
-			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_PELVIS], *m_bodies[BODYPART_SPINE_01], localA, localB, useLinearReferenceFrameA);
-
-			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.2, -SIMD_EPSILON, -SIMD_PI * 0.3));
-			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.2, SIMD_EPSILON, SIMD_PI * 0.6));
-		
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
+			m_joints[JOINT_RIGHT_ELBOW] = joint6DOF;
+			m_ownerWorld->addConstraint(m_joints[JOINT_RIGHT_ELBOW], true);
+		}
+
+		// SPINE_01 joint
+		{
+			localA.setIdentity();
+			localA.setOrigin(btVector3((DIST_FROM_PELVIS_TO_SPINE_01 * 0.5), 0, 0));
+
+			localB.setIdentity();
+			localB.setOrigin(btVector3(DIST_FROM_SPINE_01_TO_SPINE_02 * -0.5, 0, 0));
+
+			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_PELVIS], *m_bodies[BODYPART_LOWER_TORSO], localA, localB, useLinearReferenceFrameA);
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.2, -SIMD_EPSILON, -SIMD_PI * 0.3));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.2, SIMD_EPSILON, SIMD_PI * 0.6));		
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
+
 			m_joints[JOINT_SPINE_01] = joint6DOF;
-		//	m_ownerWorld->addConstraint(m_joints[JOINT_SPINE_01], true);
+			m_ownerWorld->addConstraint(m_joints[JOINT_SPINE_01], true);
 		}
 		
-		/// ******* SPINE_02 ******** ///
+		// SPINE_02 joint
 		{
 			localA.setIdentity();;
-			localA.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_SPINE_01] * 0.5, 0));
+			localA.setOrigin(btVector3(DIST_FROM_SPINE_01_TO_SPINE_02 * 0.5, 0, 0));
 
 			localB.setIdentity();
-			localB.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_SPINE_02] * -0.5, 0));
+			localB.setOrigin(btVector3(DIST_FROM_SPINE_02_TO_NECK * -0.5, 0, 0));
 
-			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_SPINE_01], *m_bodies[BODYPART_SPINE_02], localA, localB, useLinearReferenceFrameA);
+			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_LOWER_TORSO], *m_bodies[BODYPART_UPPER_TORSO], localA, localB, useLinearReferenceFrameA);
 
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.1, -SIMD_EPSILON, -SIMD_PI * 0.1));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.1, SIMD_EPSILON, SIMD_PI * 0.1));
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_SPINE_02] = joint6DOF;
-		//	m_ownerWorld->addConstraint(m_joints[JOINT_SPINE_02], true);
+			m_ownerWorld->addConstraint(m_joints[JOINT_SPINE_02], true);
 		}
 
 
-		/// ******* SPINE_02 ******** ///
-		{
-			localA.setIdentity();;
-			localA.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_SPINE_02] * 0.5, 0));
-
-			localB.setIdentity();
-			localB.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_SPINE_03] * -0.5, 0));
-
-			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_SPINE_02], *m_bodies[BODYPART_SPINE_03], localA, localB, useLinearReferenceFrameA);
-
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.1, -SIMD_EPSILON, -SIMD_PI * 0.1));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.1, SIMD_EPSILON, SIMD_PI * 0.1));
-
-			m_joints[JOINT_SPINE_03] = joint6DOF;
-			m_ownerWorld->addConstraint(m_joints[JOINT_SPINE_03], true);
-		}
 
 		/// ******* LEFT HIP ******** ///
 		{
 			localA.setIdentity();
-			localA.setOrigin(btVector3(glm::length(pelvis - thigh_l) * -1, m_capsuleLengths[BODYPART_PELVIS] * -0.5, 0));
+			//localA.setOrigin(btVector3(glm::length(pelvis - thigh_l) * -1, m_capsuleLengths[BODYPART_PELVIS] * -0.5, 0));
+			localA.setOrigin(btVector3(-m_capsuleHeights[BODYPART_PELVIS] * 0.5, DIST_FROM_THIGH_L_TO_THIGH_R * 0.5, 0));
 
 			localB.setIdentity();
-			localB.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_LEFT_UPPER_LEG] * 0.5, 0));
+			localB.getBasis().setEulerZYX(0, 0, SIMD_HALF_PI);
+			localB.setOrigin(btVector3(0, m_capsuleHeights[BODYPART_LEFT_UPPER_LEG] * 0.5, 0));
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_PELVIS], *m_bodies[BODYPART_LEFT_UPPER_LEG], localA, localB, useLinearReferenceFrameA);
-
-		//	joint6DOF->setAngularLowerLimit(btVector3(-SIMD_HALF_PI * 0.5, -SIMD_EPSILON, -SIMD_EPSILON));
-		//	joint6DOF->setAngularUpperLimit(btVector3(SIMD_HALF_PI * 0.8, SIMD_EPSILON, SIMD_HALF_PI * 0.6f));
-
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
-
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_HALF_PI * 0.5, -SIMD_EPSILON, -SIMD_EPSILON));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_HALF_PI * 0.8, SIMD_EPSILON, SIMD_HALF_PI * 0.6f));
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_LEFT_HIP] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_LEFT_HIP], true);
 		}
-
-		/// ******* RIGHT HIP ******** ///
+		// Right hip
 		{
+
 			localA.setIdentity();
-			localA.setOrigin(btVector3(glm::length(pelvis - thigh_r), m_capsuleLengths[BODYPART_PELVIS] * -0.5, 0));
+			localA.setOrigin(btVector3(m_capsuleHeights[BODYPART_PELVIS] * -0.5, DIST_FROM_THIGH_L_TO_THIGH_R * -0.5, 0));
 
 			localB.setIdentity();
-			localB.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_RIGHT_UPPER_LEG] * 0.5, 0));
+			localB.getBasis().setEulerZYX(0, 0, SIMD_HALF_PI);
+			localB.setOrigin(btVector3(0, m_capsuleHeights[BODYPART_RIGHT_UPPER_LEG] * 0.5, 0));
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_PELVIS], *m_bodies[BODYPART_RIGHT_UPPER_LEG], localA, localB, useLinearReferenceFrameA);
-
-		//	joint6DOF->setAngularLowerLimit(btVector3(-SIMD_HALF_PI * 0.5, -SIMD_EPSILON, -SIMD_HALF_PI * 0.6f));
-		//	joint6DOF->setAngularUpperLimit(btVector3(SIMD_HALF_PI * 0.8, SIMD_EPSILON, SIMD_EPSILON));
-
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_HALF_PI * 0.8, -SIMD_EPSILON, -SIMD_HALF_PI * 0.6f));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_HALF_PI * 0.5, SIMD_EPSILON, SIMD_EPSILON));
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_RIGHT_HIP] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_RIGHT_HIP], true);
 		}
 
-		/// ******* LEFT KNEE ******** ///
+		// Left knee
 		{
 			localA.setIdentity(); 
-			localA.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_LEFT_UPPER_LEG] * -0.5, 0));;
-
+			localA.setOrigin(btVector3(0, m_capsuleHeights[BODYPART_LEFT_UPPER_LEG] * -0.5, 0));;
 			localB.setIdentity();
-			localB.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_LEFT_LOWER_LEG] * 0.5, 0));
+			localB.setOrigin(btVector3(0, m_capsuleHeights[BODYPART_LEFT_LOWER_LEG] * 0.5, 0));
 	
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_LEFT_UPPER_LEG], *m_bodies[BODYPART_LEFT_LOWER_LEG], localA, localB, useLinearReferenceFrameA);
-		//	joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.7f, SIMD_EPSILON, SIMD_EPSILON));
-
-
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
-
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.7f, SIMD_EPSILON, SIMD_EPSILON));
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_LEFT_KNEE] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_LEFT_KNEE], true);
 		}
 
-		/// ******* RIGHT KNEE ******** ///
+		// Right knee
 		{
 			localA.setIdentity();
-			localA.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_RIGHT_UPPER_LEG] * -0.5, 0));
-
+			localA.setOrigin(btVector3(0, m_capsuleHeights[BODYPART_RIGHT_UPPER_LEG] * -0.5, 0));
 			localB.setIdentity(); 
-			localB.setOrigin(btVector3(0, m_capsuleLengths[BODYPART_RIGHT_LOWER_LEG] * 0.5, 0));
+			localB.setOrigin(btVector3(0, m_capsuleHeights[BODYPART_RIGHT_LOWER_LEG] * 0.5, 0));
 	
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_RIGHT_UPPER_LEG], *m_bodies[BODYPART_RIGHT_LOWER_LEG], localA, localB, useLinearReferenceFrameA);	
-		//	joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-		//	joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.7f, SIMD_EPSILON, SIMD_EPSILON));
-
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.7f, SIMD_EPSILON, SIMD_EPSILON));
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_RIGHT_KNEE] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_RIGHT_KNEE], true);
@@ -606,56 +590,59 @@ namespace HellEngine
 							
 
 				if (DisableSkinning) 
-				{	
+				{
 					glm::quat Rotate_X_180(0, 1, 0, 0);
+					glm::quat Rotate_X_90(0.70710, 0.7071, 0, 0);
 
 					// PELIVS
 					if (Util::StrCmp(NodeName, "pelvis")) {
-						glm::mat4 matrix = Get_Bottom_Joint_World_Matrix(BODYPART_PELVIS) * glm::mat4_cast(glm::quat(0.5, 0.5, 0.5, 0.5));
+						
+						//glm::mat4 matrix = Get_Bottom_Joint_World_Matrix(BODYPART_PELVIS) * glm::mat4_cast(glm::quat(0.5, 0.5, 0.5, 0.5));
+						
+
+						btTransform worldTransform;
+						m_bodies[BODYPART_PELVIS]->getMotionState()->getWorldTransform(worldTransform);
+						Transform localOffsetTransform;
+						localOffsetTransform.position.x = m_capsuleWidths[BODYPART_PELVIS] * -0.5;
+						glm::mat4 matrix = Util::btTransformToMat4(worldTransform) * localOffsetTransform.to_mat4() * glm::mat4_cast(Rotate_X_90);
+
 						skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = matrix * skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
 						skinnedModel->m_skeleton.m_joints[i].m_currentFinalTransform = matrix;
 						skinnedModel->m_BoneInfo[BoneIndex].ModelSpace_AnimatedTransform = matrix;
+
+
+
 					}
 
 					// SPINE 01
 					if (Util::StrCmp(NodeName, "spine_01")) {
 						
-						glm::mat4 pelvisTop = Get_Top_Joint_World_Matrix(BODYPART_PELVIS) * glm::mat4_cast(glm::quat(0.5, 0.5, 0.5, 0.5));
-						glm::mat4 matrix = Get_Bottom_Joint_World_Matrix(BODYPART_SPINE_01) * glm::mat4_cast(glm::quat(0.5, 0.5, 0.5, 0.5));	
-
-						matrix[3][0] = pelvisTop[3][0];
-						matrix[3][1] = pelvisTop[3][1];
-						matrix[3][2] = pelvisTop[3][2];
-
+						btTransform worldTransform;
+						m_bodies[BODYPART_LOWER_TORSO]->getMotionState()->getWorldTransform(worldTransform);
+						Transform localOffsetTransform;
+						localOffsetTransform.position.x += DIST_FROM_SPINE_01_TO_SPINE_02 * -0.5;
+						glm::mat4 matrix = Util::btTransformToMat4(worldTransform) * localOffsetTransform.to_mat4() * glm::mat4_cast(Rotate_X_90);
 
 						skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = matrix * skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
 						skinnedModel->m_skeleton.m_joints[i].m_currentFinalTransform = matrix;
 						skinnedModel->m_BoneInfo[BoneIndex].ModelSpace_AnimatedTransform = matrix;
 					}
 
-					// SPINE 01
+					// SPINE 02
 					if (Util::StrCmp(NodeName, "spine_02")) {
 
-						//glm::mat4 spine01= Get_Top_Joint_World_Matrix(BODYPART_SPINE_01) * glm::mat4_cast(glm::quat(0.5, 0.5, 0.5, 0.5));
-						glm::mat4 spine02 = Get_Bottom_Joint_World_Matrix(BODYPART_SPINE_02) * glm::mat4_cast(glm::quat(0.5, 0.5, 0.5, 0.5));
+						btTransform worldTransform;
+						m_bodies[BODYPART_UPPER_TORSO]->getMotionState()->getWorldTransform(worldTransform);
+						Transform localOffsetTransform;
+						localOffsetTransform.position.x += DIST_FROM_SPINE_02_TO_NECK * -0.5;
+						glm::mat4 matrix = Util::btTransformToMat4(worldTransform) * localOffsetTransform.to_mat4() * glm::mat4_cast(Rotate_X_90);
 
-					//	spine02[3][0] = spine01[3][0];
-					//	spine02[3][1] = spine01[3][1];
-					//	spine02[3][2] = spine01[3][2];
-
-
-						skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = spine02 * skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
-						skinnedModel->m_skeleton.m_joints[i].m_currentFinalTransform = spine02;
-						skinnedModel->m_BoneInfo[BoneIndex].ModelSpace_AnimatedTransform = spine02;
+						skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = matrix * skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
+						skinnedModel->m_skeleton.m_joints[i].m_currentFinalTransform = matrix;
+						skinnedModel->m_BoneInfo[BoneIndex].ModelSpace_AnimatedTransform = matrix;
 					}
 
-					// SPINE 01
-					if (Util::StrCmp(NodeName, "spine_03")) {
-						glm::mat4 spine02 = Get_Bottom_Joint_World_Matrix(BODYPART_SPINE_03) * glm::mat4_cast(glm::quat(0.5, 0.5, 0.5, 0.5));
-						skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = spine02 * skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
-						skinnedModel->m_skeleton.m_joints[i].m_currentFinalTransform = spine02;
-						skinnedModel->m_BoneInfo[BoneIndex].ModelSpace_AnimatedTransform = spine02;
-					}
+
 
 					// Head
 					if (Util::StrCmp(NodeName, "neck_01")) {
@@ -700,14 +687,14 @@ namespace HellEngine
 						skinnedModel->m_skeleton.m_joints[i].m_currentFinalTransform = matrix;
 						skinnedModel->m_BoneInfo[BoneIndex].ModelSpace_AnimatedTransform = matrix;
 					}
+
 					if (Util::StrCmp(NodeName, "lowerarm_r"))
 					{
 						glm::mat4 matrix = Get_Bottom_Joint_World_Matrix(BODYPART_RIGHT_LOWER_ARM) * glm::mat4_cast(glm::quat(0.7071, 0, 0, -0.7071) * Rotate_X_180);
 						skinnedModel->m_BoneInfo[BoneIndex].FinalTransformation = matrix * skinnedModel->m_BoneInfo[BoneIndex].BoneOffset;
 						skinnedModel->m_skeleton.m_joints[i].m_currentFinalTransform = matrix;
 					}
-
-
+					
 					if (Util::StrCmp(NodeName, "upperarm_l"))
 					{
 						glm::mat4 matrix = Get_Bottom_Joint_World_Matrix(BODYPART_LEFT_UPPER_ARM) * glm::mat4_cast(glm::quat(0.7071, 0, 0, 0.7071));// glm::mat4_cast(Config::TEST_QUAT) * glm::mat4_cast(Config::TEST_QUAT2);
@@ -778,7 +765,7 @@ namespace HellEngine
 		btTransform worldTransform;
 		m_bodies[BodyPartIndex]->getMotionState()->getWorldTransform(worldTransform);
 		Transform localOffsetTransform;
-		localOffsetTransform.position.y = m_capsuleLengths[BodyPartIndex] * 0.5;
+		localOffsetTransform.position.y = m_capsuleHeights[BodyPartIndex] * 0.5;
 		return Util::btTransformToMat4(worldTransform) * localOffsetTransform.to_mat4();
 	}
 
@@ -787,7 +774,7 @@ namespace HellEngine
 		btTransform worldTransform;
 		m_bodies[BodyPartIndex]->getMotionState()->getWorldTransform(worldTransform);
 		Transform localOffsetTransform;
-		localOffsetTransform.position.y = m_capsuleLengths[BodyPartIndex] * -0.5;
+		localOffsetTransform.position.y = m_capsuleHeights[BodyPartIndex] * -0.5;
 		return Util::btTransformToMat4(worldTransform) * localOffsetTransform.to_mat4();
 	}
 

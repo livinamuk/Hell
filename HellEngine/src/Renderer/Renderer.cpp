@@ -665,7 +665,7 @@ namespace HellEngine
 		//if (!s_demo)
 		{
 			GpuProfiler g("DrawAnimatedEntityDebugBones_Animated");
-			// THIS WAS WHAT YOU WERE USING TO DEBUG RAGDOLLS DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
+			// RAGDOLL TESTING DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_zombieGuy);
 		}
 
 		//

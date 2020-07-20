@@ -92,6 +92,25 @@ int main()
 
                 std::unique_ptr<stbi_uc, stb_free > p(stbi_load(bc1_files_in[i].c_str(), &w, &h, &nrChannels, 0), stb_free());
 
+                //swizzle
+                if (nrChannels == 3)
+                {
+                    uint8_t*      image = p.get();
+                    const uint64_t pitch = static_cast<uint64_t>(w) * 3UL;
+
+                    for (auto r = 0; r < h; ++r)
+                    {
+                        uint8_t* row = image + r * pitch;
+                        for (auto c = 0UL; c < static_cast<uint64_t>(w); ++c)
+                        {
+                            uint8_t* pixel = row + c * 3UL;
+                            uint8_t  p = pixel[0];
+                            pixel[0] = pixel[2];
+                            pixel[2] = p;
+                        }
+                    }
+                }
+
                 CMP_Texture srcTexture = { 0 };
                 srcTexture.dwSize = sizeof(CMP_Texture);
                 srcTexture.dwWidth = w;
@@ -106,13 +125,14 @@ int main()
                 destTexture.dwWidth = w;
                 destTexture.dwHeight = h;
                 destTexture.dwPitch = w;
-                destTexture.format = CMP_FORMAT_BC1;
+                destTexture.format = CMP_FORMAT_DXT1;
                 destTexture.dwDataSize = CMP_CalculateBufferSize(&destTexture);
                 destTexture.pData = (CMP_BYTE*)malloc(destTexture.dwDataSize);
 
                 std::cout << "Compressing ... " << bc1_files_in[i];
                 CMP_CompressOptions options = { 0 };
                 options.dwSize = sizeof(options);
+                options.fquality = 0.88f;
 
                 CMP_ERROR   cmp_status;
                 cmp_status = CMP_ConvertTexture(&srcTexture, &destTexture, &options, &CompressionCallback);
@@ -169,6 +189,25 @@ int main()
 
                 std::unique_ptr<stbi_uc, stb_free > p(stbi_load(bc3_files_in[i].c_str(), &w, &h, &nrChannels, 0), stb_free());
 
+                //swizzle
+                if (nrChannels == 3)
+                {
+                    uint8_t* image = p.get();
+                    const uint64_t pitch = static_cast<uint64_t>(w) * 3UL;
+
+                    for (auto r = 0; r < h; ++r)
+                    {
+                        uint8_t* row = image + r * pitch;
+                        for (auto c = 0UL; c < static_cast<uint64_t>(w); ++c)
+                        {
+                            uint8_t* pixel = row + c * 3UL;
+                            uint8_t  p = pixel[0];
+                            pixel[0] = pixel[2];
+                            pixel[2] = p;
+                        }
+                    }
+                }
+
                 CMP_Texture srcTexture = { 0 };
                 srcTexture.dwSize = sizeof(CMP_Texture);
                 srcTexture.dwWidth = w;
@@ -183,7 +222,7 @@ int main()
                 destTexture.dwWidth = w;
                 destTexture.dwHeight = h;
                 destTexture.dwPitch = w;
-                destTexture.format = CMP_FORMAT_BC3;
+                destTexture.format = CMP_FORMAT_DXT3;
                 destTexture.dwDataSize = CMP_CalculateBufferSize(&destTexture);
                 destTexture.pData = (CMP_BYTE*)malloc(destTexture.dwDataSize);
 
@@ -191,6 +230,7 @@ int main()
                 std::cout << "Compressing ... " << bc3_files_in[i];
                 CMP_CompressOptions options = { 0 };
                 options.dwSize = sizeof(options);
+                options.fquality = 0.88f;
 
                 CMP_ERROR   cmp_status;
                 cmp_status = CMP_ConvertTexture(&srcTexture, &destTexture, &options, &CompressionCallback);
@@ -267,6 +307,25 @@ int main()
 
                 std::unique_ptr<stbi_uc, stb_free > p(stbi_load(normal_maps[i].c_str(), &w, &h, &nrChannels, 0), stb_free());
 
+                //swizzle
+                if (nrChannels == 3)
+                {
+                    uint8_t* image = p.get();
+                    const uint64_t pitch = static_cast<uint64_t>(w) * 3UL;
+
+                    for (auto r = 0; r < h; ++r)
+                    {
+                        uint8_t* row = image + r * pitch;
+                        for (auto c = 0UL; c < static_cast<uint64_t>(w); ++c)
+                        {
+                            uint8_t* pixel = row + c * 3UL;
+                            uint8_t  p = pixel[0];
+                            pixel[0] = pixel[2];
+                            pixel[2] = p;
+                        }
+                    }
+                }
+
                 CMP_Texture srcTexture = { 0 };
                 srcTexture.dwSize = sizeof(CMP_Texture);
                 srcTexture.dwWidth = w;
@@ -281,14 +340,14 @@ int main()
                 destTexture.dwWidth = w;
                 destTexture.dwHeight = h;
                 destTexture.dwPitch = w;
-                destTexture.format = CMP_FORMAT_BC3;
+                destTexture.format = CMP_FORMAT_DXT3;
                 destTexture.dwDataSize = CMP_CalculateBufferSize(&destTexture);
                 destTexture.pData = (CMP_BYTE*)malloc(destTexture.dwDataSize);
-
 
                 std::cout << "Compressing ... " << normal_maps[i];
                 CMP_CompressOptions options = { 0 };
                 options.dwSize = sizeof(options);
+                options.fquality = 0.88f;
 
                 CMP_ERROR   cmp_status;
                 cmp_status = CMP_ConvertTexture(&srcTexture, &destTexture, &options, &CompressionCallback);
@@ -362,12 +421,31 @@ int main()
 
                     std::unique_ptr<stbi_uc, stb_free > p(stbi_load(rma_maps[i].c_str(), &w, &h, &nrChannels, 0), stb_free());
 
+                    //swizzle
+                    if (nrChannels == 3)
+                    {
+                        uint8_t* image = p.get();
+                        const uint64_t pitch = static_cast<uint64_t>(w) * 3UL;
+
+                        for (auto r = 0; r < h; ++r)
+                        {
+                            uint8_t* row = image + r * pitch;
+                            for (auto c = 0UL; c < static_cast<uint64_t>(w); ++c)
+                            {
+                                uint8_t* pixel = row + c * 3UL;
+                                uint8_t  p = pixel[0];
+                                pixel[0] = pixel[2];
+                                pixel[2] = p;
+                            }
+                        }
+                    }
+
                     CMP_Texture srcTexture = { 0 };
                     srcTexture.dwSize = sizeof(CMP_Texture);
                     srcTexture.dwWidth = w;
                     srcTexture.dwHeight = h;
                     srcTexture.dwPitch = nrChannels == 4 ? w * 4 : w * 3;
-                    srcTexture.format = nrChannels == 4 ? CMP_FORMAT_RGBA_8888 : CMP_FORMAT_RGB_888;
+                    srcTexture.format = nrChannels == 4 ? CMP_FORMAT_RGBA_8888 : CMP_FORMAT_BGR_888;
                     srcTexture.dwDataSize = srcTexture.dwHeight * srcTexture.dwPitch;
                     srcTexture.pData = p.get();
 
@@ -376,7 +454,7 @@ int main()
                     destTexture.dwWidth = w;
                     destTexture.dwHeight = h;
                     destTexture.dwPitch = w;
-                    destTexture.format = CMP_FORMAT_BC3;
+                    destTexture.format = CMP_FORMAT_DXT3;
                     destTexture.dwDataSize = CMP_CalculateBufferSize(&destTexture);
                     destTexture.pData = (CMP_BYTE*)malloc(destTexture.dwDataSize);
 
@@ -384,6 +462,7 @@ int main()
                     std::cout << "Compressing ... " << rma_out[i];
                     CMP_CompressOptions options = { 0 };
                     options.dwSize = sizeof(options);
+                    options.fquality = 0.88f;
 
                     CMP_ERROR   cmp_status;
                     cmp_status = CMP_ConvertTexture(&srcTexture, &destTexture, &options, &CompressionCallback);

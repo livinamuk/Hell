@@ -27,6 +27,7 @@ namespace
 
 int main()
 {
+    //Textures with color
     {
         std::array<std::string, 23> bc1_files_in =
         {
@@ -131,6 +132,7 @@ int main()
     }
 
     
+    //Textures with alpha
     {
         std::array<std::string, 9> bc3_files_in =
         {
@@ -207,16 +209,200 @@ int main()
         }
     }
 
+
+    //Normal maps, must be separate for now bc1 compression, but can be 2 channel
+    {
+        std::array<std::string, 19> normal_maps =
+        {
+            "res/textures/Couch_NRM.png",
+            "res/textures/DoorFrame_NRM.png",
+            "res/textures/Door_NRM.tga",
+            "res/textures/FloorBoards_NRM.tga",
+            "res/textures/Glock_NRM.tga",
+            "res/textures/Hands_NRM.tga",
+            "res/textures/Light_NRM.tga",
+            "res/textures/PlasterCeiling_NRM.tga",
+            "res/textures/Shell_NRM.png",
+            "res/textures/Shotgun_NRM.png",
+            "res/textures/Shotgun_NRM.tga",
+            "res/textures/Stairs01_NRM.tga",
+            "res/textures/Trims_NRM.tga",
+            "res/textures/WallPaper_NRM.tga",
+            "res/textures/ZombieBoy_Top_NRM.png",
+            "res/textures/Zombie_Face_NRM.png",
+            "res/textures/Zombie_Hair_NRM.png",
+            "res/textures/Zombie_Jeans_NRM.png",
+            "res/textures/Zombie_Shirt_NRM.png",
+        };
+
+        std::array<std::string, 19> normal_maps_out =
+        {
+            "res/textures/Couch_NRM.dds",
+            "res/textures/DoorFrame_NRM.dds",
+            "res/textures/Door_NRM.dds",
+            "res/textures/FloorBoards_NRM.dds",
+            "res/textures/Glock_NRM.dds",
+            "res/textures/Hands_NRM.dds",
+            "res/textures/Light_NRM.dds",
+            "res/textures/PlasterCeiling_NRM.dds",
+            "res/textures/Shell_NRM.dds",
+            "res/textures/Shotgun_NRM.dds",
+            "res/textures/Shotgun_NRM.dds",
+            "res/textures/Stairs01_NRM.dds",
+            "res/textures/Trims_NRM.dds",
+            "res/textures/WallPaper_NRM.dds",
+            "res/textures/ZombieBoy_Top_NRM.dds",
+            "res/textures/Zombie_Face_NRM.dds",
+            "res/textures/Zombie_Hair_NRM.dds",
+            "res/textures/Zombie_Jeans_NRM.dds",
+            "res/textures/Zombie_Shirt_NRM.dds",
+        };
+
+        {
+            for (auto i = 0; i < normal_maps.size(); ++i)
+            {
+                int32_t w;
+                int32_t h;
+                int32_t nrChannels;
+
+                std::unique_ptr<stbi_uc, stb_free > p(stbi_load(normal_maps[i].c_str(), &w, &h, &nrChannels, 0), stb_free());
+
+                CMP_Texture srcTexture = { 0 };
+                srcTexture.dwSize = sizeof(CMP_Texture);
+                srcTexture.dwWidth = w;
+                srcTexture.dwHeight = h;
+                srcTexture.dwPitch = nrChannels == 4 ? w * 4 : w * 3;
+                srcTexture.format = nrChannels == 4 ? CMP_FORMAT_RGBA_8888 : CMP_FORMAT_RGB_888;
+                srcTexture.dwDataSize = srcTexture.dwHeight * srcTexture.dwPitch;
+                srcTexture.pData = p.get();
+
+                CMP_Texture destTexture = { 0 };
+                destTexture.dwSize = sizeof(destTexture);
+                destTexture.dwWidth = w;
+                destTexture.dwHeight = h;
+                destTexture.dwPitch = w;
+                destTexture.format = CMP_FORMAT_BC3;
+                destTexture.dwDataSize = CMP_CalculateBufferSize(&destTexture);
+                destTexture.pData = (CMP_BYTE*)malloc(destTexture.dwDataSize);
+
+
+                std::cout << "Compressing ... " << normal_maps[i];
+                CMP_CompressOptions options = { 0 };
+                options.dwSize = sizeof(options);
+
+                CMP_ERROR   cmp_status;
+                cmp_status = CMP_ConvertTexture(&srcTexture, &destTexture, &options, &CompressionCallback);
+                if (cmp_status != CMP_OK)
+                {
+                    free(destTexture.pData);
+                    std::printf("Compression returned an error %d\n", cmp_status);
+                    return cmp_status;
+                }
+                else
+                {
+                    SaveDDSFile(normal_maps_out[i].c_str(), destTexture);
+                    free(destTexture.pData);
+                }
+            }
+        }
+
+
+        //rma maps, must be separate for now bc1 compression, but it can be investigated compressing as seprate bc4
+        {
+            std::array<std::string, 18> rma_maps =
+            {
+                "res/textures/Couch_RMA.png",
+                "res/textures/DoorFrame_RMA.png",
+                "res/textures/Door_RMA.tga",
+                "res/textures/FloorBoards_RMA.tga",
+                "res/textures/Glock_RMA.tga",
+                "res/textures/Hands_RMA.tga",
+                "res/textures/Light_RMA.tga",
+                "res/textures/Picture2_RMA.tga",
+                "res/textures/PlasterCeiling_RMA.tga",
+                "res/textures/Shell_RMA.png",
+                "res/textures/Shotgun_RMA.png",
+                "res/textures/Stairs01_RMA.tga",
+                "res/textures/Trims_RMA.tga",
+                "res/textures/WallPaper_RMA.tga",
+                "res/textures/ZombieBoy_Top_RMA.png",
+                "res/textures/Zombie_Face_RMA.png",
+                "res/textures/Zombie_Jeans_RMA.png",
+                "res/textures/Zombie_Shirt_RMA.png"
+            };
+
+            std::array<std::string, 19> rma_out =
+            {
+                "res/textures/Couch_RMA.dds",
+                "res/textures/DoorFrame_RMA.dds",
+                "res/textures/Door_RMA.dds",
+                "res/textures/FloorBoards_RMA.dds",
+                "res/textures/Glock_RMA.dds",
+                "res/textures/Hands_RMA.dds",
+                "res/textures/Light_RMA.dds",
+                "res/textures/Picture2_RMA.dds",
+                "res/textures/PlasterCeiling_RMA.dds",
+                "res/textures/Shell_RMA.dds",
+                "res/textures/Shotgun_RMA.dds",
+                "res/textures/Stairs01_RMA.dds",
+                "res/textures/Trims_RMA.dds",
+                "res/textures/WallPaper_RMA.dds",
+                "res/textures/ZombieBoy_Top_RMA.dds",
+                "res/textures/Zombie_Face_RMA.dds",
+                "res/textures/Zombie_Jeans_RMA.dds",
+                "res/textures/Zombie_Shirt_RMA.dds"
+            };
+
+            {
+                for (auto i = 0; i < rma_maps.size(); ++i)
+                {
+                    int32_t w;
+                    int32_t h;
+                    int32_t nrChannels;
+
+                    std::unique_ptr<stbi_uc, stb_free > p(stbi_load(rma_maps[i].c_str(), &w, &h, &nrChannels, 0), stb_free());
+
+                    CMP_Texture srcTexture = { 0 };
+                    srcTexture.dwSize = sizeof(CMP_Texture);
+                    srcTexture.dwWidth = w;
+                    srcTexture.dwHeight = h;
+                    srcTexture.dwPitch = nrChannels == 4 ? w * 4 : w * 3;
+                    srcTexture.format = nrChannels == 4 ? CMP_FORMAT_RGBA_8888 : CMP_FORMAT_RGB_888;
+                    srcTexture.dwDataSize = srcTexture.dwHeight * srcTexture.dwPitch;
+                    srcTexture.pData = p.get();
+
+                    CMP_Texture destTexture = { 0 };
+                    destTexture.dwSize = sizeof(destTexture);
+                    destTexture.dwWidth = w;
+                    destTexture.dwHeight = h;
+                    destTexture.dwPitch = w;
+                    destTexture.format = CMP_FORMAT_BC3;
+                    destTexture.dwDataSize = CMP_CalculateBufferSize(&destTexture);
+                    destTexture.pData = (CMP_BYTE*)malloc(destTexture.dwDataSize);
+
+
+                    std::cout << "Compressing ... " << rma_out[i];
+                    CMP_CompressOptions options = { 0 };
+                    options.dwSize = sizeof(options);
+
+                    CMP_ERROR   cmp_status;
+                    cmp_status = CMP_ConvertTexture(&srcTexture, &destTexture, &options, &CompressionCallback);
+                    if (cmp_status != CMP_OK)
+                    {
+                        free(destTexture.pData);
+                        std::printf("Compression returned an error %d\n", cmp_status);
+                        return cmp_status;
+                    }
+                    else
+                    {
+                        SaveDDSFile(rma_out[i].c_str(), destTexture);
+                        free(destTexture.pData);
+                    }
+                }
+            }
+        }
+    }
+
     std::cout << "Compression done!\n";
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

@@ -1,5 +1,6 @@
 #include "hellpch.h"
 #include "Texture.h"
+#include "DDS_Helpers.h"
 
 Texture::Texture(std::string name, std::string filetype)
 {

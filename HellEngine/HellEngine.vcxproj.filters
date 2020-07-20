@@ -1481,6 +1481,9 @@
     </ClInclude>
     <ClInclude Include="src\House\Window.h" />
     <ClInclude Include="src\Logic\WeaponLogic.h" />
+    <ClInclude Include="src\Renderer\DDS_Helpers.h">
+      <Filter>src\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\AnimatedNode.cpp">
@@ -1731,6 +1734,9 @@
     </ClCompile>
     <ClCompile Include="src\House\Window.cpp" />
     <ClCompile Include="src\Logic\WeaponLogic.cpp" />
+    <ClCompile Include="src\Renderer\DDS_Helpers.cpp">
+      <Filter>src\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">

@@ -25,6 +25,13 @@ namespace HellEngine
 		Audio::LoadAudio("Shotgun_ReloadEnd.wav");
 		Audio::LoadAudio("ShellFloorBounce.wav");
 		Audio::LoadAudio("ShellWallBounce.wav");
+		Audio::LoadAudio("Glock_Fire_0.wav");
+		Audio::LoadAudio("Glock_Fire_1.wav");
+		Audio::LoadAudio("Glock_Fire_2.wav");
+		Audio::LoadAudio("Glock_DryFire.wav");;
+		Audio::LoadAudio("Glock_Reload.wav");
+		Audio::LoadAudio("Glock_ReloadFromEmpty.wav");
+		Audio::LoadAudio("Glock_DryFire.wav");
 		//Audio::LoadAudio("Music.wav");
 	}
 

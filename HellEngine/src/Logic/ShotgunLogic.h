@@ -32,7 +32,7 @@ namespace HellEngine
 		static int m_AmmoInGun;
 		static int m_AmmoAvaliable;
 
-		static RaycastResult m_raycast;
+		//static RaycastResult m_raycast;
 		static Camera* p_camera;
 		static Player* p_player;
 		static AnimatedEntity* p_model;

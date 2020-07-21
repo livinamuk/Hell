@@ -103,7 +103,7 @@ namespace HellEngine
 		// Capsule Widths
 		m_capsuleWidths[BODYPART_PELVIS] = 0.130f;
 		m_capsuleWidths[BODYPART_LOWER_TORSO] = 0.130f;
-		m_capsuleWidths[BODYPART_UPPER_TORSO] = (DIST_FROM_SPINE_02_TO_NECK * 0.5) + 0.025;
+		m_capsuleWidths[BODYPART_UPPER_TORSO] = (DIST_FROM_SPINE_02_TO_NECK * 0.5) - 0.05;
 
 		m_capsuleWidths[BODYPART_LEFT_UPPER_ARM] = 0.05;
 		m_capsuleWidths[BODYPART_RIGHT_UPPER_ARM] = 0.05;
@@ -275,8 +275,10 @@ namespace HellEngine
 		}
 
 
-		///////////////////////////// SETTING THE CONSTRAINTS /////////////////////////////////////////////7777
-			// Now setup the constraints
+		/////////////////
+		// CONSTRAINTS //
+		/////////////////
+
 		btGeneric6DofConstraint* joint6DOF;
 		btTransform localA, localB;
 		bool useLinearReferenceFrameA = true;
@@ -285,39 +287,32 @@ namespace HellEngine
 		{
 			localA.setIdentity();
 			localA.setOrigin(btVector3(DIST_FROM_SPINE_02_TO_NECK * 0.5, 0, 0));
-
 			localB.setIdentity(); 
 			localB.getBasis().setEulerZYX(-SIMD_HALF_PI, 0, SIMD_HALF_PI);
 			localB.setOrigin(btVector3(0, DIST_FROM_NECK_TO_HEAD * -0.5, 0));
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_UPPER_TORSO], *m_bodies[BODYPART_NECK], localA, localB, useLinearReferenceFrameA);
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.3f, -SIMD_EPSILON, -SIMD_PI * 0.3f));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.5f, SIMD_EPSILON, SIMD_PI * 0.3f));
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
-
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.2f, -SIMD_PI * 0.2, -SIMD_PI * 0.2f));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.2f, SIMD_PI * 0.2, SIMD_PI * 0.2f));
+		
 			m_joints[JOINT_SPINE_NECK] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_SPINE_NECK], true); 
 		}
-		
+	
 		// Head
 		{
 			localA.setIdentity();
 			localA.setOrigin(btVector3(0, 0, 0));
-
 			localB.setIdentity();
 			localB.setOrigin(btVector3(0, -HEAD_SPHERE_RADIUS, 0));
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_NECK], *m_bodies[BODYPART_HEAD], localA, localB, useLinearReferenceFrameA);
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.075f, -SIMD_EPSILON, -SIMD_PI * 0.075f));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.075f, SIMD_EPSILON, SIMD_PI * 0.075f));
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_HEAD] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_HEAD], true);
 		}
-
 
 		glm::vec3 Center_Of_Spine_03 = Util::btVec3_to_glmVec3(Util::GetRelPosBetween2Vectors(spine_03, neck_01));
 		float Length_To_Shoulder = glm::length(Center_Of_Spine_03 - upperarm_l);
@@ -332,10 +327,11 @@ namespace HellEngine
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_UPPER_TORSO], *m_bodies[BODYPART_LEFT_UPPER_ARM], localA, localB, useLinearReferenceFrameA);
 
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.8f, -SIMD_EPSILON, -SIMD_PI * 0.5f));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.8f, SIMD_EPSILON, SIMD_PI * 0.5f));
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.8f, -SIMD_EPSILON, -SIMD_PI * 0.5f)); ORIGINAL
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.8f, SIMD_EPSILON, SIMD_PI * 0.5f)); ORIGINAL
+
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_PI * 0.3f, -SIMD_PI * 0.6f));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_PI * 0.3f, SIMD_PI * 0.6f));
 
 			m_joints[JOINT_LEFT_SHOULDER] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_LEFT_SHOULDER], true);
@@ -345,18 +341,16 @@ namespace HellEngine
 		{
 			localA.setIdentity();
 			localA.setOrigin(btVector3(DIST_VERTICALLY_FROM_SHOULDER_TO_SPINE_02, DIST_FROM_SHOULDER_L_TO_SHOULDER_R * -0.5, 0));
-
 			localB.setIdentity(); 
 			localB.getBasis().setEulerZYX(0, 0, HELL_PI);
 			localB.setOrigin(btVector3(0, DIST_FROM_SHOULDER_TO_ELBOW * -0.5, 0));
 		
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_UPPER_TORSO], *m_bodies[BODYPART_RIGHT_UPPER_ARM], localA, localB, useLinearReferenceFrameA);
 
-
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.8f, -SIMD_EPSILON, -SIMD_PI * 0.5f));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.8f, SIMD_EPSILON, SIMD_PI * 0.5f));
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.8f, -SIMD_EPSILON, -SIMD_PI * 0.5f)); ORIGINAL
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.8f, SIMD_EPSILON, SIMD_PI * 0.5f)); ORIGINAL
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_PI * 0.3f, -SIMD_PI * 0.6f));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_PI * 0.3f, SIMD_PI * 0.6f));
 
 			m_joints[JOINT_RIGHT_SHOULDER] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_RIGHT_SHOULDER], true);
@@ -366,15 +360,14 @@ namespace HellEngine
 		{;
 			localA.setIdentity();
 			localA.setOrigin(btVector3(btScalar(0.), btScalar(0.18), btScalar(0.)));
-
 			localB.setIdentity();
 			localB.setOrigin(btVector3(0, -DIST_FROM_ELBO_TO_HAND * 0.5, 0));
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_LEFT_UPPER_ARM], *m_bodies[BODYPART_LEFT_LOWER_ARM], localA, localB, useLinearReferenceFrameA);
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.7f, SIMD_EPSILON, SIMD_EPSILON));
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_LEFT_ELBOW] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_LEFT_ELBOW], true);
@@ -384,7 +377,6 @@ namespace HellEngine
 		{			
 			localA.setIdentity();
 			localA.setOrigin(btVector3(btScalar(0.), btScalar(0.18), btScalar(0.)));
-
 			localB.setIdentity();
 			localB.setOrigin(btVector3(0, -DIST_FROM_ELBO_TO_HAND * 0.5, 0));
 
@@ -392,8 +384,8 @@ namespace HellEngine
 
 			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.7, SIMD_EPSILON, SIMD_EPSILON));
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
 
 			m_joints[JOINT_RIGHT_ELBOW] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_RIGHT_ELBOW], true);
@@ -408,11 +400,15 @@ namespace HellEngine
 			localB.setOrigin(btVector3(DIST_FROM_SPINE_01_TO_SPINE_02 * -0.5, 0, 0));
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_PELVIS], *m_bodies[BODYPART_LOWER_TORSO], localA, localB, useLinearReferenceFrameA);
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.2, -SIMD_EPSILON, -SIMD_PI * 0.3));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.2, SIMD_EPSILON, SIMD_PI * 0.6));		
-			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.2, -SIMD_EPSILON, -SIMD_PI * 0.3));	original
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.2, SIMD_EPSILON, SIMD_PI * 0.6));		original
 
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_PI * 0.3, -SIMD_PI * 0.2));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_PI * 0.6, SIMD_PI * 0.2));
+
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));	
+			
 			m_joints[JOINT_SPINE_01] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_SPINE_01], true);
 		}
@@ -427,10 +423,10 @@ namespace HellEngine
 
 			joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_LOWER_TORSO], *m_bodies[BODYPART_UPPER_TORSO], localA, localB, useLinearReferenceFrameA);
 
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.1, -SIMD_EPSILON, -SIMD_PI * 0.1));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.1, SIMD_EPSILON, SIMD_PI * 0.1));
-			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
-			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
+			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * 0.1, -SIMD_EPSILON, -SIMD_PI * 0.1)); original
+			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * 0.1, SIMD_EPSILON, SIMD_PI * 0.1)); original
+			joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_PI * 0.1, -SIMD_PI * 0.1));
+			joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_PI * 0.1, SIMD_PI * 0.1));
 
 			m_joints[JOINT_SPINE_02] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_SPINE_02], true);
@@ -438,7 +434,7 @@ namespace HellEngine
 
 
 
-		/// ******* LEFT HIP ******** ///
+		// Left hip
 		{
 			localA.setIdentity();
 			//localA.setOrigin(btVector3(glm::length(pelvis - thigh_l) * -1, m_capsuleLengths[BODYPART_PELVIS] * -0.5, 0));
@@ -457,9 +453,9 @@ namespace HellEngine
 			m_joints[JOINT_LEFT_HIP] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_LEFT_HIP], true);
 		}
+
 		// Right hip
 		{
-
 			localA.setIdentity();
 			localA.setOrigin(btVector3(m_capsuleHeights[BODYPART_PELVIS] * -0.5, DIST_FROM_THIGH_L_TO_THIGH_R * -0.5, 0));
 
@@ -472,6 +468,7 @@ namespace HellEngine
 			joint6DOF->setAngularUpperLimit(btVector3(SIMD_HALF_PI * 0.5, SIMD_EPSILON, SIMD_EPSILON));
 			//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON, -SIMD_EPSILON, -SIMD_EPSILON));
 			//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON, SIMD_EPSILON, SIMD_EPSILON));
+
 
 			m_joints[JOINT_RIGHT_HIP] = joint6DOF;
 			m_ownerWorld->addConstraint(m_joints[JOINT_RIGHT_HIP], true);
@@ -566,7 +563,10 @@ namespace HellEngine
 
 	void Ragdoll::UpdateBoneTransform(SkinnedModel* skinnedModel, std::vector<glm::mat4>& Transforms, std::vector<glm::mat4>& DebugAnimatedTransforms)
 	{
-		
+		btGeneric6DofConstraint* joint6DOF = (btGeneric6DofConstraint*)m_joints[JOINT_LEFT_HIP];
+		joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * Config::TEST_FLOAT, -SIMD_PI * Config::TEST_FLOAT2, -SIMD_PI * Config::TEST_FLOAT3));
+		joint6DOF->setAngularUpperLimit(btVector3(SIMD_PI * Config::TEST_FLOAT4, SIMD_PI * Config::TEST_FLOAT5, SIMD_PI * Config::TEST_FLOAT6));
+
 		// Traverse the tree 
 		for (int i = 0; i < skinnedModel->m_skeleton.m_joints.size(); i++)
 		{

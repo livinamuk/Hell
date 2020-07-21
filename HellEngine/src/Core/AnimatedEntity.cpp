@@ -139,7 +139,10 @@ namespace HellEngine
 		if (!m_loopCurrentAnimation)
 			if (m_currentAnimationTime >= m_currentAnimationDuration)
 			{
-				m_currentAnimationTime = m_currentAnimationDuration - 0.001f; 
+				// Get timestamp of final frame
+				// this might be dumb. think about it when youaren't tired.
+				// its probably an error with the animation interpotion not here.
+				m_currentAnimationTime = m_currentAnimationDuration - 0.01f;// skinnedModel->m_animations[m_currentAnimationIndex]->m_finalTimeStamp / skinnedModel->m_animations[m_currentAnimationIndex]->m_ticksPerSecond;
 				m_animationIsComplete = true;
 			}
 

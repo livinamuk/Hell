@@ -1,5 +1,6 @@
 #include "hellpch.h"
 #include "ShotgunLogic.h"
+#include "WeaponLogic.h"
 #include "Helpers/Util.h"
 #include "Core/Input.h"
 #include "Audio/audio.h"
@@ -12,7 +13,7 @@ namespace HellEngine
 	GunState ShotgunLogic::m_gunState = GunState::IDLE;
 	ReloadState ShotgunLogic::m_reloadState = ReloadState::NOT_RELOADING;
 	IronSightState ShotgunLogic::m_ironSightState = IronSightState::NOT_IRON_SIGHTING;
-	RaycastResult ShotgunLogic::m_raycast;
+	//RaycastResult ShotgunLogic::m_raycast;
 	int ShotgunLogic::m_AmmoInGun = 8;
 	int ShotgunLogic::m_AmmoAvaliable = 1000;
 	Camera* ShotgunLogic::p_camera;
@@ -78,15 +79,16 @@ namespace HellEngine
 				if ((raycastResult.m_name == "NEW MESH") || (raycastResult.m_name == "RAGDOLL")) {
 					Renderer::s_bloodEffect.m_CurrentTime = 0;
 					playFleshSound = true;
-					Renderer::s_hitPoint.position = m_raycast.m_hitPoint;
+					Renderer::s_hitPoint.position = raycastResult.m_hitPoint;
 					Renderer::s_hitPoint.rotation = p_camera->m_transform.rotation;
 				}
-				m_raycast = raycastResult;
+				WeaponLogic::s_BulletHits.emplace_back(raycastResult);
+				//m_raycast = raycastResult;
 
 
 				if (raycastResult.m_name == "RAGDOLL") 
 				{
-					float FORCE_SCALING_FACTOR = 2;// 5;// Config::TEST_FLOAT;
+					float FORCE_SCALING_FACTOR = 5;// 5;// Config::TEST_FLOAT;
 					raycastResult.m_rigidBody->activate(true);
 					btVector3 centerOfMass = raycastResult.m_rigidBody->getCenterOfMassPosition();
 					btVector3 hitPoint = Util::glmVec3_to_btVec3(raycastResult.m_hitPoint);

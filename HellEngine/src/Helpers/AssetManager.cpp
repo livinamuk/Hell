@@ -139,7 +139,12 @@ namespace HellEngine
 
 		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("Glock.fbx"));
 		LoadAnimation("Glock.fbx", "Glock_Idle.fbx");
+		LoadAnimation("Glock.fbx", "Glock_Fire0.fbx");
+		LoadAnimation("Glock.fbx", "Glock_Fire1.fbx");
+		LoadAnimation("Glock.fbx", "Glock_Fire2.fbx");
+		LoadAnimation("Glock.fbx", "Glock_Reload.fbx");
 		LoadAnimation("Glock.fbx", "Glock_EmptyReload.fbx");
+		LoadAnimation("Glock.fbx", "Glock_IdleEmpty.fbx");
 	
 
 		/*skinnedModels.emplace_back(new SkinnedModel());

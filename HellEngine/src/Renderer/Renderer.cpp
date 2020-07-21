@@ -11,6 +11,7 @@
 #include "Logic/ShotgunLogic.h"
 #include "Config.h"
 #include "Logic/WeaponLogic.h"
+#include "Logic/GlockLogic.h"
 
 namespace HellEngine
 {
@@ -542,6 +543,15 @@ namespace HellEngine
 		}
 
 
+		static bool white = false;
+
+		if (Input::s_keyPressed[HELL_KEY_Q])
+			white = !white;
+
+		if (white) {
+			glClearColor(1, 1, 1, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
+		}
 		// Bullet Debug
 		if (m_showBulletDebug)
 		{
@@ -824,7 +834,7 @@ namespace HellEngine
 	//		DrawPoint(&s_solidColorShader, ShotgunLogic::GetShotgunBarrelHoleWorldPosition(), glm::vec3(1, 1, 1));
 	//		DrawPoint(&s_solidColorShader, ShotgunLogic::GetShotgunShellSpawnWorldPosition(), glm::vec3(1, 1, 1));
 
-
+	//DrawPoint(&s_solidColorShader, GlockLogic::GetGlockBarrelHoleWorldPosition(), glm::vec3(1, 1, 1));
 
 			// try draw ragdoll joints!!!
 		if (!s_demo)
@@ -846,19 +856,23 @@ namespace HellEngine
 		std::string text = "";// Util::Mat4ToString(camMat);
 
 
-	/*	text += "Anim index: ";
-		text += std::to_string(game->m_shotgunAnimatedEntity.m_currentAnimationIndex) + "\n";
-		text += "Anim time: ";
-		text += std::to_string(game->m_shotgunAnimatedEntity.m_currentAnimationTime) + "\n";
-		text += "Anim dur:  ";
-		text += std::to_string(game->m_shotgunAnimatedEntity.m_currentAnimationDuration) + "\n";
+		text = "FPS: ";
+		text += std::to_string(game->m_fps);
+		text += "\n";
 
-		if (game->m_shotgunAnimatedEntity.IsAnimationComplete())
+		text += "Anim index: ";
+		text += std::to_string(WeaponLogic::p_currentAnimatedEntity->m_currentAnimationIndex) + "\n";
+		text += "Anim time: ";
+		text += std::to_string(WeaponLogic::p_currentAnimatedEntity->m_currentAnimationTime) + "\n";
+		text += "Anim dur:  ";
+		text += std::to_string(WeaponLogic::p_currentAnimatedEntity->m_currentAnimationDuration) + "\n";
+
+		if (WeaponLogic::p_currentAnimatedEntity->IsAnimationComplete())
 			text += "Anim commplete: TRUE\n";
 		else
-			text += "Anim commplete: FALSE\n";*/
+			text += "Anim commplete: FALSE\n";
 
-		/*text += "Movement State: ";
+		text += "Movement State: ";
 		if (game->m_player.m_movementState == PlayerMovementState::STOPPED)
 			text += "STOPPED\n";
 		if (game->m_player.m_movementState == PlayerMovementState::WALKING)
@@ -867,26 +881,30 @@ namespace HellEngine
 			text += "RUNNING\n";
 
 		text += "Gun State: ";
-		if (ShotgunLogic::m_gunState == GunState::FIRING)
+		if (WeaponLogic::p_gunState == GunState::FIRING)
 			text += "FIRING\n";
-		if (ShotgunLogic::m_gunState == GunState::IDLE)
+		if (WeaponLogic::p_gunState == GunState::IDLE)
 			text += "IDLE\n";
-		if (ShotgunLogic::m_gunState == GunState::RELOADING)
+		if (WeaponLogic::p_gunState == GunState::RELOADING)
 			text += "RELOADING\n";
 
 		text += "Reload State: ";
-		if (ShotgunLogic::m_reloadState == ReloadState::FROM_IDLE)
+		if (WeaponLogic::p_reloadState == ReloadState::FROM_IDLE)
 			text += "FROM_IDLE\n";
-		if (ShotgunLogic::m_reloadState == ReloadState::BACK_TO_IDLE)
+		if (WeaponLogic::p_reloadState == ReloadState::BACK_TO_IDLE)
 			text += "BACK_TO_IDLE\n";
-		if (ShotgunLogic::m_reloadState == ReloadState::DOUBLE_RELOAD)
+		if (WeaponLogic::p_reloadState == ReloadState::DOUBLE_RELOAD)
 			text += "DOUBLE_RELOAD\n";
-		if (ShotgunLogic::m_reloadState == ReloadState::NOT_RELOADING)
+		if (WeaponLogic::p_reloadState == ReloadState::NOT_RELOADING)
 			text += "NOT_RELOADING\n";
-		if (ShotgunLogic::m_reloadState == ReloadState::SINGLE_RELOAD)
+		if (WeaponLogic::p_reloadState == ReloadState::SINGLE_RELOAD)
 			text += "SINGLE_RELOAD\n";
+		if (WeaponLogic::p_reloadState == ReloadState::RELOAD_CLIP)
+			text += "RELOAD_CLIP\n";
+		if (WeaponLogic::p_reloadState == ReloadState::RELOAD_CLIP_FROM_EMPTY)
+			text += "RELOAD_CLIP_FROM_EMPTY\n";
 
-		text += "Iron Sight State: ";
+		/*text += "Iron Sight State: ";
 		if (ShotgunLogic::m_ironSightState == IronSightState::BEGIN_IRON_SIGHTING)
 			text += "BEGIN_IRON_SIGHTING\n";
 		if (ShotgunLogic::m_ironSightState == IronSightState::END_IRON_SIGHTING)
@@ -899,15 +917,11 @@ namespace HellEngine
 	
 
 
-
-		text = "FPS: ";
-		text += std::to_string(game->m_fps);
-		text += "\n";
 			
-
+		/*
 		text += "Weapon: ";
 		text += std::to_string(WeaponLogic::s_SelectedWeapon);
-		text += "\n";
+		text += "\n";*/
 
 		//s_debugString = Util::Mat4ToString(WeaponLogic::s_AnimatedCameraMatrix);
 		//text += s_debugString;
@@ -1039,7 +1053,7 @@ namespace HellEngine
 
 		Transform t;
 		t.position = s_muzzleFlash.m_worldPos;;;
-		t.position = ShotgunLogic::GetShotgunBarrelHoleWorldPosition();
+		t.position = WeaponLogic::GetBarrelHoleWorldPosition();
 		t.rotation = game->camera.m_transform.rotation;
 
 		// Blood
@@ -1474,8 +1488,8 @@ namespace HellEngine
 
 		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("NumSheet"));
 
-		std::string ammoInGun = std::to_string(ShotgunLogic::m_AmmoInGun);
-		std::string ammoAvaliable = std::to_string(ShotgunLogic::m_AmmoAvaliable);
+		std::string ammoInGun = std::to_string(WeaponLogic::m_AmmoInGun);
+		std::string ammoAvaliable = std::to_string(WeaponLogic::m_AmmoAvaliable);
 
 		char* cstr = new char[ammoInGun.length() + 1];
 		strcpy(cstr, ammoInGun.c_str());
@@ -1483,7 +1497,7 @@ namespace HellEngine
 		strcpy(cstr2, ammoAvaliable.c_str());
 
 		glm::vec3 ammoColor = glm::vec3(0.26f, 0.78f, 0.33f);
-		if (ShotgunLogic::m_AmmoInGun == 0)
+		if (WeaponLogic::m_AmmoInGun == 0)
 			ammoColor = glm::vec3(0.78125f, 0.3f, 0.3f);
 
 		NumberBlitter::DrawTextBlit(shader, "/", 1700, 943);

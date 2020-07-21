@@ -1,6 +1,7 @@
 #include "hellpch.h"
 #include "WeaponLogic.h"
 #include "ShotgunLogic.h"
+#include "GlockLogic.h"
 #include "GL/GpuProfiling.h"
 
 namespace HellEngine
@@ -9,7 +10,13 @@ namespace HellEngine
 	std::vector<WEAPON> WeaponLogic::s_WeaponList;
 	glm::mat4 WeaponLogic::s_AnimatedCameraMatrix; 
 	AnimatedEntity WeaponLogic::m_shotgunAnimatedEntity;
-	AnimatedEntity WeaponLogic::m_glockAnimatedEntiyty;
+	AnimatedEntity WeaponLogic::m_glockAnimatedEntiyty; 
+	AnimatedEntity* WeaponLogic::p_currentAnimatedEntity;
+	GunState WeaponLogic::p_gunState; 
+	ReloadState WeaponLogic::p_reloadState;
+	int WeaponLogic::m_AmmoInGun = 8;
+	int WeaponLogic::m_AmmoAvaliable = 1000;
+	std::vector<RaycastResult> WeaponLogic::s_BulletHits;
 
 	void WeaponLogic::Init()
 	{
@@ -33,10 +40,14 @@ namespace HellEngine
 		m_glockAnimatedEntiyty.SetMaterial("Glock", "Glock");
 
 		ShotgunLogic::p_model = &m_shotgunAnimatedEntity;
+		GlockLogic::p_model = &m_glockAnimatedEntiyty;
 	}
 	
 	void WeaponLogic::Update(float deltaTime)
 	{
+		// clear any bullet hits from last frame
+		s_BulletHits.clear();
+
 		// Weapon select
 		if (Input::s_keyPressed[HELL_KEY_1] && s_WeaponList.size() > 0)
 			s_SelectedWeapon = s_WeaponList[0];
@@ -49,15 +60,31 @@ namespace HellEngine
 
 		if (Input::s_keyPressed[HELL_KEY_4] && s_WeaponList.size() > 4)
 			s_SelectedWeapon = s_WeaponList[3];
+
+		// Updates
+		if (s_SelectedWeapon == WEAPON::GLOCK) {
+			GlockLogic::Update(deltaTime);
+			m_AmmoInGun = GlockLogic::m_AmmoInGun;
+			m_AmmoAvaliable = GlockLogic::m_AmmoAvaliable;
+			p_gunState = GlockLogic::m_gunState;
+			p_reloadState = GlockLogic::m_reloadState;
+			p_currentAnimatedEntity = &m_glockAnimatedEntiyty;
+		}
+		if (s_SelectedWeapon == WEAPON::SHOTGUN) {
+			ShotgunLogic::Update(deltaTime);
+			m_AmmoInGun = ShotgunLogic::m_AmmoInGun;
+			m_AmmoAvaliable = ShotgunLogic::m_AmmoAvaliable;
+			p_gunState = ShotgunLogic::m_gunState;
+			p_reloadState = ShotgunLogic::m_reloadState;
+			p_currentAnimatedEntity = &m_shotgunAnimatedEntity;
+		}
 	}
 
 	void WeaponLogic::UpdateSkeletalAnimation(float deltatime)
 	{
-		if (s_SelectedWeapon == WEAPON::GLOCK) {
-			m_glockAnimatedEntiyty.m_currentAnimationTime = 2.1f;
-			m_glockAnimatedEntiyty.PauseAnimation();
+		if (s_SelectedWeapon == WEAPON::GLOCK)
 			m_glockAnimatedEntiyty.Update(deltatime);
-		}
+		
 		if (s_SelectedWeapon == WEAPON::SHOTGUN)
 			m_shotgunAnimatedEntity.Update(deltatime);
 	}
@@ -83,5 +110,14 @@ namespace HellEngine
 	glm::mat4 WeaponLogic::GetCameraMatrix()
 	{
 		return s_AnimatedCameraMatrix;
+	}
+
+	glm::vec3 WeaponLogic::GetBarrelHoleWorldPosition()
+	{
+		if (s_SelectedWeapon == WEAPON::GLOCK)
+			return GlockLogic::GetGlockBarrelHoleWorldPosition();
+
+		if (s_SelectedWeapon == WEAPON::SHOTGUN)
+			return ShotgunLogic::GetShotgunBarrelHoleWorldPosition();
 	}
 }

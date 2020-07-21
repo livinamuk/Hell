@@ -373,6 +373,8 @@ namespace HellEngine
                 sqt.scale = scale.mValue.x;
                 sqt.timeStamp = aiAnim->mChannels[n]->mPositionKeys[p].mTime;
 
+                animation->m_finalTimeStamp = std::max(animation->m_finalTimeStamp, sqt.timeStamp);
+
                 animatedNode.m_nodeKeys.push_back(sqt);
             }
             animation->m_animatedNodes.push_back(animatedNode);

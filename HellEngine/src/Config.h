@@ -26,10 +26,12 @@ namespace HellEngine
 		static inline float SWAY_MIN_Y = -1;
 		static inline float SWAY_MAX_Y = 0.5f;
 
-		static inline float TEST_FLOAT = 0.999f;
-		static inline float TEST_FLOAT2 = 0.7f;
-		static inline float TEST_FLOAT3 = 5.0f;
+		static inline float TEST_FLOAT = 0.0f;
+		static inline float TEST_FLOAT2 = 0.0f;
+		static inline float TEST_FLOAT3 = 0.0f;
 		static inline float TEST_FLOAT4 = 0.0f;
+		static inline float TEST_FLOAT5 = 0.0f;
+		static inline float TEST_FLOAT6 = 0.0f;
 
 		static inline glm::quat TEST_QUAT = glm::quat(1, 0, 0, 0);
 		static inline glm::quat TEST_QUAT2 = glm::quat(1, 0, 0, 0);

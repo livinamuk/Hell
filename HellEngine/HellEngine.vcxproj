@@ -199,6 +199,7 @@
     <ClInclude Include="src\ImGuizmo\ImGradient.h" />
     <ClInclude Include="src\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="src\ImGuizmo\ImSequencer.h" />
+    <ClInclude Include="src\Logic\GlockLogic.h" />
     <ClInclude Include="src\Logic\ShotgunLogic.h" />
     <ClInclude Include="src\Logic\WeaponLogic.h" />
     <ClInclude Include="src\Misc\Shell.h" />
@@ -678,6 +679,7 @@
     <ClCompile Include="src\ImGuizmo\ImSequencer.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Logic\GlockLogic.cpp" />
     <ClCompile Include="src\Logic\ShotgunLogic.cpp" />
     <ClCompile Include="src\Logic\WeaponLogic.cpp" />
     <ClCompile Include="src\Misc\Shell.cpp" />

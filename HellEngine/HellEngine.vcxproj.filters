@@ -231,6 +231,9 @@
     <ClInclude Include="src\House\WallMesh.h">
       <Filter>src\House</Filter>
     </ClInclude>
+    <ClInclude Include="src\House\Window.h">
+      <Filter>src\House</Filter>
+    </ClInclude>
     <ClInclude Include="src\ImGui\imgui_impl_glfw.h">
       <Filter>src\ImGui</Filter>
     </ClInclude>
@@ -253,6 +256,9 @@
       <Filter>src\ImGuizmo</Filter>
     </ClInclude>
     <ClInclude Include="src\Logic\ShotgunLogic.h">
+      <Filter>src\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logic\WeaponLogic.h">
       <Filter>src\Logic</Filter>
     </ClInclude>
     <ClInclude Include="src\Misc\Shell.h">
@@ -1479,8 +1485,7 @@
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h">
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
-    <ClInclude Include="src\House\Window.h" />
-    <ClInclude Include="src\Logic\WeaponLogic.h" />
+    <ClInclude Include="src\Logic\GlockLogic.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\AnimatedNode.cpp">
@@ -1618,6 +1623,9 @@
     <ClCompile Include="src\House\WallMesh.cpp">
       <Filter>src\House</Filter>
     </ClCompile>
+    <ClCompile Include="src\House\Window.cpp">
+      <Filter>src\House</Filter>
+    </ClCompile>
     <ClCompile Include="src\ImGui\imgui_impl_glfw.cpp">
       <Filter>src\ImGui</Filter>
     </ClCompile>
@@ -1640,6 +1648,9 @@
       <Filter>src\ImGuizmo</Filter>
     </ClCompile>
     <ClCompile Include="src\Logic\ShotgunLogic.cpp">
+      <Filter>src\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logic\WeaponLogic.cpp">
       <Filter>src\Logic</Filter>
     </ClCompile>
     <ClCompile Include="src\Misc\Shell.cpp">
@@ -1729,8 +1740,7 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\House\Window.cpp" />
-    <ClCompile Include="src\Logic\WeaponLogic.cpp" />
+    <ClCompile Include="src\Logic\GlockLogic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">

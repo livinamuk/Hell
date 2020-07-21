@@ -12,6 +12,7 @@ namespace HellEngine
     public: // fields                
         float m_duration;
         float m_ticksPerSecond;
+        float m_finalTimeStamp;
         const char* m_filename;
 
         std::vector<AnimatedNode> m_animatedNodes;

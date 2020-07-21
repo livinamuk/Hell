@@ -8,6 +8,7 @@
 #include "Audio/Audio.h"
 #include "Logic/WeaponLogic.h"
 #include "Logic/ShotgunLogic.h"
+#include "Logic/GlockLogic.h"
 #include "Config.h"
 #include "Core/EnemyCharacter.h"
 
@@ -28,6 +29,8 @@ namespace HellEngine
 		// Set up sketchy ass pointers
 		ShotgunLogic::p_camera = &camera;
 		ShotgunLogic::p_player = &m_player;
+		GlockLogic::p_camera = &camera;
+		GlockLogic::p_player = &m_player;
 		
 
 		Physics::Init();
@@ -129,8 +132,8 @@ namespace HellEngine
 			for (int i = 0; i < Ragdoll::BODYPART_COUNT; ++i)
 				Physics::s_dynamicsWorld->removeRigidBody(m_zombieGuy.m_ragdoll->m_bodies[i]);
 
-			//for (int i = 0; i < Ragdoll::JOINT_COUNT; ++i)
-			//	Physics::s_dynamicsWorld->removeConstraint(m_zombieGuy.m_ragdoll->m_joints[i]);
+			for (int i = 0; i < Ragdoll::JOINT_COUNT; ++i)
+				Physics::s_dynamicsWorld->removeConstraint(m_zombieGuy.m_ragdoll->m_joints[i]);
 
 			m_zombieGuy.SetAnimationToBindPose();
 			m_zombieGuy.NewRagdollFromAnimatedTransforms();
@@ -153,8 +156,10 @@ namespace HellEngine
 		for (Door& door : house.m_doors)
 			door.Update(m_frameTime);
 
-		ShotgunLogic::Update(m_frameTime);
-		m_cameraRaycast = ShotgunLogic::m_raycast;
+		WeaponLogic::Update(m_frameTime);
+
+		//ShotgunLogic::Update(m_frameTime);
+		m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 10.0f, 0); //ShotgunLogic::m_raycast;
 
 		
 

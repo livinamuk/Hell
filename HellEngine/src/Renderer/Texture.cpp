@@ -112,6 +112,7 @@ void Texture::LoadToGL()
 
 			glCompressedTexImage2D(GL_TEXTURE_2D, 0, glFormat, m_cmpTexture.dwWidth, m_cmpTexture.dwHeight, 0, size2, m_cmpTexture.pData);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
+			glGenerateMipmap(GL_TEXTURE_2D);
 
 			freeCMPTexture(&m_cmpTexture);
 			m_cmpTexture = {};

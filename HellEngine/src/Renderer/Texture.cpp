@@ -47,7 +47,7 @@ void Texture::ReadFromDisk()
 	//std::cout << "about to load tex ...." << name << "\n";
 	std::string fullpathdds = "res/textures/" + name + ".dds";
 
-	if (LoadDDSFile(fullpathdds.c_str(), m_cmpTexture))
+	if (false && LoadDDSFile(fullpathdds.c_str(), m_cmpTexture))
 	{
 		m_isCompressed = true;
 	}
@@ -98,7 +98,8 @@ void Texture::LoadToGL()
 	}
 	else
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		uint32_t glFormat = cmpToOpenGlFormat(m_cmpTexture.format);
 
 		unsigned int blockSize = (glFormat == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;

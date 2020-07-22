@@ -101,9 +101,9 @@ namespace HellEngine
 	//	std::cout << "DIST_FROM_SPINE_02_TO_NECK: " << DIST_FROM_SPINE_02_TO_NECK << "\n";
 
 		// Capsule Widths
-		m_capsuleWidths[BODYPART_PELVIS] = 0.130f;
+		m_capsuleWidths[BODYPART_PELVIS] = 0.120f;
 		m_capsuleWidths[BODYPART_LOWER_TORSO] = 0.130f;
-		m_capsuleWidths[BODYPART_UPPER_TORSO] = (DIST_FROM_SPINE_02_TO_NECK * 0.5) - 0.05;
+		m_capsuleWidths[BODYPART_UPPER_TORSO] = (DIST_FROM_SPINE_02_TO_NECK * 0.5) - 0.025;
 
 		m_capsuleWidths[BODYPART_LEFT_UPPER_ARM] = 0.05;
 		m_capsuleWidths[BODYPART_RIGHT_UPPER_ARM] = 0.05;

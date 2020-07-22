@@ -24,11 +24,14 @@ namespace HellEngine
 
 	void GlockLogic::Update(float deltatime)
 	{
-		if (Input::s_leftMousePressed)
-			Fire();
+		if (m_gunState != GunState::DEQUIP && m_gunState != GunState::EQUIP)
+		{
+			if (Input::s_leftMousePressed)
+				Fire();
 
-		if ((Input::s_keyPressed[HELL_KEY_R]))
-			Reload();
+			if ((Input::s_keyPressed[HELL_KEY_R]))
+				Reload();
+		}
 
 		//SpawnShellIfRequired();
 		Animate(deltatime);
@@ -140,6 +143,23 @@ namespace HellEngine
 
 	void GlockLogic::Animate(float deltatime)
 	{
+		// Equip
+		if (m_gunState == GunState::EQUIP)		{
+			p_model->PlayAnimation("Glock_Equip.fbx", false);
+
+			if (p_model->IsAnimationComplete()) {
+				p_model->PlayAnimation("Glock_Idle.fbx", true);
+				m_gunState = GunState::IDLE;
+			}
+			return;
+		}
+
+		// Equip
+		if (m_gunState == GunState::DEQUIP) {
+			WeaponLogic::SwitchToDesiredWeapon();
+			return;
+		}
+
 		// Idle 
 		if (m_gunState == GunState::IDLE)
 		{			

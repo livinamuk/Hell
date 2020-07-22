@@ -144,7 +144,8 @@ namespace HellEngine
 		LoadAnimation("Glock.fbx", "Glock_Fire2.fbx");
 		LoadAnimation("Glock.fbx", "Glock_Reload.fbx");
 		LoadAnimation("Glock.fbx", "Glock_EmptyReload.fbx");
-		LoadAnimation("Glock.fbx", "Glock_IdleEmpty.fbx");
+		//LoadAnimation("Glock.fbx", "Glock_IdleEmpty.fbx");
+		LoadAnimation("Glock.fbx", "Glock_Equip.fbx");
 	
 
 		/*skinnedModels.emplace_back(new SkinnedModel());

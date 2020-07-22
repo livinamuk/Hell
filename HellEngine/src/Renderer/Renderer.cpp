@@ -867,6 +867,11 @@ namespace HellEngine
 		text += "Anim dur:  ";
 		text += std::to_string(WeaponLogic::p_currentAnimatedEntity->m_currentAnimationDuration) + "\n";
 
+		text += "Current Weapon: ";
+		text += std::to_string(WeaponLogic::s_SelectedWeapon) + "\n";
+		text += "Desired Weapon: ";
+		text += std::to_string(WeaponLogic::s_desiredWeapon) + "\n";
+
 		if (WeaponLogic::p_currentAnimatedEntity->IsAnimationComplete())
 			text += "Anim commplete: TRUE\n";
 		else
@@ -887,6 +892,10 @@ namespace HellEngine
 			text += "IDLE\n";
 		if (WeaponLogic::p_gunState == GunState::RELOADING)
 			text += "RELOADING\n";
+		if (WeaponLogic::p_gunState == GunState::EQUIP)
+			text += "EQUIP\n";
+		if (WeaponLogic::p_gunState == GunState::DEQUIP)
+			text += "DEQUIP\n";
 
 		text += "Reload State: ";
 		if (WeaponLogic::p_reloadState == ReloadState::FROM_IDLE)

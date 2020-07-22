@@ -45,5 +45,4 @@ void Texture::LoadToGL()
 
 	stbi_image_free(data);
 	m_loadedToGL = true;
-	//std::cout << "loaded to GL: " << name << "\n";
 }

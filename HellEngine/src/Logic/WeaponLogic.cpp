@@ -7,6 +7,7 @@
 namespace HellEngine
 {
 	unsigned int WeaponLogic::s_SelectedWeapon;
+	unsigned int WeaponLogic::s_desiredWeapon;
 	std::vector<WEAPON> WeaponLogic::s_WeaponList;
 	glm::mat4 WeaponLogic::s_AnimatedCameraMatrix; 
 	AnimatedEntity WeaponLogic::m_shotgunAnimatedEntity;
@@ -21,7 +22,7 @@ namespace HellEngine
 	void WeaponLogic::Init()
 	{
 		// Setup Inventory
-		s_SelectedWeapon = 0;
+		s_SelectedWeapon = 1;
 		s_WeaponList.clear();
 		s_WeaponList.push_back(WEAPON::GLOCK);
 		s_WeaponList.push_back(WEAPON::SHOTGUN);
@@ -49,17 +50,25 @@ namespace HellEngine
 		s_BulletHits.clear();
 
 		// Weapon select
-		if (Input::s_keyPressed[HELL_KEY_1] && s_WeaponList.size() > 0)
-			s_SelectedWeapon = s_WeaponList[0];
+		if (Input::s_keyPressed[HELL_KEY_1] && s_WeaponList.size() > 0) {
+			s_desiredWeapon = s_WeaponList[0];
+			DequipCurrentWeapon();
+		}
 
-		if (Input::s_keyPressed[HELL_KEY_2] && s_WeaponList.size() > 1)
-			s_SelectedWeapon = s_WeaponList[1];
+		if (Input::s_keyPressed[HELL_KEY_2] && s_WeaponList.size() > 1) {
+			s_desiredWeapon = s_WeaponList[1];
+			DequipCurrentWeapon();
+		}
 
-		if (Input::s_keyPressed[HELL_KEY_3] && s_WeaponList.size() > 3)
-			s_SelectedWeapon = s_WeaponList[2];
+		if (Input::s_keyPressed[HELL_KEY_3] && s_WeaponList.size() > 3) {
+			s_desiredWeapon = s_WeaponList[2];
+			DequipCurrentWeapon();
+		}
 
-		if (Input::s_keyPressed[HELL_KEY_4] && s_WeaponList.size() > 4)
-			s_SelectedWeapon = s_WeaponList[3];
+		if (Input::s_keyPressed[HELL_KEY_4] && s_WeaponList.size() > 4) {
+			s_desiredWeapon = s_WeaponList[3];
+			DequipCurrentWeapon();
+		}
 
 		// Updates
 		if (s_SelectedWeapon == WEAPON::GLOCK) {
@@ -107,6 +116,26 @@ namespace HellEngine
 			m_shotgunAnimatedEntity.Draw(shader, weaponModelMatrix);
 
 	}
+	void WeaponLogic::DequipCurrentWeapon()
+	{
+		if (s_SelectedWeapon == WEAPON::GLOCK)
+			GlockLogic::m_gunState = GunState::DEQUIP;
+
+		if (s_SelectedWeapon == WEAPON::SHOTGUN)
+			ShotgunLogic::m_gunState = GunState::DEQUIP;
+	}
+
+	void WeaponLogic::SwitchToDesiredWeapon()
+	{
+		s_SelectedWeapon = s_desiredWeapon;
+
+		if (s_SelectedWeapon == WEAPON::GLOCK)
+			GlockLogic::m_gunState = GunState::EQUIP;
+
+		if (s_SelectedWeapon == WEAPON::SHOTGUN)
+			ShotgunLogic::m_gunState = GunState::EQUIP;
+	}
+
 	glm::mat4 WeaponLogic::GetCameraMatrix()
 	{
 		return s_AnimatedCameraMatrix;

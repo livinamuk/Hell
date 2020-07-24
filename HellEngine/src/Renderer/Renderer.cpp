@@ -141,7 +141,7 @@ namespace HellEngine
 		s_muzzleFlash.Init();
 		s_bloodWallSplatter.Init();
 
-		s_bloodVolumetricEffect.Init();
+		//s_bloodVolumetricEffect.Init();
 	
 		// Inventory gun examination transforms
 		s_Inv_GlockTransform.position = glm::vec3(0, -1, -10);
@@ -1080,7 +1080,7 @@ namespace HellEngine
 		t.rotation = game->camera.m_transform.rotation;
 
 		// Blood
-		//s_bloodEffect.Draw(&s_BloodShader, s_hitPoint);
+		s_bloodEffect.Draw(&s_BloodShader, s_hitPoint);
 		s_muzzleFlash.Draw(&s_BloodShader, t);
 
 		Transform t2;
@@ -1088,7 +1088,7 @@ namespace HellEngine
 		t2 = s_DebugTransform;
 		s_bloodWallSplatter.Draw(&s_BloodShader, t2);
 
-		s_bloodVolumetricEffect.Draw(&s_BloodShader, s_hitPoint);
+		//s_bloodVolumetricEffect.Draw(&s_BloodShader, s_hitPoint);
 
 		// Muzzle flash
 	}

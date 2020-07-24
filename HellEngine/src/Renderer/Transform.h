@@ -22,6 +22,8 @@ public: // methods
 	Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
 	Transform(glm::mat4 matrix);
 
+	static Transform from_mat4(glm::mat4 matrix);
+
 	// overloads
 	/*Transform operator* (const Transform& other) const
 	{

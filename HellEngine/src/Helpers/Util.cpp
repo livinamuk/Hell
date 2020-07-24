@@ -487,6 +487,7 @@ namespace HellEngine
 		else
 			return FileType::UNKNOWN;
 	}
+
 	glm::vec3 Util::GetTranslationFromMatrix(glm::mat4 matrix)
 	{
 	/*	glm::vec3 scale;

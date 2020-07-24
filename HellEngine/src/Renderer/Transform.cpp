@@ -46,6 +46,23 @@ Transform::Transform(glm::mat4 transformation)
 	t.scale = scale;
 }
 
+Transform Transform::from_mat4(glm::mat4 matrix)
+{
+	glm::vec3 scale;
+	glm::quat rotation;
+	glm::vec3 translation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::decompose(matrix, scale, rotation, translation, skew, perspective);
+
+	Transform transform;
+	transform.position = translation;
+//	transform.rotation = rotation;
+	transform.scale = scale;
+
+	return Transform();
+}
+
 Transform::Transform(glm::vec3 position)
 {
 	this->position = position;

@@ -55,7 +55,7 @@ namespace HellEngine
 		}
 		else {
 
-			SetupMesh();
+		//	SetupMesh();
 		}
 	}
 

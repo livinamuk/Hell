@@ -675,7 +675,7 @@ namespace HellEngine
 
 
 		// Shells
-		unsigned int casingType;
+		unsigned int casingType = 0;
 
 		if (name0 == "SHELL") {
 			pBody0->setUserIndex(1); // This index of 1 is used to simulate rolling friction from this moment

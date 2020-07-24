@@ -1,5 +1,6 @@
 #include "hellpch.h"
 #include "CoreImGui.h"
+#include "ImGuizmo/ImGuizmo.h"
 #include "CoreGL.h"
 #include "Helpers/AssetManager.h"
 #include "Config.h"
@@ -103,7 +104,41 @@ namespace HellEngine
 		
 		ImGui::EndTabBar();
 	
+		///////////////////////////////////////////////////////////
+		// new stuff //////////////////////////////////////////
+		ImGuizmo::BeginFrame();
+		// at first set gizmo id if scene has more than one gizmo visible (rare case?)
+		static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
+		static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::LOCAL);
+		static bool useSnap = false;
+		static float snap[3] = { 1.f, 1.f, 1.f };
+		static float bounds[] = { -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f };
+		static float boundsSnap[] = { 0.1f, 0.1f, 0.1f };
+		static bool boundSizing = false;
+		static bool boundSizingSnap = false;
 
+		float* fptr = (float*)glm::value_ptr(game->house.m_entities[0].m_transform.to_mat4()); //gizmo placement matrix
+		float deltaptr[16];
+		//manipulate gizmo function (returns data in fptr matrix)
+		ImGuizmo::SetRect(0, 0, io->DisplaySize.x, io->DisplaySize.y);
+		ImGuizmo::Manipulate(
+			glm::value_ptr(game->camera.m_viewMatrix),
+			glm::value_ptr(game->camera.m_projectionMatrix),
+			mCurrentGizmoOperation,
+			mCurrentGizmoMode,
+			//(float*)glm::value_ptr(glm::mat4(1.0)), //random position instead of the couch pos next line
+			fptr,
+			deltaptr, useSnap ? &snap[0] : NULL, boundSizing ? bounds : NULL, boundSizingSnap ? boundsSnap : NULL
+		);
+		//apply updates to the transform matrix of the object
+		float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+		ImGuizmo::DecomposeMatrixToComponents(fptr, matrixTranslation, matrixRotation, matrixScale);
+		game->house.m_entities[0].m_transform.position = glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
+		game->house.m_entities[0].m_transform.scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
+		ImGuizmo::DecomposeMatrixToComponents(deltaptr, matrixTranslation, matrixRotation, matrixScale);
+		game->house.m_entities[0].m_transform.rotation += glm::vec3(matrixRotation[0] / 180.0, matrixRotation[1] / 180.0, matrixRotation[2] / 180.0);
+		// end new stuff //////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////
 
 		ImGui::EndFrame();
 		ImGui::Render();

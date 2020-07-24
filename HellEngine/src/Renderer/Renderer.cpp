@@ -561,7 +561,7 @@ namespace HellEngine
 		// Bullet Debug
 		if (m_showBulletDebug)
 		{
-			GpuProfiler g("ShadowmapPass");
+			GpuProfiler g("Bullet debug pass");
 			BulletDebugDraw(game, &s_solidColorShader);
 		}
 	
@@ -835,12 +835,13 @@ namespace HellEngine
 			//DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
 
 			//DrawSkeleton(&s_solidColorShader, AssetManager::skinnedModels[game->m_testAnimatedEnttity.m_skinnedModelID], &trans3);
-
-
+	//DrawPoint(&s_solidColorShader, GlockLogic::GetGlockCasingSpawnWorldPosition(), glm::vec3(1, 1, 1));
+	
 	//		DrawPoint(&s_solidColorShader, ShotgunLogic::GetShotgunBarrelHoleWorldPosition(), glm::vec3(1, 1, 1));
 	//		DrawPoint(&s_solidColorShader, ShotgunLogic::GetShotgunShellSpawnWorldPosition(), glm::vec3(1, 1, 1));
-
-	//DrawPoint(&s_solidColorShader, GlockLogic::GetGlockBarrelHoleWorldPosition(), glm::vec3(1, 1, 1));
+	
+//	if (WeaponLogic::m_singleHanded)
+//		DrawPoint(&s_solidColorShader, GlockLogic::GetGlockCasingSpawnWorldPosition(), glm::vec3(1, 1, 1));
 
 			// try draw ragdoll joints!!!
 		if (!s_demo)
@@ -873,10 +874,22 @@ namespace HellEngine
 		text += "Anim dur:  ";
 		text += std::to_string(WeaponLogic::p_currentAnimatedEntity->m_currentAnimationDuration) + "\n";
 
+		text += "Current Weapon: ";
+		text += std::to_string(WeaponLogic::s_SelectedWeapon) + "\n";
+		text += "Desired Weapon: ";
+		text += std::to_string(WeaponLogic::s_desiredWeapon) + "\n";
+
 		if (WeaponLogic::p_currentAnimatedEntity->IsAnimationComplete())
 			text += "Anim commplete: TRUE\n";
 		else
 			text += "Anim commplete: FALSE\n";
+
+		if (WeaponLogic::m_singleHanded)
+			text += "Glock: ONE_HANDED\n";
+		else
+			text += "Glock: TWO_HANDED\n";
+		
+
 
 		text += "Movement State: ";
 		if (game->m_player.m_movementState == PlayerMovementState::STOPPED)
@@ -893,6 +906,10 @@ namespace HellEngine
 			text += "IDLE\n";
 		if (WeaponLogic::p_gunState == GunState::RELOADING)
 			text += "RELOADING\n";
+		if (WeaponLogic::p_gunState == GunState::EQUIP)
+			text += "EQUIP\n";
+		if (WeaponLogic::p_gunState == GunState::DEQUIP)
+			text += "DEQUIP\n";
 
 		text += "Reload State: ";
 		if (WeaponLogic::p_reloadState == ReloadState::FROM_IDLE)
@@ -1662,8 +1679,12 @@ namespace HellEngine
 		game->house.Draw(shader, envMapPass);
 		
 		// Projectiles
-		for (Shell& shell : Shell::s_shells)
+		for (Shell& shell : Shell::s_shotgunShells)
 			shell.Draw(shader);
+
+		// Projectiles
+		for (Shell& bulletCasing : Shell::s_bulletCasings)
+			bulletCasing.Draw(shader);
 
 
 		////////////////

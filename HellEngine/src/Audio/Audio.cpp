@@ -32,6 +32,16 @@ namespace HellEngine
 		Audio::LoadAudio("Glock_Reload.wav");
 		Audio::LoadAudio("Glock_ReloadFromEmpty.wav");
 		Audio::LoadAudio("Glock_DryFire.wav");
+		Audio::LoadAudio("FLY_Bullet_Impact_Flesh_01.wav");
+		Audio::LoadAudio("FLY_Bullet_Impact_Flesh_02.wav");
+		Audio::LoadAudio("FLY_Bullet_Impact_Flesh_03.wav");
+		Audio::LoadAudio("FLY_Bullet_Impact_Flesh_04.wav");
+		Audio::LoadAudio("FLY_Bullet_Impact_Flesh_05.wav");
+		Audio::LoadAudio("FLY_Bullet_Impact_Flesh_06.wav");
+		Audio::LoadAudio("FLY_Bullet_Impact_Flesh_07.wav"); 
+		Audio::LoadAudio("FLY_Bullet_Impact_Flesh_08.wav");
+		Audio::LoadAudio("WPNFLY_Glock_MagIn_Full.wav");
+		Audio::LoadAudio("BuolletCasingBounce.wav"); 
 		//Audio::LoadAudio("Music.wav");
 	}
 

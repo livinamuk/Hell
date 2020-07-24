@@ -3,10 +3,12 @@
 #include "ShotgunLogic.h"
 #include "GlockLogic.h"
 #include "GL/GpuProfiling.h"
+#include "Audio/Audio.h"
 
 namespace HellEngine
 {
 	unsigned int WeaponLogic::s_SelectedWeapon;
+	unsigned int WeaponLogic::s_desiredWeapon;
 	std::vector<WEAPON> WeaponLogic::s_WeaponList;
 	glm::mat4 WeaponLogic::s_AnimatedCameraMatrix; 
 	AnimatedEntity WeaponLogic::m_shotgunAnimatedEntity;
@@ -17,11 +19,13 @@ namespace HellEngine
 	int WeaponLogic::m_AmmoInGun = 8;
 	int WeaponLogic::m_AmmoAvaliable = 1000;
 	std::vector<RaycastResult> WeaponLogic::s_BulletHits;
+	Transform WeaponLogic::s_weaponTransform; 
+	bool WeaponLogic::m_singleHanded = false;
 
 	void WeaponLogic::Init()
 	{
 		// Setup Inventory
-		s_SelectedWeapon = 0;
+		s_SelectedWeapon = 1;
 		s_WeaponList.clear();
 		s_WeaponList.push_back(WEAPON::GLOCK);
 		s_WeaponList.push_back(WEAPON::SHOTGUN);
@@ -45,21 +49,31 @@ namespace HellEngine
 	
 	void WeaponLogic::Update(float deltaTime)
 	{
+		// not sure how but this seems to be running twice. LOOK INTO IT!!!
+
 		// clear any bullet hits from last frame
 		s_BulletHits.clear();
 
 		// Weapon select
-		if (Input::s_keyPressed[HELL_KEY_1] && s_WeaponList.size() > 0)
-			s_SelectedWeapon = s_WeaponList[0];
+		if (Input::s_keyPressed[HELL_KEY_1] && s_WeaponList.size() > 0) {
+			s_desiredWeapon = s_WeaponList[0];
+			DequipCurrentWeapon();
+		}
 
-		if (Input::s_keyPressed[HELL_KEY_2] && s_WeaponList.size() > 1)
-			s_SelectedWeapon = s_WeaponList[1];
+		if (Input::s_keyPressed[HELL_KEY_2] && s_WeaponList.size() > 1) {
+			s_desiredWeapon = s_WeaponList[1];
+			DequipCurrentWeapon();
+		}
 
-		if (Input::s_keyPressed[HELL_KEY_3] && s_WeaponList.size() > 3)
-			s_SelectedWeapon = s_WeaponList[2];
+		if (Input::s_keyPressed[HELL_KEY_3] && s_WeaponList.size() > 3) {
+			s_desiredWeapon = s_WeaponList[2];
+			DequipCurrentWeapon();
+		}
 
-		if (Input::s_keyPressed[HELL_KEY_4] && s_WeaponList.size() > 4)
-			s_SelectedWeapon = s_WeaponList[3];
+		if (Input::s_keyPressed[HELL_KEY_4] && s_WeaponList.size() > 4) {
+			s_desiredWeapon = s_WeaponList[3];
+			DequipCurrentWeapon();
+		}
 
 		// Updates
 		if (s_SelectedWeapon == WEAPON::GLOCK) {
@@ -93,12 +107,11 @@ namespace HellEngine
 	{
 		GpuProfiler g("Weapon");
 
-		static Transform trans;
-		trans.position = camera->m_viewPos;
-		trans.rotation = camera->m_transform.rotation;
-		trans.scale = glm::vec3(0.002f);
+		s_weaponTransform.position = camera->m_viewPos;
+		s_weaponTransform.rotation = camera->m_transform.rotation;
+		s_weaponTransform.scale = glm::vec3(0.002f);
 
-		glm::mat4 weaponModelMatrix = trans.to_mat4() * camera->m_weaponSwayTransform.to_mat4();
+		glm::mat4 weaponModelMatrix = s_weaponTransform.to_mat4() * camera->m_weaponSwayTransform.to_mat4();
 
 		if (s_SelectedWeapon == WEAPON::GLOCK)
 			m_glockAnimatedEntiyty.Draw(shader, weaponModelMatrix);
@@ -107,6 +120,28 @@ namespace HellEngine
 			m_shotgunAnimatedEntity.Draw(shader, weaponModelMatrix);
 
 	}
+	void WeaponLogic::DequipCurrentWeapon()
+	{
+		if (s_SelectedWeapon == WEAPON::GLOCK)
+			GlockLogic::m_gunState = GunState::DEQUIP;
+
+		if (s_SelectedWeapon == WEAPON::SHOTGUN)
+			ShotgunLogic::m_gunState = GunState::DEQUIP;
+	}
+
+	void WeaponLogic::SwitchToDesiredWeapon()
+	{
+		s_SelectedWeapon = s_desiredWeapon;
+
+		if (s_SelectedWeapon == WEAPON::GLOCK) {
+			Audio::PlayAudio("WPNFLY_Glock_MagIn_Full.wav");
+			GlockLogic::m_gunState = GunState::EQUIP;			
+		}
+
+		if (s_SelectedWeapon == WEAPON::SHOTGUN)
+			ShotgunLogic::m_gunState = GunState::EQUIP;
+	}
+
 	glm::mat4 WeaponLogic::GetCameraMatrix()
 	{
 		return s_AnimatedCameraMatrix;

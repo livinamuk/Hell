@@ -24,14 +24,20 @@ namespace HellEngine
 
 	void GlockLogic::Update(float deltatime)
 	{
-		if (Input::s_leftMousePressed)
-			Fire();
+		if (m_gunState != GunState::DEQUIP && m_gunState != GunState::EQUIP)
+		{
+			if (Input::s_leftMousePressed)
+				Fire();
 
-		if ((Input::s_keyPressed[HELL_KEY_R]))
-			Reload();
+			if ((Input::s_keyPressed[HELL_KEY_R]))
+				Reload();
+		}
 
 		//SpawnShellIfRequired();
 		Animate(deltatime);
+
+		//if (m_AmmoInGun == 0)
+			//AnimateEmptySlide();
 	}
 
 
@@ -44,7 +50,7 @@ namespace HellEngine
 		}
 
 		// not if you are reloading mate
-		if (m_reloadState == ReloadState::RELOAD_CLIP)
+		if (m_reloadState == ReloadState::RELOAD_CLIP || m_reloadState == ReloadState::RELOAD_CLIP_FROM_EMPTY)
 			return;
 
 		// not if you are empty mate
@@ -73,6 +79,7 @@ namespace HellEngine
 			//s_awaitingShell = true;
 			p_model->m_currentAnimationTime = 0;
 			Renderer::s_muzzleFlash.CreateFlash(GetGlockBarrelHoleWorldPosition());
+			GetGlockCasingSpawnWorldPosition();
 			Renderer::s_muzzleFlash.m_CurrentTime = 0;
 
 			bool playFleshSound = false;
@@ -109,7 +116,28 @@ namespace HellEngine
 			}
 
 			if (playFleshSound)
-				Audio::PlayAudio("Impact_Flesh.wav", 1.0f);
+			{
+					int RandomAudio = rand() % 8;
+
+				if (RandomAudio == 0)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_01.wav");
+				if (RandomAudio == 1)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_02.wav");
+				if (RandomAudio == 2)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_03.wav");
+				if (RandomAudio == 3)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_04.wav");
+				if (RandomAudio == 4)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_05.wav");
+				if (RandomAudio == 5)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_06.wav");
+				if (RandomAudio == 6)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_07.wav");
+				if (RandomAudio == 7)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_08.wav");
+			}
+			
+			SpawnBulletCasing();
 		}
 	}
 
@@ -141,21 +169,47 @@ namespace HellEngine
 
 	void GlockLogic::Animate(float deltatime)
 	{
+		// Equip
+		if (m_gunState == GunState::EQUIP)		{
+			p_model->PlayAnimation("Glock_Equip.fbx", false);
+
+			if (p_model->IsAnimationComplete()) {
+				p_model->PlayAnimation("Glock_Idle.fbx", true);
+				m_gunState = GunState::IDLE;
+				m_reloadState = ReloadState::NOT_RELOADING;
+			}
+			return;
+		}
+
+		// Equip
+		if (m_gunState == GunState::DEQUIP) {
+			WeaponLogic::SwitchToDesiredWeapon();
+			return;
+		}
+
 		// Idle 
 		if (m_gunState == GunState::IDLE)
-		{			
-			p_model->PlayAnimation("Glock_Idle.fbx", true);
+		{
+			if (!WeaponLogic::m_singleHanded)
+				p_model->PlayAnimation("Glock_Idle.fbx", true);
+			else
+				p_model->PlayAnimation("Glock_SingleHanded_Idle.fbx", true); 
 		}
 
 		// Fire
 		if (m_gunState == GunState::FIRING)
-		{			
-			if (s_RandomFireAnimation == 0)
-				p_model->PlayAnimation("Glock_Fire0.fbx", false);
-			if (s_RandomFireAnimation == 1)
-				p_model->PlayAnimation("Glock_Fire1.fbx", false);
-			if (s_RandomFireAnimation == 2)
-				p_model->PlayAnimation("Glock_Fire2.fbx", false);
+		{
+			if (!WeaponLogic::m_singleHanded) 
+			{
+				if (s_RandomFireAnimation == 0)
+					p_model->PlayAnimation("Glock_Fire0.fbx", false);
+				if (s_RandomFireAnimation == 1)
+					p_model->PlayAnimation("Glock_Fire1.fbx", false);
+				if (s_RandomFireAnimation == 2)
+					p_model->PlayAnimation("Glock_Fire2.fbx", false);
+			}
+			else
+				p_model->PlayAnimation("Glock_SingleHanded_Fire0.fbx", false);
 
 			if (p_model->IsAnimationComplete())
 				m_gunState = GunState::IDLE;
@@ -230,35 +284,52 @@ namespace HellEngine
 	
 	glm::vec3 GlockLogic::GetGlockBarrelHoleWorldPosition()
 	{
-		static Transform camTrans;
-		camTrans.scale = glm::vec3(0.002f);
-		camTrans.position = p_camera->m_viewPos;
-		camTrans.rotation = p_camera->m_transform.rotation;
-
 		unsigned int BoneIndex = p_model->GetSkinnedModel()->m_BoneMapping["barrel"];
+		glm::mat4 BoneMatrix = p_model->GetSkinnedModel()->m_BoneInfo[BoneIndex].FinalTransformation;
 
-		Transform hardcodedLocatorTransform;
-		hardcodedLocatorTransform.position = glm::vec3(0, -15, 10);
+		Transform offsetTransform;
+		offsetTransform.position = glm::vec3(0, -15, 10);
 
-		glm::mat4 worldMatrix = camTrans.to_mat4() * p_camera->m_weaponSwayTransform.to_mat4() * p_model->GetSkinnedModel()->m_BoneInfo[BoneIndex].FinalTransformation * hardcodedLocatorTransform.to_mat4();
+		glm::mat4 worldMatrix = WeaponLogic::s_weaponTransform.to_mat4() * p_camera->m_weaponSwayTransform.to_mat4() * BoneMatrix * offsetTransform.to_mat4();
 		return Util::TranslationFromMat4(worldMatrix);
 	}
-	/*
-	glm::vec3 ShotgunLogic::GetShotgunShellSpawnWorldPosition()
+
+	glm::vec3 GlockLogic::GetGlockCasingSpawnWorldPosition()
 	{
-		Transform trans;
-		trans.scale = glm::vec3(0.002f);
-		trans.position = p_camera->m_viewPos;
-		trans.rotation = p_camera->m_transform.rotation;
+		unsigned int BoneIndex = p_model->GetSkinnedModel()->m_BoneMapping["barrel"];
+		glm::mat4 BoneMatrix = p_model->GetSkinnedModel()->m_BoneInfo[BoneIndex].FinalTransformation;
 
-		trans.position += p_camera->m_Up * glm::vec3(-0.005f);
-		trans.position += p_camera->m_Right * glm::vec3(0.02f);
-		trans.position += p_camera->m_Front * glm::vec3(0.16f);
+		Transform offsetTransform = Renderer::s_DebugTransform;
+	//offsetTransform.position = glm::vec3(-1, 3, 11);
 
-		SkinnedModel* model = AssetManager::skinnedModels[AssetManager::GetSkinnedModelIDByName("Shotgun.fbx")];
-		unsigned int BoneIndex = model->m_BoneMapping["Bolt_bone"];
-
-		glm::mat4 worldMatrix = trans.to_mat4() * p_camera->m_weaponSwayTransform.to_mat4() * model->m_BoneInfo[BoneIndex].FinalTransformation;
+		glm::mat4 worldMatrix = WeaponLogic::s_weaponTransform.to_mat4() * p_camera->m_weaponSwayTransform.to_mat4() * BoneMatrix * offsetTransform.to_mat4();
 		return Util::TranslationFromMat4(worldMatrix);
+	}
+
+	void GlockLogic::SpawnBulletCasing()
+	{
+		Transform t;	
+		//t.position = GetGlockCasingSpawnWorldPosition();
+		t.position = GetGlockBarrelHoleWorldPosition();// it look sbetter spawning at the barrel lol. too close otherwise
+		t.rotation = p_camera->m_transform.rotation;
+
+		glm::vec3 initialVelocity;
+		initialVelocity = glm::normalize(p_camera->m_Up + (p_camera->m_Right * glm::vec3(3.0f)));
+		initialVelocity *= glm::vec3(1.5f);
+
+		Shell::s_bulletCasings.push_back(Shell(t, initialVelocity, CasingType::BULLET_CASING));
+	}
+
+	/*void GlockLogic::AnimateEmptySlide()
+	{
+		unsigned int BoneIndex = p_model->GetSkinnedModel()->m_BoneMapping["slide"];
+		glm::mat4 BoneMatrix = WeaponLogic::m_glockAnimatedEntiyty.m_animatedTransforms[BoneIndex];
+
+		Transform offsetTransform = Renderer::s_DebugTransform;
+
+		WeaponLogic::m_glockAnimatedEntiyty.m_animatedTransforms[BoneIndex] = BoneMatrix * offsetTransform.to_mat4();
+
+	//	Util::PrintMat4(p_model->GetSkinnedModel()->m_BoneInfo[BoneIndex].FinalTransformation);
+		//p_model->m_animatedTransforms[]
 	}*/
 }

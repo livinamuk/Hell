@@ -655,12 +655,12 @@ namespace HellEngine
 			name1 = entityData1->name;
 		}
 
-		bool shellCollision = false;
+	//	bool shellCollision = false;
 		bool floor = false;
 		bool wall = false;
 
-		if (name0 == "SHELL" || name1 == "SHELL")
-			shellCollision = true;
+	//	if (name0 == "SHELL" || name1 == "SHELL")
+	//		shellCollision = true;
 
 		if (name0 == "FLOOR" || name1 == "FLOOR")
 			floor = true;
@@ -673,24 +673,30 @@ namespace HellEngine
 
 		std::cout << "Collision between [" << name0 << "] and [" << name1 << "]\n";
 
-		if (shellCollision)
-		{
+
+		// Shells
+		unsigned int casingType;
+
+		if (name0 == "SHELL") {
+			pBody0->setUserIndex(1); // This index of 1 is used to simulate rolling friction from this moment
+			casingType = entityData->enumValue; 
+		}
+		if (name1 == "SHELL") {
+			pBody1->setUserIndex(1);
+			casingType = entityData1->enumValue;
+		}
+
+		if (casingType == CasingType::SHOTGUN_SHELL) {
 			if (wall)
 				Audio::PlayAudio("ShellWallBounce.wav", 0.4f);
 
-			if (floor) {
-				Audio::PlayAudio("ShellFloorBounce.wav", 0.4f);		
-
-				// This index of 1 is used to simulate rolling friction from this moment
-				if (name0 == "SHELL")
-					pBody0->setUserIndex(1); 
-				if (name1 == "SHELL")
-					pBody1->setUserIndex(1);
-			}
+			if (floor)
+				Audio::PlayAudio("ShellFloorBounce.wav", 0.4f);
 		}
 
-
-
+		if (casingType == CasingType::BULLET_CASING) {
+				Audio::PlayAudio("BuolletCasingBounce.wav", 0.4f);
+		}
 	}
 
 	void Physics::SeparationEvent(btRigidBody* pBody0, btRigidBody* pBody1) 

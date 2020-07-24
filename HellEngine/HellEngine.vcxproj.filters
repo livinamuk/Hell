@@ -261,9 +261,6 @@
     <ClInclude Include="src\Logic\WeaponLogic.h">
       <Filter>src\Logic</Filter>
     </ClInclude>
-    <ClInclude Include="src\Misc\Shell.h">
-      <Filter>src\Misc</Filter>
-    </ClInclude>
     <ClInclude Include="src\Physics\CharacterController.h">
       <Filter>src\Physics</Filter>
     </ClInclude>
@@ -1488,6 +1485,8 @@
     <ClInclude Include="src\Logic\GlockLogic.h" />
     <ClInclude Include="src\Renderer\Effects\BloodEffectVolumetric.h">
       <Filter>src\Renderer\Effects</Filter>
+    <ClInclude Include="src\Misc\Shell.h">
+      <Filter>src\Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1656,9 +1655,6 @@
     <ClCompile Include="src\Logic\WeaponLogic.cpp">
       <Filter>src\Logic</Filter>
     </ClCompile>
-    <ClCompile Include="src\Misc\Shell.cpp">
-      <Filter>src\Misc</Filter>
-    </ClCompile>
     <ClCompile Include="src\Physics\CharacterController.cpp">
       <Filter>src\Physics</Filter>
     </ClCompile>
@@ -1746,6 +1742,8 @@
     <ClCompile Include="src\Logic\GlockLogic.cpp" />
     <ClCompile Include="src\Renderer\Effects\BloodEffectVolumetric.cpp">
       <Filter>src\Renderer\Effects</Filter>
+    <ClCompile Include="src\Misc\Shell.cpp">
+      <Filter>src\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -138,6 +138,7 @@ struct Line {
 struct EntityData {
 	char* name = "NONE";
 	int vectorIndex = -1;
+	unsigned int enumValue = 0;
 };
 
 enum FileType { FBX, OBJ, PNG, JPG, UNKNOWN };
@@ -146,11 +147,13 @@ enum Axis { POS_X, NEG_X, POS_Z, NEG_Z };
 enum PlayerMovementState { STOPPED, WALKING, RUNNING };
 enum RunningAnimationState { STARTING, LOOPING, ENDING, NOT_RUNNING};
 
-enum GunState { FIRING, IDLE, RELOADING};
+enum GunState { FIRING, IDLE, RELOADING, EQUIP, DEQUIP};
 enum ReloadState { FROM_IDLE, SINGLE_RELOAD, DOUBLE_RELOAD, BACK_TO_IDLE, NOT_RELOADING, RELOAD_CLIP, RELOAD_CLIP_FROM_EMPTY };
 enum IronSightState { NOT_IRON_SIGHTING, BEGIN_IRON_SIGHTING, IRON_SIGHTING, END_IRON_SIGHTING};
 
 enum DoorWayType { DOOR, STAIRCASE_OPENING, WINDOW };
+
+enum CasingType {SHOTGUN_SHELL, BULLET_CASING};
 
 struct DoorWay {
 	DoorWayType type;

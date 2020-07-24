@@ -3,6 +3,7 @@
 #include "keycodes.h"
 #include "CoreGL.h"
 #include "Game.h"
+#include "Logic/WeaponLogic.h"
 
 namespace HellEngine
 {
@@ -72,5 +73,8 @@ namespace HellEngine
 		// Toggle ImGui
 		if (s_keyPressed[HELL_KEY_I])
 			Renderer::m_showImGui = !Renderer::m_showImGui;
+
+		if (Input::s_keyPressed[HELL_KEY_G])
+			WeaponLogic::m_singleHanded = !WeaponLogic::m_singleHanded;
 	}
 }

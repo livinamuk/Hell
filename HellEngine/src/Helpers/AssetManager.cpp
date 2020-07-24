@@ -124,6 +124,7 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Couch.obj"));
 		models.emplace_back(Model("res/models/Mannequin.obj"));
 		models.emplace_back(Model("res/models/Shell.obj"));
+		models.emplace_back(Model("res/models/BulletCasing.obj"));
 		models.emplace_back(Model("res/models/Window.obj"));
 		//models.emplace_back(Model("res/models/Glock.obj"));
 		//models.emplace_back(Model("res/models/Glass.obj"));
@@ -144,8 +145,12 @@ namespace HellEngine
 		LoadAnimation("Glock.fbx", "Glock_Fire2.fbx");
 		LoadAnimation("Glock.fbx", "Glock_Reload.fbx");
 		LoadAnimation("Glock.fbx", "Glock_EmptyReload.fbx");
-		LoadAnimation("Glock.fbx", "Glock_IdleEmpty.fbx");
-	
+		//LoadAnimation("Glock.fbx", "Glock_IdleEmpty.fbx");
+		LoadAnimation("Glock.fbx", "Glock_Equip.fbx");
+
+		LoadAnimation("Glock.fbx", "Glock_SingleHanded_Fire0.fbx");
+		LoadAnimation("Glock.fbx", "Glock_SingleHanded_Idle.fbx");
+		LoadAnimation("Glock.fbx", "Glock_SingleHanded_Reload.fbx");
 
 		/*skinnedModels.emplace_back(new SkinnedModel());
 		FileImporter::LoadSkinnedModel(skinnedModels[0], "Zombie.fbx");
@@ -176,6 +181,7 @@ namespace HellEngine
 		LoadAnimation("Shotgun.fbx", "Shotgun_SightingWalk.fbx");
 		LoadAnimation("Shotgun.fbx", "Shotgun_SightingFire.fbx");
 		LoadAnimation("Shotgun.fbx", "Shotgun_SightingOut.fbx");
+
 		
 		for (int i = 0; i < models.size(); i++)
 			models[i].ReadFromDisk(); 	

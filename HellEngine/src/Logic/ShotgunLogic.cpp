@@ -1,6 +1,7 @@
 #include "hellpch.h"
 #include "ShotgunLogic.h"
 #include "WeaponLogic.h"
+#include "WeaponLogic.h"
 #include "Helpers/Util.h"
 #include "Core/Input.h"
 #include "Audio/audio.h"
@@ -23,29 +24,32 @@ namespace HellEngine
 
 	void ShotgunLogic::Update(float deltatime)
 	{
-		if (Input::s_leftMousePressed)
-			FireShotgun();
+		if (m_gunState != GunState::DEQUIP && m_gunState != GunState::EQUIP)
+		{
+			if (Input::s_leftMousePressed)
+				FireShotgun();
 
-		//if (Input::s_rightMousePressed)
-		//	BeginIronSighting();
+			if (Input::s_rightMouseDown)
+				BeginIronSighting();
 
-		if (Input::s_rightMouseDown)
-			BeginIronSighting();
+			if (!Input::s_rightMouseDown)
+				EndIronSighting();
 
-		if (!Input::s_rightMouseDown)
-			EndIronSighting();
-
-		if ((Input::s_keyPressed[HELL_KEY_R]))
-			ReloadShotgun();
+			if ((Input::s_keyPressed[HELL_KEY_R]))
+				ReloadShotgun();
+		}
 
 		SpawnShellIfRequired();
 		Animate(deltatime);
-
 	}
 
 
 	void ShotgunLogic::FireShotgun()
 	{
+		// Can't shoot if you are dequipping
+		if (m_gunState == GunState::DEQUIP)
+			return;
+
 		// Fire empty shotgun
 		if (m_AmmoInGun == 0) {
 			Audio::PlayAudio("Empty.wav");
@@ -104,7 +108,11 @@ namespace HellEngine
 
 	
 	void ShotgunLogic::ReloadShotgun()
-	{
+	{		
+		// Can't shoot if you are dequipping
+		if (m_gunState == GunState::DEQUIP)
+			return;
+
 		// Can only reload if your gun aint busy
 		if (m_gunState != GunState::IDLE && m_ironSightState == IronSightState::NOT_IRON_SIGHTING)
 			return;
@@ -142,6 +150,27 @@ namespace HellEngine
 	{
 		static bool firstShellLoaded = false;
 		static bool secondShellLoaded = false;
+
+		// Dequiping?
+		if (m_gunState == GunState::DEQUIP) {
+			p_model->PlayAnimation("Shotgun_Dequip.fbx", false);
+			
+			if (p_model->IsAnimationComplete())
+				WeaponLogic::SwitchToDesiredWeapon();
+				
+			return;
+		}
+
+		// Equip
+		if (m_gunState == GunState::EQUIP) {
+			p_model->PlayAnimation("Shotgun_Equip.fbx", false);
+
+			if (p_model->IsAnimationComplete()) {
+				p_model->PlayAnimation("Shotgun_Idle.fbx", true);
+				m_gunState = GunState::IDLE;
+			}
+			return;
+		}
 
 		// Being iron sight?
 		if (m_ironSightState == IronSightState::BEGIN_IRON_SIGHTING)
@@ -320,7 +349,7 @@ namespace HellEngine
 			initialVelocity = glm::normalize(p_camera->m_Up + (p_camera->m_Right * glm::vec3(3.0f)));
 			initialVelocity *= glm::vec3(1.5f);
 
-			Shell::s_shells.push_back(Shell(t, initialVelocity));
+			Shell::s_shotgunShells.push_back(Shell(t, initialVelocity, CasingType::SHOTGUN_SHELL));
 		}	
 	}
 	glm::vec3 ShotgunLogic::GetShotgunBarrelHoleWorldPosition()

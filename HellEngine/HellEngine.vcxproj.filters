@@ -261,9 +261,6 @@
     <ClInclude Include="src\Logic\WeaponLogic.h">
       <Filter>src\Logic</Filter>
     </ClInclude>
-    <ClInclude Include="src\Misc\Shell.h">
-      <Filter>src\Misc</Filter>
-    </ClInclude>
     <ClInclude Include="src\Physics\CharacterController.h">
       <Filter>src\Physics</Filter>
     </ClInclude>
@@ -1486,6 +1483,9 @@
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
     <ClInclude Include="src\Logic\GlockLogic.h" />
+    <ClInclude Include="src\Misc\Shell.h">
+      <Filter>src\Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\AnimatedNode.cpp">
@@ -1653,9 +1653,6 @@
     <ClCompile Include="src\Logic\WeaponLogic.cpp">
       <Filter>src\Logic</Filter>
     </ClCompile>
-    <ClCompile Include="src\Misc\Shell.cpp">
-      <Filter>src\Misc</Filter>
-    </ClCompile>
     <ClCompile Include="src\Physics\CharacterController.cpp">
       <Filter>src\Physics</Filter>
     </ClCompile>
@@ -1741,6 +1738,9 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Logic\GlockLogic.cpp" />
+    <ClCompile Include="src\Misc\Shell.cpp">
+      <Filter>src\Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">

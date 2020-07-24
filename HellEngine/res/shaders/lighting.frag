@@ -497,15 +497,6 @@ void main()
 	vec3 irradiance = shToColor(shRD, shGD, shBD, n); 
 	vec3 indirectDiffuse = irradiance * diffuseColor;
     
-	// Indirect specular
-	const float MAX_REFLECTION_LOD = 16; // was 4 !!!!!!!
-	vec3 R = reflect(-v, n); 
-	vec3 prefilteredColor = textureLod(Env_Cubemap, R,  roughness * MAX_REFLECTION_LOD).rgb;
-	prefilteredColor = vec3(lightColor * 0.005);
-	vec2 brdf  = texture(BRDF_LUT, vec2(NdotV, roughness)).rg;
-	vec3 f = fresnelSchlickRoughness(NdotV, f0, roughness);
-    vec3 indirectSpecular = prefilteredColor * (f * brdf.x + brdf.y);
-
 	vec3 kS = F;
 	vec3 kD = 1.0 - kS;
 	kD *= 1.0 - metallic;	

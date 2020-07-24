@@ -555,7 +555,7 @@ namespace HellEngine
 		// Bullet Debug
 		if (m_showBulletDebug)
 		{
-			GpuProfiler g("ShadowmapPass");
+			GpuProfiler g("Bullet debug pass");
 			BulletDebugDraw(game, &s_solidColorShader);
 		}
 	
@@ -829,12 +829,13 @@ namespace HellEngine
 			//DrawAnimatedEntityDebugBones_BindPose(&s_solidColorShader, &game->m_zombieGuy);
 
 			//DrawSkeleton(&s_solidColorShader, AssetManager::skinnedModels[game->m_testAnimatedEnttity.m_skinnedModelID], &trans3);
-
-
+	//DrawPoint(&s_solidColorShader, GlockLogic::GetGlockCasingSpawnWorldPosition(), glm::vec3(1, 1, 1));
+	
 	//		DrawPoint(&s_solidColorShader, ShotgunLogic::GetShotgunBarrelHoleWorldPosition(), glm::vec3(1, 1, 1));
 	//		DrawPoint(&s_solidColorShader, ShotgunLogic::GetShotgunShellSpawnWorldPosition(), glm::vec3(1, 1, 1));
-
-	//DrawPoint(&s_solidColorShader, GlockLogic::GetGlockBarrelHoleWorldPosition(), glm::vec3(1, 1, 1));
+	
+//	if (WeaponLogic::m_singleHanded)
+//		DrawPoint(&s_solidColorShader, GlockLogic::GetGlockCasingSpawnWorldPosition(), glm::vec3(1, 1, 1));
 
 			// try draw ragdoll joints!!!
 		if (!s_demo)
@@ -876,6 +877,13 @@ namespace HellEngine
 			text += "Anim commplete: TRUE\n";
 		else
 			text += "Anim commplete: FALSE\n";
+
+		if (WeaponLogic::m_singleHanded)
+			text += "Glock: ONE_HANDED\n";
+		else
+			text += "Glock: TWO_HANDED\n";
+		
+
 
 		text += "Movement State: ";
 		if (game->m_player.m_movementState == PlayerMovementState::STOPPED)
@@ -1663,8 +1671,12 @@ namespace HellEngine
 		game->house.Draw(shader, envMapPass);
 		
 		// Projectiles
-		for (Shell& shell : Shell::s_shells)
+		for (Shell& shell : Shell::s_shotgunShells)
 			shell.Draw(shader);
+
+		// Projectiles
+		for (Shell& bulletCasing : Shell::s_bulletCasings)
+			bulletCasing.Draw(shader);
 
 
 		////////////////

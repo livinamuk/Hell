@@ -349,7 +349,7 @@ namespace HellEngine
 			initialVelocity = glm::normalize(p_camera->m_Up + (p_camera->m_Right * glm::vec3(3.0f)));
 			initialVelocity *= glm::vec3(1.5f);
 
-			Shell::s_shells.push_back(Shell(t, initialVelocity));
+			Shell::s_shotgunShells.push_back(Shell(t, initialVelocity, CasingType::SHOTGUN_SHELL));
 		}	
 	}
 	glm::vec3 ShotgunLogic::GetShotgunBarrelHoleWorldPosition()

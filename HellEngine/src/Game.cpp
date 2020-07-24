@@ -48,6 +48,7 @@ namespace HellEngine
 
 
 		AssetManager::PrintSkinnedModelMeshNames("Glock.fbx");
+		AssetManager::PrintSkinnedModelBoneNames("Glock.fbx");
 
 		m_NurseGuy.SetSkinnedModel("NurseGuy.fbx");
 		m_NurseGuy.m_worldTransform.position.x = 1;
@@ -141,9 +142,11 @@ namespace HellEngine
 		}
 			
 
-		for (Shell& shell : Shell::s_shells)
+		for (Shell& shell : Shell::s_shotgunShells)
 			shell.Update(m_frameTime);
 
+		for (Shell& bulletCasing : Shell::s_bulletCasings)
+			bulletCasing.Update(m_frameTime);
 
 		Renderer::s_bloodEffect.Update(m_frameTime);
 		Renderer::s_muzzleFlash.Update(m_frameTime);

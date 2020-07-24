@@ -19,7 +19,9 @@ namespace HellEngine
 		static void Reload();
 		//static void SpawnShellIfRequired();
 		static glm::vec3 GetGlockBarrelHoleWorldPosition();
-	//	static glm::vec3 GetShotgunShellSpawnWorldPosition();
+		static glm::vec3 GetGlockCasingSpawnWorldPosition();
+		static void SpawnBulletCasing();
+		//static void AnimateEmptySlide();
 
 	public:	// static variables
 

@@ -23,9 +23,11 @@ namespace HellEngine
 		static unsigned int s_desiredWeapon;
 		static std::vector<WEAPON> s_WeaponList;
 		static glm::mat4 s_AnimatedCameraMatrix;
+		static Transform s_weaponTransform;
 
 		static int m_AmmoInGun;
 		static int m_AmmoAvaliable;
+		static bool m_singleHanded;
 
 		static GunState p_gunState;
 		static ReloadState p_reloadState;

@@ -3,6 +3,7 @@
 #include "ShotgunLogic.h"
 #include "GlockLogic.h"
 #include "GL/GpuProfiling.h"
+#include "Audio/Audio.h"
 
 namespace HellEngine
 {
@@ -18,6 +19,8 @@ namespace HellEngine
 	int WeaponLogic::m_AmmoInGun = 8;
 	int WeaponLogic::m_AmmoAvaliable = 1000;
 	std::vector<RaycastResult> WeaponLogic::s_BulletHits;
+	Transform WeaponLogic::s_weaponTransform; 
+	bool WeaponLogic::m_singleHanded = false;
 
 	void WeaponLogic::Init()
 	{
@@ -46,6 +49,8 @@ namespace HellEngine
 	
 	void WeaponLogic::Update(float deltaTime)
 	{
+		// not sure how but this seems to be running twice. LOOK INTO IT!!!
+
 		// clear any bullet hits from last frame
 		s_BulletHits.clear();
 
@@ -102,12 +107,11 @@ namespace HellEngine
 	{
 		GpuProfiler g("Weapon");
 
-		static Transform trans;
-		trans.position = camera->m_viewPos;
-		trans.rotation = camera->m_transform.rotation;
-		trans.scale = glm::vec3(0.002f);
+		s_weaponTransform.position = camera->m_viewPos;
+		s_weaponTransform.rotation = camera->m_transform.rotation;
+		s_weaponTransform.scale = glm::vec3(0.002f);
 
-		glm::mat4 weaponModelMatrix = trans.to_mat4() * camera->m_weaponSwayTransform.to_mat4();
+		glm::mat4 weaponModelMatrix = s_weaponTransform.to_mat4() * camera->m_weaponSwayTransform.to_mat4();
 
 		if (s_SelectedWeapon == WEAPON::GLOCK)
 			m_glockAnimatedEntiyty.Draw(shader, weaponModelMatrix);
@@ -129,8 +133,10 @@ namespace HellEngine
 	{
 		s_SelectedWeapon = s_desiredWeapon;
 
-		if (s_SelectedWeapon == WEAPON::GLOCK)
-			GlockLogic::m_gunState = GunState::EQUIP;
+		if (s_SelectedWeapon == WEAPON::GLOCK) {
+			Audio::PlayAudio("WPNFLY_Glock_MagIn_Full.wav");
+			GlockLogic::m_gunState = GunState::EQUIP;			
+		}
 
 		if (s_SelectedWeapon == WEAPON::SHOTGUN)
 			ShotgunLogic::m_gunState = GunState::EQUIP;

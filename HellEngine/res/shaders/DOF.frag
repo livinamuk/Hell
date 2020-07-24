@@ -58,12 +58,8 @@ uniform float screenHeight;
  float fstop = 5; //f-stop value
  uniform bool showFocus;// = false; //show debug focus point and focal range (red = focal point, green = focal range)
 
-/* 
-make sure that these two values are the same for your camera, otherwise distances will be wrong.
-*/
-
-float znear = 0.02; //camera clipping start
-float zfar = 100.0; //camera clipping end
+float znear = 0.01; //camera clipping start
+float zfar = 50.0; //camera clipping end
 
 //------------------------------------------
 //user variables

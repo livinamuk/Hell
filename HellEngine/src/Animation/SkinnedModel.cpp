@@ -5,6 +5,7 @@
 #include "Helpers/Util.h"
 #include "Helpers/AssetManager.h"
 #include "Logic/WeaponLogic.h"
+#include "Renderer/Renderer.h"
 
 namespace HellEngine
 {
@@ -174,7 +175,12 @@ namespace HellEngine
                 m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
                 m_BoneInfo[BoneIndex].ModelSpace_AnimatedTransform = GlobalTransformation ;
 
+                // Glock: move slide back when empty
+                if (WeaponLogic::m_AmmoInGun == 0 && Util::StrCmp(NodeName, "slide") && WeaponLogic::p_gunState != GunState::RELOADING)
+                    m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset * Transform(glm::vec3(0, 5, 0)).to_mat4();
+
                 // If there is no bind pose, then just use bind pose
+                // ???? How about you check if this does anything useful ever ????
                 if (m_animations.size() == 0) {
                     m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
                     m_BoneInfo[BoneIndex].ModelSpace_AnimatedTransform = GlobalTransformation;

@@ -149,6 +149,8 @@ namespace HellEngine
 		Renderer::s_muzzleFlash.Update(m_frameTime);
 		Renderer::s_bloodWallSplatter.Update(m_frameTime);
 
+		Renderer::s_bloodVolumetricEffect.Update(m_frameTime);
+
 		TextBlitter::UpdateBlitter(m_frameTime);
 
 		

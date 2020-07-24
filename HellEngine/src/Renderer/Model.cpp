@@ -60,6 +60,11 @@ namespace HellEngine
 					1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
 				};
 
+				if (std::string("res/models/blood/blood1/blood_mesh.obj").compare(std::string(m_filePath)) == 0) {
+					//std::cout << "\nvertices:" << vertices.size() << " " << indices.size() << "\n";
+					vertex.Position /= 1000;
+				}
+
 				/*vertex.Normal = {
 					attrib.vertices[3 * index.normal_index + 0],
 					attrib.vertices[3 * index.normal_index + 1],
@@ -76,9 +81,37 @@ namespace HellEngine
 				indices.push_back(uniqueVertices[vertex]);
 			}
 
+//			if (std::string("res/models/blood/blood1/blood_mesh.obj").compare(std::string(m_filePath)) == 0) {	
+//				indices.clear();
+//				indices = { 0, 1, 2, 0, 2, 3 };
+//
+//				vertices.clear();
+//
+//				float quadVertices[] = {
+//-0.5f, +0.5f, +0.0f, 0.0f, 0.0f,
+//+0.5f, +0.5f, +0.0f, 1.0f, 0.0f,
+//+0.5f, -0.5f, +0.0f, 1.0f, 1.0f,
+//-0.5f, -0.5f, +0.0f, 0.0f, 1.0f
+//				};
+//
+//				for (int i = 0; i < 4; ++i) {
+//					int kk = 5 * i;
+//					Vertex vertex = {};
+//					vertex.Position = { quadVertices[kk], quadVertices[kk + 1], quadVertices[kk + 2]};
+//					vertex.TexCoords = { quadVertices[kk + 3], quadVertices[kk + 4]};
+//
+//					vertices.push_back(vertex);
+//				}
+//			}
+
+
+
+
+
 			for (int i = 0; i < indices.size(); i += 3) {
 				Util::SetNormalsAndTangentsFromVertices(&vertices[indices[i]], &vertices[indices[i + 1]], &vertices[indices[i + 2]]);
 			}
+
 			Mesh* mesh = new Mesh(vertices, indices, shape.name.c_str());
 			this->m_meshes.push_back(mesh);
 		}

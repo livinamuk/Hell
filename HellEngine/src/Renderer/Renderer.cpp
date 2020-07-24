@@ -35,6 +35,7 @@ namespace HellEngine
 	Shader Renderer::s_StencilShader;
 	Shader Renderer::s_BloodShader;
 	Shader Renderer::s_DecalShader;
+	Shader Renderer::s_BloodVolumetricShader;
 	Shader Renderer::s_GunInspectShader;
 
 	std::string Renderer::s_debugString;
@@ -42,6 +43,8 @@ namespace HellEngine
 	BloodEffect Renderer::s_bloodEffect;
 	MuzzleFlash Renderer::s_muzzleFlash;
 	BloodWallSplatter Renderer::s_bloodWallSplatter;
+
+	BloodEffectVolumetric Renderer::s_bloodVolumetricEffect;
 
 	bool Renderer::s_demo = true;
 
@@ -110,6 +113,7 @@ namespace HellEngine
 
 		s_BloodShader = Shader("Blood", "blood.vert", "blood.frag", "NONE");
 		s_DecalShader = Shader("Decal", "decals.vert", "decals.frag", "NONE");
+		s_BloodVolumetricShader = Shader("BloodVolumetric", "bloodVolumetric.vert", "bloodVolumetric.frag", "NONE");
 
 		s_GunInspectShader = Shader("GunInspect", "GunInspect.vert", "GunInspect.frag", "NONE");
 
@@ -136,6 +140,8 @@ namespace HellEngine
 		s_bloodEffect.Init();
 		s_muzzleFlash.Init();
 		s_bloodWallSplatter.Init();
+
+		s_bloodVolumetricEffect.Init();
 	
 		// Inventory gun examination transforms
 		s_Inv_GlockTransform.position = glm::vec3(0, -1, -10);
@@ -1052,18 +1058,20 @@ namespace HellEngine
 		glm::vec3 v = Util::TranslationFromMat4(worldMatrix);
 
 		Transform t;
-		t.position = s_muzzleFlash.m_worldPos;;;
+		t.position = s_muzzleFlash.m_worldPos;
 		t.position = WeaponLogic::GetBarrelHoleWorldPosition();
 		t.rotation = game->camera.m_transform.rotation;
 
 		// Blood
-		s_bloodEffect.Draw(&s_BloodShader, s_hitPoint);
+		//s_bloodEffect.Draw(&s_BloodShader, s_hitPoint);
 		s_muzzleFlash.Draw(&s_BloodShader, t);
 
 		Transform t2;
 		t.position = glm::vec3(0, 1, 0);
 		t2 = s_DebugTransform;
 		s_bloodWallSplatter.Draw(&s_BloodShader, t2);
+
+		s_bloodVolumetricEffect.Draw(&s_BloodShader, s_hitPoint);
 
 		// Muzzle flash
 	}

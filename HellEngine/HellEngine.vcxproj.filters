@@ -1486,6 +1486,9 @@
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
     <ClInclude Include="src\Logic\GlockLogic.h" />
+    <ClInclude Include="src\Renderer\Effects\BloodEffectVolumetric.h">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\AnimatedNode.cpp">
@@ -1741,6 +1744,9 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Logic\GlockLogic.cpp" />
+    <ClCompile Include="src\Renderer\Effects\BloodEffectVolumetric.cpp">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">
@@ -1867,6 +1873,12 @@
       <Filter>res\shaders</Filter>
     </None>
     <None Include="res\shaders\stencil.vert">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\bloodVolumetric.frag">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\bloodVolumetric.vert">
       <Filter>res\shaders</Filter>
     </None>
   </ItemGroup>

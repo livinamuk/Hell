@@ -89,6 +89,7 @@ namespace HellEngine
 				// make blood on couches and ragdolls
 				if ((raycastResult.m_name == "NEW MESH") || (raycastResult.m_name == "RAGDOLL")) {
 					Renderer::s_bloodEffect.m_CurrentTime = 0;
+					Renderer::s_bloodVolumetricEffect.m_CurrentTime = 0;
 					playFleshSound = true;
 					Renderer::s_hitPoint.position = raycastResult.m_hitPoint;
 					Renderer::s_hitPoint.rotation = p_camera->m_transform.rotation;

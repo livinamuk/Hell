@@ -211,6 +211,7 @@
     <ClInclude Include="src\Renderer\AssimpModel.h" />
     <ClInclude Include="src\Renderer\Cube.h" />
     <ClInclude Include="src\Renderer\Effects\BloodEffect.h" />
+    <ClInclude Include="src\Renderer\Effects\BloodEffectVolumetric.h" />
     <ClInclude Include="src\Renderer\Effects\BloodWallSplatter.h" />
     <ClInclude Include="src\Renderer\Effects\Decal.h" />
     <ClInclude Include="src\Renderer\Effects\MuzzleFlash.h" />
@@ -691,6 +692,7 @@
     <ClCompile Include="src\Renderer\AssimpModel.cpp" />
     <ClCompile Include="src\Renderer\Cube.cpp" />
     <ClCompile Include="src\Renderer\Effects\BloodEffect.cpp" />
+    <ClCompile Include="src\Renderer\Effects\BloodEffectVolumetric.cpp" />
     <ClCompile Include="src\Renderer\Effects\BloodWallSplatter.cpp" />
     <ClCompile Include="src\Renderer\Effects\Decal.cpp" />
     <ClCompile Include="src\Renderer\Effects\MuzzleFlash.cpp" />
@@ -721,6 +723,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shaders\bloodVolumetric.frag" />
+    <None Include="res\shaders\bloodVolumetric.vert" />
     <None Include="res\shaders\ChromaticAberration.frag" />
     <None Include="res\shaders\ChromaticAberration.vert" />
     <None Include="res\shaders\DOF.frag" />

@@ -17,6 +17,7 @@
 #include "Effects/BloodEffect.h"
 #include "Effects/MuzzleFlash.h"
 #include "Effects/BloodWallSplatter.h"
+#include "Effects/BloodEffectVolumetric.h"
 
 #include "Animation/SkinnedModel.h"
 #include "NumberBlitter.h"
@@ -95,6 +96,7 @@ namespace HellEngine
 
 		static Shader s_BloodShader;
 		static Shader s_DecalShader;
+		static Shader s_BloodVolumetricShader;
 
 		static Shader s_GunInspectShader;
 
@@ -140,6 +142,7 @@ namespace HellEngine
 		static BloodEffect s_bloodEffect;
 		static MuzzleFlash s_muzzleFlash;
 		static BloodWallSplatter s_bloodWallSplatter;
+		static BloodEffectVolumetric s_bloodVolumetricEffect;
 
 		static std::string s_debugString;
 

@@ -7,10 +7,12 @@ namespace HellEngine
 	class LevelEditor
 	{
 	public: // functions
-		static void Draw(Shader* shader, Game* game);
-
+		static void DrawOverlay(Shader* shader, Game* game);
+		static void DrawObject(Shader* shader, Game* game, PhysicsObjectType type, unsigned int parentIndex);
+		
 	public: // variables
-		static unsigned int s_hover_index;
-		static PhysicsObjectType s_hover_object_type;
+		static int s_SelectedOjectIndex;
+		static PhysicsObjectType s_SelectedObjectType; 
+		static RaycastResult s_mouse_ray;
 	};
 }

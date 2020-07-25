@@ -1868,9 +1868,8 @@ namespace HellEngine
 		shader->use();
 		shader->setMat4("projection", game->camera.m_projectionMatrix);
 		shader->setMat4("view", game->camera.m_viewMatrix);
-		shader->setVec3("color", glm::vec3(1, 0, 1));
 
-		LevelEditor::Draw(shader, game);
+		LevelEditor::DrawOverlay(shader, game);
 	}
 
 	void Renderer::ViewCubeMap(Game* game, Shader* shader, unsigned int CubeMapID)

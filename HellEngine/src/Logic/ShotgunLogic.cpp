@@ -46,6 +46,10 @@ namespace HellEngine
 
 	void ShotgunLogic::FireShotgun()
 	{
+		// Can't shoot in level editor
+		if (CoreImGui::s_Show)
+			return;
+
 		// Can't shoot if you are dequipping
 		if (m_gunState == GunState::DEQUIP)
 			return;

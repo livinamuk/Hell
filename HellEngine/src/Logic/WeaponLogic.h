@@ -3,6 +3,7 @@
 #include "Core/Camera.h"
 #include "Core/AnimatedEntity.h"
 #include "Physics/RaycastResult.h"
+#include "Core/CoreImGui.h"
 
 namespace HellEngine
 {

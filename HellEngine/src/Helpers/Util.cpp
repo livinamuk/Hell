@@ -21,6 +21,30 @@ namespace HellEngine
 		return cross(v, other);
 	}
 
+	char* Util::PhysicsObjectEnumToString(PhysicsObjectType objectType)
+	{		
+		if (objectType == PhysicsObjectType::UNDEFINED)
+			return "UNDEFINED";
+		if (objectType == PhysicsObjectType::WALL)
+			return "WALL";
+		if (objectType == PhysicsObjectType::FLOOR)
+			return "FLOOR";
+		if (objectType == PhysicsObjectType::DOOR)
+			return "DOOR";
+		if (objectType == PhysicsObjectType::STAIRS)
+			return "STAIRS";
+		if (objectType == PhysicsObjectType::PLAYER)
+			return "PLAYER";
+		if (objectType == PhysicsObjectType::RAGDOLL)
+			return "RAGDOLL";
+		if (objectType == PhysicsObjectType::CEILING)
+			return "CEILING";
+		if (objectType == PhysicsObjectType::SHELL_PROJECTILE)
+			return "SHELL_PROJECTILE";
+		if (objectType == PhysicsObjectType::MISC_MESH)
+			return "MISC_MESH";
+	}
+
 	btQuaternion Util::GetQuatBetween2Points(glm::vec3 P0, glm::vec3 P1)
 	{
 		glm::vec3 u = glm::normalize(P1 - P0);

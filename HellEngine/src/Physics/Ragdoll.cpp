@@ -548,12 +548,11 @@ namespace HellEngine
 		btRigidBody* body = new btRigidBody(rbInfo);
 
 		EntityData* entityData = new EntityData();
-		entityData->name = "RAGDOLL";
+		entityData->type = PhysicsObjectType::RAGDOLL;
 		body->setUserPointer(entityData);
 
 		int group = CollisionGroups::ENEMY;
 		int mask = CollisionGroups::HOUSE;// | CollisionGroups::PLAYER;
-
 
 		m_ownerWorld->addRigidBody(body, group, mask);
 

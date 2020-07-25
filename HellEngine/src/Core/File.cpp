@@ -397,7 +397,7 @@ namespace HellEngine {
 
 	int File::ReadInt(const rapidjson::Value& value, std::string name)
 	{
-		float f = -1;
+		int f = -1;
 
 		if (value.HasMember(name.c_str()))
 			f = value[name.c_str()].GetInt();

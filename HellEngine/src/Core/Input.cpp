@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "keycodes.h"
 #include "CoreGL.h"
+#include "Core/CoreImGui.h"
 #include "Game.h"
 #include "Logic/WeaponLogic.h"
 
@@ -63,6 +64,7 @@ namespace HellEngine
 			Renderer::s_DecalShader.ReloadShader();
 			Renderer::s_solidColorShader.ReloadShader();
 			Renderer::s_GunInspectShader.ReloadShader();
+			Renderer::s_SolidColor3D.ReloadShader();
 			Renderer::SetTextureBindings();
 		}
 
@@ -72,7 +74,15 @@ namespace HellEngine
 
 		// Toggle ImGui
 		if (s_keyPressed[HELL_KEY_I])
-			Renderer::m_showImGui = !Renderer::m_showImGui;
+		{
+			CoreImGui::s_Show = !CoreImGui::s_Show;
+
+			// Always show cursor in level editor, and hide it when you close 
+			if (CoreImGui::s_Show)
+				s_showCursor = true;
+			else
+				s_showCursor = false;
+		}
 
 		if (Input::s_keyPressed[HELL_KEY_G])
 			WeaponLogic::m_singleHanded = !WeaponLogic::m_singleHanded;

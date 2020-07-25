@@ -135,10 +135,13 @@ struct Line {
 	glm::vec3 end_color;
 };
 
+enum class PhysicsObjectType { UNDEFINED, WALL, DOOR, FLOOR, STAIRS, PLAYER, RAGDOLL, CEILING, SHELL_PROJECTILE, MISC_MESH};
+
 struct EntityData {
-	char* name = "NONE";
+	//char* name = "NONE";
 	int vectorIndex = -1;
 	unsigned int enumValue = 0;
+	PhysicsObjectType type;
 };
 
 enum FileType { FBX, OBJ, PNG, JPG, UNKNOWN };

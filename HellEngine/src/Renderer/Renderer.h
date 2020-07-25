@@ -11,6 +11,7 @@
 #include "GL/ChromaticAbberationBuffer.h"
 #include "GL/CameraEnvMap.h"
 #include "GL/GpuProfiling.h"
+#include "GL/EditorBuffer.h"
 #include "TextBlitter.h"
 #include "House/Light.h"
 
@@ -36,6 +37,8 @@ namespace HellEngine
 
 	private: // Functions
 		static void DrawScene(Game* game, Shader* shader, bool bindTextures, bool envMapPass);
+
+		// Render passes
 		static void GeometryPass(Game* game, Shader* shader);
 		static void LightingPass(Game* game, Shader* stencilShader, Shader* lightingShader);
 		static void BlurPass(Shader* blurVerticalShader, Shader* blurHorizontalShader);
@@ -47,16 +50,16 @@ namespace HellEngine
 		static void DecalPass(Game* game, Shader* shader);
 		static void HUDPass(Game* game, Shader* shader);
 		static void InventoryPass(Game* game);
-
 		static void ShadowMapPass(Game* game, Shader* shader);
-
 		static void EnvMapPass(Game* game, Shader* envmapShader, Shader* sphericalHarmonicsShader);
 		static void RenderEnvMap(Game* game, Shader* shader, Light* light);
 		static void RenderSphericalHarmonicsTexture(Game* game, Shader* shader, Light* light);
-
 		static void RenderFinalImage(Shader* shader, unsigned int textureID);
 		static void RenderDebugTextures(Shader* shader, unsigned int texture0_ID, unsigned int texture1_ID, unsigned int texture2_ID, unsigned int texture3_ID);
 		static void BulletDebugDraw(Game* game, Shader* shader);
+		static void EditorOverlayPass(Game* game, Shader* shader);
+
+
 		static void ViewCubeMap(Game* , Shader* shader, unsigned int CubeMapID);
 		static void CreateBRDFLut();
 
@@ -99,6 +102,7 @@ namespace HellEngine
 		static Shader s_BloodVolumetricShader;
 
 		static Shader s_GunInspectShader;
+		static Shader s_SolidColor3D;
 
 		static std::vector<BlurBuffer> s_BlurBuffers;
 
@@ -111,6 +115,7 @@ namespace HellEngine
 		static DOFBuffer s_DOFBuffer;
 		static FXAABuffer s_FXAABuffer;
 		static ChromaticAbberationBuffer s_ChromaticAbberationBuffer;
+		static EditorBuffer s_EditorBuffer;
 
 		// Env maps
 		//static LightProbe s_LightProbe;
@@ -122,7 +127,7 @@ namespace HellEngine
 		static unsigned int brdfLUTTexture;
 		static bool m_showBulletDebug;
 		static bool m_showDebugTextures;
-		static bool m_showImGui;
+	//	static bool m_showImGui;
 		static bool b_showCubemap;
 		static bool b_renderDoorWayVolumes;
 

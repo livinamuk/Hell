@@ -4,6 +4,7 @@
 #include "Header.h"
 #include "Helpers/Util.h"
 #include "Core/CoreGL.h"
+#include "Core/CoreImGui.h"
 #include "Config.h"
 
 namespace HellEngine
@@ -15,8 +16,8 @@ namespace HellEngine
 		m_transform.scale = glm::vec3(1);
 		m_oldX = 1280 / 2;
 		m_oldY = 720 / 2;
-		Input::s_mouseX = m_oldX;
-		Input::s_mouseY = m_oldY;
+		Input::s_mouseX = (int)m_oldX;
+		Input::s_mouseY = (int)m_oldY;
 	}
 
 	void Camera::CalculateMatrices(glm::vec3 viewPosition)
@@ -52,10 +53,14 @@ namespace HellEngine
 	{
 		//m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, FAR_PLANE);
 		m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, 1000.0f);
+		m_inversePprojectionMatrix = glm::inverse(m_projectionMatrix);
 	}
 
 	void Camera::CalculateWeaponSwayTransform(float deltatime)
 	{
+		if (CoreImGui::s_Show)
+			return;
+
 		float movementX = - m_xoffset * Config::SWAY_AMOUNT;
 		float movementY = -m_yoffset * Config::SWAY_AMOUNT;
 
@@ -93,7 +98,7 @@ namespace HellEngine
 
 	void Camera::PlayerMovement(float deltaTime)
 	{
-		float cameraSpeed = 2.5 * deltaTime;
+		float cameraSpeed = 2.5f * deltaTime;
 		glm::vec3 Front = m_Front;
 		Front.y = 0;
 		Front = glm::normalize(Front);

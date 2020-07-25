@@ -7,6 +7,7 @@ layout (binding = 1) uniform sampler2D blur0;
 layout (binding = 2) uniform sampler2D blur1;
 layout (binding = 3) uniform sampler2D blur2;
 layout (binding = 4) uniform sampler2D blur3;
+layout (binding = 5) uniform sampler2D EditorHover_Texture;
 
 in vec2 TexCoords;
 
@@ -40,6 +41,9 @@ void main()
 	blur += texture(blur1, TexCoords).rgb;
 	blur += texture(blur2, TexCoords).rgb;
 	blur += texture(blur3, TexCoords).rgb;
-	 
-	Composite = lighting + blur;
+	
+	// Level Editor overlay
+	vec3 editor  = vec3(texture(EditorHover_Texture, TexCoords)); 
+
+	Composite = lighting + blur + (editor * 0.5);
 }

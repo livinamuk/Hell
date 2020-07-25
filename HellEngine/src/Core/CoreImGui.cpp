@@ -3,6 +3,7 @@
 #include "ImGuizmo/ImGuizmo.h"
 #include "CoreGL.h"
 #include "Helpers/AssetManager.h"
+#include "Helpers/Util.h"
 #include "Config.h"
 #include "File.h"
 
@@ -10,6 +11,8 @@
 
 namespace HellEngine
 {
+	bool CoreImGui::s_Show = false;
+
 	void CoreImGui::InitImGui()
 	{
 		ImGui::CreateContext();
@@ -595,7 +598,7 @@ namespace HellEngine
 	void CoreImGui::ShowOtherMenu(Game* game)
 	{
 		ImGui::Text("\nCAMERA");
-		ImGui::Text("Ray cast: %s", game->m_cameraRaycast.m_name);
+		ImGui::Text("Ray cast: %s", Util::PhysicsObjectEnumToString(game->m_cameraRaycast.m_objectType));
 		ImGui::Text("Ray dist: %f", game->m_cameraRaycast.m_distance);
 		ImGui::Text("View pos: (%f, %f, %f)", game->camera.m_viewPos.x, game->camera.m_viewPos.y, game->camera.m_viewPos.z);
 		ImGui::Text("Front:    (%f, %f, %f)", game->camera.m_Front.x, game->camera.m_Front.y, game->camera.m_Front.z);
@@ -702,7 +705,7 @@ namespace HellEngine
 		//if (game->m_HUDshotgun.m_currentAnimation != NULL)
 		//	ImGui::Text("\nHUD shotgun: %s, %s, %s", game->m_HUDshotgun.m_currentAnimationName, game->m_HUDshotgun.m_currentAnimationTime.GetTimeString(), game->m_HUDshotgun.m_currentAnimation->m_endTime.GetTimeString());
 
-		ImGui::Text("\nRaycast:  %s", game->m_cameraRaycast.m_name);
+		ImGui::Text("\nRaycast:  %s", Util::PhysicsObjectEnumToString(game->m_cameraRaycast.m_objectType));
 		ImGui::Text("Distance: %f", game->m_cameraRaycast.m_distance);
 	}
 

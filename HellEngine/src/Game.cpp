@@ -4,6 +4,7 @@
 #include "Helpers/Util.h"
 #include "Core/File.h"
 #include "Core/CoreGL.h"
+#include "Core/CoreImGui.h"
 #include "GL/Quad2D.h"
 #include "Audio/Audio.h"
 #include "Logic/WeaponLogic.h"
@@ -187,7 +188,7 @@ namespace HellEngine
 		camera.CalculateProjectionMatrix((float)SCR_WIDTH, (float)SCR_HEIGHT);
 		camera.CalculateWeaponSwayTransform(m_frameTime);
 
-		if (!Renderer::m_showImGui)
+		if (!CoreImGui::s_Show)
 			m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 25);
 
 	}
@@ -222,7 +223,7 @@ namespace HellEngine
 
 	void Game::OnInteract()
 	{
-		if (m_cameraRaycast.m_name == "DOOR")
+		if (m_cameraRaycast.m_objectType == PhysicsObjectType::DOOR)
 			house.m_doors[m_cameraRaycast.m_elementIndex].Interact();
 	}
 

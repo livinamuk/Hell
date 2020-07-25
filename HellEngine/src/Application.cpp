@@ -56,7 +56,7 @@ int main()
 	double lastTime = CoreGL::GetGLTime();
 	double unprocessedTime = 0;
 	double desiredFrameRate = 60;
-	game.m_frameTime = 1.0 / desiredFrameRate;
+	game.m_frameTime = 1.0f / (float)desiredFrameRate;
 	double MAX_UPDATE_TIME = game.m_frameTime * 60;
 
 	//CoreGL::SetVSync(true);
@@ -104,7 +104,7 @@ int main()
 			game.OnRender(); 
 			frames++;
 
-			if (Renderer::m_showImGui)
+			if (CoreImGui::s_Show)
 				CoreImGui::Render(&game);
 
 			CoreGL::SwapBuffersAndPollEvents();

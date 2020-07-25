@@ -361,7 +361,7 @@ namespace HellEngine
             AnimatedNode animatedNode(nodeName);
             animation->m_NodeMapping.emplace(nodeName, n);
 
-            for (int p = 0; p < aiAnim->mChannels[n]->mNumPositionKeys; p++)
+            for (unsigned int p = 0; p < aiAnim->mChannels[n]->mNumPositionKeys; p++)
             {
                 SQT sqt;
                 aiVectorKey pos = aiAnim->mChannels[n]->mPositionKeys[p];

@@ -304,23 +304,23 @@ namespace HellEngine
 		for (DoorWay& doorWay : m_doorWaysXBackWall)
 			if (doorWay.type == DoorWayType::DOOR)
 				if (((Door*)doorWay.parent)->m_axis == Axis::POS_X)
-					m_upperZ += 0.06;
+					m_upperZ += 0.06f;
 
 		for (DoorWay& doorWay : m_doorWaysXFrontWall)
 			if (doorWay.type == DoorWayType::DOOR)
 				if (((Door*)doorWay.parent)->m_axis == Axis::NEG_X)
-					m_lowerZ -= 0.06;
+					m_lowerZ -= 0.06f;
 
 
 		for (DoorWay& doorWay : m_doorWaysZRightWall)
 			if (doorWay.type == DoorWayType::DOOR)
 				if (((Door*)doorWay.parent)->m_axis == Axis::POS_Z)
-					m_upperX += 0.06;
+					m_upperX += 0.06f;
 
 		for (DoorWay& doorWay : m_doorWaysZLeftWall)
 			if (doorWay.type == DoorWayType::DOOR)
 				if (((Door*)doorWay.parent)->m_axis == Axis::NEG_Z)
-					m_lowerX -= 0.06;
+					m_lowerX -= 0.06f;
 		/*
 			light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_upperZ));
 

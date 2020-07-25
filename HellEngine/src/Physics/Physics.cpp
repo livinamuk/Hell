@@ -116,7 +116,7 @@ namespace HellEngine
 			floor->setCustomDebugColor(DEBUG_COLOR_GROUND);
 
 			EntityData* entityData = new EntityData();
-			entityData->name = "FLOOR";
+			entityData->type = PhysicsObjectType::FLOOR;
 			floor->setUserPointer(entityData);
 
 		//	btBoxShape* collisionShape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
@@ -216,7 +216,7 @@ namespace HellEngine
 		//triangleMeshShape->setMargin(btScalar(0.01f));
 
 		EntityData* entityData = new EntityData();
-		entityData->name = "FLOOR";
+		entityData->type = PhysicsObjectType::FLOOR;
 		entityData->vectorIndex = 0;
 		collisionObject->setUserPointer(entityData);
 
@@ -289,7 +289,7 @@ namespace HellEngine
 		collisionObject->setWorldTransform(meshTransform);
 		collisionObject->setCustomDebugColor(btVector3(1, 0, 0));
 		EntityData* entityData = new EntityData();
-		entityData->name = "STAIRS";
+		entityData->type = PhysicsObjectType::STAIRS;
 		entityData->vectorIndex = 0;
 		collisionObject->setUserPointer(entityData);
 
@@ -372,7 +372,7 @@ namespace HellEngine
 		collisionObject->setFriction(0.2f);
 		collisionObject->setCustomDebugColor(DEBUG_COLOR_WALL);
 		EntityData* entityData = new EntityData();
-		entityData->name = "WALL";
+		entityData->type = PhysicsObjectType::WALL;
 		entityData->vectorIndex = 0;
 		collisionObject->setUserPointer(entityData);
 
@@ -462,7 +462,7 @@ namespace HellEngine
 		collisionObject->setFriction(0.5);
 		collisionObject->setCustomDebugColor(btVector3(1, 0, 0));
 		EntityData* entityData = new EntityData();
-		entityData->name = "NEW MESH";
+		entityData->type = PhysicsObjectType::MISC_MESH;
 		entityData->vectorIndex = 0;
 		collisionObject->setUserPointer(entityData);
 
@@ -643,54 +643,51 @@ namespace HellEngine
 		// set their colors to white
 		pObj0->SetColor(btVector3(1.0, 1.0, 1.0));
 		pObj1->SetColor(btVector3(1.0, 1.0, 1.0));*/
-		char* name0;
-		char* name1;
+
+		PhysicsObjectType objectType0;
+		PhysicsObjectType objectType1;
 
 		EntityData* entityData = (EntityData*)pBody0->getUserPointer();
 		if (entityData) {
-			name0 = entityData->name;
+			objectType0 = entityData->type;
 		}
 		EntityData* entityData1 = (EntityData*)pBody1->getUserPointer();
 		if (entityData1) {
-			name1 = entityData1->name;
+			objectType1 = entityData1->type;
 		}
 
-	//	bool shellCollision = false;
-		bool floor = false;
-		bool wall = false;
+		bool collision_with_floor = false;
+		bool collision_with_wall = false;
 
-	//	if (name0 == "SHELL" || name1 == "SHELL")
-	//		shellCollision = true;
+		if (objectType0 == PhysicsObjectType::FLOOR || objectType0 == PhysicsObjectType::FLOOR)
+			collision_with_floor = true;
 
-		if (name0 == "FLOOR" || name1 == "FLOOR")
-			floor = true;
+		if (objectType0 == PhysicsObjectType::WALL || objectType0 == PhysicsObjectType::WALL)
+			collision_with_wall = true;
 
-		if (name0 == "WALL" || name1 == "WALL")
-			wall = true;
+		if (objectType0 == PhysicsObjectType::DOOR || objectType0 == PhysicsObjectType::DOOR)
+			collision_with_wall = true;
 
-		if (name0 == "DOOR" || name1 == "DOOR")
-			wall = true;
-
-		std::cout << "Collision between [" << name0 << "] and [" << name1 << "]\n";
+		std::cout << "Collision between [" << Util::PhysicsObjectEnumToString(objectType0) << "] and [" << Util::PhysicsObjectEnumToString(objectType1) << "]\n";
 
 
 		// Shells
 		unsigned int casingType = 0;
 
-		if (name0 == "SHELL") {
+		if (objectType0 == PhysicsObjectType::SHELL_PROJECTILE) {
 			pBody0->setUserIndex(1); // This index of 1 is used to simulate rolling friction from this moment
 			casingType = entityData->enumValue; 
 		}
-		if (name1 == "SHELL") {
+		if (objectType1 == PhysicsObjectType::SHELL_PROJECTILE) {
 			pBody1->setUserIndex(1);
 			casingType = entityData1->enumValue;
 		}
 
 		if (casingType == CasingType::SHOTGUN_SHELL) {
-			if (wall)
+			if (collision_with_wall)
 				Audio::PlayAudio("ShellWallBounce.wav", 0.4f);
 
-			if (floor)
+			if (collision_with_floor)
 				Audio::PlayAudio("ShellFloorBounce.wav", 0.4f);
 		}
 
@@ -780,7 +777,7 @@ namespace HellEngine
 
 			// Entity Data
 			EntityData* entityData = new EntityData();
-			entityData->name = "DOOR";
+			entityData->type = PhysicsObjectType::DOOR;
 			entityData->vectorIndex = i;
 			door->m_rigidBody->setUserPointer(entityData);
 
@@ -793,8 +790,7 @@ namespace HellEngine
 	}
 
 	void Physics::RebuildPhysicsWorld(House* house)
-	{
-		
+	{		
 		//m_dynamicsWorld.no
 		//m_dynamicsWorld->removeCollisionObject(m_triangleCollisionObject);
 	}

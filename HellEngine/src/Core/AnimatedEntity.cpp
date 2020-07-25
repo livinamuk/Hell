@@ -57,7 +57,7 @@ namespace HellEngine
 		m_animatedTransforms.clear();
 		m_animatedDebugTransforms_Animated.clear();
 
-		for (int i  = 0; i < skinnedModel->m_NumBones; i++) {
+		for (unsigned int i = 0; i < skinnedModel->m_NumBones; i++) {
 			m_animatedTransforms.push_back(glm::mat4(1));
 			m_animatedDebugTransforms_Animated.push_back(glm::mat4(1));
 		}

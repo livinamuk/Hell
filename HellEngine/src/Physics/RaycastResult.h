@@ -11,6 +11,7 @@ namespace HellEngine
 	public: // methods
 		RaycastResult();
 		void CastRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength, float variance = 0);
+		static RaycastResult CastMouseRay(Camera* camera);
 
 	public: // members
 		int m_elementIndex; 
@@ -18,6 +19,6 @@ namespace HellEngine
 		glm::vec3 m_hitPoint;
 		glm::vec3 m_surfaceNormal;
 		btRigidBody* m_rigidBody = nullptr;
-		char* m_name;
+		PhysicsObjectType m_objectType;// char* m_name;
 	};
 }

@@ -68,7 +68,7 @@ namespace HellEngine
 		this->m_rigidBody->setLinearVelocity(Util::glmVec3_to_btVec3(initialVelocity));
 
 		EntityData* entityData = new EntityData();
-		entityData->name = "SHELL";
+		entityData->type = PhysicsObjectType::SHELL_PROJECTILE;
 		entityData->enumValue = m_casingType;
 		//entityData->vectorIndex = s_shells.size() - 1;
 		m_rigidBody->setUserPointer(entityData);

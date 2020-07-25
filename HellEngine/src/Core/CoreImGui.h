@@ -23,5 +23,6 @@ namespace HellEngine
 		static void ShowSceneMenu(Game* game);
 
 	public: // static variables
+		static bool s_Show;
 	};
 }

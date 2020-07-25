@@ -21,7 +21,8 @@ namespace HellEngine
 		ghostObject_->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
 
 		EntityData* entityData = new EntityData();
-		entityData->name = "PLAYER";
+		entityData->type = PhysicsObjectType::PLAYER;
+		//entityData->name = "PLAYER";
 		entityData->vectorIndex = 0;
 		ghostObject_->setUserPointer(entityData);
 

@@ -159,6 +159,7 @@
     <ClInclude Include="src\Core\Entity.h" />
     <ClInclude Include="src\Core\File.h" />
     <ClInclude Include="src\Core\Input.h" />
+    <ClInclude Include="src\Core\LevelEditor.h" />
     <ClInclude Include="src\Core\LightProbeGrid.h" />
     <ClInclude Include="src\Core\Player.h" />
     <ClInclude Include="src\Core\keycodes.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="src\GL\ChromaticAbberationBuffer.h" />
     <ClInclude Include="src\GL\CubeMapArray.h" />
     <ClInclude Include="src\GL\DOFBuffer.h" />
+    <ClInclude Include="src\GL\EditorBuffer.h" />
     <ClInclude Include="src\GL\EnvCubeMap.h" />
     <ClInclude Include="src\GL\FXAABuffer.h" />
     <ClInclude Include="src\GL\FinalImageBuffer.h" />
@@ -625,6 +627,7 @@
     <ClCompile Include="src\Core\Camera.cpp" />
     <ClCompile Include="src\Core\CoreGL.cpp" />
     <ClCompile Include="src\Core\CoreImGui.cpp" />
+    <ClCompile Include="src\Core\LevelEditor.cpp" />
     <ClCompile Include="src\Core\EnemyCharacter.cpp" />
     <ClCompile Include="src\Core\Entity.cpp" />
     <ClCompile Include="src\Core\File.cpp" />
@@ -636,6 +639,7 @@
     <ClCompile Include="src\GL\ChromaticAbberationBuffer.cpp" />
     <ClCompile Include="src\GL\CubeMapArray.cpp" />
     <ClCompile Include="src\GL\DOFBuffer.cpp" />
+    <ClCompile Include="src\GL\EditorBuffer.cpp" />
     <ClCompile Include="src\GL\FXAABuffer.cpp" />
     <ClCompile Include="src\GL\FinalImageBuffer.cpp" />
     <ClCompile Include="src\GL\GBuffer.cpp" />
@@ -765,6 +769,8 @@
     <None Include="res\shaders\shader.frag" />
     <None Include="res\shaders\solidColor.frag" />
     <None Include="res\shaders\solidColor.vert" />
+    <None Include="res\shaders\solidColor3D.frag" />
+    <None Include="res\shaders\solidColor3D.vert" />
     <None Include="res\shaders\stencil.frag" />
     <None Include="res\shaders\stencil.vert" />
   </ItemGroup>

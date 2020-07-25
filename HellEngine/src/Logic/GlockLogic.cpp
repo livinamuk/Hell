@@ -90,11 +90,11 @@ namespace HellEngine
 				raycastResult.CastRay(p_camera->m_viewPos, p_camera->m_Front, 10.0f, 0.05f);
 
 				// make bullet hole if it aint the ragdoll
-				if (raycastResult.m_name != "RAGDOLL")
+				if (raycastResult.m_objectType != PhysicsObjectType::RAGDOLL)
 					Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal));
 
 				// make blood on couches and ragdolls
-				if ((raycastResult.m_name == "NEW MESH") || (raycastResult.m_name == "RAGDOLL")) {
+				if ((raycastResult.m_objectType == PhysicsObjectType::MISC_MESH) || (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)) {
 					Renderer::s_bloodEffect.m_CurrentTime = 0;
 					Renderer::s_bloodVolumetricEffect.m_CurrentTime = 0;
 					playFleshSound = true;
@@ -104,7 +104,7 @@ namespace HellEngine
 				WeaponLogic::s_BulletHits.emplace_back(raycastResult);
 
 
-				if (raycastResult.m_name == "RAGDOLL")
+				if (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)
 				{
 					float FORCE_SCALING_FACTOR = 22;// Config::TEST_FLOAT;
 					raycastResult.m_rigidBody->activate(true);

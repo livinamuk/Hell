@@ -4,6 +4,7 @@
 #include "Helpers/AssetManager.h"
 #include "Game.h"
 #include "Core/CoreGL.h"
+#include "Core/CoreImGui.h"
 #include "GL/Quad2D.h"
 #include "GL/GpuProfiling.h"
 #include "Config.h"
@@ -12,6 +13,7 @@
 #include "Config.h"
 #include "Logic/WeaponLogic.h"
 #include "Logic/GlockLogic.h"
+#include "Core/LevelEditor.h"
 
 namespace HellEngine
 {
@@ -37,6 +39,7 @@ namespace HellEngine
 	Shader Renderer::s_DecalShader;
 	Shader Renderer::s_BloodVolumetricShader;
 	Shader Renderer::s_GunInspectShader;
+	Shader Renderer::s_SolidColor3D;
 
 	std::string Renderer::s_debugString;
 
@@ -72,6 +75,7 @@ namespace HellEngine
 	DOFBuffer Renderer::s_DOFBuffer;
 	FXAABuffer Renderer::s_FXAABuffer;
 	ChromaticAbberationBuffer Renderer::s_ChromaticAbberationBuffer;
+	EditorBuffer Renderer::s_EditorBuffer;
 
 	std::vector<BlurBuffer> Renderer::s_BlurBuffers;
 
@@ -79,7 +83,7 @@ namespace HellEngine
 
 	bool Renderer::m_showBulletDebug = false;
 	bool Renderer::m_showDebugTextures = false;
-	bool Renderer::m_showImGui = false;
+//	bool Renderer::m_showImGui = false;
 	bool Renderer::b_showCubemap = false;
 	bool Renderer::b_renderDoorWayVolumes = true;
 
@@ -116,6 +120,7 @@ namespace HellEngine
 		s_BloodVolumetricShader = Shader("BloodVolumetric", "bloodVolumetric.vert", "bloodVolumetric.frag", "NONE");
 
 		s_GunInspectShader = Shader("GunInspect", "GunInspect.vert", "GunInspect.frag", "NONE");
+		s_SolidColor3D = Shader("SolidColor3D", "solidColor3D.vert", "solidColor3D.frag", "NONE");
 
 		SetTextureBindings();
 
@@ -125,6 +130,7 @@ namespace HellEngine
 		s_DOFBuffer = DOFBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		s_ChromaticAbberationBuffer = ChromaticAbberationBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		s_FXAABuffer = FXAABuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		s_EditorBuffer = EditorBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 
 		s_BlurBuffers.push_back(BlurBuffer(SCR_WIDTH / 2, SCR_HEIGHT / 2));
 		s_BlurBuffers.push_back(BlurBuffer(SCR_WIDTH / 4, SCR_HEIGHT / 4));
@@ -518,6 +524,11 @@ namespace HellEngine
 		}
 
 		{
+			GpuProfiler g("EditorOverlayPass");
+			EditorOverlayPass(game, &s_SolidColor3D);
+		}
+
+		{
 			GpuProfiler g("CompositePass");
 			CompositePass(game, &s_compositeShader);
 		}
@@ -544,7 +555,8 @@ namespace HellEngine
 				RenderFinalImage(&s_quadShader, s_ChromaticAbberationBuffer.TexID);
 			else
 				//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
-				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, game->house.m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
+			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, game->house.m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
+				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_EditorBuffer.HoverTexture, s_gBuffer.gFinalLighting);
 			//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
 		}
 
@@ -1406,6 +1418,8 @@ namespace HellEngine
 		glBindTexture(GL_TEXTURE_2D, s_BlurBuffers[2].textureA);
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, s_BlurBuffers[3].textureA);
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, s_EditorBuffer.HoverTexture);
 
 		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		Quad2D::RenderQuad(shader);
@@ -1838,6 +1852,25 @@ namespace HellEngine
 		shader->setMat4("projection", game->camera.m_projectionMatrix);
 		shader->setMat4("view", game->camera.m_viewMatrix);
 		Physics::DebugDraw(&s_solidColorShader);
+	}
+
+	void Renderer::EditorOverlayPass(Game* game, Shader* shader)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, s_EditorBuffer.ID);
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		if (!CoreImGui::s_Show)
+			return;
+
+		glDisable(GL_DEPTH_TEST);
+
+		shader->use();
+		shader->setMat4("projection", game->camera.m_projectionMatrix);
+		shader->setMat4("view", game->camera.m_viewMatrix);
+		shader->setVec3("color", glm::vec3(1, 0, 1));
+
+		LevelEditor::Draw(shader, game);
 	}
 
 	void Renderer::ViewCubeMap(Game* game, Shader* shader, unsigned int CubeMapID)

@@ -12,9 +12,9 @@ namespace HellEngine
 {
 	Model::Model(const char* filepath)
 	{
-		this->m_filePath = filepath;
-		this->name = Util::FileNameFromPath(filepath);
-		this->m_fileType = Util::FileTypeFromPath(filepath);
+		m_filePath = filepath;
+		name = Util::FileNameFromPath(filepath);
+		m_fileType = Util::FileTypeFromPath(filepath);
 	}
 
 	Model::~Model()
@@ -60,10 +60,10 @@ namespace HellEngine
 					1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
 				};
 
-				if (std::string("res/models/blood/blood1/blood_mesh.obj").compare(std::string(m_filePath)) == 0) {
-					//std::cout << "\nvertices:" << vertices.size() << " " << indices.size() << "\n";
-					vertex.Position /= 1000;
-				}
+				//if (std::string("res/models/blood/blood1/blood_mesh.obj").compare(std::string(m_filePath)) == 0) {
+				//	//std::cout << "\nvertices:" << vertices.size() << " " << indices.size() << "\n";
+				//	vertex.Position /= 1000;
+				//}
 
 				/*vertex.Normal = {
 					attrib.vertices[3 * index.normal_index + 0],
@@ -104,16 +104,13 @@ namespace HellEngine
 //				}
 //			}
 
-
-
-
-
 			for (int i = 0; i < indices.size(); i += 3) {
 				Util::SetNormalsAndTangentsFromVertices(&vertices[indices[i]], &vertices[indices[i + 1]], &vertices[indices[i + 2]]);
 			}
 
 			Mesh* mesh = new Mesh(vertices, indices, shape.name.c_str());
-			this->m_meshes.push_back(mesh);
+
+			m_meshes.push_back(mesh);
 		}
 		m_readFromDisk = true;
 	}
@@ -138,10 +135,11 @@ namespace HellEngine
 	void Model::DrawMesh(Shader* shader, int meshIndex, glm::mat4 modelMatrix)
 	{
 		// If it aint loaded DO NOT TRY DRAW
-		if (!m_loadedToGL) return;
+		if (!m_loadedToGL && (shader->name.compare("BloodVolumetric") != 0)) return;
 		if (m_meshes.size() <= 0) return;
 
 		shader->setMat4("model", modelMatrix);
+
 		m_meshes[meshIndex]->Draw();
 	}
 

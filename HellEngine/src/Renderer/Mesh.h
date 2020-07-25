@@ -16,10 +16,10 @@ namespace HellEngine
 	public: // fields
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
-		unsigned int VAO = 0;
-		const char* name;
+		std::string name;
 
 	private: // fields
 		unsigned int VBO, EBO;
+		unsigned int VAO = 0;
 	};
 }

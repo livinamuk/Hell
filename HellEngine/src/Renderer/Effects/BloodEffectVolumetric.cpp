@@ -11,10 +11,25 @@ namespace HellEngine
 		bloodModel = std::make_unique<Model>("res/models/blood/blood1/blood_mesh.obj"); 
 		bloodModel->ReadFromDisk();
 		transform = Transform{ glm::vec3(+0.036f, -0.037f, -0.128f), glm::vec3(glm::radians(0.000f), glm::radians(90.000f), glm::radians(90.000f)), glm::vec3(1.00f, 1.0f, 1.0f) };
+
+		//transform = Transform{ glm::vec3(+0.036f, -0.037f, -0.128f), glm::vec3(glm::radians(0.000f), glm::radians(90.000f), glm::radians(90.000f)), glm::vec3(1.00f, 1.0f, 1.0f) };
+		//transform = Transform{ glm::vec3(+0.674f, +0.258f, +0.008f), glm::vec3(glm::radians(41.23f), glm::radians(20.878f), glm::radians(18.627f)), glm::vec3(1.50f, 1.0f, 1.0f) };
+		//transform = Transform{ glm::vec3(+0.710f, +0.000f, +0.044f), glm::vec3(glm::radians(90.00f), glm::radians(0.0000f), glm::radians(0.0000f)), glm::vec3(2.00f, 1.0f, 1.0f) };
+		//transform = Transform{ glm::vec3(+0.612f, -0.117f, -0.117f), glm::vec3(glm::radians(137.4f), glm::radians(22.758f), glm::radians(12.567f)), glm::vec3(2.00f, 1.0f, 1.0f) };
+
+
 		FramesCount = 80;
 		OffsetFrames = 0;
 		AnimationSeconds = 3;
 		m_CurrentTime = AnimationSeconds;
+
+
+		//std::cout << "BloodEffectVolumetric::Init()!!! " << bloodModel->m_meshes[0]->name << "\n";
+
+
+		//if (std::string(bloodModel->m_meshes[0]->name).compare("TRIANGLE_CLOUD") == 0) {
+		//	//std::cout << "BloodEffectVolumetric::Init()!!!" << "\n";
+		//}
 	}
 
 	void BloodEffectVolumetric::Update(float deltaTime)
@@ -67,7 +82,7 @@ namespace HellEngine
 		shader->setFloat("u_LightIntensity", 1.6f);
 		shader->setVec3("u_SunPos", glm::vec3(0.56f, 1.07f, -0.09f));
 
-		bloodModel->Draw(shader, matrix);
+		bloodModel->Draw(shader, transform.blood_mat4());
 
 		glDepthMask(true);
 		glDisable(GL_BLEND);

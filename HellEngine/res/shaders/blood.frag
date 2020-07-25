@@ -28,7 +28,7 @@ vec3 OECF_sRGBFast(const vec3 linear) {
 
 void main() {
 
-	vec2 sizeTile =  vec2(1.0 / u_CountColumn, 1.0 / u_CountRaw);
+/*	vec2 sizeTile =  vec2(1.0 / u_CountColumn, 1.0 / u_CountRaw);
 
 	int frameIndex0 = u_FrameIndex;
 	int frameIndex1 = u_FrameIndex + 1;
@@ -58,7 +58,7 @@ void main() {
 	{
 		if (frameIndex0 > 1)
 			color.a *= 0.12;
-	}	
+	}	*/
 
 
 	//if (color.a < 0.1)
@@ -71,7 +71,7 @@ void main() {
     // Gamma compressionlighting
 	//color.rgb = OECF_sRGBFast(color.rgb);
 
-	FragColor = color;
+	//FragColor = color;
 
-
+	FragColor = vec4(0, 1, 0, 1);
 }

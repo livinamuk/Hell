@@ -49,7 +49,7 @@ namespace HellEngine
 		shader->setInt("u_FrameIndex", m_FrameIndex);
 		shader->setInt("u_CountRaw", CountRaw);
 		shader->setInt("u_CountColumn", CountColumn);
-		shader->setFloat("u_TimeLerp", m_Interpolate);
+		shader->setFloat("u_TimeLerp", 0.2f/*m_Interpolate*/);
 		shader->setBool("u_isBlood", true);
 
 		Transform rot;

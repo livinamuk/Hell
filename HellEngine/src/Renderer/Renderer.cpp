@@ -1064,14 +1064,18 @@ namespace HellEngine
 
 		// Blood
 		//s_bloodEffect.Draw(&s_BloodShader, s_hitPoint);
-		s_muzzleFlash.Draw(&s_BloodShader, t);
+		//s_muzzleFlash.Draw(&s_BloodShader, t);
 
-		Transform t2;
-		t.position = glm::vec3(0, 1, 0);
-		t2 = s_DebugTransform;
-		s_bloodWallSplatter.Draw(&s_BloodShader, t2);
+		//Transform t2;
+		//t.position = glm::vec3(0, 1, 0);
+		//t2 = s_DebugTransform;
+		//s_bloodWallSplatter.Draw(&s_BloodShader, t2);
 
-		s_bloodVolumetricEffect.Draw(&s_BloodShader, s_hitPoint);
+		s_BloodVolumetricShader.use();
+		s_BloodVolumetricShader.setMat4("u_MatrixProjection", game->camera.m_projectionMatrix);
+		s_BloodVolumetricShader.setMat4("u_MatrixView", game->camera.m_viewMatrix);
+
+		s_bloodVolumetricEffect.Draw(&s_BloodVolumetricShader, s_hitPoint);
 
 		// Muzzle flash
 	}

@@ -29,5 +29,5 @@ void main() {
 	vec3 color = grabColor + clamp(light, 0, 1) * u_LightIntensity * vec3(1, 1, 1);
 
 	FragColor = vec4(color, 1);
-	//FragColor = vec4(0, 1, 0, 1);
+	//FragColor = vec4(0, 0, 1, 1);
 }

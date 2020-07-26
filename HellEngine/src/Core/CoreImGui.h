@@ -14,6 +14,7 @@ namespace HellEngine
 	public: // functions
 		static void InitImGui();
 		static void Render(Game* game);
+		static void RenderLevelEditor(Game* game);
 
 		static void ShowRagdollMenu(Game* game);
 		static void ShowMapMenu(Game* game);
@@ -22,7 +23,12 @@ namespace HellEngine
 		static void ShowShaderMenu(Game* game);
 		static void ShowSceneMenu(Game* game);
 
+		static void ShowMenuBar(Game* game);
+		static void ShowDock(Game* game);
+
 	public: // static variables
 		static bool s_Show;
+		static int menuBarHeight;
+		static int leftDockWidth;
 	};
 }

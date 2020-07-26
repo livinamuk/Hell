@@ -13,6 +13,8 @@
 namespace HellEngine
 {
 	bool CoreImGui::s_Show = false;
+	int CoreImGui::menuBarHeight = 0;
+	int CoreImGui::leftDockWidth = 0;
 
 	void CoreImGui::InitImGui()
 	{
@@ -119,6 +121,162 @@ namespace HellEngine
 		ImGui::EndFrame();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
+
+	void CoreImGui::RenderLevelEditor(Game* game)
+	{
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		ImGui::ShowDemoWindow();
+		CoreImGui::ShowMenuBar(game);
+		CoreImGui::ShowDock(game);
+
+		ImGui::EndFrame();
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
+
+	void CoreImGui::ShowMenuBar(Game* game)
+	{
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Save", "CTRL+S")) {}
+				if (ImGui::MenuItem("Load", "CTRL+L")) {}  
+				ImGui::Separator();
+				if (ImGui::MenuItem("SomeDisabledStuff", "CTRL+G", false, false)) {} // Disabled item
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("SOME_OTHER_THING_LOL"))
+			{
+				if (ImGui::MenuItem("first", "CTRL+S")) {}
+				if (ImGui::MenuItem("second", "CTRL+L")) {}
+
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+
+			CoreImGui::menuBarHeight = ImGui::GetItemRectMax()[1];  // height of menubar
+		}
+	}
+
+	void CoreImGui::ShowDock(Game* game)
+	{
+		ImGuiIO* io = &(ImGui::GetIO());
+
+		// initialization
+		ImGui::SetNextWindowPos(ImVec2(0, CoreImGui::menuBarHeight), 0);
+		ImGui::SetNextWindowSizeConstraints(ImVec2(200, io->DisplaySize.y), ImVec2(io->DisplaySize.x, io->DisplaySize.y));
+		ImGui::Begin("leftDock", NULL, ImGuiWindowFlags_NoTitleBar| ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoBringToFrontOnFocus);
+		ImGui::Text("WELCOME TO HELL\n");
+
+		CoreImGui::leftDockWidth = ImGui::GetWindowWidth();
+	
+		// items list // 
+		static float w = CoreImGui::leftDockWidth;
+		static float h = 300.0f;
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.0f);
+		ImGui::BeginChild("itemsList", ImVec2(0, h), true);
+		static int selected = -1;
+		// start
+		{
+			if (ImGui::TreeNode("Scene"))
+			{
+				for (int n = 0; n < game->house.m_entities.size(); n++)
+				{
+					Entity* entity = &game->house.m_entities[n];
+					char buf[32];
+					sprintf(buf, entity->m_tag, n);
+					if (ImGui::Selectable(buf, selected == n))
+						selected = n;
+				}
+				ImGui::TreePop();
+			}
+		}
+		ImGui::EndChild();
+		////
+
+		// dragable separator
+		ImGui::InvisibleButton("hsplitter", ImVec2(-1, 8.0f));
+		if (ImGui::IsItemActive())
+			h += ImGui::GetIO().MouseDelta.y;
+		ImGui::Separator();
+		//
+
+		// properties //
+		ImGui::BeginChild("properties", ImVec2(0, 0), true);
+		{
+			if (selected != -1)
+			{
+				Entity* entity = &game->house.m_entities[selected];
+				ImGui::InputText("Tag", entity->m_tag, 64);
+
+				// Build models list
+				std::vector<std::string> modelList;
+				for (Model& model : AssetManager::models)
+					modelList.push_back(model.name);
+
+				// Build materials list
+				std::vector<std::string> materialList;
+				for (Material& material : AssetManager::materials)
+					materialList.push_back(material.name);
+
+				std::vector<std::string> currentModelName;
+				for (int i = 0; i < game->house.m_entities.size(); i++)
+					currentModelName.push_back(AssetManager::GetModelNameByID(game->house.m_entities[i].m_modelID));
+
+				std::vector<std::string> currentMaterialName;
+				for (int i = 0; i < game->house.m_entities.size(); i++)
+					currentMaterialName.push_back(AssetManager::GetMaterialNameByID(game->house.m_entities[i].m_materialID));
+
+				// Show models list
+				if (ImGui::BeginCombo("Model", currentModelName[selected].c_str()))
+				{
+					for (int n = 0; n < modelList.size(); n++)
+					{
+						bool is_selected = (currentModelName[selected] == modelList[n]);
+						if (ImGui::Selectable(modelList[n].c_str(), is_selected)) {
+							entity->m_modelID = AssetManager::GetModelIDByName(modelList[n]);
+						}
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+
+				// Show materials list
+				if (ImGui::BeginCombo("Material", currentMaterialName[selected].c_str()))
+				{
+					for (int n = 0; n < materialList.size(); n++)
+					{
+						bool is_selected = (currentMaterialName[selected] == materialList[n]);
+						if (ImGui::Selectable(materialList[n].c_str(), is_selected)) {
+							entity->m_materialID = AssetManager::GetMaterialIDByName(materialList[n]);
+						}
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+
+
+
+				ImGui::PushItemWidth(200);
+				ImGui::InputFloat3("Position", glm::value_ptr(entity->m_transform.position));
+				ImGui::InputFloat3("Rotation", glm::value_ptr(entity->m_transform.rotation));
+				ImGui::InputFloat3("Scale   ", glm::value_ptr(entity->m_transform.scale));
+			}
+		}
+		ImGui::EndChild();
+		ImGui::PopStyleVar();
+		ImGui::PopStyleVar();
+		
+
+		ImGui::End();
 	}
 
 	void CoreImGui::ShowMapMenu(Game* game)

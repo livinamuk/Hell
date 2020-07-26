@@ -106,7 +106,8 @@ int main()
 			frames++;
 
 			if (CoreImGui::s_Show)
-				CoreImGui::Render(&game);
+				//CoreImGui::Render(&game);
+				CoreImGui::RenderLevelEditor(&game);
 
 			CoreGL::SwapBuffersAndPollEvents();
 		}		

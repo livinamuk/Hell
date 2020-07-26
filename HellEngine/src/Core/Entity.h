@@ -1,5 +1,6 @@
 #pragma once
 #include "Header.h"
+#include "bullet/src/btBulletCollisionCommon.h"
 
 namespace HellEngine
 {
@@ -19,5 +20,6 @@ namespace HellEngine
 		int m_modelID = -1;
 		int m_materialID = -1;
 		char* m_tag = "Entity";
+		btCollisionObject* m_collisionObject;
 	};
 }

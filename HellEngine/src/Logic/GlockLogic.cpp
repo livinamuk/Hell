@@ -43,10 +43,6 @@ namespace HellEngine
 
 	void GlockLogic::Fire()
 	{	
-		// Can't shoot in level editor
-		if (CoreImGui::s_Show)
-			return;
-
 		// Fire empty glock
 		if (m_AmmoInGun == 0) {
 			Audio::PlayAudio("Glock_DryFire.wav");

@@ -343,6 +343,40 @@ namespace HellEngine
 		m_triangleCollisionObject->setCollisionFlags(m_triangleCollisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	}*/
 
+	void Physics::AddWindowsToPhysicsWorld(House* house)
+	{
+		btBoxShape* collisionShape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
+		collisionShape->setLocalScaling(btVector3(btVector3(WINDOW_WIDTH_SINGLE, WINDOW_HEIGHT_SINGLE, 0.1f)));
+
+		for (size_t i = 0; i < house->m_windows.size(); i++)
+		{
+			Window* window = &house->m_windows[i];
+			glm::vec3 position = window->m_transform.position;
+			position.y += WINDOW_HEIGHT_SINGLE / 2.0f;
+
+			btTransform transform;
+			transform.setIdentity();
+			transform.setOrigin(Util::glmVec3_to_btVec3(position));
+			transform.setRotation(Util::glmVec3_to_btQuat(window->m_transform.rotation));
+
+			window->m_collisionObject = new btCollisionObject();
+			window->m_collisionObject->setCollisionShape(collisionShape);
+			window->m_collisionObject->setWorldTransform(transform);
+			window->m_collisionObject->setCustomDebugColor(DEBUG_COLOR_DOOR);
+			EntityData* entityData = new EntityData();
+			entityData->type = PhysicsObjectType::WINDOW;
+			entityData->vectorIndex = i;
+			window->m_collisionObject->setUserPointer(entityData);
+
+			int group = CollisionGroups::HOUSE;
+			int mask = CollisionGroups::EDITOR_ONLY;
+
+			s_dynamicsWorld->addCollisionObject(window->m_collisionObject, group, mask);
+			s_collisionObjects.push_back(window->m_collisionObject);
+			window->m_collisionObject->setCollisionFlags(window->m_collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		}
+	}
+
 	void Physics::AddWallsToPhysicsWorld(House* house)
 	{
 		btTriangleMesh* triangleMesh = new btTriangleMesh();
@@ -436,9 +470,9 @@ namespace HellEngine
 				std::vector<unsigned int>* indices = &AssetManager::models[entity->m_modelID].m_meshes[0]->indices;
 
 				glm::vec3 scale = entity->m_transform.scale;
-				btVector3 vertA = Util::glmVec3_to_btVec3(vertices->at(indices->at(i)).Position * scale);
-				btVector3 vertB = Util::glmVec3_to_btVec3(vertices->at(indices->at(i+1)).Position * scale);
-				btVector3 vertC = Util::glmVec3_to_btVec3(vertices->at(indices->at(i+2)).Position * scale);
+				btVector3 vertA = Util::glmVec3_to_btVec3(vertices->at(indices->at(i)).Position);
+				btVector3 vertB = Util::glmVec3_to_btVec3(vertices->at(indices->at(i+1)).Position);
+				btVector3 vertC = Util::glmVec3_to_btVec3(vertices->at(indices->at(i+2)).Position);
 				triangleMesh->addTriangle(vertA, vertB, vertC);
 			}
 	
@@ -454,26 +488,25 @@ namespace HellEngine
 		btQuaternion q = btQuaternion(entity->m_transform.rotation.y, 0, 0); // this is not always going to work. only for y it does.
 		meshTransform.setRotation((q));
 
-		//meshTransform.setFromOpenGLMatrix(glm::value_ptr(entity->m_transform.to_mat4()));
-
-		btCollisionObject* collisionObject = new btCollisionObject();
-		collisionObject->setCollisionShape(triangleMeshShape);
-		collisionObject->setWorldTransform(meshTransform);
-		collisionObject->setFriction(0.5);
-		collisionObject->setCustomDebugColor(btVector3(1, 0, 0));
+		entity->m_collisionObject = new btCollisionObject();
+		entity->m_collisionObject->setCollisionShape(triangleMeshShape);
+		entity->m_collisionObject->setWorldTransform(meshTransform);
+		entity->m_collisionObject->setFriction(0.5);
+		entity->m_collisionObject->setCustomDebugColor(btVector3(1, 0, 0));
 		EntityData* entityData = new EntityData();
 		entityData->type = PhysicsObjectType::MISC_MESH;
 		entityData->vectorIndex = 0;
-		collisionObject->setUserPointer(entityData);
+		entity->m_collisionObject->setUserPointer(entityData);
+		entity->m_collisionObject->getCollisionShape()->setLocalScaling(Util::glmVec3_to_btVec3(entity->m_transform.scale));
 
 		int group = CollisionGroups::HOUSE;
 		int mask = CollisionGroups::ENTITY | CollisionGroups::ENEMY;
 
-		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);
+		s_dynamicsWorld->addCollisionObject(entity->m_collisionObject, group, mask);
 
-		s_collisionObjects.push_back(collisionObject);
+		s_collisionObjects.push_back(entity->m_collisionObject);
 
-		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		entity->m_collisionObject->setCollisionFlags(entity->m_collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	}
 
 
@@ -739,6 +772,7 @@ namespace HellEngine
 		AddWallsToPhysicsWorld(house);
 		AddFloorsAndCeilingsToPhysicsWorld(house);
 
+		AddWindowsToPhysicsWorld(house);
 
 		for (Entity& entity : house->m_entities)
 			AddEntityToPhysicsWorld(&entity);
@@ -804,6 +838,54 @@ namespace HellEngine
 		trans.getOpenGLMatrix(matrix);
 
 		return Util::btScalar2mat4(matrix);
+	}
+
+	void Physics::SetRigidBodyWorldTransform(btRigidBody& rigidBody, Transform& transform)
+	{
+		// position and rotation
+		btTransform btTrans;
+		btTrans.setIdentity();
+		btTrans.setOrigin(Util::glmVec3_to_btVec3(transform.position));
+
+		glm::quat r = glm::quat(transform.rotation);
+		btTrans.setRotation(btQuaternion(r.x, r.y, r.z, r.w));
+
+		rigidBody.setWorldTransform(btTrans);
+
+		// scale
+		rigidBody.getCollisionShape()->setLocalScaling(Util::glmVec3_to_btVec3(transform.scale));
+	}
+
+	void Physics::SetCollisionObjectWorldTransform(btCollisionObject* collisionObject, Transform& transform)
+	{
+		// position and rotation
+		btTransform btTrans;
+		btTrans.setIdentity();
+		btTrans.setOrigin(Util::glmVec3_to_btVec3(transform.position));
+
+		glm::quat r = glm::quat(transform.rotation);
+		btTrans.setRotation(btQuaternion(r.x, r.y, r.z, r.w));
+
+		collisionObject->setWorldTransform(btTrans);
+
+		// scale
+		collisionObject->getCollisionShape()->setLocalScaling(Util::glmVec3_to_btVec3(transform.scale));
+	}
+
+	void Physics::SetCollisionObjectWorldTranslation(btCollisionObject* collisionObject, const glm::vec3& position, glm::vec3 orginOffset)
+	{
+		btTransform btTrans;
+		btTrans = collisionObject->getWorldTransform();
+		btTrans.setOrigin(Util::glmVec3_to_btVec3(position + orginOffset));
+		collisionObject->setWorldTransform(btTrans);
+	}
+
+	void Physics::SetCollisionObjectWorldRotation(btCollisionObject* collisionObject, const glm::vec3& rotation)
+	{
+		btTransform btTrans;
+		btTrans = collisionObject->getWorldTransform();
+		btTrans.setRotation(Util::glmVec3_to_btQuat(rotation));
+		collisionObject->setWorldTransform(btTrans);
 	}
 }
 

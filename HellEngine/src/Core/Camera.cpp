@@ -51,8 +51,14 @@ namespace HellEngine
 
 	void Camera::CalculateProjectionMatrix(int screenWidth, int screenHeight)
 	{
+		float zoom = m_zoomFactor;
+
+		// No zooming in level editor
+		if (CoreImGui::s_Show)
+			zoom = 0;
+
 		//m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, FAR_PLANE);
-		m_projectionMatrix = glm::perspective(1 - m_zoomFactor, (float)screenWidth / (float)screenHeight, NEAR_PLANE, 1000.0f);
+		m_projectionMatrix = glm::perspective(1 - zoom, (float)screenWidth / (float)screenHeight, NEAR_PLANE, 1000.0f);
 		m_inversePprojectionMatrix = glm::inverse(m_projectionMatrix);
 	}
 

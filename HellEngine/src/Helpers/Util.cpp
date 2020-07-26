@@ -21,6 +21,14 @@ namespace HellEngine
 		return cross(v, other);
 	}
 
+	void Util::RotateAxisBy90(Axis& axis)
+	{ 
+		int x = (int)axis;
+		x++;
+		x = x % 4;
+		axis = (Axis)x;
+	}
+
 	char* Util::PhysicsObjectEnumToString(PhysicsObjectType objectType)
 	{		
 		if (objectType == PhysicsObjectType::UNDEFINED)
@@ -43,6 +51,8 @@ namespace HellEngine
 			return "SHELL_PROJECTILE";
 		if (objectType == PhysicsObjectType::MISC_MESH)
 			return "MISC_MESH";
+		if (objectType == PhysicsObjectType::WINDOW)
+			return "WINDOW";
 	}
 
 	btQuaternion Util::GetQuatBetween2Points(glm::vec3 P0, glm::vec3 P1)
@@ -222,6 +232,13 @@ namespace HellEngine
 	{
 		return btVector3(vector.x, vector.y, vector.z);
 	}
+
+	btQuaternion Util::glmVec3_to_btQuat(glm::vec3 vector)
+	{
+		glm::quat r = glm::quat(vector);
+		return btQuaternion(r.x, r.y, r.z, r.w);
+	}
+
 	glm::vec3 Util::btVec3_to_glmVec3(btVector3 vector)
 	{
 		return glm::vec3(vector.x(), vector.y(), vector.z());

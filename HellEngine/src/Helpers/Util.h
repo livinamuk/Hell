@@ -16,6 +16,7 @@ namespace HellEngine
 	class Util
 	{
 	public:
+		static void RotateAxisBy90(Axis& axis);
 		static char* PhysicsObjectEnumToString(PhysicsObjectType objectType);
 		static btQuaternion GetQuatBetween2Points(glm::vec3 a, glm::vec3 b);
 		static const char* CopyConstChar(const char* text);;
@@ -43,7 +44,8 @@ namespace HellEngine
 		static glm::vec3 SetRotationByAxis(Axis axis);
 		static std::string FileNameFromPath(std::string filepath);
 		static FileType FileTypeFromPath(std::string filepath);
-		static btVector3 glmVec3_to_btVec3(glm::vec3);
+		static btVector3 glmVec3_to_btVec3(glm::vec3 vector);
+		static btQuaternion glmVec3_to_btQuat(glm::vec3 vector);
 		static glm::vec3 btVec3_to_glmVec3(btVector3);
 		static std::string Vec3_to_String(glm::vec3 vector);
 

@@ -73,7 +73,7 @@ namespace HellEngine
 			Renderer::m_showBulletDebug = !Renderer::m_showBulletDebug;
 
 		// Toggle ImGui
-		if (s_keyPressed[HELL_KEY_I])
+		if (s_keyPressed[HELL_KEY_GRAVE_ACCENT])
 		{
 			CoreImGui::s_Show = !CoreImGui::s_Show;
 

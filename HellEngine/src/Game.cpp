@@ -83,6 +83,7 @@ namespace HellEngine
 		std::cout << "\n";
 		AssetManager::PrintSkinnedModelBoneNames("Shotgun.fbx");*/
 		std::cout << "\n";
+
 	}
 
 	void Game::OnUpdate()

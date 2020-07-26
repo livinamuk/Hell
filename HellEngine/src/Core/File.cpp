@@ -135,8 +135,7 @@ namespace HellEngine {
 				house.AddLight(Light(position, color, radius, strength, magic, Transform(modelPosition, modelRotation, modelScale)));
 			}
 		}
-
-		
+		// Entities
 		if (document.HasMember("ENTITIES"))
 		{
 			const rapidjson::Value& entities = document["ENTITIES"];

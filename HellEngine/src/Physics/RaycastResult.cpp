@@ -138,7 +138,7 @@ namespace HellEngine
 
 		if (RayCallback.hasHit())
 		{
-			std::cout << "HIT: ";
+			//std::cout << "HIT: ";
 
 			// Collision object
 			btVector3 objectCOM = RayCallback.m_collisionObject->getWorldTransform().getOrigin();
@@ -161,7 +161,7 @@ namespace HellEngine
 				raycastResult.m_elementIndex = entityData->vectorIndex;
 				raycastResult.m_objectType = entityData->type;
 				
-				std::cout << Util::PhysicsObjectEnumToString(raycastResult.m_objectType) << "\n";
+				//std::cout << Util::PhysicsObjectEnumToString(raycastResult.m_objectType) << "\n";
 			}
 		}
 		return raycastResult;

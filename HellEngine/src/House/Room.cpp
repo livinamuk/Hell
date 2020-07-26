@@ -105,8 +105,8 @@ namespace HellEngine
 			doorWay.axis = window.m_axis;
 			doorWay.parent = &window;
 			doorWay.bottom_Y = (window.m_story * ROOM_HEIGHT) + window.m_startHeight - 0.05F;;
-			doorWay.top_Y = (window.m_story * ROOM_HEIGHT) + window.m_startHeight + 1.15f; // hardcoded height of main window model
-			doorWay.width = 0.75; // hardcoded width of main window model
+			doorWay.top_Y = (window.m_story * ROOM_HEIGHT) + window.m_startHeight + WINDOW_HEIGHT_SINGLE;
+			doorWay.width = WINDOW_WIDTH_SINGLE;
 			potentialConnectedDoorWays.push_back(doorWay);
 		}
 

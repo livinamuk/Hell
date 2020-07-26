@@ -9,7 +9,7 @@ namespace HellEngine
 		EditorBuffer();
 
 		unsigned int ID;
-		unsigned int HoverTexture, SelectedTexture;
+		unsigned int HoverTexture;// , SelectedTexture;
 
 		void Configure(int width, int height);
 	};

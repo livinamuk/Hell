@@ -9,6 +9,7 @@ namespace HellEngine
 	{
 		m_transform.position.x = xPos;
 		m_transform.position.z = zPos;
+		//m_transform.scale = glm::vec3(WINDOW_WIDTH_SINGLE, WINDOW_HEIGHT_SINGLE, 0.1f); // Used for level editor mouse picking
 		m_story = story;
 		m_axis = axis;
 		m_startHeight = height;

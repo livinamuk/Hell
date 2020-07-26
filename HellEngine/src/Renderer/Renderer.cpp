@@ -64,9 +64,6 @@ namespace HellEngine
 	float Renderer::s_polygonFactor;
 	float Renderer::s_polygonUnits;
 
-	//LightProbeGrid Renderer::s_LightProbeGrid;
-
-	//LightProbe Renderer::s_LightProbe;
 	CameraEnvMap Renderer::s_CameraEnvMap;
 
 	GBuffer Renderer::s_gBuffer;
@@ -83,11 +80,8 @@ namespace HellEngine
 
 	bool Renderer::m_showBulletDebug = false;
 	bool Renderer::m_showDebugTextures = false;
-//	bool Renderer::m_showImGui = false;
 	bool Renderer::b_showCubemap = false;
 	bool Renderer::b_renderDoorWayVolumes = true;
-
-
 
 
 	void Renderer::Init()
@@ -958,8 +952,8 @@ namespace HellEngine
 		text += std::to_string(WeaponLogic::s_SelectedWeapon);
 		text += "\n";*/
 
-		//s_debugString = Util::Mat4ToString(WeaponLogic::s_AnimatedCameraMatrix);
-		//text += s_debugString;
+		s_debugString = Util::Mat4ToString(WeaponLogic::s_AnimatedCameraMatrix);
+		text += s_debugString;
 
 		TextBlitter::BlitText(text, false);
 		{
@@ -1869,6 +1863,7 @@ namespace HellEngine
 		shader->setMat4("projection", game->camera.m_projectionMatrix);
 		shader->setMat4("view", game->camera.m_viewMatrix);
 
+		LevelEditor::Update(game);
 		LevelEditor::DrawOverlay(shader, game);
 	}
 

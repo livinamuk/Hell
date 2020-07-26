@@ -1,5 +1,6 @@
 #pragma once
 #include "Header.h"
+#include "bullet/src/btBulletCollisionCommon.h"
 
 namespace HellEngine
 {
@@ -16,5 +17,6 @@ namespace HellEngine
 		float m_startHeight;
 		Axis m_axis;
 		int m_story;
+		btCollisionObject* m_collisionObject; // for mouse picking in the level editor
 	};
 }

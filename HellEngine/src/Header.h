@@ -60,6 +60,8 @@
 #define DOOR_HEIGHT		2.0f	
 #define FLOOR_TRIM_HEIGHT	0.091f
 #define CEILING_TRIM_HEIGHT	0.082f
+#define WINDOW_WIDTH_SINGLE 0.75f
+#define WINDOW_HEIGHT_SINGLE 1.15f
 
 #define SCR_WIDTH 1280
 #define SCR_HEIGHT 720
@@ -76,7 +78,8 @@ enum CollisionGroups {
 	PLAYER = 1 << 1,
 	PROJECTILES = 1 << 2,
 	ENTITY = 2 << 3,
-	ENEMY = 3 << 4
+	ENEMY = 3 << 4,
+	EDITOR_ONLY = 4 << 5
 };
 
 struct Opp {
@@ -135,7 +138,7 @@ struct Line {
 	glm::vec3 end_color;
 };
 
-enum class PhysicsObjectType { UNDEFINED, WALL, DOOR, FLOOR, STAIRS, PLAYER, RAGDOLL, CEILING, SHELL_PROJECTILE, MISC_MESH};
+enum class PhysicsObjectType { UNDEFINED, WALL, WINDOW, DOOR, FLOOR, STAIRS, PLAYER, RAGDOLL, CEILING, SHELL_PROJECTILE, MISC_MESH};
 
 struct EntityData {
 	//char* name = "NONE";
@@ -144,9 +147,10 @@ struct EntityData {
 	PhysicsObjectType type;
 };
 
+enum GizmoState { MOVE, ROTATE, SCALE };
 enum FileType { FBX, OBJ, PNG, JPG, UNKNOWN };
 enum AssetType { TEXTURE, MODEL, AUDIO};
-enum Axis { POS_X, NEG_X, POS_Z, NEG_Z };
+enum Axis { POS_X, POS_Z, NEG_X, NEG_Z };
 enum PlayerMovementState { STOPPED, WALKING, RUNNING };
 enum RunningAnimationState { STARTING, LOOPING, ENDING, NOT_RUNNING};
 

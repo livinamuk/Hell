@@ -49,6 +49,10 @@ namespace HellEngine
 	
 	void WeaponLogic::Update(float deltaTime)
 	{
+		// Don't do shit if the level editor is open
+		if (CoreImGui::s_Show)
+			return;
+
 		// not sure how but this seems to be running twice. LOOK INTO IT!!!
 
 		// clear any bullet hits from last frame

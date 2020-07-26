@@ -69,8 +69,14 @@ namespace HellEngine
 
 		static glm::mat4 GetModelMatrixFromRigidBody(btRigidBody* rigidBody);
 
+		static void SetRigidBodyWorldTransform(btRigidBody& rigidBody, Transform& transform);
+		static void SetCollisionObjectWorldTransform(btCollisionObject* collisionObject, Transform& transform);
+		static void SetCollisionObjectWorldTranslation(btCollisionObject* collisionObject, const glm::vec3& position, glm::vec3 orginOffset = glm::vec3(0));
+		static void SetCollisionObjectWorldRotation(btCollisionObject* collisionObject, const glm::vec3& rotation);
+
 	public: // Methods
 		//void AddGroundToPhysicsWorld();
+		static void AddWindowsToPhysicsWorld(House* house);
 		static void AddWallsToPhysicsWorld(House* house);
 		static void AddStaircaseToPhysicsWorld(House* house);
 		static void AddFloorsAndCeilingsToPhysicsWorld(House* house);

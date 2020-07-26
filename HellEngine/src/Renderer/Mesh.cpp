@@ -28,6 +28,8 @@ namespace HellEngine
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 			glEnableVertexAttribArray(1);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+
+			std::cout << "rahat pe batz:" << GetLastError() << std::endl;
 			
 			
 	//		float vertices[] = {
@@ -65,10 +67,10 @@ namespace HellEngine
 		GpuProfiler g("Mesh");
 		glBindVertexArray(VAO);
 
-		if (std::string(name).compare("TRIANGLE_CLOUD") == 0) {
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, HellEngine::AssetManager::GetTexIDByName("Blood10"));
-		}
+		//if (std::string(name).compare("TRIANGLE_CLOUD") == 0) {
+		//	glActiveTexture(GL_TEXTURE0);
+		//	glBindTexture(GL_TEXTURE_2D, HellEngine::AssetManager::GetTexIDByName("Blood10"));
+		//}
 
 		glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
 	}

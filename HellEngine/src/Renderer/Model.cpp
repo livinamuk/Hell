@@ -104,6 +104,10 @@ namespace HellEngine
 //				}
 //			}
 
+			if (std::string("res/models/blood/blood1/blood_cube_test.obj").compare(std::string(m_filePath)) == 0) {
+				std::cout << " rahat pe batz! " << vertices.size() << std::endl;
+			}
+
 			for (int i = 0; i < indices.size(); i += 3) {
 				Util::SetNormalsAndTangentsFromVertices(&vertices[indices[i]], &vertices[indices[i + 1]], &vertices[indices[i + 2]]);
 			}

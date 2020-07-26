@@ -33,14 +33,22 @@ void main() {
 
 	float expand = u_BoundingMax - u_BoundingMin;
 	texturePos.xyz *= expand;
-	texturePos.xyz += u_BoundingMin;
+	//texturePos.xyz += u_BoundingMin;
+	texturePos.xyz += vec3(u_BoundingMin, u_BoundingMin, u_BoundingMin);
 	texturePos.x *= -1;
-
 	vec3 vertexPos = texturePos.xyz + u_HeightOffset.xyz;
-	
-	v_WorldNormal = textureNorm.xyz * 2; 
-	v_WorldNormal.x = 1 - v_WorldNormal.x;
 
+	/*float temp = vertexPos.x;
+	vertexPos.x = -vertexPos.z;
+	vertexPos.z = -temp;*/
+	//vertexPos.y = -vertexPos.y;
+	//vertexPos.x = -vertexPos.x;
+
+	//vertexPos.y += 71;
+		
+	v_WorldNormal = textureNorm.xyz * 2 - vec3(1, 1, 1); 
+	v_WorldNormal.x = -v_WorldNormal.x;
+	
 	v_ViewDir = (u_MatrixInverseWorld * vec4(u_WorldSpaceCameraPos, 1.0)).xyz - vertexPos;
 
 	gl_Position = u_MatrixProjection * u_MatrixView * u_MatrixWorld * vec4(vertexPos, 1.0);

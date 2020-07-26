@@ -8,7 +8,8 @@ namespace HellEngine
 {
 
 	void BloodEffectVolumetric::Init() {
-		bloodModel = std::make_unique<Model>("res/models/blood/blood1/blood_mesh.obj"); 
+		//bloodModel = std::make_unique<Model>("res/models/blood/blood1/blood_cube_test.obj");
+		bloodModel = std::make_unique<Model>("res/models/blood/blood1/blood_mesh.obj");
 		bloodModel->ReadFromDisk();
 		transform = Transform{ glm::vec3(+0.036f, -0.037f, -0.128f), glm::vec3(glm::radians(0.000f), glm::radians(90.000f), glm::radians(90.000f)), glm::vec3(1.00f, 1.0f, 1.0f) };
 
@@ -56,7 +57,7 @@ namespace HellEngine
 		rot.rotation.y = HELL_PI * 1.5f;
 		rot.rotation.x = -HELL_PI / 2;
 
-		shader->setInt("u_PosTex", 0);
+		shader->setInt("u_PosTex",0);
 		shader->setInt("u_NormTex", 1);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -65,7 +66,10 @@ namespace HellEngine
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, HellEngine::AssetManager::GetTexIDByName("blood1_norm"));
 
-		const glm::mat4 &matrix = global.to_mat4() * rot.to_mat4() * transform.blood_mat4();
+		//std::cout << global.position.x << " " << global.position.y << " " << global.position.z << std::endl;
+		//std::cout << transform.position.x << " " << transform.position.y << " " << transform.position.z << std::endl;
+
+		const glm::mat4& matrix = global.to_mat4() /*rot.to_mat4() */* transform.to_mat4();
 		shader->setMat4("u_MatrixWorld", matrix);
 		shader->setMat4("u_MatrixInverseWorld", glm::inverse(matrix));
 
@@ -82,7 +86,7 @@ namespace HellEngine
 		shader->setFloat("u_LightIntensity", 1.6f);
 		shader->setVec3("u_SunPos", glm::vec3(0.56f, 1.07f, -0.09f));
 
-		bloodModel->Draw(shader, transform.blood_mat4());
+		bloodModel->Draw(shader, matrix);
 
 		glDepthMask(true);
 		glDisable(GL_BLEND);

@@ -32,19 +32,13 @@ void main() {
 	//TODO gamma corection might be needed
 
 	float expand = u_BoundingMax - u_BoundingMin;
+	//texturePos.z = -texturePos.z;
 	texturePos.xyz *= expand;
 	//texturePos.xyz += u_BoundingMin;
-	texturePos.xyz += vec3(u_BoundingMin, u_BoundingMin, u_BoundingMin);
-	texturePos.x *= -1;
+	//texturePos.x *= -1;
 	vec3 vertexPos = texturePos.xyz + u_HeightOffset.xyz;
-
-	/*float temp = vertexPos.x;
-	vertexPos.x = -vertexPos.z;
-	vertexPos.z = -temp;*/
-	//vertexPos.y = -vertexPos.y;
-	//vertexPos.x = -vertexPos.x;
-
-	//vertexPos.y += 71;
+	//vertexPos.z = -vertexPos.z;
+	//vec3 vertexPos = texturePos.xyz;
 		
 	v_WorldNormal = textureNorm.xyz * 2 - vec3(1, 1, 1); 
 	v_WorldNormal.x = -v_WorldNormal.x;

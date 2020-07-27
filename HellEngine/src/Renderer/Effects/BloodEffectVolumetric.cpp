@@ -48,16 +48,24 @@ namespace HellEngine
 
 		GpuProfiler g("BloodEffectVolumetric");
 		glDepthMask(false);
+
+		//glDisable(GL_DEPTH_TEST);
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		shader->use();
 
-		Transform rot;
-		rot.rotation.y = HELL_PI * 1.5f;
-		rot.rotation.x = -HELL_PI / 2;
+		//Transform rot;
+		//rot.rotation.y = HELL_PI * 1.5f;
+		//rot.rotation.x = -HELL_PI / 2;
 
-		shader->setInt("u_PosTex",0);
+		Transform transformBlood;
+		transformBlood.scale = glm::vec3(0.03f, 0.03f, 0.03f);
+		//transformBlood.rotation = glm::vec3(0, glm::radians(-180.000f), 0);
+		transformBlood.position = global.position;
+
+		shader->setInt("u_PosTex", 0);
 		shader->setInt("u_NormTex", 1);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -69,18 +77,19 @@ namespace HellEngine
 		//std::cout << global.position.x << " " << global.position.y << " " << global.position.z << std::endl;
 		//std::cout << transform.position.x << " " << transform.position.y << " " << transform.position.z << std::endl;
 
-		const glm::mat4& matrix = global.to_mat4() /*rot.to_mat4() */* transform.to_mat4();
+		const glm::mat4& matrix = /*global.to_mat4() * */transformBlood.to_mat4(); /*rot.to_mat4() *///*transform.to_mat4();
+		
 		shader->setMat4("u_MatrixWorld", matrix);
 		shader->setMat4("u_MatrixInverseWorld", glm::inverse(matrix));
 
 		shader->setFloat("u_BoundingMax", 144);
-		shader->setFloat("u_BoundingMin", -86.7f);
+		shader->setFloat("u_BoundingMin", -116);
 		shader->setFloat("u_Speed", 35);
-		shader->setInt("u_NumOfFrames", 74);
-		shader->setVec4("u_HeightOffset", glm::vec4(-77.4f, -19.48f, 27.6f, 1));
+		shader->setInt("u_NumOfFrames", 81);
+		shader->setVec4("u_HeightOffset", glm::vec4(-45.4f, -26.17f, 12.7f, 1));
 
 		shader->setFloat("u_TimeInFrames", timeInFrames);
-		shader->setVec3("u_WorldSpaceCameraPos", GlockLogic::p_camera->m_transform.position);
+		shader->setVec3("u_WorldSpaceCameraPos", GlockLogic::p_camera->m_viewPos); 
 
 		shader->setVec4("u_Color", glm::vec4(0.6f, 0, 0, 1));
 		shader->setFloat("u_LightIntensity", 1.6f);
@@ -90,6 +99,8 @@ namespace HellEngine
 
 		glDepthMask(true);
 		glDisable(GL_BLEND);
+
+		//glEnable(GL_DEPTH_TEST);
 	}
 
 }

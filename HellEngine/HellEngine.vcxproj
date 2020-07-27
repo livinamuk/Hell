@@ -168,7 +168,6 @@
     <ClInclude Include="src\GL\ChromaticAbberationBuffer.h" />
     <ClInclude Include="src\GL\CubeMapArray.h" />
     <ClInclude Include="src\GL\DOFBuffer.h" />
-    <ClInclude Include="src\GL\EditorBuffer.h" />
     <ClInclude Include="src\GL\EnvCubeMap.h" />
     <ClInclude Include="src\GL\FXAABuffer.h" />
     <ClInclude Include="src\GL\FinalImageBuffer.h" />
@@ -639,7 +638,6 @@
     <ClCompile Include="src\GL\ChromaticAbberationBuffer.cpp" />
     <ClCompile Include="src\GL\CubeMapArray.cpp" />
     <ClCompile Include="src\GL\DOFBuffer.cpp" />
-    <ClCompile Include="src\GL\EditorBuffer.cpp" />
     <ClCompile Include="src\GL\FXAABuffer.cpp" />
     <ClCompile Include="src\GL\FinalImageBuffer.cpp" />
     <ClCompile Include="src\GL\GBuffer.cpp" />

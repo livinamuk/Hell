@@ -87,7 +87,6 @@
     <ClCompile Include="vendor\fmod\include\common.cpp" />
     <ClCompile Include="vendor\fmod\include\common_platform.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
-    <ClCompile Include="src\GL\EditorBuffer.cpp" />
     <ClCompile Include="src\Core\LevelEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -559,7 +558,6 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp" />
     <ClInclude Include="vendor\stb_image\stb_image.h" />
     <ClInclude Include="vendor\tinyobj\tiny_obj_loader.h" />
-    <ClInclude Include="src\GL\EditorBuffer.h" />
     <ClInclude Include="src\Core\LevelEditor.h" />
   </ItemGroup>
   <ItemGroup>

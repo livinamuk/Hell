@@ -72,7 +72,6 @@ namespace HellEngine
 	DOFBuffer Renderer::s_DOFBuffer;
 	FXAABuffer Renderer::s_FXAABuffer;
 	ChromaticAbberationBuffer Renderer::s_ChromaticAbberationBuffer;
-	EditorBuffer Renderer::s_EditorBuffer;
 
 	std::vector<BlurBuffer> Renderer::s_BlurBuffers;
 
@@ -124,7 +123,6 @@ namespace HellEngine
 		s_DOFBuffer = DOFBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		s_ChromaticAbberationBuffer = ChromaticAbberationBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		s_FXAABuffer = FXAABuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
-		s_EditorBuffer = EditorBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 
 		s_BlurBuffers.push_back(BlurBuffer(SCR_WIDTH / 2, SCR_HEIGHT / 2));
 		s_BlurBuffers.push_back(BlurBuffer(SCR_WIDTH / 4, SCR_HEIGHT / 4));
@@ -513,13 +511,13 @@ namespace HellEngine
 		}
 
 		{
-			GpuProfiler g("BlurPass");
-			BlurPass(&s_blurVerticalShader, &s_blurHorizontalShader);
+			GpuProfiler g("EditorOverlayPass");
+			EditorOverlayPass(game, &s_SolidColor3D);
 		}
 
 		{
-			GpuProfiler g("EditorOverlayPass");
-			EditorOverlayPass(game, &s_SolidColor3D);
+			GpuProfiler g("BlurPass");
+			BlurPass(&s_blurVerticalShader, &s_blurHorizontalShader);
 		}
 
 		{
@@ -550,7 +548,7 @@ namespace HellEngine
 			else
 				//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
 			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, game->house.m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
-				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_EditorBuffer.HoverTexture, s_gBuffer.gFinalLighting);
+				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gLevelEditorOverlay, s_gBuffer.gFinalLighting);
 			//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
 		}
 
@@ -1154,6 +1152,9 @@ namespace HellEngine
 		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		glm::mat4 VP;
 		
+		// Clear the lighting texture
+		glClearTexImage(s_gBuffer.gFinalLighting, 0, GL_RGB, GL_FLOAT, 0);
+
 		if (s_demo)
 			VP = glm::mat4(1);
 
@@ -1413,7 +1414,7 @@ namespace HellEngine
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, s_BlurBuffers[3].textureA);
 		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_2D, s_EditorBuffer.HoverTexture);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gLevelEditorOverlay);
 
 		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		Quad2D::RenderQuad(shader);
@@ -1850,15 +1851,16 @@ namespace HellEngine
 
 	void Renderer::EditorOverlayPass(Game* game, Shader* shader)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, s_EditorBuffer.ID);
-		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
-		glClear(GL_COLOR_BUFFER_BIT);
-
 		if (!CoreImGui::s_Show)
 			return;
 
-		glDisable(GL_DEPTH_TEST);
+		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 
+		unsigned int attachments[1] = { GL_COLOR_ATTACHMENT5 };
+		glDrawBuffers(1, attachments);
+		glDepthFunc(GL_LEQUAL);
+	
 		shader->use();
 		shader->setMat4("projection", game->camera.m_projectionMatrix);
 		shader->setMat4("view", game->camera.m_viewMatrix);

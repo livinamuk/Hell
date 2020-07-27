@@ -43,7 +43,7 @@ void main()
 	blur += texture(blur3, TexCoords).rgb;
 	
 	// Level Editor overlay
-	vec3 editor  = vec3(texture(EditorHover_Texture, TexCoords)); 
-
+	vec3 editor  = vec3(texture(EditorHover_Texture, TexCoords));
+	
 	Composite = lighting + blur + (editor * 0.5);
 }

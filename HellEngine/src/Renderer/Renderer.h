@@ -11,7 +11,6 @@
 #include "GL/ChromaticAbberationBuffer.h"
 #include "GL/CameraEnvMap.h"
 #include "GL/GpuProfiling.h"
-#include "GL/EditorBuffer.h"
 #include "TextBlitter.h"
 #include "House/Light.h"
 
@@ -115,7 +114,6 @@ namespace HellEngine
 		static DOFBuffer s_DOFBuffer;
 		static FXAABuffer s_FXAABuffer;
 		static ChromaticAbberationBuffer s_ChromaticAbberationBuffer;
-		static EditorBuffer s_EditorBuffer;
 
 		// Env maps
 		//static LightProbe s_LightProbe;

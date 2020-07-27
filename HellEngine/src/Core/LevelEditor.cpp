@@ -49,7 +49,13 @@ namespace HellEngine
 
 	void LevelEditor::DrawObject(Shader* shader, Game* game, PhysicsObjectType objectType, unsigned int parentIndex)
 	{
-		// Is it a door?
+		// This function is drawins the white and pink solid colour objects,
+		// for the hoverered and selected item.
+
+		// Scale object overlay ever so slightly
+		static glm::mat4 scaleMatrix = Transform(glm::vec3(0), glm::vec3(0), glm::vec3(1.01f)).to_mat4();
+
+		// Door?
 		if (objectType == PhysicsObjectType::DOOR)
 		{
 			Door* door = &game->house.m_doors[parentIndex];
@@ -57,9 +63,32 @@ namespace HellEngine
 			glm::vec3 boxScaling = Util::btVec3_to_glmVec3(door->m_rigidBody->getCollisionShape()->getLocalScaling());
 			Transform boxTransform = Transform(glm::vec3(0, DOOR_HEIGHT / 2, 0), glm::vec3(0), boxScaling);
 			Cube::Draw(shader, worldMatrix * boxTransform.to_mat4());
+			door->Draw(shader);
 		}
 
-		if (objectType == PhysicsObjectType::MISC_MESH)
+		// Window?
+		else if (objectType == PhysicsObjectType::WINDOW)
+		{
+			Window* window = &game->house.m_windows[parentIndex];
+			glm::mat4 worldMatrix = window->m_transform.to_mat4();
+			glm::vec3 boxScaling = Util::btVec3_to_glmVec3(window->m_collisionObject->getCollisionShape()->getLocalScaling());
+			Transform boxTransform = Transform(glm::vec3(0, WINDOW_HEIGHT_SINGLE / 2, 0), glm::vec3(0), boxScaling);
+			Cube::Draw(shader, worldMatrix * boxTransform.to_mat4());
+			window->Draw(shader);
+		}
+
+		// Room?
+		else if (objectType == PhysicsObjectType::FLOOR)
+		{
+			Room* room= &game->house.m_rooms[parentIndex];
+			Transform worldTransform;
+			worldTransform.position = glm::vec3(room->m_position.x, room->m_story * ROOM_HEIGHT, room->m_position.y);
+			worldTransform.scale = glm::vec3(room->m_size.x, 0.025f, room->m_size.y);
+			Cube::Draw(shader, worldTransform.to_mat4());
+		}
+
+		// Misc mesh
+		else if (objectType == PhysicsObjectType::MISC_MESH)
 		{
 			Entity* entity = &game->house.m_entities[parentIndex];
 			entity->Draw(shader);
@@ -93,9 +122,20 @@ namespace HellEngine
 		}
 
 		// Windows
-		if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
+		else if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
 		{
 			s_fptr_GizmoMatrix = (float*)glm::value_ptr(game->house.m_windows[i].m_transform.to_mat4());
+			EnableSnapToGrid(0.1);
+			SetControlSceheme(GizmoControlScheme::MOVE_WITH_RIGHT_CLICK_TO_ROTATE);
+		}
+		// Room?
+		else if (s_SelectedObjectType == PhysicsObjectType::FLOOR)
+		{
+			Room* room = &game->house.m_rooms[i];
+			Transform worldTransform;
+			worldTransform.position = glm::vec3(room->m_position.x, room->m_story * ROOM_HEIGHT, room->m_position.y);
+			worldTransform.scale = glm::vec3(room->m_size.x, 0.025f, room->m_size.y);
+			s_fptr_GizmoMatrix = (float*)glm::value_ptr(worldTransform.to_mat4());
 			EnableSnapToGrid(0.1);
 			SetControlSceheme(GizmoControlScheme::MOVE_WITH_RIGHT_CLICK_TO_ROTATE);
 		}
@@ -136,8 +176,9 @@ namespace HellEngine
 		// Doors
 		if (s_SelectedObjectType == PhysicsObjectType::DOOR)
 		{
-			//Door* door = &game->house.m_doors[i];
-			//SetTranslationFromGizmo(s_fptr_GizmoMatrix, door->m_rootTransform.position);
+			Door* door = &game->house.m_doors[i];
+			SetTranslationFromGizmo(s_fptr_GizmoMatrix, door->m_rootTransform.position);
+			door->Reconfigure();
 		}
 		// Windows
 		if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
@@ -165,7 +206,7 @@ namespace HellEngine
 		if (s_SelectedObjectType == PhysicsObjectType::DOOR) {
 			Door* door = &game->house.m_doors[s_SelectedOjectIndex];
 			Util::RotateAxisBy90(door->m_axis);
-			door->Reconfigure();
+			
 		}
 		// Windows
 		if (s_SelectedObjectType == PhysicsObjectType::WINDOW) {
@@ -205,7 +246,7 @@ namespace HellEngine
 		s_GizmoControlScheme = GizmoControlScheme;
 
 		if (s_GizmoControlScheme == GizmoControlScheme::MOVE_WITH_RIGHT_CLICK_TO_ROTATE)
-			s_gizmoState == GizmoState::MOVE;
+			s_gizmoState = GizmoState::MOVE;
 	}
 
 	//void LevelEditor::SetGizmoMatrix(glm::mat4 matrix)

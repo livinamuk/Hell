@@ -350,7 +350,6 @@ namespace HellEngine
 	void CoreGL::ToggleFullScreen()
 	{
 		CoreGL::SetFullscreen(!CoreGL::IsFullscreen());
-		Renderer::s_EditorBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		Renderer::s_gBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		Renderer::s_LightingBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		Renderer::s_FinalImageBuffer.Configure(CoreGL::s_windowWidth, CoreGL::s_windowHeight);

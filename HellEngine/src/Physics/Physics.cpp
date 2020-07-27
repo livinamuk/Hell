@@ -93,12 +93,13 @@ namespace HellEngine
 	void Physics::AddFloorsAndCeilingsToPhysicsWorld(House* house)
 	{
 		btTriangleMesh* triangleMesh = new btTriangleMesh();
-		for (Room& room : house->m_rooms)
+		for (size_t i = 0; i < house->m_rooms.size(); i++)
 		{
-			float roomX = room.m_position.x;
-			float roomZ = room.m_position.y;
-			float roomWidth = room.m_size.x;
-			float roomDepth = room.m_size.y;
+			Room* room = &house->m_rooms[i];
+			float roomX = room->m_position.x;
+			float roomZ = room->m_position.y;
+			float roomWidth = room->m_size.x;
+			float roomDepth = room->m_size.y;
 
 			// Create the ground
 			btBoxShape* groundShape = new btBoxShape(btVector3(btScalar(roomWidth/2), btScalar(0.2), btScalar(roomDepth/2)));
@@ -117,6 +118,7 @@ namespace HellEngine
 
 			EntityData* entityData = new EntityData();
 			entityData->type = PhysicsObjectType::FLOOR;
+			entityData->vectorIndex = i;
 			floor->setUserPointer(entityData);
 
 		//	btBoxShape* collisionShape = new btBoxShape(btVector3(0.5, 0.5, 0.5));

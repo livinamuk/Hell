@@ -131,6 +131,7 @@ namespace HellEngine
 		// draw mesh
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
 
@@ -161,4 +162,12 @@ namespace HellEngine
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
+
+	/*void WallMesh::BuildFromWallSegments(std::vector<WallSegment> wallSegments)
+	{
+		for (WallSegment& segment : wallSegments)
+		{
+			//glm::vec3 
+		}
+	}*/
 }

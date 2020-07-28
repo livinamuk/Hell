@@ -187,55 +187,62 @@ namespace HellEngine
 		float wallWidth;
 		float ROOM_Y = (m_story * STORY_HEIGHT);
 		float bias = 0.01; // to hide cracks
+		float cursorX;
+		float cursorZ;
 		
-		// Front walls		
-		float cursorX = low_x;
-		float cursorZ = low_z;
-		for (int i = 0; i < m_doorWaysXFrontWall.size(); i++) 
+		/////////////////
+		// Front walls //
 		{
-			wallWidth = m_doorWaysXFrontWall[i].position.x - cursorX - (DOOR_WIDTH / 2);
-			m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX + wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), POS_X); // wall
-			//CreateCollisionObject(glm::vec3(cursorX+wallWidth/2, ROOM_Y+ROOM_HEIGHT/2, cursorZ-0.025f), glm::vec3(wallWidth, ROOM_HEIGHT, 0.05f));
-			AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), 0, wallWidth);
-			AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), 0, wallWidth);
-			cursorX += wallWidth + DOOR_WIDTH;
+			cursorX = low_x;
+			cursorZ = low_z;
+			for (int i = 0; i < m_doorWaysXFrontWall.size(); i++) {
 
-			//if (m_doorWaysFrontWall[i].type == DoorWayType::DOOR) {
-				m_wallMesh.AddQuad(glm::vec3(cursorX - DOOR_WIDTH, DOOR_HEIGHT + ROOM_Y, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), POS_X); // above door
-				AddCeilingTrim(glm::vec3(cursorX - DOOR_WIDTH, ROOM_Y, cursorZ), 0, DOOR_WIDTH);
-		//	}
+				HoleInWall* doorway = &m_doorWaysXFrontWall[i];
+				float wallWidth = doorway->position.x - cursorX - (doorway->width / 2);
+				cursorX += (wallWidth + doorway->width);
+				glm::vec3 wallSegmentPosition = glm::vec3(cursorX + (wallWidth / 2) -doorway->width - wallWidth, ROOM_Y + ROOM_HEIGHT / 2, cursorZ);
+				m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, POS_X, wallWidth, ROOM_HEIGHT, 0));
+
+				// Build upper and lower segment of the break in the wall
+				float lowerSegmentHeight = doorway->bottom_Y;
+				float upperSegmentHeight = ROOM_HEIGHT - doorway->top_Y;
+				wallSegmentPosition = glm::vec3(cursorX + doorway->width / 2 - doorway->width, ROOM_Y + ROOM_HEIGHT / 2, cursorZ);
+				m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, POS_X, doorway->width, upperSegmentHeight, lowerSegmentHeight));
+			}
+
+			// Full height wall (final)
+			wallWidth = high_x - cursorX;
+			glm::vec3 wallSegmentPosition = glm::vec3(cursorX + wallWidth / 2, ROOM_Y + ROOM_HEIGHT / 2, cursorZ);
+			m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, POS_X, wallWidth, ROOM_HEIGHT, 0));
 		}
-		wallWidth = high_x - cursorX;
-		m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX + wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), POS_X); // wall
-		//CreateCollisionObject(glm::vec3(cursorX + wallWidth / 2, ROOM_Y + ROOM_HEIGHT / 2, cursorZ - 0.025f), glm::vec3(wallWidth, ROOM_HEIGHT, 0.05f));
-		AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), 0, wallWidth);
-		AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), 0, wallWidth);
 
-		// Back walls
-		cursorX = high_x;
-		cursorZ = high_z;
-		for (int i = 0; i < m_doorWaysXBackWall.size(); i++)	{
-			float wallWidth = cursorX - m_doorWaysXBackWall[i].position.x - (DOOR_WIDTH / 2);
-			m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX - wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), NEG_X); // wall
-			
-			//CreateCollisionObject(glm::vec3(cursorX - wallWidth / 2, ROOM_Y + ROOM_HEIGHT / 2, cursorZ + 0.025f), glm::vec3(wallWidth, ROOM_HEIGHT, 0.05f));
+		////////////////
+		// Back walls //
+		{
+			cursorX = high_x;
+			cursorZ = high_z;
+			for (int i = 0; i < m_doorWaysXBackWall.size(); i++) {
 
-			
-			AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_180, wallWidth);
-			AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_180, wallWidth);
-			cursorX -= wallWidth + DOOR_WIDTH;
-		//	if (m_doorWaysBackWall[i].type == DoorWayType::DOOR) {
-				m_wallMesh.AddQuad(glm::vec3(cursorX + DOOR_WIDTH, DOOR_HEIGHT + ROOM_Y, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), NEG_X); // above door
-				AddCeilingTrim(glm::vec3(cursorX + DOOR_WIDTH, ROOM_Y, cursorZ), ROTATE_180, DOOR_WIDTH);
-		//	}
+				HoleInWall* doorway = &m_doorWaysXBackWall[i];
+				float wallWidth = cursorX - doorway->position.x - (doorway->width / 2);
+				cursorX -= (wallWidth + doorway->width);
+				// Full height wall
+				glm::vec3 wallSegmentPosition = glm::vec3(cursorX - (wallWidth / 2) + (wallWidth + doorway->width), ROOM_Y + ROOM_HEIGHT / 2, cursorZ);
+				m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, NEG_X, wallWidth, ROOM_HEIGHT, 0)); m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, NEG_X, wallWidth, ROOM_HEIGHT, 0));
+
+				// Build upper and lower segment of the break in the wall
+				float lowerSegmentHeight = doorway->bottom_Y;
+				float upperSegmentHeight = ROOM_HEIGHT - doorway->top_Y;
+				wallSegmentPosition = glm::vec3(cursorX + doorway->width / 2, ROOM_Y + ROOM_HEIGHT / 2, cursorZ);
+				m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, NEG_X, doorway->width, upperSegmentHeight, lowerSegmentHeight));
+			}
+
+			// Full height wall (final)
+			wallWidth = cursorX - low_x;
+			glm::vec3 wallSegmentPosition = glm::vec3(cursorX - wallWidth / 2, ROOM_Y + ROOM_HEIGHT / 2, cursorZ);
+			m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, NEG_X, wallWidth, ROOM_HEIGHT, 0));
 		}
-		wallWidth = cursorX - low_x;
-		m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX - wallWidth, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), NEG_X); // wall
-		AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_180, wallWidth);
-		AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_180, wallWidth);
-		
-		//CreateCollisionObject(glm::vec3(cursorX - wallWidth / 2, ROOM_Y + ROOM_HEIGHT / 2, cursorZ + 0.025f), glm::vec3(wallWidth, ROOM_HEIGHT, 0.05f));
-
+	
 		////////////////
 		// Left walls //
 		{
@@ -244,72 +251,106 @@ namespace HellEngine
 			for (int i = 0; i < m_doorWaysZLeftWall.size(); i++) {
 
 				HoleInWall* doorway = &m_doorWaysZLeftWall[i];
-				float wallWidth = cursorZ - m_doorWaysZLeftWall[i].position.z - (doorway->width / 2);
+				float wallWidth = cursorZ - doorway->position.z - (doorway->width / 2);
+				cursorZ -= (wallWidth + doorway->width);
 
 				// Full height wall
-				glm::vec3 wallSegmentPosition = glm::vec3(cursorX, ROOM_Y + ROOM_HEIGHT / 2, cursorZ - wallWidth / 2);
+				glm::vec3 wallSegmentPosition = glm::vec3(cursorX, ROOM_Y + ROOM_HEIGHT / 2, (cursorZ - wallWidth / 2) + (wallWidth + doorway->width));
 				m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, POS_Z, wallWidth, ROOM_HEIGHT, 0));
-				AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_90, wallWidth);
-				AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_90, wallWidth);
 
-				cursorZ -= wallWidth + doorway->width;
-
+				// Build upper and lower segment of the break in the wall
 				float lowerSegmentHeight = doorway->bottom_Y;
 				float upperSegmentHeight = ROOM_HEIGHT - doorway->top_Y;
 				wallSegmentPosition = glm::vec3(cursorX, ROOM_Y + ROOM_HEIGHT / 2, cursorZ + doorway->width / 2);
-
 				m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, POS_Z, doorway->width, upperSegmentHeight, lowerSegmentHeight));
-
-				if (doorway->bottom_Y > 0)
-				{
-					// Break in wall (lower segment)	
-					//float wallSegmentHeight = doorway->bottom_Y;
-					//glm::vec3 wallSegmentPosition = glm::vec3(cursorX, ROOM_Y + wallSegmentHeight / 2, cursorZ + doorway->width / 2);
-					
-					AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ + doorway->width), ROTATE_90, doorway->width);
-				}
-				// Break in wall (upper segment)
-				//float wallSegmentHeight = ROOM_HEIGHT - doorway->top_Y;
-				//wallSegmentPosition = glm::vec3(cursorX, ROOM_Y + doorway->top_Y + wallSegmentHeight / 2, cursorZ + doorway->width / 2);
-				//m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, POS_Z, doorway->width, wallSegmentHeight, 0));
-				AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ + doorway->width), ROTATE_90, doorway->width);
 			}
 			// Full height wall (final)
 			wallWidth = cursorZ - low_z;
-
-
-			//std::cout << "cursorZ: " << cursorZ << "\n";
-			//std::cout << "low_z: " << low_z << "\n";
-			//std::cout << "wallWidth: " << wallWidth << "\n";
-
-
 			glm::vec3 wallSegmentPosition = glm::vec3(cursorX, ROOM_Y + ROOM_HEIGHT / 2, cursorZ - wallWidth / 2);
 			m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, POS_Z, wallWidth, ROOM_HEIGHT, 0));
-			AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_90, wallWidth);
-			AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_90, wallWidth);
 		}
 
-
-		// Right walls
-		cursorZ = low_z;
-		cursorX = high_x;
-		for (int i = 0; i < m_doorWaysZRightWall.size(); i++)
+		/////////////////
+		// Right walls //
 		{
-			float wallWidth = m_doorWaysZRightWall[i].position.z - cursorZ - (DOOR_WIDTH / 2);
-			m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ + wallWidth), NEG_Z); // wall
-			AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_270, wallWidth);
-			AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_270, wallWidth);
-			cursorZ += wallWidth + DOOR_WIDTH;
-			//if (m_doorWaysRightWall[i].type == DoorWayType::DOOR) {
-				m_wallMesh.AddQuad(glm::vec3(cursorX, DOOR_HEIGHT + ROOM_Y, cursorZ - DOOR_WIDTH), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ), NEG_Z); // above door
-				AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ - DOOR_WIDTH), ROTATE_270, DOOR_WIDTH);
-			//}
-		}
-		wallWidth = high_z - cursorZ;
-		m_wallMesh.AddQuad(glm::vec3(cursorX, ROOM_Y - bias, cursorZ), glm::vec3(cursorX, ROOM_HEIGHT - CEILING_TRIM_HEIGHT + ROOM_Y + bias, cursorZ + wallWidth), NEG_Z); // wall
-		AddFloorTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_270, wallWidth);
-		AddCeilingTrim(glm::vec3(cursorX, ROOM_Y, cursorZ), ROTATE_270, wallWidth);
+			cursorZ = low_z;
+			cursorX = high_x;
+			for (int i = 0; i < m_doorWaysZRightWall.size(); i++) {
 
+				HoleInWall* doorway = &m_doorWaysZRightWall[i];
+				float wallWidth =  doorway->position.z - cursorZ - (doorway->width / 2);
+				cursorZ += (wallWidth + doorway->width);
+
+				// Full height wall
+				glm::vec3 wallSegmentPosition = glm::vec3(cursorX, ROOM_Y + ROOM_HEIGHT / 2, (cursorZ - wallWidth / 2) - (doorway->width));
+				m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, NEG_Z, wallWidth, ROOM_HEIGHT, 0));
+
+				// Build upper and lower segment of the break in the wall
+				float lowerSegmentHeight = doorway->bottom_Y;
+				float upperSegmentHeight = ROOM_HEIGHT - doorway->top_Y;
+				wallSegmentPosition = glm::vec3(cursorX, ROOM_Y + ROOM_HEIGHT / 2, cursorZ + (doorway->width / 2) - doorway->width);
+				m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, NEG_Z, doorway->width, upperSegmentHeight, lowerSegmentHeight));
+			}
+			// Full height wall (final)
+			wallWidth = high_z - cursorZ;
+			glm::vec3 wallSegmentPosition = glm::vec3(cursorX, ROOM_Y + ROOM_HEIGHT / 2, cursorZ - (wallWidth / 2) + wallWidth);
+			m_wallSegments.emplace_back(WallSegment(wallSegmentPosition, NEG_Z, wallWidth, ROOM_HEIGHT, 0));
+		}
+
+
+		/////////////////////////
+		// Build the wall Mesh //
+
+		m_wallMesh.ClearMesh();
+
+		for (WallSegment& segment : m_wallSegments)
+		{
+			glm::vec4 v;
+			glm::vec3 bottomLeft, topright;
+
+			Transform trans;
+			trans.position = segment.m_position;
+			trans.rotation = Util::SetRotationByAxis(segment.m_axis);
+			glm::mat4 m = trans.to_mat4();
+
+			// Upper segment
+			v = m * glm::vec4(-segment.m_width / 2, (ROOM_HEIGHT / 2) - segment.m_heightOfUpperSegment, 0.0f, 1.0f);
+			bottomLeft = glm::vec3(v.x, v.y, v.z);
+			v = m * glm::vec4(segment.m_width / 2, ROOM_HEIGHT / 2, 0.0f, 1.0f);
+			topright = glm::vec3(v.x, v.y, v.z);
+			m_wallMesh.AddQuad(bottomLeft, topright, segment.m_axis);
+
+			// Lower segment
+			if (segment.m_heightOfLowerSegment > 0)	{
+				v = m * glm::vec4(-segment.m_width / 2, (-ROOM_HEIGHT / 2), 0.0f, 1.0f);
+				bottomLeft = glm::vec3(v.x, v.y, v.z);
+				v = m * glm::vec4(segment.m_width / 2, (-ROOM_HEIGHT / 2) + segment.m_heightOfLowerSegment, 0.0f, 1.0f);
+				topright = glm::vec3(v.x, v.y, v.z);
+				m_wallMesh.AddQuad(bottomLeft, topright, segment.m_axis);
+			}
+
+			// Floor trim
+			if (segment.m_heightOfLowerSegment > 0 || segment.m_heightOfUpperSegment == ROOM_HEIGHT)
+			{
+				Transform trim;
+				trim.position = segment.m_position;
+				//trim.position.z += segment.m_width / 2;
+				trim.position.y -= ROOM_HEIGHT / 2;
+				trim.rotation = Util::SetRotationByAxis(segment.m_axis);
+				trim.scale.x = segment.m_width;
+				m_floorTrimTransforms.push_back(trim);
+			}
+			// Ceiling trim
+			{
+				Transform trim;
+				trim.position = segment.m_position;
+				//trim.position.z += segment.m_width / 2;
+				trim.position.y -= ROOM_HEIGHT / 2;
+				trim.rotation = Util::SetRotationByAxis(segment.m_axis);
+				trim.scale.x = segment.m_width;
+				m_ceilingTrimTransforms.push_back(trim);
+			}
+		}
 		m_wallMesh.BufferMeshToGL();
 	}
 

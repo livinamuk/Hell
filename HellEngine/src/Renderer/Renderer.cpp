@@ -863,6 +863,12 @@ namespace HellEngine
 		}
 
 
+		/*for (Vertex& vertex : game->house.m_rooms[0].m_wallMesh.vertices)
+		{
+			DrawPoint(&s_solidColorShader, vertex.Position, glm::vec3(1, 0, 1));
+		}
+*/
+
 		//glm::mat4 camMat = game->m_shotgunAnimatedEntity.GetCameraMatrix();
 		std::string text = "";// Util::Mat4ToString(camMat);
 

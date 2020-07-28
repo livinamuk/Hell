@@ -44,4 +44,28 @@ namespace HellEngine
 		if (m_heightOfLowerSegment > 0)
 			Physics::s_dynamicsWorld->removeCollisionObject(m_collisionObject_LowerSegment);
 	}
+
+	glm::vec3 WallSegment::GetBottomLeftWorldPosCorner()
+	{
+		Transform trans;
+		trans.position = m_position;
+		trans.rotation = Util::SetRotationByAxis(m_axis);
+
+		glm::mat4 m = trans.to_mat4();
+		glm::vec4 v = m * glm::vec4(-m_width / 2, -ROOM_HEIGHT / 2, 0.0f, 1.0f);
+
+		return glm::vec3(v.x, v.y, v.z);
+	}
+
+	glm::vec3 WallSegment::GetTopRightWorldPosCorner()
+	{
+		Transform trans;
+		trans.position = m_position;
+		trans.rotation = Util::SetRotationByAxis(m_axis);
+		
+		glm::mat4 m = trans.to_mat4();
+		glm::vec4 v = m * glm::vec4(m_width / 2, ROOM_HEIGHT/2, 0.0f, 1.0f);
+
+		return glm::vec3(v.x, v.y, v.z);
+	}
 }

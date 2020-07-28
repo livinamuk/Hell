@@ -54,9 +54,6 @@ namespace HellEngine
 
 	void House::AddRoom(Room room)
 	{
-		if (m_rooms.size() > 0)
-			return;
-
 		m_rooms.emplace_back(room);
 	}
 
@@ -129,7 +126,7 @@ namespace HellEngine
 	{
 		for (Light& light : m_lights)
 		{
-			light.m_roomID = 0;
+			//light.m_roomID = 0;
 			// To stop a crash during a test where I disabled all rooms but room 0.
 			//if (light.m_roomID > m_rooms.size())
 			//	continue;

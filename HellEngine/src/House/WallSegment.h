@@ -1,6 +1,6 @@
 #pragma once
 #include "Header.h"
-#include "House/WallMesh.h"
+//#include "House/WallMesh.h"
 #include "House/Door.h"
 #include "House/Floor.h"
 #include "House/Ceiling.h"
@@ -16,6 +16,8 @@ namespace HellEngine
 		WallSegment(glm::vec3 position, Axis axis, float width, float heightOfUpperSegment, float heightOfLowerSegment);
 		~WallSegment();
 		void RemoveCollisionObjects();
+		glm::vec3 GetBottomLeftWorldPosCorner();
+		glm::vec3 GetTopRightWorldPosCorner();
 
 	public: // members
 		glm::vec3 m_position;

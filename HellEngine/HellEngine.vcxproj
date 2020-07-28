@@ -199,6 +199,7 @@
     <ClInclude Include="src\ImGuizmo\ImGradient.h" />
     <ClInclude Include="src\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="src\ImGuizmo\ImSequencer.h" />
+    <ClInclude Include="src\LoadEXR\tinyexr.h" />
     <ClInclude Include="src\Logic\GlockLogic.h" />
     <ClInclude Include="src\Logic\ShotgunLogic.h" />
     <ClInclude Include="src\Logic\WeaponLogic.h" />

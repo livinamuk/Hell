@@ -85,6 +85,9 @@
     <Filter Include="vendor\tinyobj">
       <UniqueIdentifier>{0184B9AB-ED51-ADB1-D6E5-1DD8C2528916}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\LoadEXR">
+      <UniqueIdentifier>{15fe3d5e-493d-4a98-af93-e5dd7df4d379}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Animation\AnimatedNode.h">
@@ -1488,6 +1491,9 @@
     <ClInclude Include="src\Logic\GlockLogic.h" />
     <ClInclude Include="src\Renderer\Effects\BloodEffectVolumetric.h">
       <Filter>src\Renderer\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LoadEXR\tinyexr.h">
+      <Filter>src\LoadEXR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

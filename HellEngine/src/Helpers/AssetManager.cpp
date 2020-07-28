@@ -52,7 +52,7 @@ namespace HellEngine
 			std::string filetype = Util::RemoveCharactersFromBeginning(filename, filename.length() - 3);
 			filename = Util::RemoveCharactersFromEnd(filename, 4);
 
-			if ((filetype != "tga") && (filetype != "png") && (filetype != "jpg"))
+			if ((filetype != "tga") && (filetype != "png") && (filetype != "jpg") && (filetype != "exr"))
 				continue;
 
 			textures.push_back(Texture(filename, filetype));

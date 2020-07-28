@@ -18,17 +18,15 @@ namespace HellEngine
 	btAlignedObjectArray<btCollisionShape*> Physics::s_collisionShapes;
 	std::vector<glm::vec3> Physics::s_points;
 	std::map<const btCollisionObject*, std::vector<btManifoldPoint*>> Physics::s_objectsCollisions;
-	CollisionPairs Physics::s_pairsLastUpdate;
+	CollisionPairs Physics::s_pairsLastUpdate; 
+
+	//std::vector<btCollisionObject*> Physics::m_WallCollisionObjects;
 
 	Ragdoll* Physics::m_ragdoll;
 
 	void Physics::Init()
 	{
-		s_debugDraw.Init();
-	}
-
-	void Physics::RebuildWorld(House* house)
-	{
+		s_debugDraw.Init();		
 		s_broadphase = new btDbvtBroadphase();
 		s_collisionConfiguration = new btDefaultCollisionConfiguration();
 		s_dispatcher = new btCollisionDispatcher(s_collisionConfiguration);
@@ -36,7 +34,10 @@ namespace HellEngine
 		s_dynamicsWorld = new btDiscreteDynamicsWorld(s_dispatcher, s_broadphase, s_solver, s_collisionConfiguration);
 		s_dynamicsWorld->setGravity(btVector3(0, -10, 0));
 		s_dynamicsWorld->getPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
-	
+	}
+
+	void Physics::RebuildWorld(House* house)
+	{
 		CreateWorld();
 		AddHouse(house);
 
@@ -249,6 +250,42 @@ namespace HellEngine
 		}*/
 	}
 
+
+	// THIS IS ONLY USED BY WALL SEGMENTS CURRENTLY
+	btCollisionObject* Physics::AddWallSegment(const Transform& trans)
+	{
+		btBoxShape* collisionShape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
+		collisionShape->setLocalScaling(Util::glmVec3_to_btVec3(trans.scale));
+
+		btTransform transform;
+		transform.setIdentity();
+		transform.setOrigin(Util::glmVec3_to_btVec3(trans.position));
+		transform.setRotation(Util::glmVec3_to_btQuat(trans.rotation));
+
+		btTransform depthOffsetTransform;
+		depthOffsetTransform.setIdentity();
+		depthOffsetTransform.setOrigin(btVector3(0, 0, -WALL_DEPTH/2));
+
+		btCollisionObject* collisionObject = new btCollisionObject();
+		collisionObject->setCollisionShape(collisionShape);
+		collisionObject->setWorldTransform(transform * depthOffsetTransform);
+		collisionObject->setCustomDebugColor(DEBUG_COLOR_WALL);
+		collisionObject->setFriction(0.2f);
+		EntityData* entityData = new EntityData();
+		entityData->type = PhysicsObjectType::WALL;
+		entityData->vectorIndex = -1;
+		collisionObject->setUserPointer(entityData);
+
+		int group = CollisionGroups::HOUSE;
+		int mask = CollisionGroups::PLAYER | CollisionGroups::ENEMY | CollisionGroups::PROJECTILES;
+
+		s_dynamicsWorld->addCollisionObject(collisionObject, group, mask);	
+		s_collisionObjects.push_back(collisionObject);
+		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+
+		return collisionObject;
+	}
+
 	void Physics::AddStaircaseToPhysicsWorld(House* house)
 	{
 		btTriangleMesh* triangleMesh = new btTriangleMesh();
@@ -381,6 +418,16 @@ namespace HellEngine
 
 	void Physics::AddWallsToPhysicsWorld(House* house)
 	{
+		// Clean up
+	/*	for (btCollisionObject* collisionObject : m_WallCollisionObjects)
+			s_dynamicsWorld->removeCollisionObject(collisionObject);
+		m_WallCollisionObjects.clear();
+		*/
+		return;
+		/////////
+		/////////
+		/////////
+		/////////
 		btTriangleMesh* triangleMesh = new btTriangleMesh();
 
 		for (Room& room : house->m_rooms)

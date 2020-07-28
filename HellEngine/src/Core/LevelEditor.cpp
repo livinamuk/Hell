@@ -13,7 +13,9 @@ namespace HellEngine
 	float LevelEditor::s_snapAmount[3];
 	float* LevelEditor::s_fptr_GizmoMatrix;
 	GizmoControlScheme LevelEditor::s_GizmoControlScheme;
-
+	void* LevelEditor::p_selectedObject;
+	void* LevelEditor::p_hoveredObject;
+	
 	void LevelEditor::Update(Game* game)
 	{
 		// Find what object the mouse is hovering on
@@ -34,6 +36,33 @@ namespace HellEngine
 			s_SelectedObjectType = s_mouse_ray.m_objectType;
 			s_SelectedOjectIndex = s_mouse_ray.m_elementIndex;
 		}
+
+		// Get pointer to selected object
+		if (s_SelectedObjectType == PhysicsObjectType::DOOR)
+			p_selectedObject = &game->house.m_doors[s_SelectedOjectIndex];
+		else if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
+			p_selectedObject = &game->house.m_windows[s_SelectedOjectIndex];
+		else if (s_SelectedObjectType == PhysicsObjectType::MISC_MESH)
+			p_selectedObject = &game->house.m_entities[s_SelectedOjectIndex];
+		else if (s_SelectedObjectType == PhysicsObjectType::FLOOR)
+			p_selectedObject = &game->house.m_rooms[s_SelectedOjectIndex].m_floor;
+		else
+			p_selectedObject = nullptr;
+
+		// Get pointer to hovered object
+		if (s_mouse_ray.m_objectType == PhysicsObjectType::DOOR)
+			p_hoveredObject = &game->house.m_doors[s_mouse_ray.m_elementIndex];
+		else if (s_mouse_ray.m_objectType == PhysicsObjectType::WINDOW)
+			p_hoveredObject = &game->house.m_windows[s_mouse_ray.m_elementIndex];
+		else if (s_mouse_ray.m_objectType == PhysicsObjectType::MISC_MESH)
+			p_hoveredObject = &game->house.m_entities[s_mouse_ray.m_elementIndex];
+		else if (s_mouse_ray.m_objectType == PhysicsObjectType::FLOOR)
+			p_hoveredObject = &game->house.m_rooms[s_mouse_ray.m_elementIndex].m_floor;
+		else
+			p_hoveredObject = nullptr;
+
+		// Update the light volumes cause you are surely fucking with them moving doors around n shit.
+		House::p_house->BuildLightVolumes();
 	}
 
 	void LevelEditor::DrawOverlay(Shader* shader, Game* game)
@@ -178,7 +207,11 @@ namespace HellEngine
 		{
 			Door* door = &game->house.m_doors[i];
 			SetTranslationFromGizmo(s_fptr_GizmoMatrix, door->m_rootTransform.position);
+
+			House::p_house = &game->house;
+
 			door->Reconfigure();
+			//game->RebuildMap();
 		}
 		// Windows
 		if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
@@ -247,6 +280,24 @@ namespace HellEngine
 
 		if (s_GizmoControlScheme == GizmoControlScheme::MOVE_WITH_RIGHT_CLICK_TO_ROTATE)
 			s_gizmoState = GizmoState::MOVE;
+	}
+
+	bool LevelEditor::IsVisisble()
+	{
+		return CoreImGui::s_Show;
+	}
+
+	void LevelEditor::SetHighlightColorIfSelected(Shader* shader, void* object)
+	{
+		// If editor is closed bail.
+		if (!IsVisisble())
+			return;
+
+		if (LevelEditor::p_selectedObject == object)
+			shader->setVec3("ColorAdd", glm::vec3(1, 0, 1));
+
+		else if (LevelEditor::p_hoveredObject == object)
+			shader->setVec3("ColorAdd", glm::vec3(0.9f));
 	}
 
 	//void LevelEditor::SetGizmoMatrix(glm::mat4 matrix)

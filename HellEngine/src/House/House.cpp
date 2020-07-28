@@ -54,6 +54,9 @@ namespace HellEngine
 
 	void House::AddRoom(Room room)
 	{
+		if (m_rooms.size() > 0)
+			return;
+
 		m_rooms.emplace_back(room);
 	}
 
@@ -126,19 +129,25 @@ namespace HellEngine
 	{
 		for (Light& light : m_lights)
 		{
+			light.m_roomID = 0;
+			// To stop a crash during a test where I disabled all rooms but room 0.
+			//if (light.m_roomID > m_rooms.size())
+			//	continue;
+
 			Room* room = &m_rooms[light.m_roomID];
 			light.m_lightVolume.BuildFromRoom(room);
 
-			for (DoorWay& doorWay : room->m_doorWaysXBackWall)
+			light.m_doorWayLightVolumes.clear();
+			for (HoleInWall& doorWay : room->m_doorWaysXBackWall)
 				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_upperZ));
 		
-			for (DoorWay& doorWay : room->m_doorWaysXFrontWall)
+			for (HoleInWall& doorWay : room->m_doorWaysXFrontWall)
 				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_lowerZ));
 
-			for (DoorWay& doorWay : room->m_doorWaysZLeftWall)
+			for (HoleInWall& doorWay : room->m_doorWaysZLeftWall)
 				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_lowerX));
 			
-			for (DoorWay& doorWay : room->m_doorWaysZRightWall)
+			for (HoleInWall& doorWay : room->m_doorWaysZRightWall)
 				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_upperX));
 		}
 

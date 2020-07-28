@@ -14,6 +14,7 @@ in vec3 FragPos;
 in mat3 TBN;
 in vec3 Normal;
 
+uniform vec3 ColorAdd;
 
 uniform bool hasAnimation;
 in vec4 test;
@@ -51,7 +52,7 @@ void main()
 	gNormal = normalize(gNormal.rgb * 2.0 - 1.0);
 	gNormal = normalize(TBN * gNormal.rgb);
 
-	gAlbedo = texture(ALB_Texture, finalTexCoords).rgb;
+	gAlbedo = texture(ALB_Texture, finalTexCoords).rgb + ColorAdd;
 	gRMA = texture(RMA_Texture, finalTexCoords).rgb;
 	
 	if (useRoughnessMetallicUniforms) {

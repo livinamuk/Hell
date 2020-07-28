@@ -28,8 +28,8 @@ namespace HellEngine
 		float m_stepsInFirstSet;
 		float m_stepsInSecondSet;
 		bool m_turnsLeft;
-		DoorWay m_topDoorway;
-		DoorWay m_bottomDoorway;
+		HoleInWall m_topDoorway;
+		HoleInWall m_bottomDoorway;
 		int m_story;
 		Axis m_axis;
 

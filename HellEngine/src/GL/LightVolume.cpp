@@ -18,10 +18,10 @@ namespace HellEngine
 	{
 		float bias = 0.02;
 		vertices.clear();
-		float lowerX = room->m_lowerX;
-		float lowerZ = room->m_lowerZ;
-		float upperX = room->m_upperX;
-		float upperZ = room->m_upperZ;
+		float lowerX = room->m_lowerX - bias;
+		float lowerZ = room->m_lowerZ - bias;
+		float upperX = room->m_upperX + bias;
+		float upperZ = room->m_upperZ + bias;
 
 		// Create vertices
 		glm::vec3 A1 = glm::vec3(lowerX, -bias, lowerZ);
@@ -34,60 +34,6 @@ namespace HellEngine
 		glm::vec3 D2 = glm::vec3(upperX, 2.4f + bias, upperZ);
 		AddCuboidToLightVolume(A1, B1, C1, D1, A2, B2, C2, D2);
 
-		/*
-		// Construct light volumes for the indented part of a door way.
-		for (DoorWay& doorWay : room->m_doorWaysXFrontWall)
-		{
-			if (doorWay.axis == Axis::NEG_X)
-			{
-				float lowerX = doorWay.position.x - 0.5f;
-				float upperX = doorWay.position.x + 0.5f;
-				float lowerY = -bias;
-				float upperY = 2;
-				float lowerZ = doorWay.position.z - 0.09f;// 315f;
-				float upperZ = doorWay.position.z + 0.09f;
-				AddCubeToLightVolume(lowerX, upperX, lowerY, upperY, lowerZ, upperZ, 0);
-			}
-		}
-		for (DoorWay& doorWay : room->m_doorWaysXBackWall)
-		{
-			if (doorWay.axis == Axis::POS_X)
-			{
-				float lowerX = doorWay.position.x - 0.5f;
-				float upperX = doorWay.position.x + 0.5f;
-				float lowerY = -bias;
-				float upperY = 2;
-				float lowerZ = doorWay.position.z - 0.05f;
-				float upperZ = doorWay.position.z + 0.05f;//315f;
-				AddCubeToLightVolume(lowerX, upperX, lowerY, upperY, lowerZ, upperZ, 0);
-			}
-		}
-		for (DoorWay& doorWay : room->m_doorWaysZRightWall)
-		{
-			if (doorWay.axis == Axis::POS_Z)
-			{
-				float lowerX = doorWay.position.x - 0.05f;
-				float upperX = doorWay.position.x + 0.05f;//315f;
-				float lowerY = -bias;
-				float upperY = 2;
-				float lowerZ = doorWay.position.z - 0.5f;
-				float upperZ = doorWay.position.z + 0.5f;
-				AddCubeToLightVolume(lowerX, upperX, lowerY, upperY, lowerZ, upperZ, 0);
-			}
-		}
-		for (DoorWay& doorWay : room->m_doorWaysZLeftWall)
-		{
-			if (doorWay.axis == Axis::NEG_Z)
-			{
-				float lowerX = doorWay.position.x - 0.05f;//315f;
-				float upperX = doorWay.position.x + 0.05f;
-				float lowerY = -bias;
-				float upperY = 2;
-				float lowerZ = doorWay.position.z - 0.5f;
-				float upperZ = doorWay.position.z + 0.5f;
-				AddCubeToLightVolume(lowerX, upperX, lowerY, upperY, lowerZ, upperZ, 0);
-			}
-		}*/
 		Setup();
 	}
 

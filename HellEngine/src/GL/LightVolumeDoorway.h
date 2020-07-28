@@ -7,7 +7,7 @@ namespace HellEngine
 	class LightVolumeDoorWay
 	{
 	public: // methods
-		LightVolumeDoorWay(DoorWay& doorWay, glm::vec3 lightPosition, float lightRadius, float roomEdge);
+		LightVolumeDoorWay(HoleInWall& doorWay, glm::vec3 lightPosition, float lightRadius, float roomEdge);
 		//void Rebuild();
 	
 	//	void BuildFromRoom(Room* room);
@@ -24,7 +24,7 @@ namespace HellEngine
 		unsigned int VAO;
 		std::vector<glm::vec3> vertices;
 		Door* p_parentDoor = nullptr;
-		DoorWayType m_type;
+		HoleInWallType m_type;
 		//Light* p_parentLight;
 
 	public: // static

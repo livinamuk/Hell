@@ -48,8 +48,8 @@ namespace HellEngine
 		m_testAnimatedEnttity.m_currentAnimationIndex = 5;
 
 
-		AssetManager::PrintSkinnedModelMeshNames("Glock.fbx");
-		AssetManager::PrintSkinnedModelBoneNames("Glock.fbx");
+		//AssetManager::PrintSkinnedModelMeshNames("Glock.fbx");
+		//AssetManager::PrintSkinnedModelBoneNames("Glock.fbx");
 
 		m_NurseGuy.SetSkinnedModel("NurseGuy.fbx");
 		m_NurseGuy.m_worldTransform.position.x = 1;

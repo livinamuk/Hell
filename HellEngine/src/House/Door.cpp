@@ -4,6 +4,7 @@
 #include "Helpers/AssetManager.h"
 #include "Audio/Audio.h"
 #include "Renderer/Renderer.h"
+#include "Core/LevelEditor.h"
 
 namespace HellEngine
 {
@@ -30,12 +31,45 @@ namespace HellEngine
 		m_floor = Floor(m_rootTransform.position, glm::vec2(1, 0.1f), m_story, m_floor.m_rotateTexture);
 		m_floor.m_transform.rotation = Util::SetRotationByAxis(m_axis);
 		m_floor.CalculateWorldSpaceCorners();
-		m_openStatus = DoorStatus::DOOR_CLOSING;
+		//m_openStatus = DoorStatus::DOOR_CLOSING;
+
+		//FindConnectedRooms();
+	}
+
+	void Door::FindConnectedRooms()
+	{
+		/*for (Room& room : House::p_house->m_rooms)
+		{
+			room.Rebuild();
+			room.FindDoors(House::p_house->m_doors, House::p_house->m_staircases, House::p_house->m_windows);
+			room.BuildWallMesh();
+			room.m_wallMesh.BufferMeshToGL();
+			room.CalculateWorldSpaceBounds();
+			/*if (withinRange(m_rootTransform.position.x, room.low_x, room.high_x)) {
+				if (withinRange(doorWay.position.z, low_z - 0.2f, low_z + 0.2f))
+					m_doorWaysXFrontWall.push_back(doorWay);
+				else if (withinRange(doorWay.position.z, high_z - 0.2f, high_z + 0.2f))
+					m_doorWaysXBackWall.push_back(doorWay);
+			}
+
+			if (withinRange(doorWay.position.z, low_z, high_z)) {
+				if (withinRange(doorWay.position.x, low_x - 0.2f, low_x + 0.2f))
+					m_doorWaysZLeftWall.push_back(doorWay);
+				if (withinRange(doorWay.position.x, high_x - 0.2f, high_x + 0.2f))
+					m_doorWaysZRightWall.push_back(doorWay);
+			}
+			
+			if (m_rootTransform.position.x > room.m_position.x)*/
+		//}
 	}
 
 	void Door::Draw(Shader* shader)
 	{
 		GpuProfiler g("Door");
+		
+		LevelEditor::SetHighlightColorIfSelected(shader, this);
+		
+		
 		//Transform shadowTransform;
 		//shadowTransform.scale = glm::vec3(1.1);
 
@@ -66,6 +100,8 @@ namespace HellEngine
 		// Draw Floor
 		AssetManager::BindMaterial(AssetManager::s_MaterialID_FloorBoards);
 		m_floor.Draw(shader);
+
+		shader->setVec3("ColorAdd", glm::vec3(0, 0, 0));
 	}
 
 	void Door::Update(float deltaTime)

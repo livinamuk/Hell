@@ -56,12 +56,13 @@
 // Game constants
 #define STORY_HEIGHT	2.6f
 #define ROOM_HEIGHT		2.4f
-#define DOOR_WIDTH		1.0f
+#define DOOR_WIDTH		0.8f
 #define DOOR_HEIGHT		2.0f	
 #define FLOOR_TRIM_HEIGHT	0.091f
 #define CEILING_TRIM_HEIGHT	0.082f
 #define WINDOW_WIDTH_SINGLE 0.75f
 #define WINDOW_HEIGHT_SINGLE 1.15f
+#define WALL_DEPTH 0.05f
 
 #define SCR_WIDTH 1280
 #define SCR_HEIGHT 720
@@ -158,12 +159,12 @@ enum GunState { FIRING, IDLE, RELOADING, EQUIP, DEQUIP};
 enum ReloadState { FROM_IDLE, SINGLE_RELOAD, DOUBLE_RELOAD, BACK_TO_IDLE, NOT_RELOADING, RELOAD_CLIP, RELOAD_CLIP_FROM_EMPTY };
 enum IronSightState { NOT_IRON_SIGHTING, BEGIN_IRON_SIGHTING, IRON_SIGHTING, END_IRON_SIGHTING};
 
-enum DoorWayType { DOOR, STAIRCASE_OPENING, WINDOW };
+enum HoleInWallType { DOOR, STAIRCASE_OPENING, WINDOW };
 
 enum CasingType {SHOTGUN_SHELL, BULLET_CASING};
 
-struct DoorWay {
-	DoorWayType type;
+struct HoleInWall {
+	HoleInWallType type;
 	glm::vec3 position;
 	Axis axis;
 	int story;

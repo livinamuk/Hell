@@ -26,12 +26,15 @@ namespace HellEngine
 		void UpdateRigidBodyTransfrom();
 		glm::mat4 GetDoorModelMatrixFromPhysicsEngine();
 		void Reconfigure();
+	
+	private:
+		void FindConnectedRooms();
+
 		
+	public:	// fields
 		Transform m_rootTransform;
 		Transform m_doorTransform;
 		Transform m_doorFrameTransform;
-		
-	public:	// fields
 		Axis m_axis;
 		Floor m_floor;
 		btRigidBody* m_rigidBody;
@@ -42,5 +45,6 @@ namespace HellEngine
 		bool locked = false;
 		float openAngle = 0;
 		float maxOpenAngle = 2;
+		//std::vector<void*> m_connectedRooms;
 	};
 }

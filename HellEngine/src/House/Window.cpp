@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "Helpers/AssetManager.h"
 #include "Helpers/Util.h"
+#include "Core/LevelEditor.h"
 
 namespace HellEngine
 {
@@ -17,9 +18,11 @@ namespace HellEngine
 	}
 
 	void Window::Draw(Shader* shader)
-	{		
+	{
+		LevelEditor::SetHighlightColorIfSelected(shader, this);
 		static int modelID = AssetManager::GetModelIDByName("Window");
-		AssetManager::models[modelID].Draw(shader, m_transform.to_mat4());
+		AssetManager::models[modelID].Draw(shader, m_transform.to_mat4());		
+		shader->setVec3("ColorAdd", glm::vec3(0, 0, 0));
 	}
 
 	void Window::Reconfigure()

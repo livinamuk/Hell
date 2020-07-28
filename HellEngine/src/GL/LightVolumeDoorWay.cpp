@@ -5,13 +5,13 @@
 
 namespace HellEngine
 {
-	LightVolumeDoorWay::LightVolumeDoorWay(DoorWay& doorWay, glm::vec3 lightPosition, float lightRadius, float roomEdge)
+	LightVolumeDoorWay::LightVolumeDoorWay(HoleInWall& doorWay, glm::vec3 lightPosition, float lightRadius, float roomEdge)
 	{
 		this->VAO = 0;
 		this->m_type = doorWay.type;
 
 		// Store a pointer to the partent door. This is used for skipping drawing the light volume if the door is closed.
-		if (doorWay.type == DoorWayType::DOOR)
+		if (doorWay.type == HoleInWallType::DOOR)
 			this->p_parentDoor = (Door*)doorWay.parent;
 
 		glm::vec3 doorHoleBottomLeft;

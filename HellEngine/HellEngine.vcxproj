@@ -192,6 +192,7 @@
     <ClInclude Include="src\House\Room.h" />
     <ClInclude Include="src\House\Staircase.h" />
     <ClInclude Include="src\House\WallMesh.h" />
+    <ClInclude Include="src\House\WallSegment.h" />
     <ClInclude Include="src\House\Window.h" />
     <ClInclude Include="src\ImGui\imgui_impl_glfw.h" />
     <ClInclude Include="src\ImGui\imgui_impl_opengl3.h" />
@@ -660,6 +661,7 @@
     <ClCompile Include="src\House\Room.cpp" />
     <ClCompile Include="src\House\Staircase.cpp" />
     <ClCompile Include="src\House\WallMesh.cpp" />
+    <ClCompile Include="src\House\WallSegment.cpp" />
     <ClCompile Include="src\House\Window.cpp" />
     <ClCompile Include="src\ImGui\imgui_impl_glfw.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>

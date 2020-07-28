@@ -985,9 +985,9 @@ namespace HellEngine
 			s_RenderSettings.DrawWeapon = false;
 			s_RenderSettings.DrawLightBulbs = false;
 			//glDisable(GL_CULL_FACE);
-			glEnable(GL_POLYGON_OFFSET_FILL);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			glPolygonOffset(s_polygonFactor, s_polygonUnits);
+		//	glEnable(GL_POLYGON_OFFSET_FILL);
+		//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//	glPolygonOffset(s_polygonFactor, s_polygonUnits);
 
 
 			// glDepthRange(0.0, 0.9);	
@@ -1192,13 +1192,13 @@ namespace HellEngine
 						for (LightVolumeDoorWay& lightVolumeDoorWay : light.m_doorWayLightVolumes)
 						{
 							// Doors, only if they aren't closed
-							if (lightVolumeDoorWay.m_type == DoorWayType::DOOR)
+							if (lightVolumeDoorWay.m_type == HoleInWallType::DOOR)
 								if (lightVolumeDoorWay.p_parentDoor->m_openStatus != DoorStatus::DOOR_CLOSED)
 									lightVolumeDoorWay.Draw(stencilShader);
 
 
 							// Staircase opening, well always!
-							if (lightVolumeDoorWay.m_type == DoorWayType::STAIRCASE_OPENING)
+							if (lightVolumeDoorWay.m_type == HoleInWallType::STAIRCASE_OPENING)
 								lightVolumeDoorWay.Draw(stencilShader);
 						}
 					}

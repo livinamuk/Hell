@@ -2,6 +2,7 @@
 #include "Entity.h"
 #include "Helpers/Util.h"
 #include "Helpers/AssetManager.h"
+#include "Core/LevelEditor.h"
 
 namespace HellEngine
 {
@@ -26,17 +27,10 @@ namespace HellEngine
 
 	void Entity::DrawEntity(Shader* shader)
 	{
-		// Bind material
-		//if (this->m_materialID != -1 && this->m_materialID < AssetManager::materials.size())
-			AssetManager::BindMaterial(m_materialID);
-
-	//	std::cout << AssetManager::currentlyBoundMaterialID << "\n";
-
-			AssetManager::models[m_modelID].Draw(shader, m_transform.to_mat4());
-
-		// Draw model
-		//if (this->m_modelID != -1 && this->m_modelID < AssetManager::models.size())
-		//	AssetManager::DrawModel(this->m_modelID, shader, m_transform.to_mat4());
+		LevelEditor::SetHighlightColorIfSelected(shader, this);
+		AssetManager::BindMaterial(m_materialID);
+		AssetManager::models[m_modelID].Draw(shader, m_transform.to_mat4());
+		shader->setVec3("ColorAdd", glm::vec3(0, 0, 0));
 	}
 
 	void Entity::Draw(Shader* shader, glm::mat4 modelMatrix)

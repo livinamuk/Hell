@@ -10,8 +10,10 @@
 
 using namespace HellEngine;
 
+
 int main()
 {
+
 	CoreGL::InitGL(SCR_WIDTH, SCR_HEIGHT);
 	CoreImGui::InitImGui();
 	Renderer::Init();

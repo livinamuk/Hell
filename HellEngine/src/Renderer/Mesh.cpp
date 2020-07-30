@@ -14,7 +14,7 @@ namespace HellEngine
 
 		if (std::string(name) == "TRIANGLE_CLOUD") {		
 
-			glGenVertexArrays(1, &VAO);
+			/*glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);
 
@@ -29,8 +29,8 @@ namespace HellEngine
 			glEnableVertexAttribArray(1);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
 								
-			glBindVertexArray(0);
-			//SetupMesh();
+			glBindVertexArray(0);*/
+			SetupMesh();
 		}
 		
 	}

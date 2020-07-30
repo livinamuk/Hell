@@ -1,7 +1,7 @@
 #version 330 core
 
 layout (location = 0) in vec3 a_Position;
-layout (location = 1) in vec2 a_Texcoord;
+layout (location = 2) in vec2 a_Texcoord;
 
 uniform mat4 u_MatrixProjection;
 uniform mat4 u_MatrixView;
@@ -25,7 +25,7 @@ void main() {
 
 	float currentSpeed = u_Speed / u_NumOfFrames;
 
-	vec2 coord = vec2(a_Texcoord.x, -u_TimeInFrames + a_Texcoord.y);	
+	vec2 coord = vec2(a_Texcoord.x, a_Texcoord.y - u_TimeInFrames);	
 
 	vec4 texturePos = textureLod(u_PosTex, coord, 0);
 	vec4 textureNorm = textureLod(u_NormTex, coord, 0);
@@ -34,17 +34,12 @@ void main() {
 
 	float expand = u_BoundingMax - u_BoundingMin;
 	
-	//texturePos.z = -texturePos.z;
 	texturePos.xyz *= expand;
-	//texturePos.xyz += u_BoundingMin;
-	texturePos.z += u_BoundingMin;
+	texturePos.xyz += vec3(u_BoundingMin, u_BoundingMin, u_BoundingMin);
 
-	//texturePos.x += u_BoundingMin;
-	//texturePos.x *= -1;
-	vec3 vertexPos = texturePos.xyz + u_HeightOffset.xyz;
-
-	vertexPos.z = -vertexPos.z;
-			
+	texturePos.x *= -1;
+	vec3 vertexPos = texturePos.xyz + vec3(u_HeightOffset.x, u_HeightOffset.y, u_HeightOffset.z);
+				
 	v_WorldNormal = textureNorm.xyz * 2 - vec3(1, 1, 1); 
 	v_WorldNormal.x = -v_WorldNormal.x;
 	

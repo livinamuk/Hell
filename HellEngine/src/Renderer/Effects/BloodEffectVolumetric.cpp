@@ -38,7 +38,7 @@ namespace HellEngine
 		GpuProfiler g("BloodEffectVolumetric");
 		glDepthMask(false);
 
-		//glDisable(GL_DEPTH_TEST);
+		glDisable(GL_DEPTH_TEST);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -50,9 +50,12 @@ namespace HellEngine
 		//rot.rotation.x = -HELL_PI / 2;
 
 		Transform transformBlood;
-		transformBlood.scale = glm::vec3(0.03f, 0.03f, 0.03f) ;
-		//transformBlood.rotation = glm::vec3(0, glm::radians(180.0f), 0);
 		transformBlood.position = global.position;
+		transformBlood.scale = glm::vec3(0.03f, 0.03f, 0.03f);
+		//transformBlood.rotation = glm::vec3(0, glm::radians(180.0f), 0);
+		transformBlood.rotation = glm::vec3(glm::radians(-90.0f), glm::radians(90.0f), 0);
+		//TODO set .... direction towards gun, or camera
+		
 
 		shader->setInt("u_PosTex", 0);
 		shader->setInt("u_NormTex", 1);
@@ -86,7 +89,7 @@ namespace HellEngine
 		glDepthMask(true);
 		glDisable(GL_BLEND);
 
-		//glEnable(GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_TEST);
 	}
 
 }

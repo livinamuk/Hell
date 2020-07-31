@@ -64,6 +64,7 @@
 #define WINDOW_WIDTH_SINGLE 0.79f
 #define WINDOW_HEIGHT_SINGLE 1.2f
 #define WALL_DEPTH 0.05f
+#define DEFAULT_WINDOW_SPAWN_HEIGHT 0.75f
 
 #define SCR_WIDTH 1280
 #define SCR_HEIGHT 720
@@ -169,7 +170,7 @@ struct HoleInWall {
 	HoleInWallType type;
 	glm::vec3 position;
 	Axis axis;
-	int story;
+	//int story;
 	void* parent;
 	float bottom_Y;
 	float top_Y;

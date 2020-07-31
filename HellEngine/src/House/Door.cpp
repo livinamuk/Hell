@@ -17,37 +17,7 @@ namespace HellEngine
 		m_story = story;
 		m_floor.m_rotateTexture = rotateFloorTex;
 		Reconfigure();
-
-
-		Physics::AddDoorToPhysicsWorld(this);
-
-
-		/*{
-			glm::vec3 position = m_rootTransform.position;
-			position.y += DOOR_HEIGHT / 2.0f;
-
-			btTransform transform;
-			transform.setIdentity();
-			transform.setOrigin(Util::glmVec3_to_btVec3(position));
-			transform.setRotation(Util::glmVec3_to_btQuat(m_rootTransform.rotation));
-
-			m_collisionObject = new btCollisionObject();
-			m_collisionObject->setCollisionShape(Physics::s_doorShape);
-			m_collisionObject->setWorldTransform(transform);
-			m_collisionObject->setCustomDebugColor(DEBUG_COLOR_DOOR);
-			EntityData* entityData = new EntityData();
-			entityData->type = PhysicsObjectType::DOOR;
-			entityData->ptr = this;
-			m_collisionObject->setUserPointer(entityData);
-
-			int group = CollisionGroups::HOUSE;
-			int mask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
-
-			Physics::s_dynamicsWorld->addCollisionObject(m_collisionObject, group, mask);
-			//s_collisionObjects.push_back(door->m_collisionObject);
-			m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-		}*/
-	//	std::cout << Util::Vec3_to_String(m_rootTransform.position) << ": " << m_collisionObject << '\n';
+		CreateCollisionObject();
 	}
 
 	Door::Door(const Door& cpy)
@@ -68,53 +38,39 @@ namespace HellEngine
 
 		EntityData* entityData = (EntityData*)m_collisionObject->getUserPointer();
 		entityData->ptr = this;
-
 		m_floor.m_parent = this;
 	}
 
-	Door::~Door()
-	{
+	Door& Door::operator = (const Door& input) {
+		new (this) Door(input);
+		return *this;
 	}
 
 	void Door::Reconfigure()
 	{
 		m_rootTransform.position.y = m_story * STORY_HEIGHT;
-
 		m_rootTransform.rotation = Util::SetRotationByAxis(m_axis);
 		m_doorTransform.position = glm::vec3(0, 0, 0.03f);
 		m_floor = Floor(m_rootTransform.position, glm::vec2(1, 0.1f), m_story, m_floor.m_rotateTexture, this);
 		m_floor.m_transform.rotation = Util::SetRotationByAxis(m_axis);
 		m_floor.CalculateWorldSpaceCorners();
-		//m_openStatus = DoorStatus::DOOR_CLOSING;
-
-		//FindConnectedRooms();
 	}
 
-	void Door::FindConnectedRooms()
+	void Door::CreateCollisionObject()
 	{
-		/*for (Room& room : House::p_house->m_rooms)
-		{
-			room.Rebuild();
-			room.FindDoors(House::p_house->m_doors, House::p_house->m_staircases, House::p_house->m_windows);
-			room.BuildWallMesh();
-			room.m_wallMesh.BufferMeshToGL();
-			room.CalculateWorldSpaceBounds();
-			/*if (withinRange(m_rootTransform.position.x, room.low_x, room.high_x)) {
-				if (withinRange(doorWay.position.z, low_z - 0.2f, low_z + 0.2f))
-					m_doorWaysXFrontWall.push_back(doorWay);
-				else if (withinRange(doorWay.position.z, high_z - 0.2f, high_z + 0.2f))
-					m_doorWaysXBackWall.push_back(doorWay);
-			}
+		Transform transform = m_rootTransform;
+		float friction = 0.5f;
+		int collisionGroup = CollisionGroups::HOUSE;
+		int collisionMask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
+		btCollisionShape* collisionShape = Physics::s_doorShape;
+		PhysicsObjectType objectType = PhysicsObjectType::DOOR;
 
-			if (withinRange(doorWay.position.z, low_z, high_z)) {
-				if (withinRange(doorWay.position.x, low_x - 0.2f, low_x + 0.2f))
-					m_doorWaysZLeftWall.push_back(doorWay);
-				if (withinRange(doorWay.position.x, high_x - 0.2f, high_x + 0.2f))
-					m_doorWaysZRightWall.push_back(doorWay);
-			}
-			
-			if (m_rootTransform.position.x > room.m_position.x)*/
-		//}
+		m_collisionObject = Physics::CreateCollisionObject(transform, collisionShape, objectType, collisionGroup, collisionMask, friction, DEBUG_COLOR_DOOR, this);
+	}
+
+	void Door::RemoveCollisionObject()
+	{
+		Physics::s_dynamicsWorld->removeCollisionObject(m_collisionObject);
 	}
 
 	void Door::Draw(Shader* shader)

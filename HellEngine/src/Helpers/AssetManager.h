@@ -5,6 +5,7 @@
 #include "Animation/SkinnedModel.h"
 #include <vector>
 #include <future>
+#include "Renderer/ExrTexture.h"
 
 namespace HellEngine
 {
@@ -84,5 +85,7 @@ namespace HellEngine
 
 		static unsigned int s_ModelID_StaircaseCeilingTrimStraight;
 		static unsigned int s_ModelID_Staircase;
+
+		static ExrTexture s_ExrTexture;
 	};
 }

@@ -74,9 +74,9 @@ namespace HellEngine
 		m_staircases.emplace_back(staircase);
 	}
 
-	void House::AddWindow(float x, float z, int story, float height, Axis axis)
+	void House::AddWindow(glm::vec3 position, Axis axis)
 	{
-		m_windows.push_back(Window(x, z, story, height, axis));
+		m_windows.push_back(Window(position, axis));
 	}
 
 /*	void House::BuildWallMeshes()
@@ -152,5 +152,29 @@ namespace HellEngine
 	//	Door* door = &m_doors[0];
 	//	LightVolumeDoorWay test(door, light->m_position, light->m_radius);
 	//	light->m_doorWayLightVolumes.push_back(test);
+	}
+	
+	void House::DeleteDoor(Door* door)
+	{
+		for (int i = 0; i < m_doors.size(); i++)
+		{
+			if (door == &m_doors[i]) {
+				m_doors[i].RemoveCollisionObject();
+				m_doors.erase(m_doors.begin() + i);
+				return;
+			}
+		}
+	}	
+	
+	void House::DeleteWindow(Window* window)
+	{
+		for (int i = 0; i < m_windows.size(); i++)
+		{
+			if (window == &m_windows[i]) {
+				m_windows[i].RemoveCollisionObject();
+				m_windows.erase(m_windows.begin() + i);
+				return;
+			}
+		}
 	}
 }

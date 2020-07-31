@@ -94,8 +94,8 @@ int Shader::LoadShader()
 		std::cout << "FAILED TO LINK SHADER: " << name << "\n" << infoLog << std::endl;
 		return 0;
 	}
-	else
-		std::cout << "SHADER LINKING SUCCESSFUL: " << name << "\n";
+	//else
+	//	std::cout << "SHADER LINKING SUCCESSFUL: " << name << "\n";
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 

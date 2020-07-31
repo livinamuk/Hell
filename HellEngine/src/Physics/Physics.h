@@ -59,7 +59,18 @@ namespace HellEngine
 		static void DebugDraw(Shader* shader);
 
 		static btRigidBody* createRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape, float friction, int group, int mask);
-		//static void AddRigidBody(btRigidBody* rigidBody);
+		
+
+		static btCollisionObject* Physics::CreateCollisionObject(
+			Transform transform, 
+			btCollisionShape* collisionShape, 
+			PhysicsObjectType objectType, 
+			int collisionGroup, 
+			int collisionMask, 
+			float friction, 
+			btVector3 debugColor,
+			void* partent);
+
 
 		static void AddEntityToPhysicsWorld(Entity* entity);
 		static void AddAnimatedEntityToPhysicsWorld(AnimatedEntity* entity);
@@ -76,13 +87,10 @@ namespace HellEngine
 
 	public: // Methods
 		//void AddGroundToPhysicsWorld();
-		static void AddWindowsToPhysicsWorld(House* house);
 		static void AddWallsToPhysicsWorld(House* house);
 		static void AddStaircaseToPhysicsWorld(House* house);
 		static void AddFloorsAndCeilingsToPhysicsWorld(House* house);
 		static void AddCubesToPhysicsWorld(std::vector<Cube> cubes);
-
-		static void AddDoorToPhysicsWorld(Door* door);
 
 		static btCollisionObject* AddWallSegment(const Transform& transform);
 

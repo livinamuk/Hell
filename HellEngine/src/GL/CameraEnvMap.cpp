@@ -56,7 +56,7 @@ namespace HellEngine
 
 
 		auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
+/*
 		if (fboStatus == 36053)
 			std::cout << "CUBE_MAP FrameBuffer: " << "COMPLETE\n";
 		else if (fboStatus == 36054)
@@ -69,7 +69,7 @@ namespace HellEngine
 			std::cout << "CUBEMAP FrameBuffer: " << "UNSPORTED\n";
 		else
 			std::cout << "unknown fbostatus code\n";
-
+		*/
 		auto glstatus = glGetError();
 		if (glstatus != GL_NO_ERROR)
 			std::cout << "Error in GL call: " << glstatus << std::endl;

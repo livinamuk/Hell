@@ -19,12 +19,15 @@ namespace HellEngine
 		void AddDoor(Door door);
 		void AddLight(Light light);
 		void AddStaircase(Staircase staircase);
-		void AddWindow(float x, float z, int story, float height, Axis axis);
+		void AddWindow(glm::vec3 position, Axis axis);
 		//void BuildWallMeshes();
 		void RebuildAll();
 		void Draw(Shader* shader, bool envMapPass);
 		void DetermineWhichLightIsInWhichRoom();
 		void BuildLightVolumes();
+
+		void DeleteDoor(Door* door);
+		void DeleteWindow(Window* window);
 		
 
 	public:	// fields

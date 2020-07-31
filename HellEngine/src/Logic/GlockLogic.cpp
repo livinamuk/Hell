@@ -61,7 +61,7 @@ namespace HellEngine
 		// Fire glock
 		if ((m_gunState != GunState::FIRING) ||	(m_gunState == GunState::FIRING && p_model->m_currentAnimationTime > 0.15f))
 		{
-			s_RandomFireAnimation = rand() % 3;
+			s_RandomFireAnimation = rand() % 4;
 			m_reloadState = ReloadState::NOT_RELOADING;
 			m_gunState = GunState::FIRING;
 			m_AmmoInGun -= 1;
@@ -171,7 +171,8 @@ namespace HellEngine
 	{
 		// Equip
 		if (m_gunState == GunState::EQUIP)		{
-			p_model->PlayAnimation("Glock_Equip.fbx", false);
+			p_model->PlayAnimation("Glock_FirstEquip1.fbx", false);
+			//p_model->PlayAnimation("Glock_Equip.fbx", false);
 
 			if (p_model->IsAnimationComplete()) {
 				p_model->PlayAnimation("Glock_Idle.fbx", true);
@@ -188,12 +189,17 @@ namespace HellEngine
 		}
 
 		// Idle 
-		if (m_gunState == GunState::IDLE)
+		if (m_gunState == GunState::IDLE)			
 		{
-			if (!WeaponLogic::m_singleHanded)
-				p_model->PlayAnimation("Glock_Idle.fbx", true);
+			if (p_player->m_movementState != PlayerMovementState::WALKING)
+			{
+				if (!WeaponLogic::m_singleHanded)
+					p_model->PlayAnimation("Glock_Idle.fbx", true);
+				else
+					p_model->PlayAnimation("Glock_SingleHanded_Idle.fbx", true);
+			}
 			else
-				p_model->PlayAnimation("Glock_SingleHanded_Idle.fbx", true); 
+				p_model->PlayAnimation("Glock_Walk.fbx", true);
 		}
 
 		// Fire
@@ -207,6 +213,8 @@ namespace HellEngine
 					p_model->PlayAnimation("Glock_Fire1.fbx", false);
 				if (s_RandomFireAnimation == 2)
 					p_model->PlayAnimation("Glock_Fire2.fbx", false);
+				if (s_RandomFireAnimation == 3)
+					p_model->PlayAnimation("Glock_Fire3.fbx", false);
 			}
 			else
 				p_model->PlayAnimation("Glock_SingleHanded_Fire0.fbx", false);

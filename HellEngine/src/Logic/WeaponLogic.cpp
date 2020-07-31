@@ -117,11 +117,15 @@ namespace HellEngine
 
 		glm::mat4 weaponModelMatrix = s_weaponTransform.to_mat4() * camera->m_weaponSwayTransform.to_mat4();
 
+		glDisable(GL_CULL_FACE);
+
 		if (s_SelectedWeapon == WEAPON::GLOCK)
 			m_glockAnimatedEntiyty.Draw(shader, weaponModelMatrix);
 
 		if (s_SelectedWeapon == WEAPON::SHOTGUN)
 			m_shotgunAnimatedEntity.Draw(shader, weaponModelMatrix);
+
+		glEnable(GL_CULL_FACE);
 
 	}
 	void WeaponLogic::DequipCurrentWeapon()

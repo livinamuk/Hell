@@ -262,31 +262,27 @@ namespace HellEngine
 		}*/
 	}
 
-	void Physics::AddDoorToPhysicsWorld(Door* door)
+	btCollisionObject* Physics::CreateCollisionObject(Transform transform, btCollisionShape* collisionShape, PhysicsObjectType objectType, int collisionGroup, int collisionMask, float friction, btVector3 debugColor, void* parent)
 	{
-		glm::vec3 position = door->m_rootTransform.position;
-		position.y += DOOR_HEIGHT / 2.0f;
+		btTransform btTrans;
+		btTrans.setIdentity();
+		btTrans.setOrigin(Util::glmVec3_to_btVec3(transform.position));
+		btTrans.setRotation(Util::glmVec3_to_btQuat(transform.rotation));
 
-		btTransform transform;
-		transform.setIdentity();
-		transform.setOrigin(Util::glmVec3_to_btVec3(position));
-		transform.setRotation(Util::glmVec3_to_btQuat(door->m_rootTransform.rotation));
+		btCollisionObject* collisionObject = new btCollisionObject();
+		collisionObject->setCollisionShape(collisionShape);
+		collisionObject->setWorldTransform(btTrans);
+		collisionObject->setCustomDebugColor(debugColor);
 
-		door->m_collisionObject = new btCollisionObject();
-		door->m_collisionObject->setCollisionShape(s_doorShape);
-		door->m_collisionObject->setWorldTransform(transform);
-		door->m_collisionObject->setCustomDebugColor(DEBUG_COLOR_DOOR);
 		EntityData* entityData = new EntityData();
-		entityData->type = PhysicsObjectType::DOOR;
-		entityData->ptr = door;
-		door->m_collisionObject->setUserPointer(entityData);
+		entityData->type = objectType;
+		entityData->ptr = parent;
+		collisionObject->setUserPointer(entityData);
+		
+		collisionObject->setCollisionFlags(collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		s_dynamicsWorld->addCollisionObject(collisionObject, collisionGroup, collisionMask);
 
-		int group = CollisionGroups::HOUSE;
-		int mask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
-
-		s_dynamicsWorld->addCollisionObject(door->m_collisionObject, group, mask);
-		s_collisionObjects.push_back(door->m_collisionObject);
-		door->m_collisionObject->setCollisionFlags(door->m_collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		return collisionObject;
 	}
 
 
@@ -420,76 +416,6 @@ namespace HellEngine
 		m_dynamicsWorld->addCollisionObject(m_triangleCollisionObject);
 		m_triangleCollisionObject->setCollisionFlags(m_triangleCollisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	}*/
-
-	void Physics::AddWindowsToPhysicsWorld(House* house)
-	{
-		for (size_t i = 0; i < house->m_windows.size(); i++)
-		{
-			Window* window = &house->m_windows[i];
-			glm::vec3 position = window->m_transform.position;
-			position.y += WINDOW_HEIGHT_SINGLE / 2.0f;
-
-			btTransform transform;
-			transform.setIdentity();
-			transform.setOrigin(Util::glmVec3_to_btVec3(position));
-			transform.setRotation(Util::glmVec3_to_btQuat(window->m_transform.rotation));
-
-			window->m_collisionObject = new btCollisionObject();
-			window->m_collisionObject->setCollisionShape(s_doorShape);
-			window->m_collisionObject->setWorldTransform(transform);
-			window->m_collisionObject->setCustomDebugColor(DEBUG_COLOR_DOOR);
-			EntityData* entityData = new EntityData();
-			entityData->type = PhysicsObjectType::WINDOW;
-			entityData->ptr = window;
-			window->m_collisionObject->setUserPointer(entityData);
-
-			int group = CollisionGroups::HOUSE;
-			int mask = CollisionGroups::EDITOR_ONLY;
-
-			s_dynamicsWorld->addCollisionObject(window->m_collisionObject, group, mask);
-			s_collisionObjects.push_back(window->m_collisionObject);
-			window->m_collisionObject->setCollisionFlags(window->m_collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-		}
-
-
-
-	
-
-
-
-		for (size_t i = 0; i < house->m_doors.size(); i++)
-		{
-			//AddDoorToPhysicsWorld(&house->m_doors[i]);
-		}
-
-		/*
-		btTransform btTransform;
-		btTransform.setIdentity();
-
-		glm::vec3 pos = Util::GetTranslationFromMatrix(m_rootTransform.to_mat4() * m_doorTransform.to_mat4());
-
-		float x = pos.x;
-		float y = pos.y + DOOR_HEIGHT / 2;
-		float z = pos.z;
-
-		btTransform.setOrigin(btVector3(x, y, z));
-		btTransform.setRotation(btQuaternion(m_rootTransform.rotation.y, 0, 0));
-
-		int group = CollisionGroups::HOUSE;
-		int mask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
-
-		m_rigidBody = Physics::createRigidBody(0.0, btTransform, collisionShape, 1.0, group, mask);
-		m_rigidBody->setCustomDebugColor(DEBUG_COLOR_DOOR);
-
-		// Entity Data
-		EntityData* entityData = new EntityData();
-		entityData->type = PhysicsObjectType::DOOR;
-		entityData->ptr = this;
-		m_rigidBody->setUserPointer(entityData);
-
-		m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-		*/
-	}
 
 	void Physics::AddWallsToPhysicsWorld(House* house)
 	{
@@ -896,16 +822,8 @@ namespace HellEngine
 		AddWallsToPhysicsWorld(house);
 		AddFloorsAndCeilingsToPhysicsWorld(house);
 
-		AddWindowsToPhysicsWorld(house);
-
 		for (Entity& entity : house->m_entities)
 			AddEntityToPhysicsWorld(&entity);
-
-
-		//AddGroundToPhysicsWorld();
-
-		// Add doors
-		
 	}
 
 	void Physics::RebuildPhysicsWorld(House* house)

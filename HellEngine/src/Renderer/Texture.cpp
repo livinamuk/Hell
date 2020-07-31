@@ -9,12 +9,45 @@ Texture::Texture(std::string name, std::string filetype)
 
 void Texture::ReadFromDisk()
 {
+	//std::cout << "about to load tex ...." << name << "\n";	
+//	std::string fullpath = "res/textures/" + name + "." + filetype;
+
+	//std::cout << fullpath << "\n";
+
+	/*if (filetype == "exr") {
+		char* err;
+		if (LoadEXR((float**)&data, &width, &height, fullpath.c_str(), (const char**)&err) < 0) {
+			std::cout << "Error reading EXR file:" << err << "\n";
+		}
+
+		std::cout << "\nSUCCESS reading EXR file: " << fullpath << "\n";
+
+		int num_layers;
+		const char** layer_names;
+		EXRLayers(fullpath.c_str(), &layer_names, &num_layers, (const char**)&err);
+
+		std::cout << "num_layers: " << num_layers << "\n";
+		std::cout << "layer_names: " << layer_names << "\n";
+		std::cout << "err: " << err << "\n";
+
+		for (int i = 0; i < num_layers; ++i) {
+			std::cout << "layer_names[" << i << "]: " << layer_names[i] << "\n";
+		}
+	}
+	else {
+		stbi_set_flip_vertically_on_load(false);
+		data = stbi_load(fullpath.c_str(), &width, &height, &nrChannels, 0);
+	}
+	m_readFromDisk = true;
+	
+	/*/
+	
 	//std::cout << "about to load tex ...." << name << "\n";
 	stbi_set_flip_vertically_on_load(false);
 	std::string fullpath = "res/textures/" + name + "." + filetype;
 	data = stbi_load(fullpath.c_str(), &width, &height, &nrChannels, 0);
 	m_readFromDisk = true;
-	//std::cout << "Read from disk: " << name << "\n";
+	//std::cout << "Read from disk: " << name << "\n";*/
 }
 
 void Texture::LoadToGL()

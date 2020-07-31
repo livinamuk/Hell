@@ -6,15 +6,27 @@
 
 namespace HellEngine
 {
-	Window::Window(float xPos, float zPos, int story, float height, Axis axis)
+	Window::Window(glm::vec3 position, Axis axis)
 	{
-		m_transform.position.x = xPos;
-		m_transform.position.z = zPos;
-		//m_transform.scale = glm::vec3(WINDOW_WIDTH_SINGLE, WINDOW_HEIGHT_SINGLE, 0.1f); // Used for level editor mouse picking
-		m_story = story;
+		m_transform.position = position;
 		m_axis = axis;
-		m_startHeight = height;
 		Reconfigure();
+		CreateCollisionObject();
+	}
+
+	Window::Window(const Window& cpy)
+	{
+		m_collisionObject = cpy.m_collisionObject;
+		m_transform = cpy.m_transform;
+		m_axis = cpy.m_axis;
+
+		EntityData* entityData = (EntityData*)m_collisionObject->getUserPointer();
+		entityData->ptr = this;
+	}
+
+	Window& Window::operator = (const Window& input) {
+		new (this) Window(input);
+		return *this;
 	}
 
 	void Window::Draw(Shader* shader)
@@ -27,7 +39,25 @@ namespace HellEngine
 
 	void Window::Reconfigure()
 	{
-		m_transform.position.y = m_story * ROOM_HEIGHT + m_startHeight;
 		m_transform.rotation = Util::SetRotationByAxis(m_axis);
+	}
+
+	void Window::CreateCollisionObject()
+	{
+		Transform transform = m_transform;
+		transform.position.y += WINDOW_HEIGHT_SINGLE / 2.0f;
+
+		float friction = 0.5f;
+		int collisionGroup = CollisionGroups::HOUSE;
+		int collisionMask = CollisionGroups::EDITOR_ONLY;
+		btCollisionShape* collisionShape = Physics::s_windowShape;
+		PhysicsObjectType objectType = PhysicsObjectType::WINDOW;
+
+		m_collisionObject = Physics::CreateCollisionObject(transform, collisionShape, objectType, collisionGroup, collisionMask, friction, DEBUG_COLOR_DOOR, this);
+	}
+
+	void Window::RemoveCollisionObject()
+	{
+		Physics::s_dynamicsWorld->removeCollisionObject(m_collisionObject);
 	}
 }

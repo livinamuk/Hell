@@ -548,7 +548,7 @@ namespace HellEngine
 			else
 				//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
 			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, game->house.m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
-				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gLevelEditorOverlay, s_gBuffer.gFinalLighting);
+				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, AssetManager::s_ExrTexture.gTexId, s_gBuffer.gFinalLighting);
 			//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
 		}
 
@@ -894,11 +894,8 @@ namespace HellEngine
 		else
 			text += "Anim commplete: FALSE\n";
 
-		if (WeaponLogic::m_singleHanded)
-			text += "Glock: ONE_HANDED\n";
-		else
-			text += "Glock: TWO_HANDED\n";
-		
+		text += "Fire animation: ";
+		text += std::to_string(GlockLogic::s_RandomFireAnimation) + "\n";
 
 
 		text += "Movement State: ";
@@ -1872,7 +1869,6 @@ namespace HellEngine
 		shader->setMat4("view", game->camera.m_viewMatrix);
 
 		LevelEditor::Update(game);
-		LevelEditor::DrawOverlay(shader, game);
 	}
 
 	void Renderer::ViewCubeMap(Game* game, Shader* shader, unsigned int CubeMapID)

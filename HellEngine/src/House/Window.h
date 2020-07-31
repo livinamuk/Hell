@@ -8,15 +8,18 @@ namespace HellEngine
 	{
 
 	public: // methods
-		Window(float xPos, float zPos, int story, float height, Axis axis);
+		Window(glm::vec3 position, Axis axis);
+		Window(const Window&);
+		Window& operator = (const Window& input);
+
 		void Draw(Shader* shader);
 		void Reconfigure();
+		void CreateCollisionObject(); 
+		void RemoveCollisionObject();
 
 	public: // members
 		Transform m_transform;
-		float m_startHeight;
 		Axis m_axis;
-		int m_story;
 		btCollisionObject* m_collisionObject; // for mouse picking in the level editor
 	};
 }

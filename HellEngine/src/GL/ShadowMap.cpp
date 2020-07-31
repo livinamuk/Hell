@@ -49,7 +49,7 @@ namespace HellEngine
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			std::cout << "Shadowmap FBO not complete!" << std::endl;
 		//else
-		std::cout << "Shadowmap FBO complete." << std::endl;
+		//std::cout << "Shadowmap FBO complete." << std::endl;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 

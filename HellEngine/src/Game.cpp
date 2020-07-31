@@ -81,8 +81,8 @@ namespace HellEngine
 		std::cout << "\n";
 		AssetManager::PrintSkinnedModelMeshNames("Shotgun.fbx");
 		std::cout << "\n";
-		AssetManager::PrintSkinnedModelBoneNames("Shotgun.fbx");*/
-		std::cout << "\n";
+		AssetManager::PrintSkinnedModelBoneNames("Shotgun.fbx");
+		std::cout << "\n";*/
 
 	}
 

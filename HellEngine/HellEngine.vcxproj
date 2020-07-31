@@ -80,7 +80,7 @@
       <PrecompiledHeaderFile>hellpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HELL_PLATFORM_WINDOWS;HELL_BUILD_DLL;GLFW_INCLUDE_NONE;HELL_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\bullet\bullet\src;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\bullet\bullet\src;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;vendor\tinyexr;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -100,7 +100,7 @@
       <PrecompiledHeaderFile>hellpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HELL_PLATFORM_WINDOWS;HELL_BUILD_DLL;GLFW_INCLUDE_NONE;HELL_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\bullet\bullet\src;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\bullet\bullet\src;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;vendor\tinyexr;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -124,7 +124,7 @@
       <PrecompiledHeaderFile>hellpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HELL_PLATFORM_WINDOWS;HELL_BUILD_DLL;GLFW_INCLUDE_NONE;HELL_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\bullet\bullet\src;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>res;src;vendor\stb_image;vendor\tinyobj;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\bullet;vendor\bullet\bullet\src;vendor\assimp\include;vendor\rapidjson\include;vendor\sdl\include;vendor\soloud\include;vendor\tinyexr;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -218,6 +218,7 @@
     <ClInclude Include="src\Renderer\Effects\Decal.h" />
     <ClInclude Include="src\Renderer\Effects\MuzzleFlash.h" />
     <ClInclude Include="src\Renderer\Effects\Quad.h" />
+    <ClInclude Include="src\Renderer\ExrTexture.h" />
     <ClInclude Include="src\Renderer\GLDebugDraw.h" />
     <ClInclude Include="src\Renderer\HDRTexture.h" />
     <ClInclude Include="src\Renderer\Material.h" />
@@ -627,11 +628,11 @@
     <ClCompile Include="src\Core\Camera.cpp" />
     <ClCompile Include="src\Core\CoreGL.cpp" />
     <ClCompile Include="src\Core\CoreImGui.cpp" />
-    <ClCompile Include="src\Core\LevelEditor.cpp" />
     <ClCompile Include="src\Core\EnemyCharacter.cpp" />
     <ClCompile Include="src\Core\Entity.cpp" />
     <ClCompile Include="src\Core\File.cpp" />
     <ClCompile Include="src\Core\Input.cpp" />
+    <ClCompile Include="src\Core\LevelEditor.cpp" />
     <ClCompile Include="src\Core\LightProbeGrid.cpp" />
     <ClCompile Include="src\Core\Player.cpp" />
     <ClCompile Include="src\GL\BlurBuffer.cpp" />
@@ -701,6 +702,7 @@
     <ClCompile Include="src\Renderer\Effects\Decal.cpp" />
     <ClCompile Include="src\Renderer\Effects\MuzzleFlash.cpp" />
     <ClCompile Include="src\Renderer\Effects\Quad.cpp" />
+    <ClCompile Include="src\Renderer\ExrTexture.cpp" />
     <ClCompile Include="src\Renderer\GLDebugDraw.cpp" />
     <ClCompile Include="src\Renderer\HDRTexture.cpp" />
     <ClCompile Include="src\Renderer\Material.cpp" />
@@ -727,8 +729,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\bloodVolumetric.frag" />
-    <None Include="res\shaders\bloodVolumetric.vert" />
     <None Include="res\shaders\ChromaticAberration.frag" />
     <None Include="res\shaders\ChromaticAberration.vert" />
     <None Include="res\shaders\DOF.frag" />
@@ -746,6 +746,8 @@
     <None Include="res\shaders\background.vert" />
     <None Include="res\shaders\blood.frag" />
     <None Include="res\shaders\blood.vert" />
+    <None Include="res\shaders\bloodVolumetric.frag" />
+    <None Include="res\shaders\bloodVolumetric.vert" />
     <None Include="res\shaders\blur.frag" />
     <None Include="res\shaders\blurHorizontal.vert" />
     <None Include="res\shaders\blurVertical.vert" />

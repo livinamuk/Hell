@@ -22,6 +22,9 @@ namespace HellEngine
 		// Find what object the mouse is hovering on
 		s_mouse_ray = RaycastResult::CastMouseRay(&game->camera);
 
+		if (Input::s_keyPressed[HELL_KEY_DELETE])
+			DeleteSelectedObject(game);
+
 		// Right click
 		if (Input::s_rightMousePressed)
 		{
@@ -71,64 +74,13 @@ namespace HellEngine
 		
 	}
 
-	void LevelEditor::DrawOverlay(Shader* shader, Game* game)
+	void LevelEditor::DeleteSelectedObject(Game* game)
 	{
-		// Draw hover object
-		/*shader->setVec3("color", glm::vec3(0.9f, 0.9, 0.9f));
-		DrawObject(shader, game, s_mouse_ray.m_objectType, s_mouse_ray.m_elementIndex);
-
-		// Draw hover object
-		shader->setVec3("color", glm::vec3(1, 0, 1));
-		DrawObject(shader, game, s_SelectedObjectType, s_SelectedOjectIndex);*/
+		if (s_SelectedObjectType == PhysicsObjectType::DOOR)
+			game->house.DeleteDoor((Door*)p_selectedObject);
+		else if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
+			game->house.DeleteWindow((Window*)p_selectedObject);
 	}
-
-	/*void LevelEditor::DrawObject(Shader* shader, Game* game, PhysicsObjectType objectType, unsigned int parentIndex)
-	{
-		// This function is drawins the white and pink solid colour objects,
-		// for the hoverered and selected item.
-
-		// Scale object overlay ever so slightly
-		static glm::mat4 scaleMatrix = Transform(glm::vec3(0), glm::vec3(0), glm::vec3(1.01f)).to_mat4();
-
-		// Door?
-		if (objectType == PhysicsObjectType::DOOR)
-		{
-			Door* door = &game->house.m_doors[parentIndex];
-			glm::mat4 worldMatrix = door->GetDoorModelMatrixFromPhysicsEngine();
-			glm::vec3 boxScaling = Util::btVec3_to_glmVec3(door->m_rigidBody->getCollisionShape()->getLocalScaling());
-			Transform boxTransform = Transform(glm::vec3(0, DOOR_HEIGHT / 2, 0), glm::vec3(0), boxScaling);
-			Cube::Draw(shader, worldMatrix * boxTransform.to_mat4());
-			door->Draw(shader);
-		}
-
-		// Window?
-		else if (objectType == PhysicsObjectType::WINDOW)
-		{
-			Window* window = &game->house.m_windows[parentIndex];
-			glm::mat4 worldMatrix = window->m_transform.to_mat4();
-			glm::vec3 boxScaling = Util::btVec3_to_glmVec3(window->m_collisionObject->getCollisionShape()->getLocalScaling());
-			Transform boxTransform = Transform(glm::vec3(0, WINDOW_HEIGHT_SINGLE / 2, 0), glm::vec3(0), boxScaling);
-			Cube::Draw(shader, worldMatrix * boxTransform.to_mat4());
-			window->Draw(shader);
-		}
-
-		// Room?
-		else if (objectType == PhysicsObjectType::FLOOR)
-		{
-			Room* room= &game->house.m_rooms[parentIndex];
-			Transform worldTransform;
-			worldTransform.position = glm::vec3(room->m_position.x, room->m_story * ROOM_HEIGHT, room->m_position.y);
-			worldTransform.scale = glm::vec3(room->m_size.x, 0.025f, room->m_size.y);
-			Cube::Draw(shader, worldTransform.to_mat4());
-		}
-
-		// Misc mesh
-		else if (objectType == PhysicsObjectType::MISC_MESH)
-		{
-			Entity* entity = &game->house.m_entities[parentIndex];
-			entity->Draw(shader);
-		}
-	}*/
 
 	void LevelEditor::RenderGizmo(ImGuiIO* io, Game* game)
 	{

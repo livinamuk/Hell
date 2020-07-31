@@ -34,6 +34,6 @@ namespace HellEngine
 		//m_lightVolume.p_parentLight = this;
 		m_lightVolume.Rebuild();
 
-		std::cout << "INIT LIGHT\n";
+		//std::cout << "INIT LIGHT\n";
 	}
 }

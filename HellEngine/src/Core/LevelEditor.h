@@ -13,7 +13,7 @@ namespace HellEngine
 	{
 	public: // functions
 		static void Update(Game* game);
-		static void DrawOverlay(Shader* shader, Game* game);
+		static void DeleteSelectedObject(Game* game);
 		//static void DrawObject(Shader* shader, Game* game, PhysicsObjectType type, unsigned int parentIndex);
 		static void RenderGizmo(ImGuiIO* io, Game* game);
 		static void SetTranslationFromGizmo(float* fptr, glm::vec3& sourceTranslation);

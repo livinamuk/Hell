@@ -34,11 +34,15 @@ namespace HellEngine
 	unsigned int AssetManager::s_ModelID_StaircaseCeilingTrimStraight;
 	unsigned int AssetManager::s_ModelID_Staircase;
 
+	ExrTexture AssetManager::s_ExrTexture;
+
 	bool AssetManager::s_loadingComplete = false;
 	std::string AssetManager::s_loadLog = "WELCOME TO HELL\nLoadng please wait...\n";
 
 	void AssetManager::FindAllFiles()
 	{
+		s_ExrTexture = ExrTexture("res/textures/blood_pos.exr");
+
 		// Find all textures
 		std::string path = "res/textures/";
 		for (const auto& entry : std::filesystem::directory_iterator(path))
@@ -52,6 +56,7 @@ namespace HellEngine
 			std::string filetype = Util::RemoveCharactersFromBeginning(filename, filename.length() - 3);
 			filename = Util::RemoveCharactersFromEnd(filename, 4);
 
+		//	if ((filetype != "tga") && (filetype != "png") && (filetype != "exr") && (filetype != "jpg"))
 			if ((filetype != "tga") && (filetype != "png") && (filetype != "jpg"))
 				continue;
 
@@ -143,10 +148,12 @@ namespace HellEngine
 		LoadAnimation("Glock.fbx", "Glock_Fire0.fbx");
 		LoadAnimation("Glock.fbx", "Glock_Fire1.fbx");
 		LoadAnimation("Glock.fbx", "Glock_Fire2.fbx");
+		LoadAnimation("Glock.fbx", "Glock_Fire3.fbx");
 		LoadAnimation("Glock.fbx", "Glock_Reload.fbx");
 		LoadAnimation("Glock.fbx", "Glock_EmptyReload.fbx");
 		//LoadAnimation("Glock.fbx", "Glock_IdleEmpty.fbx");
 		LoadAnimation("Glock.fbx", "Glock_Equip.fbx");
+		LoadAnimation("Glock.fbx", "Glock_FirstEquip1.fbx");
 		LoadAnimation("Glock.fbx", "Glock_Walk.fbx");
 
 		LoadAnimation("Glock.fbx", "Glock_SingleHanded_Fire0.fbx");

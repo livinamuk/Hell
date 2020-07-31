@@ -59,7 +59,7 @@ namespace HellEngine
 
 		auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
-		if (fboStatus == 36053)
+	/*	if (fboStatus == 36053)
 			std::cout << "CUBE_MAP FrameBuffer: " << "COMPLETE\n";
 		else if (fboStatus == 36054)
 			std::cout << "CUBEMAP FrameBuffer: " << "INCOMPLETE ATTACHMENT\n";
@@ -70,7 +70,7 @@ namespace HellEngine
 		else if (fboStatus == 36061)
 			std::cout << "CUBEMAP FrameBuffer: " << "UNSPORTED\n";
 		else
-			std::cout << "unknown fbostatus code\n";
+			std::cout << "unknown fbostatus code\n";*/
 
 		auto glstatus = glGetError();
 		if (glstatus != GL_NO_ERROR)

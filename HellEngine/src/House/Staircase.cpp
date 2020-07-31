@@ -61,7 +61,7 @@ namespace HellEngine
 
 		m_bottomDoorway.position = Util::GetTranslationFromMatrix(m_rootTransform.to_mat4() * bottomDoorWayTransform.to_mat4());
 		m_bottomDoorway.type = HoleInWallType::STAIRCASE_OPENING;
-		m_bottomDoorway.story = m_story;
+		//m_bottomDoorway.story = m_story;
 		m_bottomDoorway.axis = m_axis;
 
 		// Doorway: top
@@ -71,7 +71,7 @@ namespace HellEngine
 			topDoorWayTransform.position.z = (18 * stepDepth) + 0.15f;
 			m_topDoorway.position = Util::GetTranslationFromMatrix(m_rootTransform.to_mat4() * topDoorWayTransform.to_mat4());
 			m_topDoorway.type = HoleInWallType::STAIRCASE_OPENING;
-			m_topDoorway.story = m_story + 1;
+			//m_topDoorway.story = m_story + 1;
 			m_topDoorway.axis = m_axis;
 		}
 		if (m_stepsInSecondSet > 0) {
@@ -82,7 +82,7 @@ namespace HellEngine
 			topDoorWayTransform.position.z = (m_stepsInSecondSet * stepDepth) + 0.05f + 0.5f;
 			m_topDoorway.position = Util::GetTranslationFromMatrix(m_rootTransform.to_mat4() * m_landingTransform.to_mat4() * topDoorWayTransform.to_mat4());
 			m_topDoorway.type = HoleInWallType::STAIRCASE_OPENING;
-			m_topDoorway.story = m_story + 1;
+			//m_topDoorway.story = m_story + 1;
 
 			if (m_turnsLeft && m_axis == Axis::POS_X)
 				m_topDoorway.axis = Axis::POS_Z;

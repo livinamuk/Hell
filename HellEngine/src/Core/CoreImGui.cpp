@@ -299,23 +299,16 @@ namespace HellEngine
 					}
 					ImGui::EndCombo();
 				}
-				if (ImGui::Button("Delete Door")) {
-					game->house.m_doors.erase(game->house.m_doors.begin() + i);
-					Physics::Update(game->m_frameTime);
-					//game->RebuildMap();
+
+				if (ImGui::Button("Delete Door")) {					
+					Door* door = &game->house.m_doors[i];
+					game->house.DeleteDoor(door);
 				}
+
 				if (ImGui::Button("New Door")) {
 					game->house.m_doors.push_back(Door(glm::vec2(0, 0), 0, Axis::POS_X, true));
-					Physics::AddDoorToPhysicsWorld(&game->house.m_doors[game->house.m_doors.size()-1]);
-
-
-					// repair the pointers
-				/*	for (Door& door : game->house.m_doors) {
-						EntityData* entityData = (EntityData*)door.m_collisionObject->getUserPointer();
-						entityData->ptr = &door;
-					}*/
-					
 				}
+
 				ImGui::EndTabItem();
 			}
 		}
@@ -345,16 +338,16 @@ namespace HellEngine
 					game->RebuildMap();
 					game->house.m_windows[i].Reconfigure();
 				}
-				if (ImGui::InputFloat("height", &game->house.m_windows[i].m_startHeight)) {
+				/*if (ImGui::InputFloat("height", &game->house.m_windows[i].m_startHeight)) {
 					game->RebuildMap();
 					game->house.m_windows[i].Reconfigure();
 				}
 				if (ImGui::InputInt("Story", &game->house.m_windows[i].m_story)) {
 					game->RebuildMap(); 
 					game->house.m_windows[i].Reconfigure();
-				}
+				}*/
 
-				ImGui::Text("Story");
+			/*	ImGui::Text("Story");
 				ImGui::SameLine(); if (ImGui::Button("<##A")) {
 					game->house.m_windows[i].m_story -= 1;
 					game->house.m_windows[i].Reconfigure();
@@ -362,7 +355,7 @@ namespace HellEngine
 				ImGui::SameLine(); if (ImGui::Button(">##B")) {
 					game->house.m_windows[i].m_story += 1;
 					game->house.m_windows[i].Reconfigure();
-				}
+				}*/
 			
 				ImGui::Text("Rotation Axis ");
 				const char* axisList[4] = { "POS_X", "NEG_X", "POS_Z", "NEG_Z" };
@@ -390,7 +383,7 @@ namespace HellEngine
 			}
 		}
 		if (ImGui::Button("New Window")) {
-			game->house.m_windows.push_back(Window(0, 0, 0, 0.6f, Axis::POS_X));
+			game->house.m_windows.push_back(Window(glm::vec3(0,0,0), Axis::POS_X));
 			game->RebuildMap();
 		}
 		ImGui::EndTabBar();

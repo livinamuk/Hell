@@ -63,7 +63,8 @@ project "HellEngine"
 		"%{prj.name}/vendor/assimp/include",
 		"%{prj.name}/vendor/rapidjson/include",
 		"%{prj.name}/vendor/sdl/include",
-		"%{prj.name}/vendor/soloud/include"
+		"%{prj.name}/vendor/soloud/include",
+		"%{prj.name}/vendor/tinyexr"
 	}
 
 

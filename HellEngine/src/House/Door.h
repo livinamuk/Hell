@@ -20,16 +20,19 @@ namespace HellEngine
 	public: // methods
 		Door(glm::vec2 position, int story, Axis axis, bool rotateFloorTex);
 		Door(const Door&);
-		~Door();
+		Door& operator = (const Door& input);
+
 		void Draw(Shader* shader);
 		void Update(float deltaTime);
 		void Interact();
 		void UpdateRigidBodyTransfrom();
 		glm::mat4 GetDoorModelMatrixFromPhysicsEngine();
 		void Reconfigure();
+		void CreateCollisionObject();
+		void RemoveCollisionObject();
 	
 	private:
-		void FindConnectedRooms();
+		//void FindConnectedRooms();
 
 		
 	public:	// fields

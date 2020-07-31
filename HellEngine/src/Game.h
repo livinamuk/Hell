@@ -40,12 +40,12 @@ namespace HellEngine
 		Transform m_doorTrans;
 		Player m_player;
 		Entity m_HUDshotgun;
-
 		Transform testTrans; 
 
 		SkinnedModel m_skinnedMesh;
 		//SkinnedModel m_skinnedShotgunMesh;
 		SkinnedModel m_ZombieBoyMesh;
+
 
 
 	//	std::vector<glm::mat4> m_animatedTransforms;

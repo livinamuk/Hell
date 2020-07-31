@@ -104,11 +104,13 @@ namespace HellEngine
 			HoleInWall doorWay;
 			doorWay.position = window.m_transform.position;
 			doorWay.type = HoleInWallType::WINDOW;
-			doorWay.story = window.m_story;
+			//doorWay.story = window.m_story;
 			doorWay.axis = window.m_axis;
 			doorWay.parent = &window;
-			doorWay.bottom_Y = (window.m_story * ROOM_HEIGHT) + window.m_startHeight - 0.05F;;
-			doorWay.top_Y = (window.m_story * ROOM_HEIGHT) + window.m_startHeight + WINDOW_HEIGHT_SINGLE;
+			//doorWay.bottom_Y = (window.m_story * ROOM_HEIGHT) + window.m_startHeight - 0.05F;;
+			//doorWay.top_Y = (window.m_story * ROOM_HEIGHT) + window.m_startHeight + WINDOW_HEIGHT_SINGLE;
+			doorWay.bottom_Y = window.m_transform.position.y;
+			doorWay.top_Y = window.m_transform.position.y + WINDOW_HEIGHT_SINGLE;
 			doorWay.width = WINDOW_WIDTH_SINGLE;
 			potentialConnectedDoorWays.push_back(doorWay);
 		}
@@ -132,7 +134,7 @@ namespace HellEngine
 			HoleInWall doorWay;
 			doorWay.position = door.m_rootTransform.position;
 			doorWay.type = HoleInWallType::DOOR;
-			doorWay.story = door.m_story;
+			//doorWay.story = door.m_story;
 			doorWay.axis = door.m_axis;
 			doorWay.parent = &door; 
 			doorWay.bottom_Y = (door.m_story * ROOM_HEIGHT);

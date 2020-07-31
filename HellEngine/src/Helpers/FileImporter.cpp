@@ -74,16 +74,15 @@ namespace HellEngine
             printf("Error parsing '%s': '%s'\n", filename, m_Importer.GetErrorString());
         }
 
-        std::cout << "\nLoaded: " << filename << "\n";
+       /* std::cout << "\nLoaded: " << filename << "\n";
         std::cout << " " << m_pScene->mNumMeshes << " meshes\n";
         std::cout << " " << skinnedModel->m_NumBones << " bones\n";
-
+        
         for (int i = 0; i < skinnedModel->m_meshEntries.size(); i++)  {
             std::cout << " -" << skinnedModel->m_meshEntries[i].Name << ": " << skinnedModel->m_meshEntries[i].NumIndices << " indices " << skinnedModel->m_meshEntries[i].BaseIndex << " base index " << skinnedModel->m_meshEntries[i].BaseVertex << " base vertex\n";
-        }
+        }*/
 
 
-        Util::PrintMat4(glm::inverse(skinnedModel->m_GlobalInverseTransform));
 
         
 
@@ -330,7 +329,7 @@ namespace HellEngine
         if (m_pAnimationScene) {
             animation->m_duration = m_pAnimationScene->mAnimations[0]->mDuration;
             animation->m_ticksPerSecond = m_pAnimationScene->mAnimations[0]->mTicksPerSecond;
-            std::cout << "Loaded animation: " << Filename << "\n";
+           // std::cout << "Loaded animation: " << Filename << "\n";
         }
 
 

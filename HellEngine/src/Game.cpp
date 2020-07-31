@@ -99,22 +99,6 @@ namespace HellEngine
 
 
 
-
-		if (Input::s_keyPressed[HELL_KEY_M])
-		{
-		
-			SkinnedModel* skinnedModel = m_zombieGuy.GetSkinnedModel();
-			glm::mat4 m = skinnedModel->m_BoneInfo[skinnedModel->m_BoneMapping["thigh_r"]].ModelSpace_AnimatedTransform;
-
-			//Ragdoll* ragdoll = m_zombieGuy.m_ragdoll;
-			//btGeneric6DofConstraint* constraint = ragdoll->m_joints[Ragdoll::JOINT_RIGHT_HIP];
-			//btRigidBody* body = ragdoll->m_bodies[Ragdoll::BODYPART_RIGHT_UPPER_LEG];
-
-			//constraint->calculateTransforms();
-
-			//constraint.getr
-		}
-
 		m_player.Update(m_frameTime);
 		m_player.m_characterController.Update(m_frameTime, &camera);
 
@@ -225,7 +209,10 @@ namespace HellEngine
 	void Game::OnInteract()
 	{
 		if (m_cameraRaycast.m_objectType == PhysicsObjectType::DOOR)
-			house.m_doors[m_cameraRaycast.m_elementIndex].Interact();
+		{
+			Door* door = (Door*)m_cameraRaycast.m_objectPtr;
+			door->Interact();
+		}
 	}
 
 	void Game::RebuildMap()

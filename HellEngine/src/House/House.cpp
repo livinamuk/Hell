@@ -11,6 +11,8 @@ namespace HellEngine
 	House::House()
 	{
 		p_house = this;
+
+		//m_doors.reserve(30);
 	}
 
 	House::~House()
@@ -87,14 +89,12 @@ namespace HellEngine
 
 	void House::RebuildAll()
 	{
-		// Clear the room vectors, and reconstruc the floors/ceilings etc.
 		for (Room& room : m_rooms) {
 			room.Rebuild(); 
 			room.FindDoors(m_doors, m_staircases, m_windows);
 			room.BuildWallMesh();
 			room.m_wallMesh.BufferMeshToGL();
 			room.CalculateWorldSpaceBounds();
-			//room.CalculateLightVolume();
 		}
 
 		DetermineWhichLightIsInWhichRoom();

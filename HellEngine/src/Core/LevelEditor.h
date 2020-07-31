@@ -14,7 +14,7 @@ namespace HellEngine
 	public: // functions
 		static void Update(Game* game);
 		static void DrawOverlay(Shader* shader, Game* game);
-		static void DrawObject(Shader* shader, Game* game, PhysicsObjectType type, unsigned int parentIndex);
+		//static void DrawObject(Shader* shader, Game* game, PhysicsObjectType type, unsigned int parentIndex);
 		static void RenderGizmo(ImGuiIO* io, Game* game);
 		static void SetTranslationFromGizmo(float* fptr, glm::vec3& sourceTranslation);
 		static void SetScaleFromGizmo(float* fptr, glm::vec3& sourceScale);
@@ -32,7 +32,8 @@ namespace HellEngine
 		static void* p_selectedObject;
 		static void* p_hoveredObject;
 
-		static int s_SelectedOjectIndex;
+		//static int s_SelectedOjectIndex;
+		//static void* s_selectedObject;
 		static PhysicsObjectType s_SelectedObjectType; 
 		static RaycastResult s_mouse_ray;
 		static GizmoState s_gizmoState;

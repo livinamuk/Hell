@@ -31,7 +31,7 @@ namespace HellEngine
 		std::vector<btCollisionObject*> m_collisionObjects; // Thee are all the cubes that make up the walls.
 
 	public:	// fields
-		glm::vec2 m_position;
+		glm::vec2 m_position = glm::vec2(0,0);
 		glm::vec2 m_size;
 		int m_story;
 		WallMesh m_wallMesh;

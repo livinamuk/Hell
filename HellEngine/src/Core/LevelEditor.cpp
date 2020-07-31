@@ -5,7 +5,8 @@
 
 namespace HellEngine
 {
-	int LevelEditor::s_SelectedOjectIndex = -1;
+	//int LevelEditor::s_SelectedOjectIndex = -1;
+	//void* LevelEditor::s_selectedObject = nullptr;
 	PhysicsObjectType LevelEditor::s_SelectedObjectType;
 	RaycastResult LevelEditor::s_mouse_ray;
 	GizmoState LevelEditor::s_gizmoState;		
@@ -34,11 +35,14 @@ namespace HellEngine
 		// If you aint hovering the gizmo, then set the selected object to whatever you clicked.
 		if (Input::s_leftMousePressed && !ImGuizmo::IsOver()) {
 			s_SelectedObjectType = s_mouse_ray.m_objectType;
-			s_SelectedOjectIndex = s_mouse_ray.m_elementIndex;
+			p_selectedObject = s_mouse_ray.m_objectPtr;
+			//s_SelectedOjectIndex = s_mouse_ray.m_elementIndex;
 		}
+		//else
+		//	p_selectedObject = nullptr;
 
 		// Get pointer to selected object
-		if (s_SelectedObjectType == PhysicsObjectType::DOOR)
+		/*if (s_SelectedObjectType == PhysicsObjectType::DOOR)
 			p_selectedObject = &game->house.m_doors[s_SelectedOjectIndex];
 		else if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
 			p_selectedObject = &game->house.m_windows[s_SelectedOjectIndex];
@@ -46,37 +50,39 @@ namespace HellEngine
 			p_selectedObject = &game->house.m_entities[s_SelectedOjectIndex];
 		else if (s_SelectedObjectType == PhysicsObjectType::FLOOR)
 			p_selectedObject = &game->house.m_rooms[s_SelectedOjectIndex].m_floor;
-		else
-			p_selectedObject = nullptr;
+		else*/
+		//	p_selectedObject = nullptr;
 
 		// Get pointer to hovered object
 		if (s_mouse_ray.m_objectType == PhysicsObjectType::DOOR)
-			p_hoveredObject = &game->house.m_doors[s_mouse_ray.m_elementIndex];
+			p_hoveredObject = s_mouse_ray.m_objectPtr;// &game->house.m_doors[s_mouse_ray.m_elementIndex];
 		else if (s_mouse_ray.m_objectType == PhysicsObjectType::WINDOW)
-			p_hoveredObject = &game->house.m_windows[s_mouse_ray.m_elementIndex];
+			p_hoveredObject = s_mouse_ray.m_objectPtr; //&game->house.m_windows[s_mouse_ray.m_elementIndex];
 		else if (s_mouse_ray.m_objectType == PhysicsObjectType::MISC_MESH)
-			p_hoveredObject = &game->house.m_entities[s_mouse_ray.m_elementIndex];
+			p_hoveredObject = s_mouse_ray.m_objectPtr; // &game->house.m_entities[s_mouse_ray.m_elementIndex];
 		else if (s_mouse_ray.m_objectType == PhysicsObjectType::FLOOR)
-			p_hoveredObject = &game->house.m_rooms[s_mouse_ray.m_elementIndex].m_floor;
+			p_hoveredObject = s_mouse_ray.m_objectPtr; // &game->house.m_rooms[s_mouse_ray.m_elementIndex].m_floor;
 		else
 			p_hoveredObject = nullptr;
 
 		// Update the light volumes cause you are surely fucking with them moving doors around n shit.
-		House::p_house->BuildLightVolumes();
+		//House::p_house->BuildLightVolumes();
+		//House::p_house->RebuildAll();// Clear the room vectors, and reconstruc the floors/ceilings etc.
+		
 	}
 
 	void LevelEditor::DrawOverlay(Shader* shader, Game* game)
 	{
 		// Draw hover object
-		shader->setVec3("color", glm::vec3(0.9f, 0.9, 0.9f));
+		/*shader->setVec3("color", glm::vec3(0.9f, 0.9, 0.9f));
 		DrawObject(shader, game, s_mouse_ray.m_objectType, s_mouse_ray.m_elementIndex);
 
 		// Draw hover object
 		shader->setVec3("color", glm::vec3(1, 0, 1));
-		DrawObject(shader, game, s_SelectedObjectType, s_SelectedOjectIndex);
+		DrawObject(shader, game, s_SelectedObjectType, s_SelectedOjectIndex);*/
 	}
 
-	void LevelEditor::DrawObject(Shader* shader, Game* game, PhysicsObjectType objectType, unsigned int parentIndex)
+	/*void LevelEditor::DrawObject(Shader* shader, Game* game, PhysicsObjectType objectType, unsigned int parentIndex)
 	{
 		// This function is drawins the white and pink solid colour objects,
 		// for the hoverered and selected item.
@@ -122,7 +128,7 @@ namespace HellEngine
 			Entity* entity = &game->house.m_entities[parentIndex];
 			entity->Draw(shader);
 		}
-	}
+	}*/
 
 	void LevelEditor::RenderGizmo(ImGuiIO* io, Game* game)
 	{
@@ -140,12 +146,13 @@ namespace HellEngine
 		static bool boundSizing = false;
 		static bool boundSizingSnap = false;
 		float* s_fptr_GizmoMatrix;
-		unsigned int i = s_SelectedOjectIndex;
+		//unsigned int i = s_SelectedOjectIndex;
 
 		// Doors
 		if (s_SelectedObjectType == PhysicsObjectType::DOOR)
 		{
-			s_fptr_GizmoMatrix = (float*)glm::value_ptr(game->house.m_doors[i].m_rootTransform.to_mat4());
+			Door* door = (Door*)p_selectedObject;
+			s_fptr_GizmoMatrix = (float*)glm::value_ptr(door->m_rootTransform.to_mat4());
 			EnableSnapToGrid(0.1);
 			SetControlSceheme(GizmoControlScheme::MOVE_WITH_RIGHT_CLICK_TO_ROTATE);
 		}
@@ -153,14 +160,16 @@ namespace HellEngine
 		// Windows
 		else if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
 		{
-			s_fptr_GizmoMatrix = (float*)glm::value_ptr(game->house.m_windows[i].m_transform.to_mat4());
+			Window* window = (Window*)p_selectedObject;
+			s_fptr_GizmoMatrix = (float*)glm::value_ptr(window->m_transform.to_mat4());
 			EnableSnapToGrid(0.1);
 			SetControlSceheme(GizmoControlScheme::MOVE_WITH_RIGHT_CLICK_TO_ROTATE);
 		}
 		// Room?
 		else if (s_SelectedObjectType == PhysicsObjectType::FLOOR)
 		{
-			Room* room = &game->house.m_rooms[i];
+			Floor* floor = (Floor*)p_selectedObject;
+			Room* room = (Room*)floor->m_parent;
 			Transform worldTransform;
 			worldTransform.position = glm::vec3(room->m_position.x, room->m_story * ROOM_HEIGHT, room->m_position.y);
 			worldTransform.scale = glm::vec3(room->m_size.x, 0.025f, room->m_size.y);
@@ -172,7 +181,8 @@ namespace HellEngine
 		// Misc meshes
 		else if (s_SelectedObjectType == PhysicsObjectType::MISC_MESH)
 		{
-			s_fptr_GizmoMatrix = (float*)glm::value_ptr(game->house.m_entities[i].m_transform.to_mat4());
+			Entity* entity = (Entity*)p_selectedObject;
+			s_fptr_GizmoMatrix = (float*)glm::value_ptr(entity->m_transform.to_mat4());
 			DisableSnapToGrid();
 			SetControlSceheme(GizmoControlScheme::MOVE_RESIZE_SCALE);
 		}
@@ -205,10 +215,10 @@ namespace HellEngine
 		// Doors
 		if (s_SelectedObjectType == PhysicsObjectType::DOOR)
 		{
-			Door* door = &game->house.m_doors[i];
+			Door* door = (Door*)p_selectedObject;
 			SetTranslationFromGizmo(s_fptr_GizmoMatrix, door->m_rootTransform.position);
 
-			House::p_house = &game->house;
+		//	House::p_house = &game->house;
 
 			door->Reconfigure();
 			//game->RebuildMap();
@@ -216,7 +226,7 @@ namespace HellEngine
 		// Windows
 		if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
 		{
-			Window* window = &game->house.m_windows[i];
+			Window* window = (Window*)p_selectedObject;
 			SetTranslationFromGizmo(s_fptr_GizmoMatrix, window->m_transform.position);
 			Physics::SetCollisionObjectWorldTranslation(window->m_collisionObject, window->m_transform.position, glm::vec3(0, WINDOW_HEIGHT_SINGLE * 0.5f, 0));
 			Physics::SetCollisionObjectWorldRotation(window->m_collisionObject, window->m_transform.rotation);
@@ -225,11 +235,19 @@ namespace HellEngine
 		// Misc Mesh
 		if (s_SelectedObjectType == PhysicsObjectType::MISC_MESH)
 		{
-			Entity* entity = &game->house.m_entities[i];
+			Entity* entity = (Entity*)p_selectedObject;
 			SetTranslationFromGizmo(s_fptr_GizmoMatrix, entity->m_transform.position);
 			SetScaleFromGizmo(s_fptr_GizmoMatrix, entity->m_transform.scale);
 			SetRotationFromGizmo(deltaptr, entity->m_transform.rotation);
 			Physics::SetCollisionObjectWorldTransform(entity->m_collisionObject, entity->m_transform);
+		}
+
+		// If the matrices are different, recalculate light volumes and wall meshes etc.
+		for (int i = 0; i < 16; i++) {
+			if (s_fptr_GizmoMatrix[i] != deltaptr[i]) { 
+				game->house.RebuildAll();
+				return;
+			}		
 		}
 	}
 
@@ -237,13 +255,13 @@ namespace HellEngine
 	{
 		// Doors
 		if (s_SelectedObjectType == PhysicsObjectType::DOOR) {
-			Door* door = &game->house.m_doors[s_SelectedOjectIndex];
+			Door* door = (Door*)p_selectedObject;
 			Util::RotateAxisBy90(door->m_axis);
 			
 		}
 		// Windows
 		if (s_SelectedObjectType == PhysicsObjectType::WINDOW) {
-			Window* window = &game->house.m_windows[s_SelectedOjectIndex];
+			Window* window = (Window*)p_selectedObject;
 			Util::RotateAxisBy90(window->m_axis);
 			window->Reconfigure();
 		}
@@ -300,6 +318,7 @@ namespace HellEngine
 			shader->setVec3("ColorAdd", glm::vec3(0.9f));
 	}
 
+	
 	//void LevelEditor::SetGizmoMatrix(glm::mat4 matrix)
 //	{
 	//	s_gizmoMatrix
@@ -319,7 +338,6 @@ namespace HellEngine
 		s_snapAmount[0] = snapAmount;
 		s_snapAmount[1] = snapAmount;
 		s_snapAmount[2] = snapAmount;
-
 	}
 }
 

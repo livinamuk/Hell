@@ -22,8 +22,7 @@ namespace HellEngine
 
 		EntityData* entityData = new EntityData();
 		entityData->type = PhysicsObjectType::PLAYER;
-		//entityData->name = "PLAYER";
-		entityData->vectorIndex = 0;
+		entityData->ptr = this;
 		ghostObject_->setUserPointer(entityData);
 
 		//ghostObject_->getCollisionShape()->setMargin(0.04);

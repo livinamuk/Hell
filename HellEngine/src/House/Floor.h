@@ -7,7 +7,7 @@ namespace HellEngine
 	{
 	public: // methods
 		Floor();
-		Floor(glm::vec3 position, glm::vec2 size, int story, bool rotateTexture);
+		Floor(glm::vec3 position, glm::vec2 size, int story, bool rotateTexture, void* parent);
 		Floor(glm::vec3 position, glm::vec2 size); // for stairs
 		void Draw(Shader* shader);
 		void CalculateWorldSpaceCorners();
@@ -15,6 +15,7 @@ namespace HellEngine
 	public:	// fields
 		Transform m_transform; 
 		bool m_rotateTexture;
+		void* m_parent;
 		std::vector<glm::vec3>worldSpaceCorners;
 	};
 }

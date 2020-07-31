@@ -301,11 +301,20 @@ namespace HellEngine
 				}
 				if (ImGui::Button("Delete Door")) {
 					game->house.m_doors.erase(game->house.m_doors.begin() + i);
-					game->RebuildMap();
+					Physics::Update(game->m_frameTime);
+					//game->RebuildMap();
 				}
 				if (ImGui::Button("New Door")) {
 					game->house.m_doors.push_back(Door(glm::vec2(0, 0), 0, Axis::POS_X, true));
-					game->RebuildMap();
+					Physics::AddDoorToPhysicsWorld(&game->house.m_doors[game->house.m_doors.size()-1]);
+
+
+					// repair the pointers
+				/*	for (Door& door : game->house.m_doors) {
+						EntityData* entityData = (EntityData*)door.m_collisionObject->getUserPointer();
+						entityData->ptr = &door;
+					}*/
+					
 				}
 				ImGui::EndTabItem();
 			}

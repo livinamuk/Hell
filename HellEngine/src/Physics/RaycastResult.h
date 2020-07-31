@@ -14,10 +14,11 @@ namespace HellEngine
 		static RaycastResult CastMouseRay(Camera* camera);
 
 	public: // members
-		int m_elementIndex; 
+		//int m_elementIndex; 
 		float m_distance;
 		glm::vec3 m_hitPoint;
 		glm::vec3 m_surfaceNormal;
+		void* m_objectPtr;
 		btRigidBody* m_rigidBody = nullptr;
 		PhysicsObjectType m_objectType;// char* m_name;
 	};

@@ -82,7 +82,12 @@ namespace HellEngine
 		static void AddFloorsAndCeilingsToPhysicsWorld(House* house);
 		static void AddCubesToPhysicsWorld(std::vector<Cube> cubes);
 
+		static void AddDoorToPhysicsWorld(Door* door);
+
 		static btCollisionObject* AddWallSegment(const Transform& transform);
+
+		static btBoxShape* s_windowShape;
+		static btBoxShape* s_doorShape;
 
 	//	static std::vector<btCollisionObject*> m_WallCollisionObjects;
 		//public: // static fields

@@ -16,9 +16,10 @@ namespace HellEngine
 			return;
 
 		// Reset
-		m_elementIndex = -1;
+		//m_elementIndex = -1;
 		m_distance = 0;
 		m_hitPoint = glm::vec3(0);;
+		m_objectPtr = nullptr;
 		m_surfaceNormal = glm::vec3(0);
 		m_objectType = PhysicsObjectType::UNDEFINED;
 		
@@ -71,8 +72,9 @@ namespace HellEngine
 
 			EntityData* entityData = (EntityData*)rigidBody->getUserPointer();
 			if (entityData) {
-				m_elementIndex = entityData->vectorIndex;
+				//m_elementIndex = entityData->vectorIndex;
 				m_objectType = entityData->type;
+				m_objectPtr = entityData->ptr;
 			}
 		}
 	}
@@ -128,12 +130,13 @@ namespace HellEngine
 
 		// init
 		RaycastResult raycastResult;
-		raycastResult.m_elementIndex = -1;
+		//raycastResult.m_elementIndex = -1;
 		raycastResult.m_distance = 0;
 		raycastResult.m_hitPoint = glm::vec3(0);;
 		raycastResult.m_surfaceNormal = glm::vec3(0);
 		raycastResult.m_objectType = PhysicsObjectType::UNDEFINED;
 		raycastResult.m_rigidBody = nullptr;
+		raycastResult.m_objectPtr = nullptr;
 
 
 		if (RayCallback.hasHit())
@@ -158,7 +161,8 @@ namespace HellEngine
 
 			EntityData* entityData = (EntityData*)rigidBody->getUserPointer();
 			if (entityData) {
-				raycastResult.m_elementIndex = entityData->vectorIndex;
+				//raycastResult.m_elementIndex = entityData->vectorIndex;
+				raycastResult.m_objectPtr = entityData->ptr;
 				raycastResult.m_objectType = entityData->type;
 				
 				//std::cout << Util::PhysicsObjectEnumToString(raycastResult.m_objectType) << "\n";

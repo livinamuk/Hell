@@ -22,7 +22,7 @@ namespace HellEngine
 
 	void Room::Rebuild()
 	{
-		m_floor = Floor(glm::vec3(m_position.x, 0, m_position.y), m_size, m_story, false);
+		m_floor = Floor(glm::vec3(m_position.x, 0, m_position.y), m_size, m_story, false, this);
 		m_ceiling = Ceiling(glm::vec3(m_position.x, 0, m_position.y), m_size, m_story, false);
 
 		m_wallMesh.ClearMesh();
@@ -145,16 +145,16 @@ namespace HellEngine
 		for (HoleInWall& doorWay : potentialConnectedDoorWays)
 		{
 			if (withinRange(doorWay.position.x, low_x, high_x)) {
-				if (withinRange(doorWay.position.z, low_z - 0.2f, low_z + 0.2f))
+				if (withinRange(doorWay.position.z, low_z - 0.2f, low_z + 0.2f) && (doorWay.axis != Axis::NEG_Z) && (doorWay.axis != Axis::POS_Z))
 					m_doorWaysXFrontWall.push_back(doorWay);
-				else if (withinRange(doorWay.position.z, high_z - 0.2f, high_z + 0.2f))
+				else if (withinRange(doorWay.position.z, high_z - 0.2f, high_z + 0.2f) && (doorWay.axis != Axis::NEG_Z) && (doorWay.axis != Axis::POS_Z))
 					m_doorWaysXBackWall.push_back(doorWay);
 			}
 
 			if (withinRange(doorWay.position.z, low_z, high_z)) {
-				if (withinRange(doorWay.position.x, low_x - 0.2f, low_x + 0.2f))
+				if (withinRange(doorWay.position.x, low_x - 0.2f, low_x + 0.2f) && (doorWay.axis != Axis::NEG_X) && (doorWay.axis != Axis::POS_X))
 					m_doorWaysZLeftWall.push_back(doorWay);
-				if (withinRange(doorWay.position.x, high_x - 0.2f, high_x + 0.2f))
+				if (withinRange(doorWay.position.x, high_x - 0.2f, high_x + 0.2f) && (doorWay.axis != Axis::NEG_X) && (doorWay.axis != Axis::POS_X))
 					m_doorWaysZRightWall.push_back(doorWay);
 			}
 		}

@@ -19,6 +19,7 @@ namespace HellEngine
 
 	public: // methods
 		Door(glm::vec2 position, int story, Axis axis, bool rotateFloorTex);
+		Door(const Door&);
 		~Door();
 		void Draw(Shader* shader);
 		void Update(float deltaTime);
@@ -35,16 +36,16 @@ namespace HellEngine
 		Transform m_rootTransform;
 		Transform m_doorTransform;
 		Transform m_doorFrameTransform;
-		Axis m_axis;
+		Axis m_axis = Axis::POS_X;
 		Floor m_floor;
-		btRigidBody* m_rigidBody;
+		
+		btCollisionObject* m_collisionObject = nullptr;
 		int m_openStatus = DOOR_CLOSED;
-		int m_story;
+		int m_story = 0;
 		bool initiallyOpen = false;
 		bool initiallyLocked = false;
 		bool locked = false;
 		float openAngle = 0;
 		float maxOpenAngle = 2;
-		//std::vector<void*> m_connectedRooms;
 	};
 }

@@ -123,13 +123,13 @@ namespace HellEngine
 		else
 			doorwayFloorSize = glm::vec2(stairIndent + 0.05f, 1);
 
-		m_bottomDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * bottomFloorTransform.to_mat4()), doorwayFloorSize, m_story, m_bottomDoorwayFloor.m_rotateTexture);
+		m_bottomDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * bottomFloorTransform.to_mat4()), doorwayFloorSize, m_story, m_bottomDoorwayFloor.m_rotateTexture, this);
 		
 		// Floor: top door way
 		Transform topDoorWayFloorTransform;
 		topDoorWayFloorTransform.position = m_topDoorway.position;
 		if (m_axis == Axis::POS_Z) topDoorWayFloorTransform.rotation.y = ROTATE_90;
-		m_topDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * topDoorWayFloorTransform.to_mat4()), doorwayFloorSize, m_story, m_topDoorwayFloor.m_rotateTexture);
+		m_topDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * topDoorWayFloorTransform.to_mat4()), doorwayFloorSize, m_story, m_topDoorwayFloor.m_rotateTexture, this);
 
 
 

@@ -5,6 +5,7 @@
 #include "Audio/Audio.h"
 #include "Renderer/Renderer.h"
 #include "Core/LevelEditor.h"
+#include "Physics/Physics.h"
 
 namespace HellEngine
 {
@@ -16,6 +17,59 @@ namespace HellEngine
 		m_story = story;
 		m_floor.m_rotateTexture = rotateFloorTex;
 		Reconfigure();
+
+
+		Physics::AddDoorToPhysicsWorld(this);
+
+
+		/*{
+			glm::vec3 position = m_rootTransform.position;
+			position.y += DOOR_HEIGHT / 2.0f;
+
+			btTransform transform;
+			transform.setIdentity();
+			transform.setOrigin(Util::glmVec3_to_btVec3(position));
+			transform.setRotation(Util::glmVec3_to_btQuat(m_rootTransform.rotation));
+
+			m_collisionObject = new btCollisionObject();
+			m_collisionObject->setCollisionShape(Physics::s_doorShape);
+			m_collisionObject->setWorldTransform(transform);
+			m_collisionObject->setCustomDebugColor(DEBUG_COLOR_DOOR);
+			EntityData* entityData = new EntityData();
+			entityData->type = PhysicsObjectType::DOOR;
+			entityData->ptr = this;
+			m_collisionObject->setUserPointer(entityData);
+
+			int group = CollisionGroups::HOUSE;
+			int mask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
+
+			Physics::s_dynamicsWorld->addCollisionObject(m_collisionObject, group, mask);
+			//s_collisionObjects.push_back(door->m_collisionObject);
+			m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		}*/
+	//	std::cout << Util::Vec3_to_String(m_rootTransform.position) << ": " << m_collisionObject << '\n';
+	}
+
+	Door::Door(const Door& cpy)
+	{
+		m_collisionObject = cpy.m_collisionObject;
+		m_rootTransform = cpy.m_rootTransform;
+		m_doorTransform = cpy.m_doorTransform;
+		m_doorFrameTransform = cpy.m_doorFrameTransform;
+		m_axis = cpy.m_axis;
+		m_floor = cpy.m_floor;
+		m_openStatus = cpy.m_openStatus;
+		m_story = cpy.m_story;
+		initiallyOpen = cpy.initiallyOpen;
+		initiallyLocked = cpy.initiallyLocked;
+		locked = cpy.locked;
+		openAngle = cpy.openAngle;
+		maxOpenAngle = cpy.maxOpenAngle;
+
+		EntityData* entityData = (EntityData*)m_collisionObject->getUserPointer();
+		entityData->ptr = this;
+
+		m_floor.m_parent = this;
 	}
 
 	Door::~Door()
@@ -28,7 +82,7 @@ namespace HellEngine
 
 		m_rootTransform.rotation = Util::SetRotationByAxis(m_axis);
 		m_doorTransform.position = glm::vec3(0, 0, 0.03f);
-		m_floor = Floor(m_rootTransform.position, glm::vec2(1, 0.1f), m_story, m_floor.m_rotateTexture);
+		m_floor = Floor(m_rootTransform.position, glm::vec2(1, 0.1f), m_story, m_floor.m_rotateTexture, this);
 		m_floor.m_transform.rotation = Util::SetRotationByAxis(m_axis);
 		m_floor.CalculateWorldSpaceCorners();
 		//m_openStatus = DoorStatus::DOOR_CLOSING;
@@ -228,21 +282,29 @@ namespace HellEngine
 		baseTransform.setRotation(btQuaternion(m_rootTransform.rotation.y, 0, 0));
 
 		btTransform newMat = baseTransform * translateXMat * rotateYMat * translateXMat2;
-		m_rigidBody->setWorldTransform(newMat);
+		m_collisionObject->setWorldTransform(newMat);
+		//m_rigidBody->setWorldTransform(newMat);
 	}
 	
 	glm::mat4 Door::GetDoorModelMatrixFromPhysicsEngine()
 	{
 		// Position
-		float xPos = (float)m_rigidBody->getCenterOfMassPosition().x();
-		float yPos = (float)m_rigidBody->getCenterOfMassPosition().y();
-		float zPos = (float)m_rigidBody->getCenterOfMassPosition().z();
+		//float xPos = (float)m_rigidBody->getCenterOfMassPosition().x();
+		//float yPos = (float)m_rigidBody->getCenterOfMassPosition().y();
+		//float zPos = (float)m_rigidBody->getCenterOfMassPosition().z();
+		btTransform transform = m_collisionObject->getWorldTransform();
+		btVector3 position = transform.getOrigin();
+		//float xPos = (float)m_collisionObject->getCenterOfMassPosition().x();
+		//float yPos = (float)m_collisionObject->getCenterOfMassPosition().y();
+		//float zPos = (float)m_collisionObject->getCenterOfMassPosition().z();
 		Transform modelTransform;
-		modelTransform.position = glm::vec3(xPos, yPos - 1, zPos);
+		//modelTransform.position = glm::vec3(xPos, yPos - 1, zPos);
+		modelTransform.position = glm::vec3(position[0], position[1] - 1, position[2]);
 
 		// Rotation
 		btScalar x, y, z;
-		m_rigidBody->getWorldTransform().getRotation().getEulerZYX(x, y, z);
+		//m_rigidBody->getWorldTransform().getRotation().getEulerZYX(x, y, z);
+		m_collisionObject->getWorldTransform().getRotation().getEulerZYX(x, y, z);
 		modelTransform.rotation = glm::vec3(z, y, x);
 
 		return modelTransform.to_mat4();

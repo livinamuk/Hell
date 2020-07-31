@@ -58,10 +58,11 @@
 #define ROOM_HEIGHT		2.4f
 #define DOOR_WIDTH		0.8f
 #define DOOR_HEIGHT		2.0f	
+#define DOOR_DEPTH		0.04f
 #define FLOOR_TRIM_HEIGHT	0.091f
 #define CEILING_TRIM_HEIGHT	0.082f
-#define WINDOW_WIDTH_SINGLE 0.75f
-#define WINDOW_HEIGHT_SINGLE 1.15f
+#define WINDOW_WIDTH_SINGLE 0.79f
+#define WINDOW_HEIGHT_SINGLE 1.2f
 #define WALL_DEPTH 0.05f
 
 #define SCR_WIDTH 1280
@@ -143,9 +144,10 @@ enum class PhysicsObjectType { UNDEFINED, WALL, WINDOW, DOOR, FLOOR, STAIRS, PLA
 
 struct EntityData {
 	//char* name = "NONE";
-	int vectorIndex = -1;
+	//int vectorIndex = -1;
 	unsigned int enumValue = 0;
 	PhysicsObjectType type;
+	void* ptr;
 };
 
 enum GizmoState { MOVE, ROTATE, SCALE };

@@ -147,6 +147,7 @@ namespace HellEngine
 		LoadAnimation("Glock.fbx", "Glock_EmptyReload.fbx");
 		//LoadAnimation("Glock.fbx", "Glock_IdleEmpty.fbx");
 		LoadAnimation("Glock.fbx", "Glock_Equip.fbx");
+		LoadAnimation("Glock.fbx", "Glock_Walk.fbx");
 
 		LoadAnimation("Glock.fbx", "Glock_SingleHanded_Fire0.fbx");
 		LoadAnimation("Glock.fbx", "Glock_SingleHanded_Idle.fbx");

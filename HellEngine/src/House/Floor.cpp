@@ -10,7 +10,7 @@ namespace HellEngine
 	{
 	}
 
-	Floor::Floor(glm::vec3 position, glm::vec2 size, int story, bool rotateTexture)
+	Floor::Floor(glm::vec3 position, glm::vec2 size, int story, bool rotateTexture, void* parent)
 	{
 		m_transform.position.x = position.x;
 		m_transform.position.y = STORY_HEIGHT * story;
@@ -18,6 +18,7 @@ namespace HellEngine
 		m_transform.scale.x = size.x;
 		m_transform.scale.z = size.y;
 		m_rotateTexture = rotateTexture;
+		m_parent = parent;
 		CalculateWorldSpaceCorners();
 	}
 

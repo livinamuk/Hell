@@ -1783,12 +1783,8 @@ namespace HellEngine
 		game->house.Draw(shader, envMapPass);
 		
 		// Projectiles
-		for (Shell& shell : Shell::s_shotgunShells)
-			shell.Draw(shader);
-
-		// Projectiles
-		for (Shell& bulletCasing : Shell::s_bulletCasings)
-			bulletCasing.Draw(shader);
+		Shell::DrawInstanced(shader, Shell::s_shotgunShells);
+		Shell::DrawInstanced(shader, Shell::s_bulletCasings);
 
 
 	

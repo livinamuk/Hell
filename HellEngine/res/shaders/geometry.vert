@@ -64,8 +64,8 @@ void main()
 		gl_Position = projection * view * vec4(FragPos, 1);
 	}
 
-	vec3 T = normalize(vec3(model * vec4(aTangent,   0.0)));
-	vec3 B = normalize(vec3(model * vec4(aBinormal, 0.0)));
-	vec3 N = normalize(vec3(model * vec4(Normal,    0.0)));
+	vec3 T = normalize(vec3(modelMatrix * vec4(aTangent,   0.0)));
+	vec3 B = normalize(vec3(modelMatrix * vec4(aBinormal, 0.0)));
+	vec3 N = normalize(vec3(modelMatrix * vec4(Normal,    0.0)));
 	TBN = mat3(T, B, N);
 }

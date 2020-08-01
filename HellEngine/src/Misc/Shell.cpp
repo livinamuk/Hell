@@ -10,11 +10,13 @@ namespace HellEngine
 {
 	std::vector<Shell> Shell::s_shotgunShells;
 	std::vector<Shell> Shell::s_bulletCasings;
+	unsigned int Shell::buffer;
 
 	Shell::Shell(Transform transform, glm::vec3 initialVelocity, CasingType casingType)
 	{
 		m_casingType = casingType;
 		m_transform = transform;
+		glGenBuffers(1, &buffer);
 
 		if (m_casingType == CasingType::BULLET_CASING)
 			m_shellScale = 1;		
@@ -104,6 +106,73 @@ namespace HellEngine
 			AssetManager::models[BulletCasing_ModelID].Draw(shader, m_modelMatrix * scaleTransform.to_mat4());
 		}
 	}
+
+	void Shell::DrawInstanced(Shader* shader, std::vector<Shell> shells) {
+		GpuProfiler g("Shell");
+		static int Shell_ModelID = AssetManager::GetModelIDByName("Shell");
+		static int Shell_MaterialID = AssetManager::GetMaterialIDByName("Shell");
+		static int BulletCasing_ModelID = AssetManager::GetModelIDByName("BulletCasing");
+		static int BulletCasing_MaterialID = AssetManager::GetMaterialIDByName("BulletCasing");
+
+		std::vector<Transform> scaleTransforms;
+		std::vector<glm::mat4> modelMatrixVector;
+		for (unsigned int i = 0; i < shells.size(); i++) {
+			Transform temp;
+			temp.scale = glm::vec3(shells[i].m_shellScale);
+			scaleTransforms.push_back(temp);
+			// if its a bullet casing, make it bigger. they look too big coming out the gun but too small on the ground...
+			if (shells[i].m_timeSinceHitTheGround > 0 && shells[i].m_casingType == CasingType::BULLET_CASING)
+					scaleTransforms[i].scale = glm::vec3(1.5f);
+		
+			if (shells[i].m_rigidBody != nullptr)
+				shells[i].m_modelMatrix = Physics::GetModelMatrixFromRigidBody(shells[i].m_rigidBody);
+
+			modelMatrixVector.push_back(shells[i].m_modelMatrix * scaleTransforms[i].to_mat4());
+		}
+		
+		//would this ruin anything? checking only the first one..
+		if (shells.size() && shells[0].m_casingType == CasingType::SHOTGUN_SHELL) {
+			AssetManager::BindMaterial(Shell_MaterialID);
+
+			//setup vertex buffers and vertex array for model matrices
+			// vertex buffer object -- should this be created every time?! very stupid question i think .. it keeps slowing the fps down!
+			glBindBuffer(GL_ARRAY_BUFFER, buffer);
+			glBufferData(GL_ARRAY_BUFFER, shells.size() * sizeof(glm::mat4), &modelMatrixVector[0], GL_STATIC_DRAW);
+			
+			unsigned int VAO = AssetManager::models[Shell_ModelID].m_meshes[0]->VAO;
+			glBindVertexArray(VAO);
+			// vertex attributes
+			std::size_t vec4Size = sizeof(glm::vec4);
+			glEnableVertexAttribArray(7);
+			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+			glEnableVertexAttribArray(8);
+			glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+			glEnableVertexAttribArray(9);
+			glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+			glEnableVertexAttribArray(10);
+			glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+
+			glVertexAttribDivisor(7, 1);
+			glVertexAttribDivisor(8, 1);
+			glVertexAttribDivisor(9, 1);
+			glVertexAttribDivisor(10, 1);
+			// 
+
+			//draw
+			glUniform1i(glGetUniformLocation(shader->ID, "instanced"), 1);
+			glBindVertexArray(AssetManager::models[Shell_ModelID].m_meshes[0]->VAO);
+			glDrawElementsInstanced(
+				GL_TRIANGLES, AssetManager::models[Shell_ModelID].m_meshes[0]->indices.size(), GL_UNSIGNED_INT, 0, shells.size()
+			);
+			glUniform1i(glGetUniformLocation(shader->ID, "instanced"), 0);
+			//
+		}
+		else if (shells.size() && shells[0].m_casingType == CasingType::BULLET_CASING) {
+			AssetManager::BindMaterial(BulletCasing_MaterialID);
+			//AssetManager::models[BulletCasing_ModelID].Draw(shader, m_modelMatrix * scaleTransform.to_mat4());
+		}
+	}
+
 
 	void Shell::Update(float deltaTime)
 	{

@@ -14,6 +14,7 @@ namespace HellEngine
 		Shell(Transform transform, glm::vec3 initialVelocity, CasingType casingType);
 		void Update(float deltaTime);
 		void Draw(Shader* shader);
+		static void DrawInstanced(Shader* shader, std::vector<Shell> shells);
 
 		btRigidBody* m_rigidBody; 
 		glm::mat4 m_modelMatrix;
@@ -21,6 +22,8 @@ namespace HellEngine
 		float m_timeSinceHitTheGround = 0;
 		float m_lifeTime = 0;
 		CasingType m_casingType;
+		static unsigned int buffer;
+
 
 		static std::vector<Shell> s_shotgunShells;
 		static std::vector<Shell> s_bulletCasings;

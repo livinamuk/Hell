@@ -7,6 +7,8 @@ layout (location = 3) in vec3 aTangent;
 layout (location = 4) in vec3 aBinormal;
 layout (location = 5) in ivec4 aBoneID;
 layout (location = 6) in vec4 aBoneWeight;
+layout (location = 7) in mat4 instanceMatrix;
+
 
 uniform mat4 view;
 uniform mat4 model;
@@ -19,11 +21,16 @@ out mat3 TBN;
 
 uniform bool hasAnimation;
 uniform mat4 skinningMats[64];
+uniform bool instanced;
 
 void main()
 {
 	TexCoord = aTexCoord;
-	mat4 modelMatrix = model;
+	mat4 modelMatrix;
+	if (!instanced)
+		modelMatrix = model;
+	else 
+		modelMatrix = instanceMatrix;
 
 	vec4 worldPos;
 	vec4 totalLocalPos = vec4(0.0);

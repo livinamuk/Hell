@@ -82,6 +82,8 @@ namespace HellEngine
 	bool Renderer::b_showCubemap = false;
 	bool Renderer::b_renderDoorWayVolumes = true;
 
+	float Renderer::s_animTime = 0;
+
 
 	void Renderer::Init()
 	{
@@ -511,6 +513,11 @@ namespace HellEngine
 		}
 
 		{
+			GpuProfiler g("Volumetric Pass");
+			VolumetricBloodPass(game, &s_BloodVolumetricShader);
+		}
+
+		{
 			GpuProfiler g("EditorOverlayPass");
 			EditorOverlayPass(game, &s_SolidColor3D);
 		}
@@ -548,7 +555,7 @@ namespace HellEngine
 			else
 				//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
 			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, game->house.m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
-				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, AssetManager::s_ExrTexture.gTexId, s_gBuffer.gFinalLighting);
+				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, AssetManager::s_ExrTexture_pos.gTexId, s_gBuffer.gFinalLighting);
 			//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
 		}
 
@@ -876,8 +883,11 @@ namespace HellEngine
 		text = "FPS: ";
 		text += std::to_string(game->m_fps);
 		text += "\n";
-
-		text += "Anim index: ";
+		text = "s_animTime: ";
+		text += std::to_string(s_animTime);
+		text += "\n";
+		
+	/*	text += "Anim index: ";
 		text += std::to_string(WeaponLogic::p_currentAnimatedEntity->m_currentAnimationIndex) + "\n";
 		text += "Anim time: ";
 		text += std::to_string(WeaponLogic::p_currentAnimatedEntity->m_currentAnimationTime) + "\n";
@@ -953,8 +963,8 @@ namespace HellEngine
 		text += std::to_string(WeaponLogic::s_SelectedWeapon);
 		text += "\n";*/
 
-		s_debugString = Util::Mat4ToString(WeaponLogic::s_AnimatedCameraMatrix);
-		text += s_debugString;
+		//s_debugString = Util::Mat4ToString(WeaponLogic::s_AnimatedCameraMatrix);
+	//	text += s_debugString;
 
 		TextBlitter::BlitText(text, false);
 		{
@@ -1053,6 +1063,31 @@ namespace HellEngine
 		s_geometryShader.setMat4("view", game->camera.m_viewMatrix);
 		DrawScene(game, shader, true, false);
 
+
+	/*	Transform transform;// = Renderer::s_DebugTransform;
+		transform.position.y = 1;
+		transform.scale = glm::vec3(0.0001f);
+
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("White"));
+
+		Model* blood_mesh = AssetManager::GetModelByName("blood_mesh");
+		//blood_mesh->Draw(shader, transform.to_mat4());
+
+		int VAO = blood_mesh->m_meshes[0]->VAO;
+		int numIndices = blood_mesh->m_meshes[0]->indices.size();
+		int numVerts = blood_mesh->m_meshes[0]->vertices.size();
+
+		s_geometryShader.setMat4("model", transform.to_mat4());
+
+		glBindVertexArray(VAO);
+		glPointSize(4);
+		//glDisable(GL_DEPTH_TEST);
+		glDrawElements(GL_POINTS, (GLsizei)numIndices, GL_UNSIGNED_INT, 0);
+		*/
+		//	glDrawArrays(GL_POINTS, 0, (GLsizei)numIndices);
+
+		//	glDrawArrays(GL_POINTS, 0, 1);
+
 		glDepthMask(GL_FALSE);
 	}
 
@@ -1098,6 +1133,63 @@ namespace HellEngine
 		//s_bloodVolumetricEffect.Draw(&s_BloodShader, s_hitPoint);
 
 		// Muzzle flash
+	}
+
+
+	void Renderer::VolumetricBloodPass(Game* game, Shader* shader)
+	{
+		s_animTime += game->m_frameTime;
+
+		if (Input::s_keyPressed[HELL_KEY_U])
+			s_animTime = 0;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+
+		unsigned int attachments[1] = { GL_COLOR_ATTACHMENT4 };
+		glDrawBuffers(1, attachments);
+
+		//glEnable(GL_DEPTH_TEST);
+		//glDepthMask(GL_FALSE);
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_DEPTH_TEST);
+
+		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("White"));
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, HellEngine::AssetManager::s_ExrTexture_pos.gTexId);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, HellEngine::AssetManager::s_ExrTexture_norm.gTexId);
+
+
+		Transform transform;// = Renderer::s_DebugTransform;
+		transform.position.y = 1;
+		transform.scale = glm::vec3(0.0001f);
+
+		
+		Model* blood_mesh = AssetManager::GetModelByName("blood_mesh");
+		//blood_mesh->Draw(shader, transform.to_mat4());
+
+		int VAO = blood_mesh->m_meshes[0]->VAO;
+		int numIndices = blood_mesh->m_meshes[0]->indices.size();
+		int numVerts = blood_mesh->m_meshes[0]->vertices.size();
+
+		shader->use();
+		shader->setMat4("u_MatrixProjection", game->camera.m_projectionMatrix);
+		shader->setMat4("u_MatrixView", game->camera.m_viewMatrix);
+		shader->setFloat("u_Time", s_animTime);
+		shader->setVec3("u_WorldSpaceCameraPos", game->camera.m_viewPos);
+		shader->setMat4("u_MatrixWorld", transform.to_mat4());
+
+		glBindVertexArray(VAO);
+		glPointSize(4);
+		glDisable(GL_DEPTH_TEST);
+		glDrawElements(GL_TRIANGLES, (GLsizei)numIndices, GL_UNSIGNED_INT, 0);
+
+
+		//Model* blood_mesh = AssetManager::GetModelByName("blood_mesh");
+		//blood_mesh->Draw(shader, glm::mat4(1));
 	}
 
 	void Renderer::DecalPass(Game* game, Shader* shader)
@@ -1691,17 +1783,11 @@ namespace HellEngine
 		game->house.Draw(shader, envMapPass);
 		
 		// Projectiles
-		std::vector<Shell> shotgunshells;
-		for (Shell& shell : Shell::s_shotgunShells)
-			//shell.Draw(shader);
-			shotgunshells.push_back(shell);
-		Shell::DrawInstanced(shader, shotgunshells);
-
-		// Projectiles
-		for (Shell& bulletCasing : Shell::s_bulletCasings)
-			bulletCasing.Draw(shader);
+		Shell::DrawInstanced(shader, Shell::s_shotgunShells);
+		Shell::DrawInstanced(shader, Shell::s_bulletCasings);
 
 
+	
 		////////////////
 		// ZOMBIE BOY //
 		////////////////

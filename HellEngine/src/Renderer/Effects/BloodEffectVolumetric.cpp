@@ -27,8 +27,9 @@ namespace HellEngine
 
 	void BloodEffectVolumetric::Draw(Shader* shader, Transform& global)
 	{
-		if (m_CurrentTime >= AnimationSeconds)
-			return;
+		//if (m_CurrentTime >= AnimationSeconds)
+		//	return;
+
 
 		GpuProfiler g("BloodEffectVolumetric");
 		glDepthMask(false);

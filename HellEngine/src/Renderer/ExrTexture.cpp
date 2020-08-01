@@ -40,6 +40,10 @@ namespace HellEngine
         // @todo { Use GL_RGBA32F for internal texture format. }
         //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, gExrWidth, gExrHeight, 0, GL_RGBA, GL_FLOAT, gExrRGBA);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16, gExrWidth, gExrHeight, 0, GL_RGBA, GL_FLOAT, gExrRGBA);
+
+      /*  for (int i = 0; i < gExrWidth; i++) {
+            std::cout << i << ": " << gExrRGBA[i] << "\n";
+        }*/
 	}
 
     bool ExrTexture::GetEXRLayers(const char* filename)

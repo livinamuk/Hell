@@ -65,6 +65,7 @@ namespace HellEngine
 			Renderer::s_solidColorShader.ReloadShader();
 			Renderer::s_GunInspectShader.ReloadShader();
 			Renderer::s_SolidColor3D.ReloadShader();
+			Renderer::s_BloodVolumetricShader.ReloadShader();
 			Renderer::SetTextureBindings();
 		}
 

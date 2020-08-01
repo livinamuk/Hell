@@ -9,7 +9,6 @@ layout (location = 5) in ivec4 aBoneID;
 layout (location = 6) in vec4 aBoneWeight;
 layout (location = 7) in mat4 instanceMatrix;
 
-
 uniform mat4 view;
 uniform mat4 model;
 uniform mat4 projection;
@@ -25,7 +24,9 @@ uniform bool instanced;
 
 void main()
 {
-	TexCoord = aTexCoord;
+
+	TexCoord = aTexCoord;	
+	
 	mat4 modelMatrix;
 	if (!instanced)
 		modelMatrix = model;
@@ -64,8 +65,8 @@ void main()
 		gl_Position = projection * view * vec4(FragPos, 1);
 	}
 
-	vec3 T = normalize(vec3(model * vec4(aTangent,   0.0)));
-	vec3 B = normalize(vec3(model * vec4(aBinormal, 0.0)));
-	vec3 N = normalize(vec3(model * vec4(Normal,    0.0)));
+	vec3 T = normalize(vec3(modelMatrix * vec4(aTangent,   0.0)));
+	vec3 B = normalize(vec3(modelMatrix * vec4(aBinormal, 0.0)));
+	vec3 N = normalize(vec3(modelMatrix * vec4(Normal,    0.0)));
 	TBN = mat3(T, B, N);
 }

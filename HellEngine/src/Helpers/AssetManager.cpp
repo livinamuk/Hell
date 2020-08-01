@@ -34,14 +34,16 @@ namespace HellEngine
 	unsigned int AssetManager::s_ModelID_StaircaseCeilingTrimStraight;
 	unsigned int AssetManager::s_ModelID_Staircase;
 
-	ExrTexture AssetManager::s_ExrTexture;
+	ExrTexture AssetManager::s_ExrTexture_pos;
+	ExrTexture AssetManager::s_ExrTexture_norm;
 
 	bool AssetManager::s_loadingComplete = false;
 	std::string AssetManager::s_loadLog = "WELCOME TO HELL\nLoadng please wait...\n";
 
 	void AssetManager::FindAllFiles()
 	{
-		s_ExrTexture = ExrTexture("res/textures/blood_pos.exr");
+		s_ExrTexture_pos = ExrTexture("res/textures/blood_pos.exr");
+		s_ExrTexture_norm = ExrTexture("res/textures/blood_norm.exr");
 
 		// Find all textures
 		std::string path = "res/textures/";
@@ -131,6 +133,7 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Shell.obj"));
 		models.emplace_back(Model("res/models/BulletCasing.obj"));
 		models.emplace_back(Model("res/models/Window.obj"));
+		models.emplace_back(Model("res/models/blood_mesh.obj"));
 		//models.emplace_back(Model("res/models/Glock.obj"));
 		//models.emplace_back(Model("res/models/Glass.obj"));
 

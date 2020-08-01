@@ -64,6 +64,7 @@ namespace HellEngine
 		GpuProfiler g("Mesh");
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_LINES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
 	}
 
 	void Mesh::SetupMesh()

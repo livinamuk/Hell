@@ -86,6 +86,7 @@ namespace HellEngine
 		static unsigned int s_ModelID_StaircaseCeilingTrimStraight;
 		static unsigned int s_ModelID_Staircase;
 
-		static ExrTexture s_ExrTexture;
+		static ExrTexture s_ExrTexture_pos;
+		static ExrTexture s_ExrTexture_norm;
 	};
 }

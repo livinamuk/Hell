@@ -57,7 +57,7 @@ namespace HellEngine
 		static void RenderDebugTextures(Shader* shader, unsigned int texture0_ID, unsigned int texture1_ID, unsigned int texture2_ID, unsigned int texture3_ID);
 		static void BulletDebugDraw(Game* game, Shader* shader);
 		static void EditorOverlayPass(Game* game, Shader* shader);
-
+		static void VolumetricBloodPass(Game* game, Shader* shader);
 
 		static void ViewCubeMap(Game* , Shader* shader, unsigned int CubeMapID);
 		static void CreateBRDFLut();
@@ -150,5 +150,7 @@ namespace HellEngine
 		static std::string s_debugString;
 
 		static AnimatedEntity s_zombieAnimatedEntity;
+
+		static float s_animTime;
 	};
 }

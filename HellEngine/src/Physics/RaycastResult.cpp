@@ -44,7 +44,7 @@ namespace HellEngine
 		//rayCallback.m_collisionFilterMask &= ~btBroadphaseProxy::CharacterFilter;
 		//rayCallback.m_collisionFilterMask &= CollisionGroups::HOUSE | CollisionGroups::PROJECTILES;
 		rayCallback.m_collisionFilterGroup = btBroadphaseProxy::AllFilter;
-		rayCallback.m_collisionFilterMask =  ~CollisionGroups::PLAYER;
+		rayCallback.m_collisionFilterMask =  ~(CollisionGroups::PLAYER | CollisionGroups::EDITOR_ONLY);
 
 		Physics::s_dynamicsWorld->rayTest(
 			btVector3(rayOrigin.x, rayOrigin.y, rayOrigin.z),

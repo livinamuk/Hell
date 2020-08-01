@@ -1,4 +1,4 @@
-#version 330 core
+#version 420 core
 
 layout (location = 0) in vec3 a_Position;
 layout (location = 2) in vec2 a_Texcoord;
@@ -8,14 +8,15 @@ uniform mat4 u_MatrixView;
 uniform mat4 u_MatrixWorld;
 uniform mat4 u_MatrixInverseWorld;
 
-uniform sampler2D u_PosTex;
-uniform sampler2D u_NormTex;
-uniform float u_BoundingMax;
-uniform float u_BoundingMin;
-uniform float u_Speed;
-uniform int u_NumOfFrames;
-uniform vec4 u_HeightOffset;
-uniform float u_TimeInFrames;
+layout (binding = 0) uniform sampler2D u_PosTex;
+layout (binding = 1) uniform sampler2D u_NormTex;
+
+//uniform float u_BoundingMax;
+//uniform float u_BoundingMin;
+//uniform float u_Speed;
+//uniform int u_NumOfFrames;
+//uniform vec4 u_HeightOffset;
+uniform float u_Time;
 uniform vec3 u_WorldSpaceCameraPos;
 
 out vec3 v_WorldNormal;
@@ -38,30 +39,68 @@ vec3 LinearToGammaSpace (vec3 linRGB)
    return vec3(LinearToGammaSpaceExact(linRGB.r), LinearToGammaSpaceExact(linRGB.g), LinearToGammaSpaceExact(linRGB.b));
 }
 
+vec3 ObjSpaceViewDir(vec3 v )
+{
+    //vec3 objSpaceCameraPos = mul(u_MatrixWorld, vec4(u_WorldSpaceCameraPos.xyz, 1)).xyz;
+    vec3 objSpaceCameraPos = (u_MatrixWorld, vec4(u_WorldSpaceCameraPos.xyz, 1)).xyz;
+    return objSpaceCameraPos - v.xyz;
+}
+
 void main() {
 
-    float currentSpeed = u_Speed / u_NumOfFrames;
+    //float currentSpeed = u_Speed / u_NumOfFrames;
 
-    vec2 coord = vec2(a_Texcoord.x, a_Texcoord.y - u_TimeInFrames);    
+ // float  u_Time = 0;
 
-    vec4 texturePos = textureLod(u_PosTex, coord, 0);
-    vec4 textureNorm = textureLod(u_NormTex, coord, 0);
+    int u_NumOfFrames = 81;
+    int u_Speed = 35;
+    int u_BoundingMax = 144;
+    int u_BoundingMin = 116;
+    vec3 u_HeightOffset = vec3(-45.4, -26.17, 12.7);
+
+    u_BoundingMax = 1;
+    u_BoundingMin = -1;
+    u_HeightOffset = vec3(0, 0, 0);
+
+    float currentSpeed = 1.0f / (u_NumOfFrames / u_Speed);
+    float timeInFrames = ((ceil(fract(-u_Time * currentSpeed) * u_NumOfFrames)) / u_NumOfFrames) + (1.0 / u_NumOfFrames);
+
+    vec3 v = a_Position;
+    vec2 uv = a_Texcoord;
+
+    timeInFrames = u_Time;//
+   // timeInFrames = 0.166;
+
+    vec4 texturePos = textureLod(u_PosTex, vec2(uv.x, (timeInFrames + uv.y)), 0);
+    vec4 textureNorm = textureLod(u_NormTex, vec2(uv.x, (timeInFrames + uv.y)), 0);
+
+    //float expand = u_BoundingMax - u_BoundingMin;
+    //texturePos.xyz *= expand;
+    //texturePos.xyz += u_BoundingMin;
+    //texturePos.x *= -1;
+
+    //v = texturePos.xzy * 20000;
+        
+   // texturePos *= (0.0001);
+
+   // v = texturePos.xzy;
+   // v += u_HeightOffset.xyz;
     
-    texturePos.xyz = LinearToGammaSpace(texturePos.xyz);
-    textureNorm.xyz = LinearToGammaSpace(textureNorm.xyz);
 
-    float expand = u_BoundingMax - u_BoundingMin;
+  //  gl_Position = u_MatrixProjection * u_MatrixView * u_MatrixWorld * vec4(a_Position, 1.0);
     
-    texturePos.xyz *= expand;
-    texturePos.xyz += vec3(u_BoundingMin, u_BoundingMin, u_BoundingMin);
+    v = texturePos.xzy * 25000;
 
-    texturePos.x *= -1;
-    vec3 vertexPos = texturePos.xyz + vec3(u_HeightOffset.x, u_HeightOffset.y, u_HeightOffset.z);
+    v_WorldNormal = textureNorm.xzy * 2 - 1;
+    v_WorldNormal.x *= -1;
+
+    v_ViewDir = ObjSpaceViewDir(v);
+
+    gl_Position = u_MatrixProjection * u_MatrixView * u_MatrixWorld * vec4(v, 1.0);
                 
-    v_WorldNormal = textureNorm.xyz * 2 - vec3(1, 1, 1); 
-    v_WorldNormal.x = -v_WorldNormal.x;
+   // v_WorldNormal = textureNorm.xyz * 2 - vec3(1, 1, 1); 
+    //v_WorldNormal.x = -v_WorldNormal.x;
     
-    v_ViewDir = (u_MatrixInverseWorld * vec4(u_WorldSpaceCameraPos, 1.0)).xyz - vertexPos;
+    //v_ViewDir = (u_MatrixInverseWorld * vec4(u_WorldSpaceCameraPos, 1.0)).xyz - vertexPos;
 
-    gl_Position = u_MatrixProjection * u_MatrixView * u_MatrixWorld * vec4(vertexPos, 1.0);
 }

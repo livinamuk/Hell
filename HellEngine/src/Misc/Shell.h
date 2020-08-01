@@ -23,10 +23,6 @@ namespace HellEngine
 		float m_lifeTime = 0;
 		CasingType m_casingType;
 		static unsigned int buffer;
-<<<<<<< HEAD
-
-=======
->>>>>>> 7c5eff1fc59fc54645bd52f7ff2c252d417a6228
 
 		static std::vector<Shell> s_shotgunShells;
 		static std::vector<Shell> s_bulletCasings;

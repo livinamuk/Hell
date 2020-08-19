@@ -51,14 +51,24 @@ namespace HellEngine
 		m_rootTransform.position.y = m_story * STORY_HEIGHT;
 		m_rootTransform.rotation = Util::SetRotationByAxis(m_axis);
 		m_doorTransform.position = glm::vec3(0, 0, 0.03f);
-		m_floor = Floor(m_rootTransform.position, glm::vec2(1, 0.1f), m_story, m_floor.m_rotateTexture, this);
-		m_floor.m_transform.rotation = Util::SetRotationByAxis(m_axis);
+
+		Transform floorTransform;
+		floorTransform.position = m_rootTransform.position;
+		floorTransform.rotation = m_rootTransform.rotation;
+		floorTransform.scale = glm::vec3(DOOR_WIDTH, FLOOR_THICKNESS, 0.1);
+
+		m_floor = Floor(floorTransform, m_floor.m_rotateTexture, this);
+
+	//	m_floor.m_transform.rotation = Util::SetRotationByAxis(m_axis);
 		m_floor.CalculateWorldSpaceCorners();
 	}
 
 	void Door::CreateCollisionObject()
 	{
-		Transform transform = m_rootTransform;
+		btTransform transform;
+		transform.setIdentity();
+		transform.setOrigin(Util::glmVec3_to_btVec3(m_rootTransform.position));
+		transform.setRotation(Util::glmVec3_to_btQuat(m_rootTransform.rotation));
 		float friction = 0.5f;
 		int collisionGroup = CollisionGroups::HOUSE;
 		int collisionMask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
@@ -98,17 +108,17 @@ namespace HellEngine
 		modelID = AssetManager::GetModelIDByName("Door");
 
 
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Door"));
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("Door"));
 		AssetManager::DrawModel(modelID, shader, GetDoorModelMatrixFromPhysicsEngine());
 	//	AssetManager::DrawModel(AssetManager::GetModelIDByName("DoorVolumeA"), shader, GetDoorModelMatrixFromPhysicsEngine());
 
 		//AssetManager::DrawModel(AssetManager::s_ModelID_Door, shader, GetDoorModelMatrixFromPhysicsEngine());
 
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("DoorFrame")); 
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("DoorFrame")); 
 		AssetManager::DrawModel(AssetManager::s_ModelID_DoorFrame, shader, m_rootTransform.to_mat4() * m_doorFrameTransform.to_mat4());
 
 		// Draw Floor
-		AssetManager::BindMaterial(AssetManager::s_MaterialID_FloorBoards);
+		AssetManager::BindMaterial_0(AssetManager::s_MaterialID_FloorBoards);
 		m_floor.Draw(shader);
 
 		shader->setVec3("ColorAdd", glm::vec3(0, 0, 0));

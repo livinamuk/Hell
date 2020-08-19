@@ -117,7 +117,8 @@ int main()
 	return 0;
 
 	{
+		Opp c = Opp(1100);
 		Opp r = Opp(2000);
-		Opp m = Opp(1650); // reckons there was only 5 the dog. so 1350 uggh.
+		Opp m = Opp(1350 - 275); //1350 but i got one back so - 275
 	}
 }

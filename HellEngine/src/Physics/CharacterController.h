@@ -26,7 +26,7 @@ namespace HellEngine
 		float height = 0.9f;
 		float mass = 5;
 
-		float m_currentViewHeight;
+		float m_currentViewHeight = 0; // MUST START AT 0 TO PREVENT BAD INTEROPLATION
 		float m_currentMovementSpeed;
 		bool m_isCrouching;
 

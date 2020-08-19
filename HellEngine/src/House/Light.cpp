@@ -12,7 +12,7 @@ namespace HellEngine
 		Init();
 	}
 
-	Light::Light(glm::vec3 position, glm::vec3 color, float radius, float strength, float magic, Transform modelTransform)
+	Light::Light(glm::vec3 position, glm::vec3 color, float radius, float strength, float magic, Transform modelTransform, int modelType)
 	{
 		m_position = position;
 		m_modelTransform = modelTransform;
@@ -20,6 +20,7 @@ namespace HellEngine
 		m_magic = magic;
 		m_strength = strength;
 		m_color = color;	
+		m_modelType = modelType;
 		Init();
 	}
 

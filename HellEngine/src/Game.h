@@ -34,7 +34,7 @@ namespace HellEngine
 	public: // Fields
 		double currentTime, lastFrame;
 		Camera camera;
-		House house;
+		//House house;
 		//Transform m_shotgunTransform;
 		RaycastResult m_cameraRaycast;
 		Transform m_doorTrans;

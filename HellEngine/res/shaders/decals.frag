@@ -4,14 +4,9 @@ layout (location = 0) out vec3 gAlbedo;
 layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec3 gRMA;
 
-//layout (location = 0) out vec4 gEmissive;   // metallic in alpha
-//layout (location = 1) out vec4 gNormal;     // roughness in alpha
-//layout (location = 2) out vec4 baseColor;
-
 layout (binding = 0) uniform sampler2D depthTexture;
 layout (binding = 1) uniform sampler2D normalTexture;
 layout (binding = 2) uniform sampler2D diffuseTexture;
-
 
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
@@ -26,18 +21,6 @@ in mat3 TBN;
 
 void main()
 {    
-    //Position on the screen
-    //float2 screenPos = positionCS.xy / positionCS.w;
-    
-    //Convert into a texture coordinate
-   // vec2 depthCoords = vec2((1 + gl_FragCoord.x) / 2 + (0.5 / screenWidth), (1 - gl_FragCoord.y) / 2 + (0.5 / screenHeight));
-
-    //Sample a value from the depth buffer
-    //vec4 sampledDepth =  texture(depthTexture, vec2(depthCoords.s, depthCoords.t));
-
-
-
-
     // Get the Fragment Z position (from the depth buffer)
     vec2 depthCoords = gl_FragCoord.xy / vec2(screenWidth, screenHeight);
     float z = texture(depthTexture, vec2(depthCoords.s, depthCoords.t)).x * 2.0f - 1.0f;
@@ -49,26 +32,14 @@ void main()
     vec4 worldSpacePosition = inverseViewMatrix * viewSpacePosition;
     vec3 WorldPos = worldSpacePosition.xyz;
 	
-	//vec4 objectPosition = mul(WorldPos, inverse(model));
 	vec4 objectPosition = inverse(model) * vec4(WorldPos, 1.0);
-
 
     if (abs(objectPosition.x) > 0.5)
         discard;
     if (abs(objectPosition.y) > 0.5)
         discard;
-   // if (abs(objectPosition.z) > 0.5)
-    //    discard;
 
-    //
-    // Clipping
-    //vec3 orientation = normalize(vec3(model[0].y, model[1].y, model[2].y));
-    //vec3 orientation = normalize(model[1].xyz);
-    //float threshold = -0.95241298041;
     vec3 normal = texture(normalTexture, vec2(depthCoords.s, depthCoords.t)).rgb;
-    
-   // if (dot(normal, targetPlaneSurfaceNormal)  < 0.6) 
-   //    discard;//- threshold < 0) discard;
 
 	// Add 0.5 to get texture coordinates.
 	vec2 decalTexCoord = objectPosition.xy + 0.5;
@@ -81,28 +52,4 @@ void main()
     gNormal = targetPlaneSurfaceNormal;
 
     gRMA = vec3(1, 0, 1);
-
-//if (writeRoughnessMetallic == 1) {
- //   if (texture(diffuseTexture, decalTexCoord).a > 0.5)
-//        gEmissive.a = 1;
-    
-    //   gNormal.a = 1 * texture(diffuseTexture, decalTexCoord).a;
- //   }
-
-
-
-
-
-
-
- //   baseColor.rgb = orientation;
-
-  //baseColor.rgb = targetPlaneSurfaceNormal;
-
-//  if (dot(normal, targetPlaneSurfaceNormal) < 0.5)  
-//    baseColor.rgb = vec3(1);
 }
-
-
-	//  Reject anything outside.
-	//clip(0.5 - abs(objectPosition.xyz)); YOU COMMENTED THIS OUT RECKLESSLY

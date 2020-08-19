@@ -37,7 +37,7 @@ namespace HellEngine
 		shader->setMat4("model", modelMatrix);
 
 		for (int i = 0; i < skinnedModel->m_meshEntries.size(); i++) {
-			AssetManager::BindMaterial(m_MaterialIDs[i]);
+			AssetManager::BindMaterial_0(m_MaterialIDs[i]);
 			glDrawElementsBaseVertex(GL_TRIANGLES, skinnedModel->m_meshEntries[i].NumIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * skinnedModel->m_meshEntries[i].BaseIndex), skinnedModel->m_meshEntries[i].BaseVertex);
 		}
 		

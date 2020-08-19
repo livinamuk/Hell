@@ -20,6 +20,8 @@ namespace HellEngine
 		void DrawMesh(Shader* shader, int meshIndex, glm::mat4 modelMatrix);
 		//void SetMeshMaterialByName(const char* meshName, unsigned int materialID);
 		//void SetMaterial(unsigned int materialID);
+		void Set_Mesh_MaterialID_Set0(const char* meshname, unsigned int materialID);
+		void Set_Mesh_MaterialID_Set1(const char* meshname, unsigned int materialID);
 	
 	public:
 		std::vector<Mesh*> m_meshes;

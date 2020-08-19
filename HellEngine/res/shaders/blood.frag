@@ -7,7 +7,8 @@ uniform float     u_TimeLerp;
 uniform sampler2D u_MainTexture;
 uniform bool u_isBlood;
 
-in  vec2 v_Texcoord;
+in vec2 Texcoord;
+in vec3 Normal;
 out vec4 FragColor;
 
 
@@ -38,8 +39,8 @@ void main() {
 	vec2 tileOffset1 = ivec2(frameIndex1 % u_CountColumn, frameIndex1 / u_CountColumn) * sizeTile;
 
 
-	vec4 color0 = texture(u_MainTexture, tileOffset0 + v_Texcoord * sizeTile);
-	vec4 color1 = texture(u_MainTexture, tileOffset1 + v_Texcoord * sizeTile);
+	vec4 color0 = texture(u_MainTexture, tileOffset0 + Texcoord * sizeTile);
+	vec4 color1 = texture(u_MainTexture, tileOffset1 + Texcoord * sizeTile);
 	
 	
 	vec3 tint = vec3(1, 1, 1);
@@ -73,5 +74,12 @@ void main() {
 
 	FragColor = color;
 
+	if (u_isBlood)
+	{
+		//FragColor = vec4(Normal, 1);
 
+	//	FragColor = vec4(1, 0, 1 , 1);
+
+		}
+	
 }

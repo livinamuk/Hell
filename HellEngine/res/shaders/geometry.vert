@@ -1,4 +1,4 @@
-#version 330 core
+#version 420 core
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
@@ -7,7 +7,8 @@ layout (location = 3) in vec3 aTangent;
 layout (location = 4) in vec3 aBinormal;
 layout (location = 5) in ivec4 aBoneID;
 layout (location = 6) in vec4 aBoneWeight;
-layout (location = 7) in mat4 instanceMatrix;
+layout (location = 7) in int aMaterialID;
+layout (location = 8) in mat4 instanceMatrix;
 
 uniform mat4 view;
 uniform mat4 model;
@@ -17,6 +18,7 @@ out vec3 FragPos;
 out vec2 TexCoord;
 out vec3 Normal;
 out mat3 TBN;
+out float MaterialID;
 
 uniform bool hasAnimation;
 uniform mat4 skinningMats[64];
@@ -24,12 +26,14 @@ uniform bool instanced;
 
 void main()
 {
+	MaterialID = aMaterialID;
 	TexCoord = aTexCoord;	
+
 	
 	mat4 modelMatrix;
 	if (!instanced)
 		modelMatrix = model;
-	else 
+		else 
 		modelMatrix = instanceMatrix;
 
 	vec4 worldPos;

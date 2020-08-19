@@ -131,6 +131,9 @@ float ShadowCalculation(vec3 fragPos, vec3 viewPos)
 
 	 visibility /= float(samples);
 	return visibility;
+
+
+	//  return texture(ShadowMap, fragToLight ).r;
 }
 
 struct PBRInfo
@@ -362,8 +365,12 @@ float geometricOcclusion(PBRInfo pbrInputs)
 // Follows the distribution function recommended in the SIGGRAPH 2013 course notes from EPIC Games [1], Equation 3.
 float microfacetDistribution(PBRInfo pbrInputs)
 {
+
+
 	float roughnessSq = pbrInputs.alphaRoughness * pbrInputs.alphaRoughness;
 	float f = (pbrInputs.NdotH * roughnessSq - pbrInputs.NdotH) * pbrInputs.NdotH + 1.0;
+	
+
 	return roughnessSq / (PI * f * f);
 }
 
@@ -430,6 +437,7 @@ void main()
 	vec3 specularEnvironmentR90 = vec3(1.0, 1.0, 1.0) * reflectance90;
 
     vec3 viewPos = vec3(inverseViewMatrix * vec4(0, 0, 0, 1));
+//viewPos = vec3(1.989, 1.46,-0.659);
 
     vec3 n = normalize(texture(NRM_Texture, TexCoords).rgb);
 	vec3 v = normalize(viewPos - WorldPos);    // Vector from surface point to camera
@@ -501,7 +509,7 @@ void main()
 	vec3 kD = 1.0 - kS;
 	kD *= 1.0 - metallic;	
     //vec3 indirectLighting = (kD * indirectDiffuse + indirectSpecular) * ao;
-	vec3 indirectLighting = (kD * indirectDiffuse) * ao; // no specular!!!!!!!!!!!!
+	vec3 indirectLighting = (kD * indirectDiffuse) * ao ; // no specular!!!!!!!!!!!!
 
 	float shadowFactor = ShadowCalculation(WorldPos, viewPos);
     
@@ -518,14 +526,28 @@ void main()
 //	if (WorldPos.z > 2 + bias)
 	//	shadow = min((1.0 - shadowFactor), NdotL * NdotL * NdotL);
 
-	if ((WorldPos.x < room_lowerX) || (WorldPos.z < room_lowerZ)  || (WorldPos.x > room_upperX) || (WorldPos.z > room_upperZ))
+	indirectLighting *= attenuation  * 25 ;
+	
+	float bias = 0.02;
+	float xLow = room_lowerX - bias;
+	float xHigh = room_upperX + bias;
+	float zLow = room_lowerZ - bias;
+	float zHigh = room_upperZ + bias;
+
+	if ((WorldPos.x < xLow) || (WorldPos.z < zLow)  || (WorldPos.x > xHigh) || (WorldPos.z > zHigh))
 		indirectLighting *= vec3(shadow);// * NdotL;
 
 		//indirectLighting = vec3(0,0,0);
 	//	directLighting = vec3(0,0,0);
 	color = ((shadow * directLighting) + indirectLighting) * attenuation;
-	//color = indirectLighting;
+//	color  = vec3(shadow);//(( directLighting) + indirectLighting) * attenuation;
+	//color = indirectLighting;// * attenuation * attenuation* attenuation * attenuation ;
 	//color = ((shadow * directLighting) + (indirectLighting * shadow)) * attenuation;
-	
+		//viewPos = vec3(1, 1, 0);
+
+		//color = (indirectLighting);
+
     FragColor = vec4(color, 1.0);
+   // FragColor = vec4(vec3(n), 1.0);
+//	FragColor = vec4(1, 0, 0, 1);
 }

@@ -97,7 +97,7 @@ namespace HellEngine
 			return;
 
 		float yLimit = 1.5f;
-		m_transform.rotation += glm::vec3(-m_yoffset, -m_xoffset, 0.0) / glm::vec3(200);
+		m_transform.rotation += glm::vec3(-m_yoffset, -m_xoffset, 0.0) / glm::vec3(201 - Config::MOUSE_SESNSITIVITY);
 		m_transform.rotation.x = std::min(m_transform.rotation.x, yLimit);
 		m_transform.rotation.x = std::max(m_transform.rotation.x, -yLimit);
 	}

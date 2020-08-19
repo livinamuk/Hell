@@ -42,7 +42,6 @@ namespace HellEngine {
 		{ "Null", "False", "True", "Object", "Array", "String", "Number" };
 
 		House house;
-		//house.position = glm::vec3(0, 0, 0);
 
 		// Rooms
 		if (document.HasMember("ROOMS"))
@@ -53,6 +52,7 @@ namespace HellEngine {
 				glm::vec2 position = ReadVec2(rooms[i], "Position");
 				glm::vec2 size = ReadVec2(rooms[i], "Size");
 				int story = ReadInt(rooms[i], "Story");
+
 				house.AddRoom(Room(position, size, story, &house));
 			}
 		}
@@ -124,12 +124,13 @@ namespace HellEngine {
 				glm::vec3 modelPosition = ReadVec3(lights[i], "ModelPosition");
 				glm::vec3 modelRotation = ReadVec3(lights[i], "ModelRotation");
 				glm::vec3 modelScale = ReadVec3(lights[i], "ModelScale");
+				int modelType = ReadInt(lights[i], "ModelType");
 				glm::vec3 color = ReadVec3(lights[i], "Color");
 				float radius = ReadFloat(lights[i], "Radius");
 				float magic = ReadFloat(lights[i], "Magic");
 				float strength = ReadFloat(lights[i], "Strength");
 				
-				house.AddLight(Light(position, color, radius, strength, magic, Transform(modelPosition, modelRotation, modelScale)));
+				house.AddLight(Light(position, color, radius, strength, magic, Transform(modelPosition, modelRotation, modelScale), modelType));
 			}
 		}
 		// Entities
@@ -149,12 +150,13 @@ namespace HellEngine {
 				e.m_transform.position = Position;
 				e.m_transform.rotation = Rotation;
 				e.m_transform.scale = Scale;
-				e.m_modelID = AssetManager::GetModelIDByName(ModelName);
+				e.SetModelID(AssetManager::GetModelIDByName(ModelName));
 				e.m_materialID = AssetManager::GetMaterialIDByName(MaterialName);
 				house.m_entities.push_back(e);
 			}
 		}
 
+		house.RebuildAll();
 		return house;
 	}
 
@@ -177,7 +179,7 @@ namespace HellEngine {
 			SaveVec3(&object, "Position", entity.m_transform.position, allocator);
 			SaveVec3(&object, "Rotation", entity.m_transform.rotation, allocator);
 			SaveVec3(&object, "Scale", entity.m_transform.scale, allocator);
-			SaveString(&object, "ModelName", AssetManager::GetModelNameByID(entity.m_modelID), allocator);
+			SaveString(&object, "ModelName", AssetManager::GetModelNameByID(entity.GetModelID()), allocator);
 			SaveString(&object, "MaterialName", AssetManager::GetMaterialNameByID(entity.m_materialID), allocator);
 			SaveString(&object, "Tag", entity.m_tag, allocator);
 			entitiesArray.PushBack(object, allocator);
@@ -232,6 +234,7 @@ namespace HellEngine {
 		for (Light& light : house->m_lights)
 		{
 			rapidjson::Value object(rapidjson::kObjectType);
+			SaveInt(&object, "ModelType", light.m_modelType, allocator);
 			SaveVec3(&object, "Position", light.m_position, allocator);
 			SaveVec3(&object, "ModelPosition", light.m_modelTransform.position, allocator);
 			SaveVec3(&object, "ModelRotation", light.m_modelTransform.rotation, allocator);

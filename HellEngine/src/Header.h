@@ -56,7 +56,7 @@
 // Game constants
 #define STORY_HEIGHT	2.6f
 #define ROOM_HEIGHT		2.4f
-#define DOOR_WIDTH		0.8f
+#define DOOR_WIDTH		0.825f
 #define DOOR_HEIGHT		2.0f	
 #define DOOR_DEPTH		0.04f
 #define FLOOR_TRIM_HEIGHT	0.091f
@@ -64,7 +64,11 @@
 #define WINDOW_WIDTH_SINGLE 0.79f
 #define WINDOW_HEIGHT_SINGLE 1.2f
 #define WALL_DEPTH 0.05f
-#define DEFAULT_WINDOW_SPAWN_HEIGHT 0.75f
+#define DEFAULT_WINDOW_SPAWN_HEIGHT 0.75f		
+#define WORLD_GROUND_SIZE	20.0f
+#define WORLD_GROUND_HEIGHT	0.1f
+#define FLOOR_THICKNESS		0.05f
+#define CEILING_THICKNESS	0.05f
 
 #define SCR_WIDTH 1280
 #define SCR_HEIGHT 720
@@ -82,7 +86,8 @@ enum CollisionGroups {
 	PROJECTILES = 1 << 2,
 	ENTITY = 2 << 3,
 	ENEMY = 3 << 4,
-	EDITOR_ONLY = 4 << 5
+	EDITOR_ONLY = 4 << 5,
+	TERRAIN = 5 << 6
 };
 
 struct Opp {
@@ -108,6 +113,7 @@ struct Vertex {
 	glm::vec3 Bitangent;
 	unsigned int BlendingIndex[4];
 	glm::vec4 BlendingWeight;
+	unsigned int MaterialID;
 
 	bool operator==(const Vertex& other) const {
 		return Position == other.Position && Normal == other.Normal && TexCoords == other.TexCoords;

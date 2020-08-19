@@ -18,6 +18,8 @@ namespace HellEngine
 		void RemoveCollisionObjects();
 		glm::vec3 GetBottomLeftWorldPosCorner();
 		glm::vec3 GetTopRightWorldPosCorner();
+		void CreateUpperCollisionObject_UpperSegment(const Transform& trans);
+		void CreateUpperCollisionObject_LowerSegment(const Transform& trans);
 
 	public: // members
 		glm::vec3 m_position;
@@ -27,5 +29,7 @@ namespace HellEngine
 		float m_heightOfLowerSegment = 0;
 		btCollisionObject* m_collisionObject_UpperSegment = nullptr;
 		btCollisionObject* m_collisionObject_LowerSegment = nullptr;
+		btCollisionShape* m_collisionShape_UpperSegment;
+		btCollisionShape* m_collisionShape_LowerSegment;
 	};
 }

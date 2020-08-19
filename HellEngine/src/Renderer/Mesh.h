@@ -19,6 +19,9 @@ namespace HellEngine
 		unsigned int VAO = 0;
 		const char* name;
 
+		int materialID_Set0 = -1;
+		int materialID_Set1 = -1;
+
 	private: // fields
 		unsigned int VBO, EBO;
 	};

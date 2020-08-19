@@ -23,10 +23,22 @@ namespace HellEngine
 	{
 		GpuProfiler g("House");
 		for (Window& window : m_windows) {
-			static int floorMaterialID = AssetManager::GetMaterialIDByName("FloorBoards");
-			AssetManager::BindMaterial(floorMaterialID);
-			window.Draw(shader); 
+			static int material0 = AssetManager::GetMaterialIDByName("Window");
+			static int material1 = AssetManager::GetMaterialIDByName("WindowExterior");
+			AssetManager::BindMaterial_0(material0);
+			AssetManager::BindMaterial_1(material1);
+			window.DrawFrameAndSashes(shader);
+		//	window.DrawGlass(shader);
 		}
+
+		// Draw glass
+		static Model* model = AssetManager::GetModelByName("Window");
+		//	glDisable(GL_CULL_FACE);
+		Transform trans = m_windows[0].m_transform;
+		trans.position.x += 1;
+		model->DrawMesh(shader, 2, trans.to_mat4());
+		model->DrawMesh(shader, 4, trans.to_mat4());
+		//	glEnable(GL_CULL_FACE);
 
 		for (Room& room : m_rooms)
 			room.Draw(shader);
@@ -40,15 +52,41 @@ namespace HellEngine
 		for (Entity& entity : m_entities)
 			entity.DrawEntity(shader);
 
+
+
+		// RENDER LIGHTS
 		if (Renderer::s_RenderSettings.DrawLightBulbs) {
 
-			AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Light")); 
+			static unsigned int light_model_01 = AssetManager::GetModelIDByName("Light_01");
+			static unsigned int light_model_02 = AssetManager::GetModelIDByName("Light_02");
+			static unsigned int light_model_03 = AssetManager::GetModelIDByName("Light_03");
+			static unsigned int light_model_04 = AssetManager::GetModelIDByName("Light_04");
+			static unsigned int emmissiveTexture = AssetManager::GetTexIDByName("Light_E");
+
+			glActiveTexture(GL_TEXTURE6);
+			glBindTexture(GL_TEXTURE_2D, emmissiveTexture);
+
+			AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("Light")); 
 			for (Light& light : m_lights)
 			{
 				shader->setBool("hasEmissive", true);
 				shader->setVec3("emissiveColor", light.m_color);
 				Transform lightPosition(light.m_position);
-				AssetManager::GetModelByName("Light")->DrawMesh(shader, 0, lightPosition.to_mat4() * light.m_modelTransform.to_mat4());
+
+				unsigned int modelID = 0;
+				if (light.m_modelType == 0)
+					modelID = light_model_01;
+
+				if (light.m_modelType == 1)
+					modelID = light_model_02;
+
+				if (light.m_modelType == 2)
+					modelID = light_model_03;
+
+				if (light.m_modelType == 3)
+					modelID = light_model_04;
+
+				AssetManager::models[modelID].DrawMesh(shader, 0, lightPosition.to_mat4() * light.m_modelTransform.to_mat4());
 			}
 			shader->setBool("hasEmissive", false);
 		}
@@ -95,10 +133,16 @@ namespace HellEngine
 			room.BuildWallMesh();
 			room.m_wallMesh.BufferMeshToGL();
 			room.CalculateWorldSpaceBounds();
+
+			// Fix broken pointer
+			EntityData* data = (EntityData*)room.m_floor.m_collisionObject->getUserPointer();
+			data->ptr = &room.m_floor;
+			room.m_floor.m_parent = &room;
 		}
 
 		DetermineWhichLightIsInWhichRoom();
 		BuildLightVolumes();
+
 	}
 
 	void House::DetermineWhichLightIsInWhichRoom() // note this does not consider rooms above rooms yet
@@ -131,21 +175,26 @@ namespace HellEngine
 			//if (light.m_roomID > m_rooms.size())
 			//	continue;
 
+
+			/// THIS IS DEFINITELY NOT HOW YOU WANT TO BE DOING THIS LONG TERM. BUT FOR NOW...
+			float bias = 0.02f;
+
+
 			Room* room = &m_rooms[light.m_roomID];
 			light.m_lightVolume.BuildFromRoom(room);
 
 			light.m_doorWayLightVolumes.clear();
 			for (HoleInWall& doorWay : room->m_doorWaysXBackWall)
-				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_upperZ));
+				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_upperZ + bias));
 		
 			for (HoleInWall& doorWay : room->m_doorWaysXFrontWall)
-				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_lowerZ));
+				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_lowerZ - bias));
 
 			for (HoleInWall& doorWay : room->m_doorWaysZLeftWall)
-				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_lowerX));
+				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_lowerX - bias));
 			
 			for (HoleInWall& doorWay : room->m_doorWaysZRightWall)
-				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_upperX));
+				light.m_doorWayLightVolumes.push_back(LightVolumeDoorWay(doorWay, light.m_position, light.m_radius, room->m_upperX + bias));
 		}
 
 		//Light* light = &m_lights[0];

@@ -39,7 +39,7 @@ namespace HellEngine
 		trans.setRotation(btQuaternion(qt.x, qt.y, qt.z, qt.w));
 
 		int group = CollisionGroups::PROJECTILES;
-		int mask = CollisionGroups::HOUSE;
+		int mask = CollisionGroups::HOUSE | CollisionGroups::TERRAIN;
 
 		float mass = 4;
 
@@ -98,11 +98,11 @@ namespace HellEngine
 			m_modelMatrix = Physics::GetModelMatrixFromRigidBody(m_rigidBody);
 
 		if (m_casingType == CasingType::SHOTGUN_SHELL) {
-			AssetManager::BindMaterial(Shell_MaterialID);
+			AssetManager::BindMaterial_0(Shell_MaterialID);
 			AssetManager::models[Shell_ModelID].Draw(shader, m_modelMatrix * scaleTransform.to_mat4());
 		}
 		else if (m_casingType == CasingType::BULLET_CASING) {
-			AssetManager::BindMaterial(BulletCasing_MaterialID);
+			AssetManager::BindMaterial_0(BulletCasing_MaterialID);
 			AssetManager::models[BulletCasing_ModelID].Draw(shader, m_modelMatrix * scaleTransform.to_mat4());
 		}
 	}
@@ -141,7 +141,7 @@ namespace HellEngine
 			modelID = Shell_ModelID;
 			materialID = Shell_MaterialID;
 		}
-		AssetManager::BindMaterial(materialID);
+		AssetManager::BindMaterial_0(materialID);
 
 		//setup vertex buffers and vertex array for model matrices
 		// vertex buffer object -- should this be created every time?! very stupid question i think .. it keeps slowing the fps down!
@@ -152,18 +152,18 @@ namespace HellEngine
 		glBindVertexArray(VAO);
 		// vertex attributes
 		std::size_t vec4Size = sizeof(glm::vec4);
-		glEnableVertexAttribArray(7);
-		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
 		glEnableVertexAttribArray(8);
-		glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+		glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
 		glEnableVertexAttribArray(9);
-		glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+		glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
 		glEnableVertexAttribArray(10);
-		glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
-		glVertexAttribDivisor(7, 1);
+		glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+		glEnableVertexAttribArray(11);
+		glVertexAttribPointer(11, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
 		glVertexAttribDivisor(8, 1);
 		glVertexAttribDivisor(9, 1);
 		glVertexAttribDivisor(10, 1);
+		glVertexAttribDivisor(11, 1);
 
 		//draw
 		glUniform1i(glGetUniformLocation(shader->ID, "instanced"), 1);

@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "File.h"
 #include "LevelEditor.h"
+#include "Core/GameData.h"
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 
@@ -20,7 +21,6 @@ namespace HellEngine
 		ImGui_ImplGlfw_InitForOpenGL(CoreGL::s_window, true);
 		ImGui_ImplOpenGL3_Init("#version 330");
 		ImGui::StyleColorsDark();
-
 	}
 
 	void CoreImGui::Render(Game* game)
@@ -127,90 +127,93 @@ namespace HellEngine
 		float comboWidth = 200;
 		ImGui::Indent(4.0f);
 
-		if (ImGui::Button("Load Map")) {
-			game->house = File::LoadMap("Map.txt"); 
-			game->RebuildMap();
+		if (ImGui::Button("Load Map"))
+		{
+			//Physics::RemoveHouse(&game->house);
+			//game->house = File::LoadMap("Map.txt");
+			Physics::RemoveHouse(GameData::p_house);
+			GameData::LoadHouse("Map.txt");
 		}
 		ImGui::SameLine(); 
 		if (ImGui::Button("Save Map")) {
-			File::SaveMap("Map.txt", &game->house);
+			File::SaveMap("Map.txt", GameData::p_house);
 		}
 		ImGui::Text(" ");
 
 		ImGui::BeginTabBar("ROOM_TAB_BAR", tab_bar_flags);
-		for (int i = 0; i < game->house.m_rooms.size(); i++)
+		for (int i = 0; i < GameData::p_house->m_rooms.size(); i++)
 		{
 			if (ImGui::BeginTabItem(("Room " + std::to_string(i)).c_str()))
 			{
-			//	ImGui::Text("Size: %.1f, %.1f", game->house.m_rooms[i].m_size.x, game->house.m_rooms[i].m_size.y);
-			//	ImGui::Text("Pos:  %.1f, %.1f", game->house.m_rooms[i].m_position.x, game->house.m_rooms[i].m_position.y);
+			//	ImGui::Text("Size: %.1f, %.1f", GameData::p_house->m_rooms[i].m_size.x, GameData::p_house->m_rooms[i].m_size.y);
+			//	ImGui::Text("Pos:  %.1f, %.1f", GameData::p_house->m_rooms[i].m_position.x, GameData::p_house->m_rooms[i].m_position.y);
 
 				// Size
 				ImGui::Text("North Wall");
 				ImGui::SameLine(); if (ImGui::Button("<##A")) {
-					game->house.m_rooms[i].m_position.x -= 0.05f;
-					game->house.m_rooms[i].m_size.x += 0.1f;
-					game->RebuildMap();
+					GameData::p_house->m_rooms[i].m_position.x -= 0.05f;
+					GameData::p_house->m_rooms[i].m_size.x += 0.1f;
+					GameData::p_house->RebuildAll();
 				}
 				ImGui::SameLine(); if (ImGui::Button(">##B")) {
-					game->house.m_rooms[i].m_position.x += 0.05f;
-					game->house.m_rooms[i].m_size.x -= 0.1f;
-					game->RebuildMap();
+					GameData::p_house->m_rooms[i].m_position.x += 0.05f;
+					GameData::p_house->m_rooms[i].m_size.x -= 0.1f;
+					GameData::p_house->RebuildAll();
 				}
 				ImGui::Text("South Wall");
 				ImGui::SameLine(); if (ImGui::Button("<##C")) {
-					game->house.m_rooms[i].m_position.x += 0.05f;
-					game->house.m_rooms[i].m_size.x += 0.1f;
-					game->RebuildMap();
+					GameData::p_house->m_rooms[i].m_position.x += 0.05f;
+					GameData::p_house->m_rooms[i].m_size.x += 0.1f;
+					GameData::p_house->RebuildAll();
 				}
 				ImGui::SameLine(); if (ImGui::Button(">##D")) {
-					game->house.m_rooms[i].m_position.x -= 0.05f;
-					game->house.m_rooms[i].m_size.x -= 0.1f;
-					game->RebuildMap();
+					GameData::p_house->m_rooms[i].m_position.x -= 0.05f;
+					GameData::p_house->m_rooms[i].m_size.x -= 0.1f;
+					GameData::p_house->RebuildAll();
 				}
 				ImGui::Text("West Wall");
 				ImGui::SameLine(); if (ImGui::Button("<##F")) {
-					game->house.m_rooms[i].m_position.y -= 0.05f;
-					game->house.m_rooms[i].m_size.y += 0.1f;
-					game->RebuildMap();
+					GameData::p_house->m_rooms[i].m_position.y -= 0.05f;
+					GameData::p_house->m_rooms[i].m_size.y += 0.1f;
+					GameData::p_house->RebuildAll();
 				}
 				ImGui::SameLine(); if (ImGui::Button(">##G")) {
-					game->house.m_rooms[i].m_position.y += 0.05f;
-					game->house.m_rooms[i].m_size.y -= 0.1f;
-					game->RebuildMap();
+					GameData::p_house->m_rooms[i].m_position.y += 0.05f;
+					GameData::p_house->m_rooms[i].m_size.y -= 0.1f;
+					GameData::p_house->RebuildAll();
 				}
 				ImGui::Text("East Wall");
 				ImGui::SameLine(); if (ImGui::Button("<##H")) {
-					game->house.m_rooms[i].m_position.y += 0.05f;
-					game->house.m_rooms[i].m_size.y += 0.1f;
-					game->RebuildMap();
+					GameData::p_house->m_rooms[i].m_position.y += 0.05f;
+					GameData::p_house->m_rooms[i].m_size.y += 0.1f;
+					GameData::p_house->RebuildAll();
 				}
 				ImGui::SameLine(); if (ImGui::Button(">##I")) {
-					game->house.m_rooms[i].m_position.y -= 0.05f;
-					game->house.m_rooms[i].m_size.y -= 0.1f;
-					game->RebuildMap();
+					GameData::p_house->m_rooms[i].m_position.y -= 0.05f;
+					GameData::p_house->m_rooms[i].m_size.y -= 0.1f;
+					GameData::p_house->RebuildAll();
 				}
 				ImGui::Text("Story");
 				ImGui::SameLine(); if (ImGui::Button("<##Asdf")) {
-					game->house.m_rooms[i].m_story -= 1;
-					game->RebuildMap();
+					GameData::p_house->m_rooms[i].m_story -= 1;
+					GameData::p_house->RebuildAll();
 				}
 				ImGui::SameLine(); if (ImGui::Button(">##Bsdf")) {
-					game->house.m_rooms[i].m_story += 1;
-					game->RebuildMap();
+					GameData::p_house->m_rooms[i].m_story += 1;
+					GameData::p_house->RebuildAll();
 				}
 				if (ImGui::Button("Delete Room")) {
-					game->house.m_rooms.erase(game->house.m_rooms.begin() + i);
-					game->RebuildMap();
+					GameData::p_house->m_rooms.erase(GameData::p_house->m_rooms.begin() + i);
+					GameData::p_house->RebuildAll();
 				}
 				ImGui::SameLine(); if (ImGui::Button("New Room")) {
-					game->house.m_rooms.push_back(Room(glm::vec2(0, 0), glm::vec2(4, 4), 0, &game->house));
-					game->RebuildMap();
+					GameData::p_house->m_rooms.push_back(Room(glm::vec2(0, 0), glm::vec2(4, 4), 0, GameData::p_house));
+					GameData::p_house->RebuildAll();
 				}
-				ImGui::Text("Pos X, Z:  %.3f %.3f", game->house.m_rooms[i].m_position.x, game->house.m_rooms[i].m_position.y);
-				ImGui::Text("Size X, Z: %.3f %.3f", game->house.m_rooms[i].m_size.x, game->house.m_rooms[i].m_size.y);
-				ImGui::Text("Lower X, Lower Z: %.3f %.3f", game->house.m_rooms[i].m_lowerX, game->house.m_rooms[i].m_lowerZ);
-				ImGui::Text("Upper X, Upper Z: %.3f %.3f", game->house.m_rooms[i].m_upperX, game->house.m_rooms[i].m_upperZ);
+				ImGui::Text("Pos X, Z:  %.3f %.3f", GameData::p_house->m_rooms[i].m_position.x, GameData::p_house->m_rooms[i].m_position.y);
+				ImGui::Text("Size X, Z: %.3f %.3f", GameData::p_house->m_rooms[i].m_size.x, GameData::p_house->m_rooms[i].m_size.y);
+				ImGui::Text("Lower X, Lower Z: %.3f %.3f", GameData::p_house->m_rooms[i].m_lowerX, GameData::p_house->m_rooms[i].m_lowerZ);
+				ImGui::Text("Upper X, Upper Z: %.3f %.3f", GameData::p_house->m_rooms[i].m_upperX, GameData::p_house->m_rooms[i].m_upperZ);
 
 				ImGui::Text(" ");
 				ImGui::EndTabItem();
@@ -219,29 +222,31 @@ namespace HellEngine
 		ImGui::EndTabBar();
 
 		ImGui::BeginTabBar("LIGHT_TAB_BAR", tab_bar_flags);
-		for (int i = 0; i < game->house.m_lights.size(); i++)
+		for (int i = 0; i < GameData::p_house->m_lights.size(); i++)
 		{
 			if (ImGui::BeginTabItem(("Light " + std::to_string(i)).c_str()))
 			{
-				if (ImGui::InputFloat3("Position", glm::value_ptr(game->house.m_lights[i].m_position)))
-					game->house.m_lights[i].Init();
+				if (ImGui::InputFloat3("Position", glm::value_ptr(GameData::p_house->m_lights[i].m_position)))
+					GameData::p_house->m_lights[i].Init();
 
-				ImGui::InputFloat3("ModelPos", glm::value_ptr(game->house.m_lights[i].m_modelTransform.position));
-				ImGui::InputFloat3("ModelRot", glm::value_ptr(game->house.m_lights[i].m_modelTransform.rotation));
-				ImGui::InputFloat3("ModelSca", glm::value_ptr(game->house.m_lights[i].m_modelTransform.scale));
+				ImGui::InputInt("Type", &(GameData::p_house->m_lights[i].m_modelType));
 
-				ImGui::InputFloat("Radius   ", &game->house.m_lights[i].m_radius, 0.1f, 1.0f, "%0.5f");
-				ImGui::InputFloat("Magic    ", &game->house.m_lights[i].m_magic, 0.1f, 1.0f, "%0.5f");
-				ImGui::InputFloat("Strength ", &game->house.m_lights[i].m_strength, 0.1f, 1.0f, "%0.5f");
-				ImGui::ColorEdit3("Color", glm::value_ptr(game->house.m_lights[i].m_color));
-				ImGui::Text("RoomID: %d", game->house.m_lights[i].m_roomID);
+				ImGui::InputFloat3("ModelPos", glm::value_ptr(GameData::p_house->m_lights[i].m_modelTransform.position));
+				ImGui::InputFloat3("ModelRot", glm::value_ptr(GameData::p_house->m_lights[i].m_modelTransform.rotation));
+				ImGui::InputFloat3("ModelSca", glm::value_ptr(GameData::p_house->m_lights[i].m_modelTransform.scale));
+
+				ImGui::InputFloat("Radius   ", &GameData::p_house->m_lights[i].m_radius, 0.1f, 1.0f, "%0.5f");
+				ImGui::InputFloat("Magic    ", &GameData::p_house->m_lights[i].m_magic, 0.1f, 1.0f, "%0.5f");
+				ImGui::InputFloat("Strength ", &GameData::p_house->m_lights[i].m_strength, 0.1f, 1.0f, "%0.5f");
+				ImGui::ColorEdit3("Color", glm::value_ptr(GameData::p_house->m_lights[i].m_color));
+				ImGui::Text("RoomID: %d", GameData::p_house->m_lights[i].m_roomID);
 
 				if (ImGui::Button("Delete Light")) {
-					game->house.m_lights.erase(game->house.m_lights.begin() + i);
+					GameData::p_house->m_lights.erase(GameData::p_house->m_lights.begin() + i);
 					game->RebuildMap();
 				}
 				ImGui::SameLine(); if (ImGui::Button("New Light")) {
-					game->house.m_lights.push_back(Light(glm::vec3(0, 1, 0)));
+					GameData::p_house->m_lights.push_back(Light(glm::vec3(0, 1, 0)));
 					game->RebuildMap();
 				}
 				
@@ -260,26 +265,26 @@ namespace HellEngine
 		ImGui::BeginTabBar("DOOR_TAB_BAR", tab_bar_flags);
 
 		std::vector<std::string> currentDoorAxis;
-		for (int i = 0; i < game->house.m_doors.size(); i++)
-			currentDoorAxis.push_back(Util::AxisToString(game->house.m_doors[i].m_axis));
+		for (int i = 0; i < GameData::p_house->m_doors.size(); i++)
+			currentDoorAxis.push_back(Util::AxisToString(GameData::p_house->m_doors[i].m_axis));
 
-		for (int i = 0; i < game->house.m_doors.size(); i++)
+		for (int i = 0; i < GameData::p_house->m_doors.size(); i++)
 		{
 			if (ImGui::BeginTabItem(("Door " + std::to_string(i)).c_str()))
 			{
-				if (ImGui::InputFloat3("Position", glm::value_ptr(game->house.m_doors[i].m_rootTransform.position)))
+				if (ImGui::InputFloat3("Position", glm::value_ptr(GameData::p_house->m_doors[i].m_rootTransform.position)))
 					game->RebuildMap(); 
 				
 				ImGui::Text("Story");
 				ImGui::SameLine(); if (ImGui::Button("<##A")) {
-					game->house.m_doors[i].m_story -= 1;
-					game->house.m_doors[i].Reconfigure();
+					GameData::p_house->m_doors[i].m_story -= 1;
+					GameData::p_house->m_doors[i].Reconfigure();
 				}
 				ImGui::SameLine(); if (ImGui::Button(">##B")) {
-					game->house.m_doors[i].m_story += 1;
-					game->house.m_doors[i].Reconfigure();
+					GameData::p_house->m_doors[i].m_story += 1;
+					GameData::p_house->m_doors[i].Reconfigure();
 				}
-				ImGui::Text("Rotate floor texture"); ImGui::SameLine(); ImGui::Checkbox("##checkBox3", &game->house.m_doors[i].m_floor.m_rotateTexture);
+				ImGui::Text("Rotate floor texture"); ImGui::SameLine(); ImGui::Checkbox("##checkBox3", &GameData::p_house->m_doors[i].m_floor.m_rotateTexture);
 
 				ImGui::Text("Rotation Axis ");
 				const char* axisList[4] = { "POS_X", "NEG_X", "POS_Z", "NEG_Z" };
@@ -291,8 +296,8 @@ namespace HellEngine
 					{
 						bool is_selected = (currentDoorAxis[i] == axisList[n]);
 						if (ImGui::Selectable(axisList[n], is_selected)) {
-							game->house.m_doors[i].m_axis = Util::StringToAxis(axisList[n]);
-							game->house.m_doors[i].Reconfigure();
+							GameData::p_house->m_doors[i].m_axis = Util::StringToAxis(axisList[n]);
+							GameData::p_house->m_doors[i].Reconfigure();
 						}
 						if (is_selected)
 							ImGui::SetItemDefaultFocus();
@@ -301,12 +306,12 @@ namespace HellEngine
 				}
 
 				if (ImGui::Button("Delete Door")) {					
-					Door* door = &game->house.m_doors[i];
-					game->house.DeleteDoor(door);
+					Door* door = &GameData::p_house->m_doors[i];
+					GameData::p_house->DeleteDoor(door);
 				}
 
 				if (ImGui::Button("New Door")) {
-					game->house.m_doors.push_back(Door(glm::vec2(0, 0), 0, Axis::POS_X, true));
+					GameData::p_house->m_doors.push_back(Door(glm::vec2(0, 0), 0, Axis::POS_X, true));
 				}
 
 				ImGui::EndTabItem();
@@ -323,38 +328,38 @@ namespace HellEngine
 		ImGui::BeginTabBar("WINDOWS_TAB_BAR", tab_bar_flags);
 
 		std::vector<std::string> currentWindowAxis;
-		for (int i = 0; i < game->house.m_windows.size(); i++)
-			currentWindowAxis.push_back(Util::AxisToString(game->house.m_windows[i].m_axis));
+		for (int i = 0; i < GameData::p_house->m_windows.size(); i++)
+			currentWindowAxis.push_back(Util::AxisToString(GameData::p_house->m_windows[i].m_axis));
 
-		for (int i = 0; i < game->house.m_windows.size(); i++)
+		for (int i = 0; i < GameData::p_house->m_windows.size(); i++)
 		{
 			if (ImGui::BeginTabItem(("Window " + std::to_string(i)).c_str()))
 			{
-				if (ImGui::InputFloat("X Pos", &game->house.m_windows[i].m_transform.position.x)) {
+				if (ImGui::InputFloat("X Pos", &GameData::p_house->m_windows[i].m_transform.position.x)) {
 					game->RebuildMap();
-					game->house.m_windows[i].Reconfigure();
+					GameData::p_house->m_windows[i].Reconfigure();
 				}
-				if (ImGui::InputFloat("Z Pos", &game->house.m_windows[i].m_transform.position.z)) {
+				if (ImGui::InputFloat("Z Pos", &GameData::p_house->m_windows[i].m_transform.position.z)) {
 					game->RebuildMap();
-					game->house.m_windows[i].Reconfigure();
+					GameData::p_house->m_windows[i].Reconfigure();
 				}
-				/*if (ImGui::InputFloat("height", &game->house.m_windows[i].m_startHeight)) {
+				/*if (ImGui::InputFloat("height", &GameData::p_house->m_windows[i].m_startHeight)) {
 					game->RebuildMap();
-					game->house.m_windows[i].Reconfigure();
+					GameData::p_house->m_windows[i].Reconfigure();
 				}
-				if (ImGui::InputInt("Story", &game->house.m_windows[i].m_story)) {
+				if (ImGui::InputInt("Story", &GameData::p_house->m_windows[i].m_story)) {
 					game->RebuildMap(); 
-					game->house.m_windows[i].Reconfigure();
+					GameData::p_house->m_windows[i].Reconfigure();
 				}*/
 
 			/*	ImGui::Text("Story");
 				ImGui::SameLine(); if (ImGui::Button("<##A")) {
-					game->house.m_windows[i].m_story -= 1;
-					game->house.m_windows[i].Reconfigure();
+					GameData::p_house->m_windows[i].m_story -= 1;
+					GameData::p_house->m_windows[i].Reconfigure();
 				}
 				ImGui::SameLine(); if (ImGui::Button(">##B")) {
-					game->house.m_windows[i].m_story += 1;
-					game->house.m_windows[i].Reconfigure();
+					GameData::p_house->m_windows[i].m_story += 1;
+					GameData::p_house->m_windows[i].Reconfigure();
 				}*/
 			
 				ImGui::Text("Rotation Axis ");
@@ -367,8 +372,8 @@ namespace HellEngine
 					{
 						bool is_selected = (currentWindowAxis[i] == axisList[n]);
 						if (ImGui::Selectable(axisList[n], is_selected)) {
-							game->house.m_windows[i].m_axis = Util::StringToAxis(axisList[n]);
-							game->house.m_windows[i].Reconfigure();
+							GameData::p_house->m_windows[i].m_axis = Util::StringToAxis(axisList[n]);
+							GameData::p_house->m_windows[i].Reconfigure();
 						}
 						if (is_selected)
 							ImGui::SetItemDefaultFocus();
@@ -376,14 +381,14 @@ namespace HellEngine
 					ImGui::EndCombo();
 				}
 				if (ImGui::Button("Delete Window")) {
-					game->house.m_windows.erase(game->house.m_windows.begin() + i);
+					GameData::p_house->m_windows.erase(GameData::p_house->m_windows.begin() + i);
 					game->RebuildMap();
 				}
 				ImGui::EndTabItem();
 			}
 		}
 		if (ImGui::Button("New Window")) {
-			game->house.m_windows.push_back(Window(glm::vec3(0,0,0), Axis::POS_X));
+			GameData::p_house->m_windows.push_back(Window(glm::vec3(0,0,0), Axis::POS_X));
 			game->RebuildMap();
 		}
 		ImGui::EndTabBar();
@@ -396,28 +401,28 @@ namespace HellEngine
 		ImGui::BeginTabBar("STAIRCASE_TAB_BAR", tab_bar_flags);
 
 		std::vector<std::string> currentStaircaseAxis;
-		for (int i = 0; i < game->house.m_staircases.size(); i++)
-			currentStaircaseAxis.push_back(Util::AxisToString(game->house.m_staircases[i].m_axis));
+		for (int i = 0; i < GameData::p_house->m_staircases.size(); i++)
+			currentStaircaseAxis.push_back(Util::AxisToString(GameData::p_house->m_staircases[i].m_axis));
 
-		for (int i = 0; i < game->house.m_staircases.size(); i++)
+		for (int i = 0; i < GameData::p_house->m_staircases.size(); i++)
 		{
 			if (ImGui::BeginTabItem(("Staircase " + std::to_string(i)).c_str()))
 			{
-				if (ImGui::InputFloat3("Position", glm::value_ptr(game->house.m_staircases[i].m_rootTransform.position)))
+				if (ImGui::InputFloat3("Position", glm::value_ptr(GameData::p_house->m_staircases[i].m_rootTransform.position)))
 					game->RebuildMap();
 
 				ImGui::Text("Story");
 				ImGui::SameLine(); if (ImGui::Button("<##A")) {
-					game->house.m_staircases[i].m_story -= 1;
-					game->house.m_staircases[i].Reconfigure();
+					GameData::p_house->m_staircases[i].m_story -= 1;
+					GameData::p_house->m_staircases[i].Reconfigure();
 				}
 				ImGui::SameLine(); if (ImGui::Button(">##B")) {
-					game->house.m_staircases[i].m_story += 1;
-					game->house.m_staircases[i].Reconfigure();
+					GameData::p_house->m_staircases[i].m_story += 1;
+					GameData::p_house->m_staircases[i].Reconfigure();
 				}
-				ImGui::Text("Rotate bottom floor tex"); ImGui::SameLine(); ImGui::Checkbox("##checkBox8", &game->house.m_staircases[i].m_bottomDoorwayFloor.m_rotateTexture);
-				ImGui::Text("Rotate top floor tex"); ImGui::SameLine(); ImGui::Checkbox("##checkBox9", &game->house.m_staircases[i].m_topDoorwayFloor.m_rotateTexture);
-				ImGui::Text("Rotate landing floor tex"); ImGui::SameLine(); ImGui::Checkbox("##checkBox10", &game->house.m_staircases[i].m_landingFloor.m_rotateTexture);
+				ImGui::Text("Rotate bottom floor tex"); ImGui::SameLine(); ImGui::Checkbox("##checkBox8", &GameData::p_house->m_staircases[i].m_bottomDoorwayFloor.m_rotateTexture);
+				ImGui::Text("Rotate top floor tex"); ImGui::SameLine(); ImGui::Checkbox("##checkBox9", &GameData::p_house->m_staircases[i].m_topDoorwayFloor.m_rotateTexture);
+				ImGui::Text("Rotate landing floor tex"); ImGui::SameLine(); ImGui::Checkbox("##checkBox10", &GameData::p_house->m_staircases[i].m_landingFloor.m_rotateTexture);
 
 				ImGui::Text("Rotation Axis ");
 				const char* axisList[4] = { "POS_X", "NEG_X", "POS_Z", "NEG_Z" };
@@ -430,8 +435,8 @@ namespace HellEngine
 					{
 						bool is_selected = (currentStaircaseAxis[i] == axisList[n]);
 						if (ImGui::Selectable(axisList[n], is_selected)) {
-							game->house.m_staircases[i].m_axis = Util::StringToAxis(axisList[n]);
-							game->house.m_staircases[i].Reconfigure();
+							GameData::p_house->m_staircases[i].m_axis = Util::StringToAxis(axisList[n]);
+							GameData::p_house->m_staircases[i].Reconfigure();
 						}
 						if (is_selected)
 							ImGui::SetItemDefaultFocus();
@@ -439,11 +444,11 @@ namespace HellEngine
 					ImGui::EndCombo();
 				}
 				if (ImGui::Button("Delete Stiarcase")) {
-					game->house.m_staircases.erase(game->house.m_staircases.begin() + i);
+					GameData::p_house->m_staircases.erase(GameData::p_house->m_staircases.begin() + i);
 					game->RebuildMap();
 				}
 				ImGui::SameLine(); if (ImGui::Button("New Staircase")) {
-					game->house.m_staircases.push_back(Staircase(glm::vec2(0, 0), Axis::POS_X, 0, 18, false, false, false, false));
+					GameData::p_house->m_staircases.push_back(Staircase(glm::vec2(0, 0), Axis::POS_X, 0, 18, false, false, false, false));
 					game->RebuildMap();
 				}
 				ImGui::EndTabItem();
@@ -462,9 +467,9 @@ namespace HellEngine
 
 		if (ImGui::TreeNode("Scene"))
 		{
-			for (int n = 0; n < game->house.m_entities.size(); n++)
+			for (int n = 0; n < GameData::p_house->m_entities.size(); n++)
 			{
-				Entity* entity = &game->house.m_entities[n];
+				Entity* entity = &GameData::p_house->m_entities[n];
 				char buf[32];
 				sprintf(buf, entity->m_tag, n);
 				if (ImGui::Selectable(buf, selected == n))
@@ -481,7 +486,7 @@ namespace HellEngine
 
 		if (selected != -1)
 		{
-			Entity* entity = &game->house.m_entities[selected];
+			Entity* entity = &GameData::p_house->m_entities[selected];
 			ImGui::InputText("Tag", entity->m_tag, 64);
 
 			// Build models list
@@ -495,12 +500,12 @@ namespace HellEngine
 				materialList.push_back(material.name);
 
 			std::vector<std::string> currentModelName;
-			for (int i = 0; i < game->house.m_entities.size(); i++)
-				currentModelName.push_back(AssetManager::GetModelNameByID(game->house.m_entities[i].m_modelID));
+			for (int i = 0; i < GameData::p_house->m_entities.size(); i++)
+				currentModelName.push_back(AssetManager::GetModelNameByID(GameData::p_house->m_entities[i].m_materialID));
 
 			std::vector<std::string> currentMaterialName;
-			for (int i = 0; i < game->house.m_entities.size(); i++)
-				currentMaterialName.push_back(AssetManager::GetMaterialNameByID(game->house.m_entities[i].m_materialID));
+			for (int i = 0; i < GameData::p_house->m_entities.size(); i++)
+				currentMaterialName.push_back(AssetManager::GetMaterialNameByID(GameData::p_house->m_entities[i].m_materialID));
 
 			// Show models list
 			if (ImGui::BeginCombo("Model", currentModelName[selected].c_str()))
@@ -509,7 +514,7 @@ namespace HellEngine
 				{
 					bool is_selected = (currentModelName[selected] == modelList[n]);
 					if (ImGui::Selectable(modelList[n].c_str(), is_selected)) {
-						entity->m_modelID = AssetManager::GetModelIDByName(modelList[n]);
+						entity->SetModelID(AssetManager::GetModelIDByName(modelList[n]));
 					}
 					if (is_selected)
 						ImGui::SetItemDefaultFocus();

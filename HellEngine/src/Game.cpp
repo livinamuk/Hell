@@ -12,6 +12,7 @@
 #include "Logic/GlockLogic.h"
 #include "Config.h"
 #include "Core/EnemyCharacter.h"
+#include "Core/Core.h"
 
 namespace HellEngine
 {
@@ -37,16 +38,29 @@ namespace HellEngine
 		Physics::Init();
 		WeaponLogic::Init();
 
-		this->house = File::LoadMap("Map.txt");
+		//this->house = File::LoadMap("Map.txt");
+
+		GameData::LoadHouse("Map.txt");
+	
+
 		this->RebuildMap();
 
 
 	
-
-
+	/*	Model* windowModel = AssetManager::GetModelByName("Window");
+		windowModel->Set_Mesh_MaterialID_Set0("SM_Window_01a", AssetManager::GetMaterialIDByName("Window"));
+		windowModel->Set_Mesh_MaterialID_Set0("SM_Window_01a", AssetManager::GetMaterialIDByName("WindowExterior"));
+		windowModel->Set_Mesh_MaterialID_Set0("SM_Window_01b", AssetManager::GetMaterialIDByName("Window"));
+		windowModel->Set_Mesh_MaterialID_Set0("SM_Window_01b", AssetManager::GetMaterialIDByName("WindowExterior"));
+		windowModel->Set_Mesh_MaterialID_Set0("SM_Window_01c", AssetManager::GetMaterialIDByName("Window"));
+		windowModel->Set_Mesh_MaterialID_Set0("SM_Window_01c", AssetManager::GetMaterialIDByName("WindowExterior"));
+		windowModel->Set_Mesh_MaterialID_Set0("SM_Window_01d", AssetManager::GetMaterialIDByName("Window"));
+		windowModel->Set_Mesh_MaterialID_Set0("SM_Window_01d", AssetManager::GetMaterialIDByName("WindowExterior"));
+		windowModel->Set_Mesh_MaterialID_Set0("SM_Glass_Top", AssetManager::GetMaterialIDByName("White"));
+		windowModel->Set_Mesh_MaterialID_Set0("SM_Glass_Down", AssetManager::GetMaterialIDByName("White"));
+		*/
 		m_testAnimatedEnttity.SetSkinnedModel("Shotgun.fbx");
 		m_testAnimatedEnttity.m_currentAnimationIndex = 5;
-
 
 		//AssetManager::PrintSkinnedModelMeshNames("Glock.fbx");
 		//AssetManager::PrintSkinnedModelBoneNames("Glock.fbx");
@@ -144,7 +158,7 @@ namespace HellEngine
 
 		
 		// Doors
-		for (Door& door : house.m_doors)
+		for (Door& door : GameData::p_house->m_doors)
 			door.Update(m_frameTime);
 
 		WeaponLogic::Update(m_frameTime);
@@ -220,8 +234,8 @@ namespace HellEngine
 		static bool FIRST_BUILD = true;
 		
 
-		house.RebuildAll();
-		Physics::RebuildWorld(&house);
+		//house.RebuildAll();
+		//Physics::RebuildWorld(&house);
 
 
 

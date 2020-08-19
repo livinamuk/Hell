@@ -7,7 +7,8 @@ layout (binding = 1) uniform sampler2D blur0;
 layout (binding = 2) uniform sampler2D blur1;
 layout (binding = 3) uniform sampler2D blur2;
 layout (binding = 4) uniform sampler2D blur3;
-layout (binding = 5) uniform sampler2D EditorHover_Texture;
+layout (binding = 5) uniform sampler2D GlassBlurTexture;
+layout (binding = 6) uniform sampler2D GlassSurfaceTexture;
 
 in vec2 TexCoords;
 
@@ -32,18 +33,31 @@ void main()
 {
 	vec3 lighting = vec3(texture(FinalLighting_Texture, TexCoords));
 
+	// Glass Blur
+	//vec3 glassBlur  = vec3(texture(GlassBlurTexture, TexCoords));
+	//if (glassBlur != 0)
+	//	lighting = glassBlur;
+		
+	// Glass Blur
+	vec3 glassSurface  = vec3(texture(GlassSurfaceTexture, TexCoords));
+
 	// Tone mapping
-	lighting = Tonemap_ACES(lighting);
+	//lighting = Tonemap_ACES(lighting);
     // Gamma compressionlighting
-	lighting = OECF_sRGBFast(lighting);
+	//lighting = OECF_sRGBFast(lighting);
 
 	vec3 blur = texture(blur0, TexCoords).rgb;
 	blur += texture(blur1, TexCoords).rgb;
 	blur += texture(blur2, TexCoords).rgb;
 	blur += texture(blur3, TexCoords).rgb;
 	
-	// Level Editor overlay
-	vec3 editor  = vec3(texture(EditorHover_Texture, TexCoords));
 	
-	Composite = lighting + blur + (editor * 0.0);
+	vec3 final = (lighting) + (glassSurface );
+
+		// Tone mapping
+	final = Tonemap_ACES(final);
+    // Gamma compressionlighting
+	final = OECF_sRGBFast(final);
+
+	Composite = final + blur  ;
 }

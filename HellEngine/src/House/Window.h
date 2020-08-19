@@ -12,7 +12,8 @@ namespace HellEngine
 		Window(const Window&);
 		Window& operator = (const Window& input);
 
-		void Draw(Shader* shader);
+		void DrawFrameAndSashes(Shader* shader);
+		void DrawGlass(Shader* shader);
 		void Reconfigure();
 		void CreateCollisionObject(); 
 		void RemoveCollisionObject();

@@ -41,7 +41,9 @@ namespace HellEngine
 		Audio::LoadAudio("FLY_Bullet_Impact_Flesh_07.wav"); 
 		Audio::LoadAudio("FLY_Bullet_Impact_Flesh_08.wav");
 		Audio::LoadAudio("WPNFLY_Glock_MagIn_Full.wav");
-		Audio::LoadAudio("BuolletCasingBounce.wav"); 
+		Audio::LoadAudio("BuolletCasingBounce.wav");
+		Audio::LoadAudio("FLY_Head_Explode_01.wav");
+		
 		//Audio::LoadAudio("Music.wav");
 	}
 

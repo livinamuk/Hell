@@ -143,6 +143,16 @@ typedef double real_t;
 typedef float real_t;
 #endif
 
+
+///////////////////////////////////
+// YOU ADDED THIS CRISPY BURRITO //
+///////////////////////////////////
+
+std::map<std::string, int> materials_mapping;
+
+///////////////////////////////////
+///////////////////////////////////
+
 typedef enum {
   TEXTURE_TYPE_NONE,  // default
   TEXTURE_TYPE_SPHERE,
@@ -173,6 +183,8 @@ struct texture_option_t {
   std::string colorspace;  // Explicitly specify color space of stored texel
                            // value. Usually `sRGB` or `linear` (default empty).
 };
+
+
 
 struct material_t {
   std::string name;
@@ -2143,6 +2155,7 @@ bool LoadObj(attrib_t *attrib, std::vector<shape_t> *shapes,
   attrib->texcoords.clear();
   attrib->colors.clear();
   shapes->clear();
+  materials_mapping.clear();    // YOU ADDED THIS CRISPY BURRITO
 
   std::stringstream errss;
 
@@ -2384,16 +2397,24 @@ bool LoadObj(attrib_t *attrib, std::vector<shape_t> *shapes,
       token += 6;
       std::string namebuf = parseString(&token);
 
-      int newMaterialId = -1;
+
+      // YOU ADDED THIS CRISPY BURRITO. AND COMMENTED OUT THE SHIT BELOW THIS
+      materials_mapping.insert({ namebuf, materials_mapping.size() });     
+      int newMaterialId = materials_mapping[namebuf];
+
+
+    /*  int newMaterialId = -1;
       std::map<std::string, int>::const_iterator it = material_map.find(namebuf);
       if (it != material_map.end()) {
         newMaterialId = it->second;
+
+
       } else {
         // { error!! material not found }
         if (warn) {
           (*warn) += "material [ '" + namebuf + "' ] not found in .mtl\n";
         }
-      }
+      }*/
 
       if (newMaterialId != material) {
         // Create per-face material. Thus we don't add `shape` to `shapes` at
@@ -2801,6 +2822,8 @@ bool LoadObjWithCallback(std::istream &inStream, const callback_t &callback,
         // { warn!! material not found }
         if (warn && (!callback.usemtl_cb)) {
           (*warn) += "material [ " + namebuf + " ] not found in .mtl\n";
+
+
         }
       }
 
@@ -2810,6 +2833,7 @@ bool LoadObjWithCallback(std::istream &inStream, const callback_t &callback,
 
       if (callback.usemtl_cb) {
         callback.usemtl_cb(user_data, namebuf.c_str(), material_id);
+
       }
 
       continue;

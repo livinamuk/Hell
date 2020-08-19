@@ -13,6 +13,18 @@ namespace HellEngine
 		m_size = size;
 		m_story = story;
 		p_house = house;
+
+
+		Transform transform;
+		transform.position = glm::vec3(m_position.x, m_story * STORY_HEIGHT, m_position.y);
+		transform.rotation = glm::vec3(0, 0, 0);
+		transform.scale = glm::vec3(m_size.x, FLOOR_THICKNESS, m_size.y);
+		m_floor = Floor(transform, false, this);
+		
+		// Build ceiling
+		transform.position = glm::vec3(m_position.x, (m_story * STORY_HEIGHT) + ROOM_HEIGHT, m_position.y);
+		m_ceiling = Ceiling(transform, false, this);
+
 		Rebuild();
 	}
 
@@ -22,9 +34,32 @@ namespace HellEngine
 
 	void Room::Rebuild()
 	{
-		m_floor = Floor(glm::vec3(m_position.x, 0, m_position.y), m_size, m_story, false, this);
-		m_ceiling = Ceiling(glm::vec3(m_position.x, 0, m_position.y), m_size, m_story, false);
+		Physics::s_dynamicsWorld->removeCollisionObject(m_floor.m_collisionObject);
+		delete m_floor.m_collisionShape;
 
+		// Build floor
+		Transform transform;
+		transform.position = glm::vec3(m_position.x, m_story * STORY_HEIGHT, m_position.y);
+		transform.rotation = glm::vec3(0, 0, 0);
+		transform.scale = glm::vec3(m_size.x, FLOOR_THICKNESS, m_size.y);
+		m_floor = Floor(transform, false, this);
+
+		EntityData* floorPtr = (EntityData*)m_floor.m_collisionObject->getUserPointer();
+		floorPtr->ptr = this;
+
+		
+
+		// Build floor
+		/*Transform transform;
+		transform.position = glm::vec3(m_position.x, m_story * STORY_HEIGHT, m_position.y);
+		transform.rotation = glm::vec3(0,0,0);
+		transform.scale = glm::vec3(m_size.x, FLOOR_THICKNESS, m_size.y);
+		//m_floor = Floor(transform, false, this);
+
+		// Build ceiling
+		transform.position = glm::vec3(m_position.x, (m_story * STORY_HEIGHT) + ROOM_HEIGHT, m_position.y);
+		m_ceiling = Ceiling(transform, false, this);
+		*/
 		m_wallMesh.ClearMesh();
 
 		m_doorWaysXFrontWall.clear();
@@ -56,22 +91,22 @@ namespace HellEngine
 	{
 		GpuProfiler g("Room");
 		// Draw Floor
-		AssetManager::BindMaterial(AssetManager::s_MaterialID_FloorBoards);
+		AssetManager::BindMaterial_0(AssetManager::s_MaterialID_FloorBoards);
 		LevelEditor::SetHighlightColorIfSelected(shader, &m_floor);
 		m_floor.Draw(shader);
 		shader->setVec3("ColorAdd", glm::vec3(0, 0, 0));
 
-		AssetManager::BindMaterial(AssetManager::s_MaterialID_PlasterCeiling);
+		AssetManager::BindMaterial_0(AssetManager::s_MaterialID_PlasterCeiling);
 		m_ceiling.Draw(shader);
 
 		// Walls
-		AssetManager::BindMaterial(AssetManager::s_MaterialID_WallPaper);
+		AssetManager::BindMaterial_0(AssetManager::s_MaterialID_WallPaper);
 		glm::mat4 identity = glm::mat4(1);
 		shader->setMat4("model", identity);
 		m_wallMesh.Draw(shader);	
 
 		// Floor trims
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Trims"));
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("Trims"));
 		for (Transform transform : m_floorTrimTransforms) {
 			shader->setVec2("TEXTURE_SCALE", glm::vec2(transform.scale.x, 1.0));
 			AssetManager::DrawModel(AssetManager::s_ModelID_FloorTrim, shader, transform.to_mat4());
@@ -376,7 +411,7 @@ namespace HellEngine
 
 	void Room::CalculateWorldSpaceBounds()
 	{
-		float bias = 0.02;
+		float bias = 0;// 0.02;
 		m_lowerX = m_position.x - (m_size.x / 2) - bias;
 		m_lowerZ = m_position.y - (m_size.y / 2) - bias;
 		m_upperX = m_position.x + (m_size.x / 2) + bias;

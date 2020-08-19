@@ -102,7 +102,7 @@ namespace HellEngine
 			}
 
 			if (playFleshSound)
-				Audio::PlayAudio("Impact_Flesh.wav", 1.0f);
+				Audio::PlayAudio("FLY_Head_Explode_01.wav", 0.75f);
 		}
 	}
 

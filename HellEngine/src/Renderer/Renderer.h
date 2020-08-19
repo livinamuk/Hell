@@ -40,6 +40,7 @@ namespace HellEngine
 		// Render passes
 		static void GeometryPass(Game* game, Shader* shader);
 		static void LightingPass(Game* game, Shader* stencilShader, Shader* lightingShader);
+		static void GlassPass(Game* game, Shader* shader);
 		static void BlurPass(Shader* blurVerticalShader, Shader* blurHorizontalShader);
 		static void CompositePass(Game* game, Shader* shader);
 		static void ChromaticAberrationPass(Shader* shader);
@@ -58,6 +59,7 @@ namespace HellEngine
 		static void BulletDebugDraw(Game* game, Shader* shader);
 		static void EditorOverlayPass(Game* game, Shader* shader);
 		static void VolumetricBloodPass(Game* game, Shader* shader);
+		static void VolumetricBloodPassDecals(Game* game, Shader* shader);
 
 		static void ViewCubeMap(Game* , Shader* shader, unsigned int CubeMapID);
 		static void CreateBRDFLut();
@@ -99,9 +101,14 @@ namespace HellEngine
 		static Shader s_BloodShader;
 		static Shader s_DecalShader;
 		static Shader s_BloodVolumetricShader;
+		static Shader s_BloodVolumetricShaderDecals;
 
 		static Shader s_GunInspectShader;
 		static Shader s_SolidColor3D;
+		static Shader s_TransparentSurfacesShader;
+
+		static Shader s_GlassBlur;
+		static Shader s_CombineGlassBlurWithFinalLighting;
 
 		static std::vector<BlurBuffer> s_BlurBuffers;
 

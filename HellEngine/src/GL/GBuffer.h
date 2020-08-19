@@ -10,7 +10,7 @@ namespace HellEngine
 		~GBuffer();
 
 		unsigned int ID;
-		unsigned int gAlbedo, gNormal, gRMA, rboDepth, gEmissive, gFinalLighting, gLevelEditorOverlay;
+		unsigned int gAlbedo, gNormal, gRMA, rboDepth, gEmissive, gFinalLighting, gGlassBlur, gGlassSurface;
 
 		void Configure(int width, int height);
 	};

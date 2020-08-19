@@ -1,5 +1,6 @@
 #include "hellpch.h"
 #include "CharacterController.h"
+#include <algorithm>
 
 namespace HellEngine
 {
@@ -30,7 +31,7 @@ namespace HellEngine
 		bulletController_->setGravity(Physics::s_dynamicsWorld->getGravity());
 
 		int group = CollisionGroups::PLAYER;
-		int mask = CollisionGroups::HOUSE | CollisionGroups::ENEMY;
+		int mask = CollisionGroups::HOUSE | CollisionGroups::ENEMY | CollisionGroups::TERRAIN;
 
 		Physics::s_dynamicsWorld->addCollisionObject(ghostObject_, group, mask);
 		Physics::s_dynamicsWorld->addAction(bulletController_);
@@ -48,6 +49,13 @@ namespace HellEngine
 			m_isCrouching = false;
 
 		float target = m_isCrouching ? m_viewHeightCrouching : m_viewHeightStanding;
+
+		/*
+		std::cout << "m_currentViewHeight: " << m_currentViewHeight << "\n";
+		std::cout << "target: " << target << "\n";
+		std::cout << "deltaTime: " << deltaTime << "\n";
+		std::cout << "m_crouchDownSpeed: " << m_crouchDownSpeed << "\n";
+		*/
 		m_currentViewHeight = Util::FInterpTo(m_currentViewHeight, target, deltaTime, m_crouchDownSpeed);
 
 		btVector3 capsuleScaling = m_isCrouching ? btVector3(1, 0.5f, 1) : btVector3(1, 1, 1);;
@@ -107,10 +115,14 @@ namespace HellEngine
 
 	glm::vec3 CharacterController::GetWorldPosition()
 	{
-		float x = bulletController_->getGhostObject()->getWorldTransform().getOrigin().getX();
-		float y = bulletController_->getGhostObject()->getWorldTransform().getOrigin().getY();
-		float z = bulletController_->getGhostObject()->getWorldTransform().getOrigin().getZ();
-		return glm::vec3(x, y, z);
+		//float x = bulletController_->getGhostObject()->getWorldTransform().getOrigin().getX();
+		//float y = bulletController_->getGhostObject()->getWorldTransform().getOrigin().getY();
+		//float z = bulletController_->getGhostObject()->getWorldTransform().getOrigin().getZ();
+	//	return glm::vec3(x, y, z);
+
+		btTransform trans;
+		m_pRigidBody->getMotionState()->getWorldTransform(trans);
+		return Util::btVec3_to_glmVec3(trans.getOrigin());
 	}
 
 	glm::mat4 CharacterController::GetWorldMatrix()
@@ -126,9 +138,11 @@ namespace HellEngine
 	}*/
 
 	glm::vec3 CharacterController::GetViewPosition()
-	{
+	{	
 		glm::vec3 worldPos = Util::btVec3_to_glmVec3(bulletController_->getGhostObject()->getWorldTransform().getOrigin());
+		
 		float capsuleScaling = ghostObject_->getCollisionShape()->getLocalScaling().getY();
+
 		float bottomOfCapsuleYPosition = worldPos.y - (height * capsuleScaling * 0.5f) - radius;
 		worldPos.y = bottomOfCapsuleYPosition + m_currentViewHeight;
 		return worldPos;

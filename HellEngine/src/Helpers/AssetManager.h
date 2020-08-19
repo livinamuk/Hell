@@ -51,7 +51,8 @@ namespace HellEngine
 		static unsigned int GetRmaTexID(unsigned int materialID);
 		static unsigned int GetRmeTexID(unsigned int materialID);
 		static unsigned int GetMaterialIDByName(std::string name);
-		static void BindMaterial(unsigned int materialID);
+		static void BindMaterial_0(unsigned int materialID);
+		static void BindMaterial_1(unsigned int materialID);
 		static std::string GetMaterialNameByID(unsigned int materialID);
 
 		static void PrintSkinnedModelMeshNames(const char* name);

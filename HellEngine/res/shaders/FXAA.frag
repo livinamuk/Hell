@@ -54,6 +54,7 @@ void main( void ) {
 		FragColor = vec4(result1, 1.0);
 	else
 		FragColor = vec4(result2, 1.0);
+				
  //   FragColor.x = 1;
  // FragColor = vec4(vec3(texture(tex0, TexCoords)), 1.0);
 }

@@ -1498,6 +1498,8 @@
       <Filter>vendor\tinyobj</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\ExrTexture.h" />
+    <ClInclude Include="src\Core\GameData.h" />
+    <ClInclude Include="src\Core\Core.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\AnimatedNode.cpp">
@@ -1765,6 +1767,7 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\ExrTexture.cpp" />
+    <ClCompile Include="src\Core\GameData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">
@@ -1905,5 +1908,13 @@
     <None Include="res\shaders\stencil.vert">
       <Filter>res\shaders</Filter>
     </None>
+    <None Include="res\shaders\bloodVolumetricDecals.frag" />
+    <None Include="res\shaders\bloodVolumetricDecals.vert" />
+    <None Include="res\shaders\TransparentSurfaces.frag" />
+    <None Include="res\shaders\TransparentSurfaces.vert" />
+    <None Include="res\shaders\GlassBlur.frag" />
+    <None Include="res\shaders\GlassBlur.vert" />
+    <None Include="res\shaders\CombineGlassBlurWithFinalLighting.frag" />
+    <None Include="res\shaders\CombineGlassBlurWithFinalLighting.vert" />
   </ItemGroup>
 </Project>

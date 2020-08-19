@@ -5,6 +5,7 @@
 #include "Core/CoreImGui.h"
 #include "Game.h"
 #include "Logic/WeaponLogic.h"
+#include <algorithm>
 
 namespace HellEngine
 {
@@ -66,6 +67,10 @@ namespace HellEngine
 			Renderer::s_GunInspectShader.ReloadShader();
 			Renderer::s_SolidColor3D.ReloadShader();
 			Renderer::s_BloodVolumetricShader.ReloadShader();
+			Renderer::s_BloodVolumetricShaderDecals.ReloadShader();
+			Renderer::s_TransparentSurfacesShader.ReloadShader();
+			Renderer::s_GlassBlur.ReloadShader(); 
+			Renderer::s_CombineGlassBlurWithFinalLighting.ReloadShader();
 			Renderer::SetTextureBindings();
 		}
 
@@ -87,5 +92,15 @@ namespace HellEngine
 
 		if (Input::s_keyPressed[HELL_KEY_G])
 			WeaponLogic::m_singleHanded = !WeaponLogic::m_singleHanded;
+
+
+		// Mouse sensititivity
+		if (Input::s_keyPressed[HELL_KEY_MINUS])
+			Config::MOUSE_SESNSITIVITY -= 10; 
+		if (Input::s_keyPressed[HELL_KEY_EQUAL])
+			Config::MOUSE_SESNSITIVITY += 10;
+
+		Config::MOUSE_SESNSITIVITY = std::min((int)Config::MOUSE_SESNSITIVITY, 200);
+		Config::MOUSE_SESNSITIVITY = std::max((int)Config::MOUSE_SESNSITIVITY, 10);
 	}
 }

@@ -14,6 +14,7 @@
 #include "Logic/WeaponLogic.h"
 #include "Logic/GlockLogic.h"
 #include "Core/LevelEditor.h"
+#include "Core/GameData.h"
 
 namespace HellEngine
 {
@@ -38,8 +39,12 @@ namespace HellEngine
 	Shader Renderer::s_BloodShader;
 	Shader Renderer::s_DecalShader;
 	Shader Renderer::s_BloodVolumetricShader;
+	Shader Renderer::s_BloodVolumetricShaderDecals;
 	Shader Renderer::s_GunInspectShader;
 	Shader Renderer::s_SolidColor3D;
+	Shader Renderer::s_TransparentSurfacesShader;
+	Shader Renderer::s_GlassBlur;
+	Shader Renderer::s_CombineGlassBlurWithFinalLighting;
 
 	std::string Renderer::s_debugString;
 
@@ -92,6 +97,12 @@ namespace HellEngine
 		s_quadShader = Shader("QuadShader", "quadShader.vert", "quadShader.frag", "NONE");
 
 		s_geometryShader = Shader("GeometryShader", "geometry.vert", "geometry.frag", "NONE");
+		
+		// Glass
+		s_TransparentSurfacesShader = Shader("TransparentSurfaces", "TransparentSurfaces.vert", "TransparentSurfaces.frag", "NONE");
+		s_GlassBlur = Shader("GlassBlur", "GlassBlur.vert", "GlassBlur.frag", "NONE"); 
+		s_CombineGlassBlurWithFinalLighting = Shader("CombineGlassBlurWithFinalLighting", "CombineGlassBlurWithFinalLighting.vert", "CombineGlassBlurWithFinalLighting.frag", "NONE");
+
 		s_lightingShader = Shader("LightingShader", "lighting.vert", "lighting.frag", "NONE");
 		s_compositeShader = Shader("CompositeShader", "composite.vert", "composite.frag", "NONE");
 		s_ShadowMapShader = Shader("ShadowMapShader", "ShadowMapDepth.vert", "ShadowMapDepth.frag", "ShadowMapDepth.geom");
@@ -99,7 +110,6 @@ namespace HellEngine
 		s_ChromaticAberrationShader = Shader("ChromaticAberration", "ChromaticAberration.vert", "ChromaticAberration.frag", "NONE");
 		s_FXAAShader = Shader("FXAAShader", "FXAA.vert", "FXAA.frag", "NONE");
 		s_StencilShader = Shader("StencilShader", "stencil.vert", "stencil.frag", "NONE");
-
 		// IBL
 		s_backgroundShader = Shader("Background", "background.vert", "background.frag", "NONE");
 		s_BRDF_Shader = Shader("BRDF", "brdf.vert", "brdf.frag", "NONE");
@@ -113,6 +123,7 @@ namespace HellEngine
 		s_BloodShader = Shader("Blood", "blood.vert", "blood.frag", "NONE");
 		s_DecalShader = Shader("Decal", "decals.vert", "decals.frag", "NONE");
 		s_BloodVolumetricShader = Shader("BloodVolumetric", "bloodVolumetric.vert", "bloodVolumetric.frag", "NONE");
+		s_BloodVolumetricShaderDecals = Shader("BloodVolumetricDecals", "bloodVolumetricDecals.vert", "bloodVolumetricDecals.frag", "NONE");
 
 		s_GunInspectShader = Shader("GunInspect", "GunInspect.vert", "GunInspect.frag", "NONE");
 		s_SolidColor3D = Shader("SolidColor3D", "solidColor3D.vert", "solidColor3D.frag", "NONE");
@@ -476,7 +487,7 @@ namespace HellEngine
 		static bool test = false;
 		if (test == false)
 		{
-			for (Light& light : game->house.m_lights)
+			for (Light& light : GameData::p_house->m_lights)
 			{
 				light.m_LightProbe.m_needsEnvMapReRender = true;
 				light.m_LightProbe.m_needsSphericalHarmonicsReRender = true;
@@ -498,13 +509,25 @@ namespace HellEngine
 			GeometryPass(game, &s_geometryShader);
 		}
 
+
 		{
 			GpuProfiler g("DecalPass");
 			DecalPass(game, &s_DecalShader);
+		} 
+
+		{
+			GpuProfiler g("BloodDecalPass");
+			//VolumetricBloodPassDecals(game, &s_BloodVolumetricShaderDecals);
 		}
+
 		{
 			GpuProfiler g("LightingPass");
 			LightingPass(game, &s_StencilShader, &s_lightingShader);
+		}
+
+		{
+			GpuProfiler g("GlassPass");
+			GlassPass(game, &s_geometryShader);
 		}
 
 		{
@@ -514,7 +537,7 @@ namespace HellEngine
 
 		{
 			GpuProfiler g("Volumetric Pass");
-			VolumetricBloodPass(game, &s_BloodVolumetricShader);
+		//	VolumetricBloodPass(game, &s_BloodVolumetricShader);
 		}
 
 		{
@@ -554,8 +577,9 @@ namespace HellEngine
 				RenderFinalImage(&s_quadShader, s_ChromaticAbberationBuffer.TexID);
 			else
 				//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
-			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, game->house.m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
-				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, AssetManager::s_ExrTexture_pos.gTexId, s_gBuffer.gFinalLighting);
+			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, GameData::p_house->m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
+		//		RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gGlassBlur, s_gBuffer.gFinalLighting);		
+			RenderDebugTextures(&s_quadShader, s_gBuffer.gNormal, s_gBuffer.gGlassSurface, s_gBuffer.gGlassBlur, s_gBuffer.gFinalLighting);
 			//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
 		}
 
@@ -579,30 +603,32 @@ namespace HellEngine
 
 		// Show a cubemap
 		/*if (Input::s_keyDown[HELL_KEY_1]) {
-			ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[0].m_LightProbe.CubeMap_TexID);
+			ViewCubeMap(game, &s_backgroundShader, GameData::p_house->m_lights[0].m_LightProbe.CubeMap_TexID);
 		}
 		if (Input::s_keyDown[HELL_KEY_2]) {
-			ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[1].m_LightProbe.CubeMap_TexID);
+			ViewCubeMap(game, &s_backgroundShader, GameData::p_house->m_lights[1].m_LightProbe.CubeMap_TexID);
 		}
 		if (Input::s_keyDown[HELL_KEY_3]) {
-			ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[2].m_LightProbe.CubeMap_TexID);
+			ViewCubeMap(game, &s_backgroundShader, GameData::p_house->m_lights[2].m_LightProbe.CubeMap_TexID);
 		}*/
 		//if (Input::s_keyDown[HELL_KEY_4]) {
-		//	ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[3].m_LightProbe.CubeMap_TexID);
+		//	ViewCubeMap(game, &s_backgroundShader, GameData::p_house->m_lights[3].m_LightProbe.CubeMap_TexID);
 		//}
 		// Show a cubemap
-		//if (Input::s_keyDown[HELL_KEY_V])
-		//	ViewCubeMap(game, &s_backgroundShader, game->house.m_lights[0].m_shadowMap.FboID);
+		if (Input::s_keyDown[HELL_KEY_V])
+			ViewCubeMap(game, &s_backgroundShader, GameData::p_house->m_lights[3].m_shadowMap.DepthCubeMapID);
 
 		if (Input::s_keyDown[HELL_KEY_T]) {
 			Decal::s_decals.clear();
+			Shell::s_bulletCasings.clear();
+			Shell::s_shotgunShells.clear();
 
 			//		game->m_shotgunAmmo = 4;
 		}
 
 		//	}
 		if (Input::s_keyDown[HELL_KEY_4]) {
-			for (Light& light : game->house.m_lights)
+			for (Light& light : GameData::p_house->m_lights)
 			{
 				light.m_LightProbe.m_needsEnvMapReRender = true;
 				light.m_LightProbe.m_needsSphericalHarmonicsReRender = true;
@@ -633,12 +659,12 @@ namespace HellEngine
 			s_solidColorShader.setMat4("view", game->camera.m_viewMatrix);
 			s_solidColorShader.setMat4("model", glm::mat4(1));
 			s_solidColorShader.setVec3("color", glm::vec3(1, 0, 0));
-			//	game->house.m_lights[0].m_lightVolume.Draw(&s_solidColorShader);
+			//	GameData::p_house->m_lights[0].m_lightVolume.Draw(&s_solidColorShader);
 
-			Light* light = &game->house.m_lights[0];
+			Light* light = &GameData::p_house->m_lights[0];
 
 
-			/*	for (Door& door : game->house.m_doors)
+			/*	for (Door& door : GameData::p_house->m_doors)
 				{
 					AssetManager::DrawModel(AssetManager::GetModelIDByName("DoorVolumeA"), &s_solidColorShader, door.GetDoorModelMatrixFromPhysicsEngine());
 				}*/
@@ -870,7 +896,7 @@ namespace HellEngine
 		}
 
 
-		/*for (Vertex& vertex : game->house.m_rooms[0].m_wallMesh.vertices)
+		/*for (Vertex& vertex : GameData::p_house->m_rooms[0].m_wallMesh.vertices)
 		{
 			DrawPoint(&s_solidColorShader, vertex.Position, glm::vec3(1, 0, 1));
 		}
@@ -882,10 +908,15 @@ namespace HellEngine
 
 		text = "FPS: ";
 		text += std::to_string(game->m_fps);
-		text += "\n";
-		text = "s_animTime: ";
-		text += std::to_string(s_animTime);
-		text += "\n";
+
+		text += "\nSENSITIVITY: ";
+		text += std::to_string(Config::MOUSE_SESNSITIVITY);
+				
+	//	text += "GameData::p_house->m_rooms.size(): ";
+	//	text += std::to_string(GameData::p_house->m_rooms.size());
+		////text += "GameData::p_house->m_rooms[0].m_wallMesh.vertices.size(): ";
+		//text += std::to_string(GameData::p_house->m_rooms[0].m_wallMesh.vertices.size());
+		//text += "\n";
 		
 	/*	text += "Anim index: ";
 		text += std::to_string(WeaponLogic::p_currentAnimatedEntity->m_currentAnimationIndex) + "\n";
@@ -980,7 +1011,7 @@ namespace HellEngine
 		glDepthMask(true);
 		glDisable(GL_BLEND);
 
-		for (Light light : game->house.m_lights)
+		for (Light light : GameData::p_house->m_lights)
 		{
 			glViewport(0, 0, ShadowMap::SHADOW_MAP_SIZE, ShadowMap::SHADOW_MAP_SIZE);
 			glBindFramebuffer(GL_FRAMEBUFFER, light.m_shadowMap.FboID);
@@ -1022,7 +1053,7 @@ namespace HellEngine
 
 	void Renderer::EnvMapPass(Game* game, Shader* envMapShader, Shader* sphericalHarmonicsShader)
 	{
-		for (Light& light : game->house.m_lights)
+		for (Light& light : GameData::p_house->m_lights)
 		{
 			if (light.m_LightProbe.m_needsEnvMapReRender) {
 				RenderEnvMap(game, envMapShader, &light);
@@ -1030,7 +1061,7 @@ namespace HellEngine
 			}
 		}
 
-		for (Light& light : game->house.m_lights)
+		for (Light& light : GameData::p_house->m_lights)
 		{
 			if (light.m_LightProbe.m_needsSphericalHarmonicsReRender) {
 				RenderSphericalHarmonicsTexture(game, sphericalHarmonicsShader, &light);
@@ -1107,6 +1138,17 @@ namespace HellEngine
 		shader->use();
 		shader->setMat4("u_MatrixProjection", game->camera.m_projectionMatrix);
 		shader->setMat4("u_MatrixView", game->camera.m_viewMatrix);
+		shader->setVec3("u_ViewPos", game->camera.m_viewPos);
+
+		for (int i = 0; i < GameData::p_house->m_lights.size(); i++)
+		{
+			Light& light = GameData::p_house->m_lights[i];
+			shader->setVec3("lightPosition[" + std::to_string(i) + "]", light.m_position);
+			shader->setFloat("lightRadius[" + std::to_string(i) + "]", light.m_radius);
+			shader->setFloat("lightMagic[" + std::to_string(i) + "]", light.m_magic);
+			shader->setFloat("lightStrength[" + std::to_string(i) + "]", light.m_strength);
+			shader->setVec3("lightColor[" + std::to_string(i) + "]", light.m_color);
+		}
 
 		SkinnedModel* model = AssetManager::skinnedModels[AssetManager::GetSkinnedModelIDByName("Shotgun.fbx")];
 		unsigned int BoneIndex = model->m_BoneMapping["Bolt_bone"];
@@ -1154,7 +1196,7 @@ namespace HellEngine
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_DEPTH_TEST);
 
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("White"));
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("White"));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, HellEngine::AssetManager::s_ExrTexture_pos.gTexId);
@@ -1190,6 +1232,135 @@ namespace HellEngine
 
 		//Model* blood_mesh = AssetManager::GetModelByName("blood_mesh");
 		//blood_mesh->Draw(shader, glm::mat4(1));
+	}
+
+	void Renderer::VolumetricBloodPassDecals(Game* game, Shader* shader)
+	{
+		shader->use();
+		shader->setMat4("pv", game->camera.m_projectionViewMatrix);
+		shader->setMat4("inverseProjectionMatrix", glm::inverse(game->camera.m_projectionMatrix));
+		shader->setMat4("inverseViewMatrix", glm::inverse(game->camera.m_viewMatrix));
+		shader->setFloat("screenWidth", CoreGL::s_windowWidth);
+		shader->setFloat("screenHeight", CoreGL::s_windowHeight);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.rboDepth);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gNormal);
+
+		unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+		glDrawBuffers(3, attachments);
+
+		glEnable(GL_BLEND);
+		glDepthMask(GL_FALSE);
+		glEnable(GL_DEPTH_TEST);
+		glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
+
+
+
+		Transform transform;
+		transform.position = glm::vec3(1, 0, 1);
+		transform.scale = glm::vec3(6, 0.1, 2.8);
+
+		glm::mat4 modelMatrix = transform.to_mat4();// glm::translate(glm::mat4(1), transform.position);
+		glm::vec3 squareNormal = glm::vec3(0, 0, 1);
+		/*float angle = glm::acos(glm::dot(normal, squareNormal));
+		if (angle > 0.001f)
+		{
+			if (angle == HELL_PI)
+				modelMatrix = glm::rotate(modelMatrix, angle, glm::vec3(0, 1, 0));
+			else {
+				glm::vec3 axis = glm::normalize(glm::cross(squareNormal, normal));
+				modelMatrix = glm::rotate(modelMatrix, angle, axis);
+			}
+		}*/
+		// Draw the cunt
+	//	modelMatrix = glm::rotate(modelMatrix, randomRotation, glm::vec3(0, 0, 1));
+	//	modelMatrix = glm::scale(modelMatrix, transform.scale);
+		shader->setMat4("model", modelMatrix);
+
+		//		if (!blackOnly)
+		//			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("BulletHole1_BaseColor"));
+		//		else
+		//			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("BulletHole1Black_BaseColor"));
+
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("Decal_norm"));
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("Decal_mask"));
+		//	if (!blackOnly)
+		//		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("BulletHole1"));
+		//	else
+		//		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("BulletHole1Black"));
+
+
+			//shader->setMat4("model", glm::mat4(1));
+
+		static unsigned int VAO = 0;
+		if (VAO == 0) {
+			float vertices[] = {
+				// positions          // normals           // texture coords	
+				0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,	// top
+				0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+				-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+				-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+				-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+				0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+
+				0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,	// front
+				0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+				-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+				-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+				-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+				0.5f, 0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+
+				-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f, // back
+				0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+				0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+				0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+				-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+				-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+
+				-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f, // right
+				-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+				-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+				-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+				-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+				-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+				0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f, // left
+				0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+				0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+				0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+				0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+				0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+				-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f, // bottom
+				0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+				0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+				0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+				-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+				-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f
+			};
+			unsigned int VBO;
+			glGenVertexArrays(1, &VAO);
+			glGenBuffers(1, &VBO);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+			glBindVertexArray(VAO);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+			glEnableVertexAttribArray(2);
+		}
+
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
 	}
 
 	void Renderer::DecalPass(Game* game, Shader* shader)
@@ -1253,9 +1424,15 @@ namespace HellEngine
 		if (s_demo)
 			VP = glm::mat4(1);
 
-		for (Light light : game->house.m_lights)
+		for (Light light : GameData::p_house->m_lights)
 		{
-			
+			//Light light = GameData::p_house->m_lights[3];
+
+			if (light.m_roomID == -1)
+			{
+				std::cout << " 'THIS' LIGHT IS NOT IN A ROOM\n";
+				break;
+			}
 
 			// Stencil Buffer optimisation
 			VP = game->camera.m_projectionMatrix * game->camera.m_viewMatrix;
@@ -1300,7 +1477,7 @@ namespace HellEngine
 				}
 
 
-			/*	for (Door& door : game->house.m_doors)
+			/*	for (Door& door : GameData::p_house->m_doors)
 				{
 					AssetManager::DrawModel(AssetManager::GetModelIDByName("DoorVolumeA"), stencilShader, door.GetDoorModelMatrixFromPhysicsEngine());
 				}*/
@@ -1308,7 +1485,7 @@ namespace HellEngine
 
 
 			/*enderer::s_RenderSettings.ShadowMapPass = true;
-				Door* door = &game->house.m_doors[0];
+				Door* door = &GameData::p_house->m_doors[0];
 				stencilShader->setMat4("gWVP", door->GetDoorModelMatrixFromPhysicsEngine() * MVP);
 				door->Draw(stencilShader);
 				Renderer::s_RenderSettings.ShadowMapPass = false;*/
@@ -1358,10 +1535,10 @@ namespace HellEngine
 
 			// This is a dirty hack. To apply the shadow factor to indirect lighting outside of room bounds.
 			float bias = 0;// 0.07f;
-			lightingShader->setFloat("room_lowerX", game->house.m_rooms[light.m_roomID].m_lowerX - bias);
-			lightingShader->setFloat("room_lowerZ", game->house.m_rooms[light.m_roomID].m_lowerZ - bias);
-			lightingShader->setFloat("room_upperX", game->house.m_rooms[light.m_roomID].m_upperX + bias);
-			lightingShader->setFloat("room_upperZ", game->house.m_rooms[light.m_roomID].m_upperZ + bias);
+			lightingShader->setFloat("room_lowerX", GameData::p_house->m_rooms[light.m_roomID].m_lowerX - bias);
+			lightingShader->setFloat("room_lowerZ", GameData::p_house->m_rooms[light.m_roomID].m_lowerZ - bias);
+			lightingShader->setFloat("room_upperX", GameData::p_house->m_rooms[light.m_roomID].m_upperX + bias);
+			lightingShader->setFloat("room_upperZ", GameData::p_house->m_rooms[light.m_roomID].m_upperZ + bias);
 	
 
 
@@ -1380,7 +1557,7 @@ namespace HellEngine
 				glCullFace(GL_FRONT);
 
 				if (light.m_roomID != -1)
-					game->house.m_rooms[light.m_roomID].m_lightVolume.Draw(lightingShader);
+					GameData::p_house->m_rooms[light.m_roomID].m_lightVolume.Draw(lightingShader);
 
 			}		
 			else
@@ -1401,6 +1578,93 @@ namespace HellEngine
 		// HOLY SHIT. THIS CAUSED THAT ANNOYING AS FUCK PROBLEM.
 		// YOU CAN'T CREATE CUBEMAPS WITHOUT THIS SET BACK TO TRUE.
 		glDepthMask(GL_TRUE);
+	}
+
+	void Renderer::GlassPass(Game* game, Shader* shader)
+	{
+		// BLUR FIRST
+		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+
+		unsigned int attachments[1] = { GL_COLOR_ATTACHMENT5 };
+		glDrawBuffers(1, attachments);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
+		glEnable(GL_CULL_FACE);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendEquation(GL_FUNC_ADD);
+
+		Shader* blurShader = &s_GlassBlur;
+		blurShader->use();
+		blurShader->setMat4("projection", game->camera.m_projectionMatrix);
+		blurShader->setMat4("viewMatrix", game->camera.m_viewMatrix);
+		blurShader->setMat4("inverseViewMatrix", glm::inverse(game->camera.m_viewMatrix));
+		blurShader->setFloat("screenWidth", CoreGL::s_windowWidth);
+		blurShader->setFloat("screenHeight", CoreGL::s_windowHeight);
+		
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gFinalLighting);
+
+		for (Window& window : GameData::p_house->m_windows) {
+			static int material0 = AssetManager::GetMaterialIDByName("Window");
+			static int material1 = AssetManager::GetMaterialIDByName("WindowExterior");
+			window.DrawGlass(blurShader);
+		}
+
+
+		// NOW DO GLASS				
+		glDrawBuffer(GL_COLOR_ATTACHMENT6);
+		glClearColor(0, 0, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT);
+		
+		shader = &s_TransparentSurfacesShader;
+		shader->use();
+		shader->setMat4("projection", game->camera.m_projectionMatrix);
+		shader->setMat4("viewMatrix", game->camera.m_viewMatrix);
+		shader->setMat4("inverseViewMatrix", glm::inverse(game->camera.m_viewMatrix));	
+
+		for (int i = 0; i < GameData::p_house->m_lights.size(); i++)
+		{
+			Light& light = GameData::p_house->m_lights[i];
+			shader->setVec3("lightPosition[" + std::to_string(i) + "]", light.m_position);
+			shader->setFloat("lightRadius[" + std::to_string(i) + "]", light.m_radius);
+			shader->setFloat("lightMagic[" + std::to_string(i) + "]", light.m_magic);
+			shader->setFloat("lightStrength[" + std::to_string(i) + "]", light.m_strength);
+			shader->setVec3("lightColor[" + std::to_string(i) + "]", light.m_color);
+		}
+		
+		static int dust1 = AssetManager::GetTexIDByName("Dust0_Overlay");
+		static int dust2 = AssetManager::GetTexIDByName("Dust0_Overlay2");
+
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, dust1);
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, dust2);
+				
+		for (Window& window : GameData::p_house->m_windows) {
+			static int material0 = AssetManager::GetMaterialIDByName("Window");
+			static int material1 = AssetManager::GetMaterialIDByName("WindowExterior");
+			AssetManager::BindMaterial_0(material0);
+			AssetManager::BindMaterial_1(material1);
+			window.DrawGlass(shader);
+		}
+
+
+		// Now combine that the glass blur texture with the final lighting, so that you can draw muzzel flashes ontop of it
+
+		glDrawBuffer(GL_COLOR_ATTACHMENT4);
+
+		glUseProgram(s_CombineGlassBlurWithFinalLighting.ID);
+		glDisable(GL_DEPTH_TEST);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gGlassBlur);
+
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		Quad2D::RenderQuad(&s_CombineGlassBlurWithFinalLighting);
 	}
 
 
@@ -1509,7 +1773,9 @@ namespace HellEngine
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, s_BlurBuffers[3].textureA);
 		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gLevelEditorOverlay);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gGlassBlur);
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gGlassSurface);
 
 		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		Quad2D::RenderQuad(shader);
@@ -1534,6 +1800,30 @@ namespace HellEngine
 
 	void Renderer::DOFPass(Shader* shader)
 	{
+		// First you need to render the glass into the depth map
+		/*glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+
+		glDepthMask(GL_TRUE);
+		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+
+		unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+		glDrawBuffers(4, attachments);
+
+		s_geometryShader.use();
+		//s_geometryShader.setMat4("projection", game->camera.m_projectionMatrix);
+		//s_geometryShader.setMat4("view", game->camera.m_viewMatrix);
+
+		for (Window& window : GameData::p_house->m_windows) {
+			static int material0 = AssetManager::GetMaterialIDByName("Window");
+			static int material1 = AssetManager::GetMaterialIDByName("WindowExterior");
+			window.DrawGlass(&s_geometryShader);
+		}
+		
+		*/
+		// Now you can do your DOF stuff buddy
 		glBindFramebuffer(GL_FRAMEBUFFER, s_DOFBuffer.ID);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -1686,9 +1976,9 @@ namespace HellEngine
 		s_Inv_GlockTransform.rotation.y += 0.01f;
 
 		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_2D, game->house.m_lights[0].m_LightProbe.SH_TexID);
+		glBindTexture(GL_TEXTURE_2D, GameData::p_house->m_lights[0].m_LightProbe.SH_TexID);
 
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Glock"));
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("Glock"));
 		AssetManager::GetModelByName("Glock")->Draw(&s_GunInspectShader, s_Inv_GlockTransform.to_mat4());
 	}
 
@@ -1780,7 +2070,7 @@ namespace HellEngine
 	{
 		// DRAW THE HOUSE
 		// walls, floors, ceilings, doors, staircases.
-		game->house.Draw(shader, envMapPass);
+		GameData::p_house->Draw(shader, envMapPass);
 		
 		// Projectiles
 		Shell::DrawInstanced(shader, Shell::s_shotgunShells);
@@ -1880,7 +2170,7 @@ namespace HellEngine
 
 		//if (!s_demo)
 
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("NumberGrid"));
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("NumberGrid"));
 		//AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shell"));
 			game->m_zombieGuy.Draw(shader, glm::mat4(1));
 
@@ -1918,7 +2208,7 @@ namespace HellEngine
 //		game->m_testAnimatedEnttity2.m_worldTransform.rotation = glm::vec3(0, 0, 0);
 		//game->m_glockAnimatedEntiyty.m_worldTransform.scale = glm::vec3(0.0125f);
 
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("White"));
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("White"));
 		//glDisable(GL_DEPTH_TEST);
 		//game->m_glockAnimatedEntiyty.Draw(shader, glm::mat4(1));
 		shader->setInt("hasAnimation", false);
@@ -1990,9 +2280,9 @@ namespace HellEngine
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, CubeMapID);
-
+	
 		glCullFace(GL_FRONT);
-		Cube cube = Cube(glm::vec3(0));
+			Cube cube = Cube(glm::vec3(0));
 		cube.Draw(shader);
 		glCullFace(GL_BACK);
 	}

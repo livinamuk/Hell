@@ -16,7 +16,7 @@ namespace HellEngine
 
 	void LightVolume::BuildFromRoom(Room* room)
 	{
-		float bias = 0.02;
+		float bias = 0.02f;
 		vertices.clear();
 		float lowerX = room->m_lowerX - bias;
 		float lowerZ = room->m_lowerZ - bias;

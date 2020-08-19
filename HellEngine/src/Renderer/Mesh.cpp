@@ -93,5 +93,7 @@ namespace HellEngine
 		glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, BlendingIndex));
 		glEnableVertexAttribArray(6);
 		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, BlendingWeight));
+		glEnableVertexAttribArray(7);
+		glVertexAttribIPointer(7, 1, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, MaterialID));
 	}
 }

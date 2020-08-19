@@ -102,7 +102,6 @@ not looking good with small sample and ring count
 looks okay starting from samples = 4, rings = 4
 */
 
-bool pentagon = false; //use pentagon as bokeh shape?
 float feather = 0.4; //pentagon shape feather
 
 //------------------------------------------
@@ -317,13 +316,11 @@ void main()
 				float step = PI*2.0 / float(ringsamples);
 				float pw = (cos(float(j)*step)*float(i));
 				float ph = (sin(float(j)*step)*float(i));
-				float p = 1.0;
-				if (pentagon)
-				{ 
-					p = penta(vec2(pw,ph));
-				}
-				col += color(TexCoords + vec2(pw*w,ph*h),blur)*mix(1.0,(float(i))/(float(rings)),bias)*p;  
-				s += 1.0*mix(1.0,(float(i))/(float(rings)),bias)*p;   
+			
+				col += color(TexCoords + vec2(pw*w,ph*h),blur)*mix(1.0,(float(i))/(float(rings)),bias);  
+				s += 1.0*mix(1.0,(float(i))/(float(rings)),bias);   
+
+			//	col = vec3(p);
 			}
 		}
 		col /= s; //divide by sample count

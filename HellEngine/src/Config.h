@@ -36,7 +36,8 @@ namespace HellEngine
 		static inline glm::quat TEST_QUAT = glm::quat(1, 0, 0, 0);
 		static inline glm::quat TEST_QUAT2 = glm::quat(1, 0, 0, 0);
 
-		static inline float INSPECT_FOV = 1.0f;
+		static inline float INSPECT_FOV = 1.0f; 
+		static inline unsigned int MOUSE_SESNSITIVITY = 100;
 
 	};
 }

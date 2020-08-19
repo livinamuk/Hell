@@ -153,11 +153,13 @@
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\Core\AnimatedEntity.h" />
     <ClInclude Include="src\Core\Camera.h" />
+    <ClInclude Include="src\Core\Core.h" />
     <ClInclude Include="src\Core\CoreGL.h" />
     <ClInclude Include="src\Core\CoreImGui.h" />
     <ClInclude Include="src\Core\EnemyCharacter.h" />
     <ClInclude Include="src\Core\Entity.h" />
     <ClInclude Include="src\Core\File.h" />
+    <ClInclude Include="src\Core\GameData.h" />
     <ClInclude Include="src\Core\Input.h" />
     <ClInclude Include="src\Core\LevelEditor.h" />
     <ClInclude Include="src\Core\LightProbeGrid.h" />
@@ -631,6 +633,7 @@
     <ClCompile Include="src\Core\EnemyCharacter.cpp" />
     <ClCompile Include="src\Core\Entity.cpp" />
     <ClCompile Include="src\Core\File.cpp" />
+    <ClCompile Include="src\Core\GameData.cpp" />
     <ClCompile Include="src\Core\Input.cpp" />
     <ClCompile Include="src\Core\LevelEditor.cpp" />
     <ClCompile Include="src\Core\LightProbeGrid.cpp" />
@@ -729,12 +732,18 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shaders\bloodVolumetricDecals.frag" />
+    <None Include="res\shaders\bloodVolumetricDecals.vert" />
     <None Include="res\shaders\ChromaticAberration.frag" />
     <None Include="res\shaders\ChromaticAberration.vert" />
+    <None Include="res\shaders\CombineGlassBlurWithFinalLighting.frag" />
+    <None Include="res\shaders\CombineGlassBlurWithFinalLighting.vert" />
     <None Include="res\shaders\DOF.frag" />
     <None Include="res\shaders\DOF.vert" />
     <None Include="res\shaders\FXAA.frag" />
     <None Include="res\shaders\FXAA.vert" />
+    <None Include="res\shaders\GlassBlur.frag" />
+    <None Include="res\shaders\GlassBlur.vert" />
     <None Include="res\shaders\GunInspect.frag" />
     <None Include="res\shaders\GunInspect.vert" />
     <None Include="res\shaders\SH.frag" />
@@ -775,6 +784,8 @@
     <None Include="res\shaders\solidColor3D.vert" />
     <None Include="res\shaders\stencil.frag" />
     <None Include="res\shaders\stencil.vert" />
+    <None Include="res\shaders\TransparentSurfaces.frag" />
+    <None Include="res\shaders\TransparentSurfaces.vert" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">

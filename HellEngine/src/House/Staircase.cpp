@@ -109,7 +109,7 @@ namespace HellEngine
 		if (m_stepsInSecondSet > 0) {
 			glm::vec3 landingPosition = glm::vec3(0);
 			Util::TranslatePosition(&landingPosition, m_rootTransform.to_mat4() * m_landingTransform.to_mat4());
-			m_landingFloor = Floor(landingPosition, glm::vec2(1.075f, 1.075f));
+			//m_landingFloor = Floor(landingPosition, glm::vec2(1.075f, 1.075f));
 		}
 
 		// Floor: bottom door way
@@ -123,13 +123,13 @@ namespace HellEngine
 		else
 			doorwayFloorSize = glm::vec2(stairIndent + 0.05f, 1);
 
-		m_bottomDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * bottomFloorTransform.to_mat4()), doorwayFloorSize, m_story, m_bottomDoorwayFloor.m_rotateTexture, this);
+		//m_bottomDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * bottomFloorTransform.to_mat4()), doorwayFloorSize, m_story, m_bottomDoorwayFloor.m_rotateTexture, this);
 		
 		// Floor: top door way
 		Transform topDoorWayFloorTransform;
 		topDoorWayFloorTransform.position = m_topDoorway.position;
 		if (m_axis == Axis::POS_Z) topDoorWayFloorTransform.rotation.y = ROTATE_90;
-		m_topDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * topDoorWayFloorTransform.to_mat4()), doorwayFloorSize, m_story, m_topDoorwayFloor.m_rotateTexture, this);
+		//m_topDoorwayFloor = Floor(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * topDoorWayFloorTransform.to_mat4()), doorwayFloorSize, m_story, m_topDoorwayFloor.m_rotateTexture, this);
 
 
 
@@ -138,7 +138,7 @@ namespace HellEngine
 		Transform bottomCeilingTransform;
 		bottomCeilingTransform.position.y = ROOM_HEIGHT + (ROOM_HEIGHT * m_story);
 		bottomCeilingTransform.position.z = (stairIndent / 2);
-		m_bottomDoorwayCeiling = Ceiling(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * bottomCeilingTransform.to_mat4()), glm::vec2(1, stairIndent));
+		//m_bottomDoorwayCeiling = Ceiling(Util::Position_From_Mat_4(m_rootTransform.to_mat4() * bottomCeilingTransform.to_mat4()), glm::vec2(1, stairIndent));
 
 		// Build first set
 		glm::vec3 vertA, vertB, vertC, vertD;
@@ -390,7 +390,7 @@ namespace HellEngine
 		return;
 		*/
 
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("DoorFrame"));
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("DoorFrame"));
 		AssetManager::GetModelByID(AssetManager::s_ModelID_DoorFrame)->DrawMesh(shader, 0, Transform(m_bottomDoorway.position, Util::SetRotationByAxis(m_bottomDoorway.axis)).to_mat4());
 		AssetManager::GetModelByID(AssetManager::s_ModelID_DoorFrame)->DrawMesh(shader, 0, Transform(m_topDoorway.position, Util::SetRotationByAxis(m_topDoorway.axis)).to_mat4());
 		 
@@ -419,7 +419,7 @@ namespace HellEngine
 
 		*/
 
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Stairs01"));
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("Stairs01"));
 		for (int i = 0; i < m_stepsInFirstSet / 3; i++)
 		{
 			Transform trans;
@@ -467,7 +467,7 @@ namespace HellEngine
 				trans.position.z = 0.5f;
 				trans.position.z += stepDepth * (3 * i);
 				trans.position.y = stepHeight * (3 * i);
-				AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Stairs01"));
+				AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("Stairs01"));
 				AssetManager::DrawModel(AssetManager::s_ModelID_Staircase, shader, m_rootTransform.to_mat4() * m_landingTransform.to_mat4() * trans.to_mat4());
 			}
 			// Landing
@@ -483,7 +483,7 @@ namespace HellEngine
 		//AssetManager::GetModelByName("StaircaseCeilingTrimStraight")->SetMaterial(AssetManager::GetMaterialIDByName("Trims"));
 		//AssetManager::GetModelByName("StaircaseCeilingTrimStraight")->Draw(shader, m_rootTransform.to_mat4() * trans.to_mat4());
 
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Trims"));
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("Trims"));
 		AssetManager::DrawModel(AssetManager::s_ModelID_StaircaseCeilingTrimStraight, shader, m_rootTransform.to_mat4() * trans.to_mat4());
 
 
@@ -510,18 +510,18 @@ namespace HellEngine
 		*/
 
 		// Bottom floor
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("FloorBoards"));
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("FloorBoards"));
 		m_bottomDoorwayFloor.Draw(shader);
 		m_topDoorwayFloor.Draw(shader);
 
 		// Ceilings
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("PlasterCeiling"));
-		m_bottomDoorwayCeiling.Draw(shader);
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("PlasterCeiling"));
+		//m_bottomDoorwayCeiling.Draw(shader);
 
 		m_ceilingMesh.Draw(shader);
 
 		// Walls
-		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("WallPaper"));
+		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("WallPaper"));
 		m_wallMesh.Draw(shader);
 	}
 }

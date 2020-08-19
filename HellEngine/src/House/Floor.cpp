@@ -3,6 +3,7 @@
 #include "Helpers/Util.h"
 #include "Helpers/AssetManager.h"
 #include "GL/GpuProfiling.h"
+#include "Physics/Physics.h"
 
 namespace HellEngine
 {
@@ -10,25 +11,22 @@ namespace HellEngine
 	{
 	}
 
-	Floor::Floor(glm::vec3 position, glm::vec2 size, int story, bool rotateTexture, void* parent)
+	Floor::Floor(Transform transform, bool rotateTexture, void* parent)
 	{
-		m_transform.position.x = position.x;
-		m_transform.position.y = STORY_HEIGHT * story;
-		m_transform.position.z = position.z;
-		m_transform.scale.x = size.x;
-		m_transform.scale.z = size.y;
+		m_transform = transform;
 		m_rotateTexture = rotateTexture;
 		m_parent = parent;
 		CalculateWorldSpaceCorners();
+		CreateCollisionObject();
 	}
 
-	Floor::Floor(glm::vec3 position, glm::vec2 size) // for stairs
+	/*Floor::Floor(glm::vec3 position, glm::vec2 size) // for stairs
 	{
 		m_transform.position = position;
 		m_transform.scale.x = size.x;
 		m_transform.scale.z = size.y;
 		CalculateWorldSpaceCorners();
-	}
+	}*/
 
 	void Floor::Draw(Shader* shader)
 	{
@@ -54,5 +52,41 @@ namespace HellEngine
 		worldSpaceCorners.push_back(glm::vec3(b));
 		worldSpaceCorners.push_back(glm::vec3(c));
 		worldSpaceCorners.push_back(glm::vec3(d));
+	}
+
+	void Floor::CreateCollisionObject()
+	{
+		/*static bool hasBeenCreatedBefore = false;
+		if (hasBeenCreatedBefore) {
+			Physics::s_dynamicsWorld->removeCollisionObject(m_collisionObject);
+			//delete m_collisionShape;
+			delete m_collisionObject;
+			hasBeenCreatedBefore = true;
+		}*/
+
+		glm::vec3 position = m_transform.position;
+		position.y -= FLOOR_THICKNESS / 2;
+
+		btTransform transform;
+		transform.setIdentity();
+		transform.setOrigin(Util::glmVec3_to_btVec3(position));
+		transform.setRotation(Util::glmVec3_to_btQuat(m_transform.rotation));
+
+		float friction = 0.8f;			
+		int collisionGroup = CollisionGroups::HOUSE;
+		int collisionMask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
+	
+		// STATIC collision shape
+		m_collisionShape = new btBoxShape(btVector3(0.5, 0.5, 0.5)); 
+		m_collisionShape->setLocalScaling(btVector3(m_transform.scale.x, FLOOR_THICKNESS, m_transform.scale.z));
+
+		PhysicsObjectType objectType = PhysicsObjectType::FLOOR;
+
+		m_collisionObject = Physics::CreateCollisionObject(transform, m_collisionShape, objectType, collisionGroup, collisionMask, friction, DEBUG_COLOR_YELLOW, this);
+	}
+
+	void Floor::RemoveCollisionObject()
+	{
+		Physics::s_dynamicsWorld->removeCollisionObject(m_collisionObject);
 	}
 }

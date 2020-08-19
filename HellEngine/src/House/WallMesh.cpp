@@ -121,7 +121,13 @@ namespace HellEngine
 	}
 
 	void WallMesh::Draw(Shader* shader)
-	{
+	{		
+		// Bail if empty
+		if (vertices.size() == 0) {
+			std::cout << " ALERT ALERT: You are trying to draw a wall mesh with no vertices.\n";
+			return;
+		}
+
 		GpuProfiler g("WallMesh");
 		shader->setMat4("model", transform.to_mat4());
 
@@ -131,12 +137,11 @@ namespace HellEngine
 		// draw mesh
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-		//glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
 
 	void WallMesh::BufferMeshToGL()
-	{
+	{				
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &VBO);
 		glGenBuffers(1, &EBO);
@@ -162,12 +167,4 @@ namespace HellEngine
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
-
-	/*void WallMesh::BuildFromWallSegments(std::vector<WallSegment> wallSegments)
-	{
-		for (WallSegment& segment : wallSegments)
-		{
-			//glm::vec3 
-		}
-	}*/
 }

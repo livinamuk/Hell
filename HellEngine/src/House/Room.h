@@ -16,6 +16,7 @@ namespace HellEngine
 	{
 	public: // methods
 		Room(glm::vec2 position, glm::vec2 size, int story, void* house);
+
 		~Room();
 		void Draw(Shader* shader);
 		void Rebuild();

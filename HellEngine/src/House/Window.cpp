@@ -29,11 +29,28 @@ namespace HellEngine
 		return *this;
 	}
 
-	void Window::Draw(Shader* shader)
+	void Window::DrawFrameAndSashes(Shader* shader)
 	{
+		// Draw frame and sashes
 		LevelEditor::SetHighlightColorIfSelected(shader, this);
-		static int modelID = AssetManager::GetModelIDByName("Window");
-		AssetManager::models[modelID].Draw(shader, m_transform.to_mat4());		
+		static Model* model = AssetManager::GetModelByName("Window");		
+		model->DrawMesh(shader, 0, m_transform.to_mat4());
+		model->DrawMesh(shader, 1, m_transform.to_mat4());
+		model->DrawMesh(shader, 3, m_transform.to_mat4());
+		model->DrawMesh(shader, 5, m_transform.to_mat4());
+		shader->setVec3("ColorAdd", glm::vec3(0, 0, 0));
+	}
+
+	void Window::DrawGlass(Shader* shader)
+	{
+		// Draw glass
+		LevelEditor::SetHighlightColorIfSelected(shader, this);
+		static Model* model = AssetManager::GetModelByName("WindowGlass");
+	//	glDisable(GL_CULL_FACE);
+		model->Draw(shader, m_transform.to_mat4());
+	//	model->DrawMesh(shader, 2, m_transform.to_mat4());
+	//	model->DrawMesh(shader, 4, m_transform.to_mat4());
+	//	glEnable(GL_CULL_FACE);
 		shader->setVec3("ColorAdd", glm::vec3(0, 0, 0));
 	}
 
@@ -44,8 +61,13 @@ namespace HellEngine
 
 	void Window::CreateCollisionObject()
 	{
-		Transform transform = m_transform;
-		transform.position.y += WINDOW_HEIGHT_SINGLE / 2.0f;
+		glm::vec3 position = m_transform.position;
+		position.y += WINDOW_HEIGHT_SINGLE / 2;
+
+		btTransform transform;
+		transform.setIdentity();
+		transform.setOrigin(Util::glmVec3_to_btVec3(position));
+		transform.setRotation(Util::glmVec3_to_btQuat(m_transform.rotation));
 
 		float friction = 0.5f;
 		int collisionGroup = CollisionGroups::HOUSE;

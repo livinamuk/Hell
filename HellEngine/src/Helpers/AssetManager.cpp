@@ -124,7 +124,7 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/DoorShadowCaster.obj"));
 		models.emplace_back(Model("res/models/DoorFrame.obj"));
 		models.emplace_back(Model("res/models/Staircase.obj"));
-		models.emplace_back(Model("res/models/Light.obj"));
+	//	models.emplace_back(Model("res/models/Light.obj"));
 		models.emplace_back(Model("res/models/sphere.obj"));
 		models.emplace_back(Model("res/models/PictureFrame2.obj"));
 		models.emplace_back(Model("res/models/PictureFrame.obj"));
@@ -133,10 +133,18 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Shell.obj"));
 		models.emplace_back(Model("res/models/BulletCasing.obj"));
 		models.emplace_back(Model("res/models/Window.obj"));
+		models.emplace_back(Model("res/models/WindowGlass.obj"));
 		models.emplace_back(Model("res/models/blood_mesh.obj"));
 		//models.emplace_back(Model("res/models/Glock.obj"));
 		//models.emplace_back(Model("res/models/Glass.obj"));
 
+		//models.emplace_back(Model("res/models/Light_00.obj"));
+		models.emplace_back(Model("res/models/Light_01.obj"));
+		models.emplace_back(Model("res/models/Light_02.obj"));
+		models.emplace_back(Model("res/models/Light_03.obj"));
+		models.emplace_back(Model("res/models/Light_04.obj"));
+
+		models.emplace_back(Model("res/models/Table.obj"));
 
 		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("NurseGuy.fbx"));
 		LoadAnimation("NurseGuy.fbx", "NurseGuyWalk.fbx");
@@ -445,7 +453,7 @@ namespace HellEngine
 			std::cout << " " << i << ": " << skinnedModels[ID]->m_BoneInfo[i].BoneName << "\n";
 	}
 
-	void AssetManager::BindMaterial(unsigned int materialID)
+	void AssetManager::BindMaterial_0(unsigned int materialID)
 	{
 		if (materialID < 0) return;
 		if (materialID >= materials.size()) return;
@@ -459,7 +467,22 @@ namespace HellEngine
 		glBindTexture(GL_TEXTURE_2D, AssetManager::GetNrmTexID(materialID));
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, AssetManager::GetRmaTexID(materialID));
+	}
+
+	void AssetManager::BindMaterial_1(unsigned int materialID)
+	{
+		if (materialID < 0) return;
+		if (materialID >= materials.size()) return;
+
+		Material* material = &materials[materialID];
+		currentlyBoundMaterialID = materialID;
+
 		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetAlbTexID(materialID));
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetNrmTexID(materialID));
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetRmaTexID(materialID));
 	}
 
 	unsigned int AssetManager::GetAlbTexID(unsigned int materialID)

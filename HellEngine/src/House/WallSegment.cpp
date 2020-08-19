@@ -19,7 +19,7 @@ namespace HellEngine
 		transform.position.y += (ROOM_HEIGHT / 2) - (heightOfUpperSegment / 2);
 		transform.rotation = Util::SetRotationByAxis(m_axis);
 		transform.scale = glm::vec3(width, heightOfUpperSegment, WALL_DEPTH);
-		m_collisionObject_UpperSegment = Physics::AddWallSegment(transform);
+		CreateUpperCollisionObject_UpperSegment(transform);
 
 		// Create lower collision object
 		if (heightOfLowerSegment > 0) {
@@ -28,7 +28,7 @@ namespace HellEngine
 			transform.position.y -= (ROOM_HEIGHT / 2) - (heightOfLowerSegment / 2);
 			transform.rotation = Util::SetRotationByAxis(m_axis);
 			transform.scale = glm::vec3(width, heightOfLowerSegment, WALL_DEPTH);
-			m_collisionObject_LowerSegment = Physics::AddWallSegment(transform);
+			CreateUpperCollisionObject_LowerSegment(transform);
 		}
 	}
 
@@ -67,5 +67,66 @@ namespace HellEngine
 		glm::vec4 v = m * glm::vec4(m_width / 2, ROOM_HEIGHT/2, 0.0f, 1.0f);
 
 		return glm::vec3(v.x, v.y, v.z);
+	}
+
+	void WallSegment::CreateUpperCollisionObject_UpperSegment(const Transform& trans)
+	{
+		static bool hasBeenCreatedBefore = false;
+		if (hasBeenCreatedBefore) {
+			Physics::s_dynamicsWorld->removeCollisionObject(m_collisionObject_UpperSegment);
+			delete m_collisionShape_UpperSegment;
+			delete m_collisionObject_UpperSegment;
+			hasBeenCreatedBefore = true;
+		}
+
+		btTransform transform;
+		transform.setIdentity();
+		transform.setOrigin(Util::glmVec3_to_btVec3(trans.position));
+		transform.setRotation(Util::glmVec3_to_btQuat(trans.rotation));
+
+		btTransform depthOffsetTransform;
+		depthOffsetTransform.setIdentity();
+		depthOffsetTransform.setOrigin(btVector3(0, 0, -WALL_DEPTH / 2));
+
+		float friction = 0.5f;
+
+		int collisionGroup = CollisionGroups::HOUSE;
+		int collisionMask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
+		m_collisionShape_UpperSegment = new btBoxShape(btVector3(0.5, 0.5, 0.5));
+		m_collisionShape_UpperSegment->setLocalScaling(Util::glmVec3_to_btVec3(trans.scale));
+		PhysicsObjectType objectType = PhysicsObjectType::WALL;
+
+		m_collisionObject_UpperSegment = Physics::CreateCollisionObject(transform * depthOffsetTransform, m_collisionShape_UpperSegment, objectType, collisionGroup, collisionMask, friction, DEBUG_COLOR_WALL, this);
+	}
+
+	void WallSegment::CreateUpperCollisionObject_LowerSegment(const Transform& trans)
+	{
+		static bool hasBeenCreatedBefore = false;
+		if (hasBeenCreatedBefore) {
+			Physics::s_dynamicsWorld->removeCollisionObject(m_collisionObject_LowerSegment);
+			delete m_collisionShape_LowerSegment;
+			delete m_collisionObject_LowerSegment;
+			hasBeenCreatedBefore = true;
+		}
+
+		btTransform transform;
+		transform.setIdentity();
+		transform.setOrigin(Util::glmVec3_to_btVec3(trans.position));
+		transform.setRotation(Util::glmVec3_to_btQuat(trans.rotation));
+
+		btTransform depthOffsetTransform;
+		depthOffsetTransform.setIdentity();
+		depthOffsetTransform.setOrigin(btVector3(0, 0, -WALL_DEPTH / 2));
+
+		float friction = 0.5f;
+
+		int collisionGroup = CollisionGroups::HOUSE;
+		int collisionMask = CollisionGroups::PLAYER | CollisionGroups::PROJECTILES | CollisionGroups::ENEMY;
+		m_collisionShape_LowerSegment = new btBoxShape(btVector3(0.5, 0.5, 0.5));
+		m_collisionShape_LowerSegment->setLocalScaling(Util::glmVec3_to_btVec3(trans.scale));
+		PhysicsObjectType objectType = PhysicsObjectType::WALL;
+
+		m_collisionObject_LowerSegment = Physics::CreateCollisionObject(transform * depthOffsetTransform, m_collisionShape_LowerSegment, objectType, collisionGroup, collisionMask, friction, DEBUG_COLOR_WALL, this);
+
 	}
 }

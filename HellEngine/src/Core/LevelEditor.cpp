@@ -2,6 +2,7 @@
 #include "LevelEditor.h"
 #include "Helpers/Util.h"
 #include "Helpers/AssetManager.h"
+#include "Core/GameData.h"
 
 namespace HellEngine
 {
@@ -19,6 +20,14 @@ namespace HellEngine
 	
 	void LevelEditor::Update(Game* game)
 	{
+		/*for (Room& room : GameData::p_house->m_rooms)
+		{
+			//EntityData* data = (EntityData*)room.m_floor.m_collisionObject->getUserPointer();
+			//data->ptr = &room.m_floor;
+
+			room.m_floor.m_parent = &room;
+		}*/
+
 		// Find what object the mouse is hovering on
 		s_mouse_ray = RaycastResult::CastMouseRay(&game->camera);
 
@@ -46,25 +55,33 @@ namespace HellEngine
 
 		// Get pointer to selected object
 		/*if (s_SelectedObjectType == PhysicsObjectType::DOOR)
-			p_selectedObject = &game->house.m_doors[s_SelectedOjectIndex];
+			p_selectedObject = &GameData::p_house->m_doors[s_SelectedOjectIndex];
 		else if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
-			p_selectedObject = &game->house.m_windows[s_SelectedOjectIndex];
+			p_selectedObject = &GameData::p_house->m_windows[s_SelectedOjectIndex];
 		else if (s_SelectedObjectType == PhysicsObjectType::MISC_MESH)
-			p_selectedObject = &game->house.m_entities[s_SelectedOjectIndex];
+			p_selectedObject = &GameData::p_house->m_entities[s_SelectedOjectIndex];
 		else if (s_SelectedObjectType == PhysicsObjectType::FLOOR)
-			p_selectedObject = &game->house.m_rooms[s_SelectedOjectIndex].m_floor;
+			p_selectedObject = &GameData::p_house->m_rooms[s_SelectedOjectIndex].m_floor;
 		else*/
 		//	p_selectedObject = nullptr;
 
 		// Get pointer to hovered object
 		if (s_mouse_ray.m_objectType == PhysicsObjectType::DOOR)
-			p_hoveredObject = s_mouse_ray.m_objectPtr;// &game->house.m_doors[s_mouse_ray.m_elementIndex];
+			p_hoveredObject = s_mouse_ray.m_objectPtr;// &GameData::p_house->m_doors[s_mouse_ray.m_elementIndex];
 		else if (s_mouse_ray.m_objectType == PhysicsObjectType::WINDOW)
-			p_hoveredObject = s_mouse_ray.m_objectPtr; //&game->house.m_windows[s_mouse_ray.m_elementIndex];
+			p_hoveredObject = s_mouse_ray.m_objectPtr; //&GameData::p_house->m_windows[s_mouse_ray.m_elementIndex];
 		else if (s_mouse_ray.m_objectType == PhysicsObjectType::MISC_MESH)
-			p_hoveredObject = s_mouse_ray.m_objectPtr; // &game->house.m_entities[s_mouse_ray.m_elementIndex];
+			p_hoveredObject = s_mouse_ray.m_objectPtr; // &GameData::p_house->m_entities[s_mouse_ray.m_elementIndex];
 		else if (s_mouse_ray.m_objectType == PhysicsObjectType::FLOOR)
-			p_hoveredObject = s_mouse_ray.m_objectPtr; // &game->house.m_rooms[s_mouse_ray.m_elementIndex].m_floor;
+		{
+			p_hoveredObject = s_mouse_ray.m_objectPtr; // &GameData::p_house->m_rooms[s_mouse_ray.m_elementIndex].m_floor;
+
+			Floor* floor = (Floor*)p_hoveredObject;
+			std::cout << floor->m_transform.position.x << ", ";
+			std::cout << floor->m_transform.position.y << ", ";
+			std::cout << floor->m_transform.position.z << "\n";
+		}
+
 		else
 			p_hoveredObject = nullptr;
 
@@ -77,9 +94,9 @@ namespace HellEngine
 	void LevelEditor::DeleteSelectedObject(Game* game)
 	{
 		if (s_SelectedObjectType == PhysicsObjectType::DOOR)
-			game->house.DeleteDoor((Door*)p_selectedObject);
+			GameData::p_house->DeleteDoor((Door*)p_selectedObject);
 		else if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
-			game->house.DeleteWindow((Window*)p_selectedObject);
+			GameData::p_house->DeleteWindow((Window*)p_selectedObject);
 	}
 
 	void LevelEditor::RenderGizmo(ImGuiIO* io, Game* game)
@@ -120,8 +137,17 @@ namespace HellEngine
 		// Room?
 		else if (s_SelectedObjectType == PhysicsObjectType::FLOOR)
 		{
-			Floor* floor = (Floor*)p_selectedObject;
+
+			Floor* floor = &GameData::p_house->m_rooms[0].m_floor;// 
+			floor = (Floor*)p_selectedObject;
+
+			std::cout << floor->m_transform.position.x << ", ";
+			std::cout << floor->m_transform.position.y << ", ";
+			std::cout << floor->m_transform.position.z << "\n";
+
 			Room* room = (Room*)floor->m_parent;
+
+
 			Transform worldTransform;
 			worldTransform.position = glm::vec3(room->m_position.x, room->m_story * ROOM_HEIGHT, room->m_position.y);
 			worldTransform.scale = glm::vec3(room->m_size.x, 0.025f, room->m_size.y);
@@ -197,7 +223,7 @@ namespace HellEngine
 		// If the matrices are different, recalculate light volumes and wall meshes etc.
 		for (int i = 0; i < 16; i++) {
 			if (s_fptr_GizmoMatrix[i] != deltaptr[i]) { 
-				game->house.RebuildAll();
+				GameData::p_house->RebuildAll();
 				return;
 			}		
 		}
@@ -297,14 +323,14 @@ namespace HellEngine
 // Doors
 if (s_SelectedObjectType == PhysicsObjectType::DOOR)
 {
-	Door* door = &game->house.m_doors[s_SelectedOjectIndex];
+	Door* door = &GameData::p_house->m_doors[s_SelectedOjectIndex];
 	SetTranslationFromGizmo(s_gizmoMatrix, door->m_rootTransform.position);
 }
 
 // Misc Mesh
 if (s_SelectedObjectType == PhysicsObjectType::MISC_MESH)
 {
-	Entity* entity = &game->house.m_entities[s_SelectedOjectIndex];
+	Entity* entity = &GameData::p_house->m_entities[s_SelectedOjectIndex];
 	SetTranslationFromGizmo(s_gizmoMatrix, entity->m_transform.position);
 	SetScaleFromGizmo(s_gizmoMatrix, entity->m_transform.scale);
 	SetRotationFromGizmo(deltaptr, entity->m_transform.rotation);

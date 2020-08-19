@@ -11,7 +11,7 @@ namespace HellEngine
 	{
 	}
 
-	glm::quat fromaxisangle(float angle, glm::vec3 axis)
+	/*glm::quat fromaxisangle(float angle, glm::vec3 axis)
 	{
 		float half_sin = sin(0.5f * angle);
 		float half_cos = cos(0.5f * angle);
@@ -19,7 +19,7 @@ namespace HellEngine
 			half_sin * axis.x,
 			half_sin * axis.y,
 			half_sin * axis.z);
-	}
+	}*/
 
 	Ragdoll::Ragdoll(const btVector3& positionOffset, float modelScale, glm::mat4 worldMatrix)
 	{
@@ -552,7 +552,7 @@ namespace HellEngine
 		body->setUserPointer(entityData);
 
 		int group = CollisionGroups::ENEMY;
-		int mask = CollisionGroups::HOUSE;// | CollisionGroups::PLAYER;
+		int mask = CollisionGroups::HOUSE | CollisionGroups::TERRAIN;// | CollisionGroups::PLAYER;
 
 		m_ownerWorld->addRigidBody(body, group, mask);
 

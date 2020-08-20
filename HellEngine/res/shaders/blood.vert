@@ -10,11 +10,13 @@ uniform mat4 u_MatrixWorld;
 
 out vec3 Normal;
 out vec2 Texcoord;
+out vec3 FragPos;
 
 void main() {
 	Texcoord = a_Texcoord;
-	//Normal = a_Normal;
-	gl_Position = u_MatrixProjection * u_MatrixView * u_MatrixWorld * vec4(a_Position.xyz, 1.0);
+	FragPos = vec4(u_MatrixWorld * vec4(a_Position.xyz, 1.0)).xyz;
+
+	gl_Position = u_MatrixProjection * u_MatrixView * vec4(FragPos, 1);
 
 	// this is fucking slow. do it on CPU.
 	mat3 normalMatrix = transpose(inverse(mat3(u_MatrixWorld))); 

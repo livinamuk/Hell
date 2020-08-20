@@ -147,7 +147,8 @@ struct Line {
 	glm::vec3 end_color;
 };
 
-enum class PhysicsObjectType { UNDEFINED, WALL, WINDOW, DOOR, FLOOR, STAIRS, PLAYER, RAGDOLL, CEILING, SHELL_PROJECTILE, MISC_MESH};
+enum class PhysicsObjectType { UNDEFINED, WALL, EDITOR_WINDOW, DOOR, FLOOR, STAIRS, PLAYER, RAGDOLL, CEILING, SHELL_PROJECTILE, MISC_MESH, GLASS};
+enum class DecalType {PLASTER, GLASS};
 
 struct EntityData {
 	//char* name = "NONE";

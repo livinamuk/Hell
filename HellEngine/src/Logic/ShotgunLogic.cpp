@@ -69,6 +69,7 @@ namespace HellEngine
 
 		//	Renderer::s_muzzleFlash.m_CurrentTime = 0;
 			bool playFleshSound = false;
+			bool playGlassSound = false;
 
 			for (int i = 0; i < 12; i++)
 			{
@@ -77,7 +78,15 @@ namespace HellEngine
 				
 				// make bullet hole if it aint the ragdoll
 				if (raycastResult.m_objectType != PhysicsObjectType::RAGDOLL)
-					Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal));
+				{
+					// Glass
+					if (raycastResult.m_objectType == PhysicsObjectType::GLASS) {
+						Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::GLASS));
+					}
+					// any other surface
+					else
+						Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::PLASTER));
+				}
 
 				// make blood on couches and ragdolls
 				if ((raycastResult.m_objectType == PhysicsObjectType::MISC_MESH) || (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)) {
@@ -103,6 +112,8 @@ namespace HellEngine
 
 			if (playFleshSound)
 				Audio::PlayAudio("FLY_Head_Explode_01.wav", 0.75f);
+			if (playGlassSound)
+				Audio::PlayAudio("GlassImpact.wav", 1.75f);
 		}
 	}
 

@@ -21,6 +21,9 @@ namespace HellEngine
 	public: // members
 		Transform m_transform;
 		Axis m_axis;
-		btCollisionObject* m_collisionObject; // for mouse picking in the level editor
+		btCollisionObject* m_EditorCollisionObject;	// for mouse picking in the level editor
+		btCollisionObject* m_GlassCollisionObject; // for glass raycasts
+		btTriangleMesh* m_triangleMesh;				// for glass raycasts
+		btTriangleMeshShape* m_triangleMeshShape;	// for glass raycasts
 	};
 }

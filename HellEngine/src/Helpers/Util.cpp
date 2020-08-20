@@ -51,8 +51,10 @@ namespace HellEngine
 			return "SHELL_PROJECTILE";
 		if (objectType == PhysicsObjectType::MISC_MESH)
 			return "MISC_MESH";
-		if (objectType == PhysicsObjectType::WINDOW)
+		if (objectType == PhysicsObjectType::EDITOR_WINDOW)
 			return "WINDOW";
+		if (objectType == PhysicsObjectType::GLASS)
+			return "GLASS";
 	}
 
 	btQuaternion Util::GetQuatBetween2Points(glm::vec3 P0, glm::vec3 P1)

@@ -9,15 +9,17 @@ namespace HellEngine
 {
 	std::vector<Decal> Decal::s_decals;
 
-	Decal::Decal(glm::vec3 position, glm::vec3 normal)
+	Decal::Decal(glm::vec3 position, glm::vec3 normal, DecalType type)
 	{
-		//this->decalType = decalType;
+		this->m_type= type;
 		this->transform.position = position;
 		this->normal = normal;// *glm::vec3(-1);
 		this->randomRotation = Util::RandomFloat(0, HELL_PI * 2);
 
-		//if (decalType == DecalType::BULLET_HOLE)
+		if (m_type == DecalType::PLASTER)
 			transform.scale = glm::vec3(0.025f);
+		if (m_type == DecalType::GLASS)
+			transform.scale = glm::vec3(0.075f);
 	}
 
 	void Decal::Draw(Shader* shader, bool blackOnly)
@@ -41,14 +43,26 @@ namespace HellEngine
 		modelMatrix = glm::scale(modelMatrix, transform.scale);
 		shader->setMat4("model", modelMatrix);
 
-		glActiveTexture(GL_TEXTURE2);
 //		if (!blackOnly)
 //			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("BulletHole1_BaseColor"));
 //		else
 //			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("BulletHole1Black_BaseColor"));
 
+		if (m_type == DecalType::PLASTER)
+		{
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("BulletHole_Plaster"));
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("BulletHole_Plaster_Mask"));
+		}
+		else
+		{
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("BulletHole_Glass_00"));
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("BulletHole_Glass_00_Mask")); 
+		}
 
-		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("Bullet"));
 	//	if (!blackOnly)
 	//		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("BulletHole1"));
 	//	else

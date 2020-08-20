@@ -511,11 +511,6 @@ namespace HellEngine
 
 
 		{
-			GpuProfiler g("DecalPass");
-			DecalPass(game, &s_DecalShader);
-		} 
-
-		{
 			GpuProfiler g("BloodDecalPass");
 			//VolumetricBloodPassDecals(game, &s_BloodVolumetricShaderDecals);
 		}
@@ -528,6 +523,11 @@ namespace HellEngine
 		{
 			GpuProfiler g("GlassPass");
 			GlassPass(game, &s_geometryShader);
+		}
+
+		{
+			GpuProfiler g("DecalPass");
+			DecalPass(game, &s_DecalShader);
 		}
 
 		{
@@ -911,6 +911,9 @@ namespace HellEngine
 
 		text += "\nSENSITIVITY: ";
 		text += std::to_string(Config::MOUSE_SESNSITIVITY);
+
+		text += "\n CAMERA RAY CAST: ";
+		text += Util::PhysicsObjectEnumToString(game->m_cameraRaycast.m_objectType);
 				
 	//	text += "GameData::p_house->m_rooms.size(): ";
 	//	text += std::to_string(GameData::p_house->m_rooms.size());
@@ -1365,12 +1368,55 @@ namespace HellEngine
 
 	void Renderer::DecalPass(Game* game, Shader* shader)
 	{
+		// First you need to render the glass into the depth map
+		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		glDepthMask(GL_TRUE);
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		glEnable(GL_DEPTH_TEST);
+		unsigned int attachmentss[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+		glDrawBuffers(4, attachmentss);
+		s_geometryShader.use();
+
+		for (Window& window : GameData::p_house->m_windows) {
+			static int material0 = AssetManager::GetMaterialIDByName("Window");
+			static int material1 = AssetManager::GetMaterialIDByName("WindowExterior");
+			window.DrawGlass(&s_geometryShader);
+		}
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+
+
+
+		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+
+		unsigned int attachments[1] = { GL_COLOR_ATTACHMENT4 };
+		glDrawBuffers(1, attachments);
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
+	//	glDisable(GL_CULL_FACE);
+		/// Now render the decals
 		shader->use(); 
 		shader->setMat4("pv", game->camera.m_projectionViewMatrix);
 		shader->setMat4("inverseProjectionMatrix", glm::inverse(game->camera.m_projectionMatrix));
 		shader->setMat4("inverseViewMatrix", glm::inverse(game->camera.m_viewMatrix));
 		shader->setFloat("screenWidth", CoreGL::s_windowWidth);
 		shader->setFloat("screenHeight", CoreGL::s_windowHeight);
+		shader->setVec3("u_CameraFront", game->camera.m_Front);
+		shader->setVec3("u_ViewPos", game->camera.m_viewPos); 
+
+		// Better pass in that light data too so u can get some nice ligthing ya dick head
+		for (int i = 0; i < GameData::p_house->m_lights.size(); i++)
+		{
+			Light& light = GameData::p_house->m_lights[i];
+			shader->setVec3("lightPosition[" + std::to_string(i) + "]", light.m_position);
+			shader->setFloat("lightRadius[" + std::to_string(i) + "]", light.m_radius);
+			shader->setFloat("lightMagic[" + std::to_string(i) + "]", light.m_magic);
+			shader->setFloat("lightStrength[" + std::to_string(i) + "]", light.m_strength);
+			shader->setVec3("lightColor[" + std::to_string(i) + "]", light.m_color);
+		}
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, s_gBuffer.rboDepth);
@@ -1378,8 +1424,8 @@ namespace HellEngine
 		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gNormal);
 
 
-		unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-		glDrawBuffers(3, attachments);
+	//	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+	//	glDrawBuffers(3, attachments);
 
 		//glEnable(GL_BLEND);
 		glDepthMask(GL_FALSE);

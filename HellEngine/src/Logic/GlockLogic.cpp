@@ -91,7 +91,16 @@ namespace HellEngine
 
 				// make bullet hole if it aint the ragdoll
 				if (raycastResult.m_objectType != PhysicsObjectType::RAGDOLL)
-					Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal));
+				{
+					// Glass
+					if (raycastResult.m_objectType == PhysicsObjectType::GLASS) {
+						Audio::PlayAudio("GlassImpact.wav", 1.75	); 
+						Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::GLASS));
+					}
+					// any other surface
+					else
+						Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::PLASTER));
+				}
 
 				// make blood on couches and ragdolls
 				if ((raycastResult.m_objectType == PhysicsObjectType::MISC_MESH) || (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)) {

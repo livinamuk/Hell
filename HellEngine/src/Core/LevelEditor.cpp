@@ -68,7 +68,7 @@ namespace HellEngine
 		// Get pointer to hovered object
 		if (s_mouse_ray.m_objectType == PhysicsObjectType::DOOR)
 			p_hoveredObject = s_mouse_ray.m_objectPtr;// &GameData::p_house->m_doors[s_mouse_ray.m_elementIndex];
-		else if (s_mouse_ray.m_objectType == PhysicsObjectType::WINDOW)
+		else if (s_mouse_ray.m_objectType == PhysicsObjectType::EDITOR_WINDOW)
 			p_hoveredObject = s_mouse_ray.m_objectPtr; //&GameData::p_house->m_windows[s_mouse_ray.m_elementIndex];
 		else if (s_mouse_ray.m_objectType == PhysicsObjectType::MISC_MESH)
 			p_hoveredObject = s_mouse_ray.m_objectPtr; // &GameData::p_house->m_entities[s_mouse_ray.m_elementIndex];
@@ -95,7 +95,7 @@ namespace HellEngine
 	{
 		if (s_SelectedObjectType == PhysicsObjectType::DOOR)
 			GameData::p_house->DeleteDoor((Door*)p_selectedObject);
-		else if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
+		else if (s_SelectedObjectType == PhysicsObjectType::EDITOR_WINDOW)
 			GameData::p_house->DeleteWindow((Window*)p_selectedObject);
 	}
 
@@ -127,7 +127,7 @@ namespace HellEngine
 		}
 
 		// Windows
-		else if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
+		else if (s_SelectedObjectType == PhysicsObjectType::EDITOR_WINDOW)
 		{
 			Window* window = (Window*)p_selectedObject;
 			s_fptr_GizmoMatrix = (float*)glm::value_ptr(window->m_transform.to_mat4());
@@ -202,12 +202,12 @@ namespace HellEngine
 			//game->RebuildMap();
 		}
 		// Windows
-		if (s_SelectedObjectType == PhysicsObjectType::WINDOW)
+		if (s_SelectedObjectType == PhysicsObjectType::EDITOR_WINDOW)
 		{
 			Window* window = (Window*)p_selectedObject;
 			SetTranslationFromGizmo(s_fptr_GizmoMatrix, window->m_transform.position);
-			Physics::SetCollisionObjectWorldTranslation(window->m_collisionObject, window->m_transform.position, glm::vec3(0, WINDOW_HEIGHT_SINGLE * 0.5f, 0));
-			Physics::SetCollisionObjectWorldRotation(window->m_collisionObject, window->m_transform.rotation);
+			Physics::SetCollisionObjectWorldTranslation(window->m_EditorCollisionObject, window->m_transform.position, glm::vec3(0, WINDOW_HEIGHT_SINGLE * 0.5f, 0));
+			Physics::SetCollisionObjectWorldRotation(window->m_EditorCollisionObject, window->m_transform.rotation);
 		}
 
 		// Misc Mesh
@@ -238,7 +238,7 @@ namespace HellEngine
 			
 		}
 		// Windows
-		if (s_SelectedObjectType == PhysicsObjectType::WINDOW) {
+		if (s_SelectedObjectType == PhysicsObjectType::EDITOR_WINDOW) {
 			Window* window = (Window*)p_selectedObject;
 			Util::RotateAxisBy90(window->m_axis);
 			window->Reconfigure();

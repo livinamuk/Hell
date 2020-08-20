@@ -201,7 +201,7 @@ namespace HellEngine
 			m_shellScale = 1.6f;
 
 		// Remove rigid body if at rest or fell through floor
-		if ((m_rigidBody->getActivationState() != ACTIVE_TAG) || (Util::GetTranslationFromMatrix(m_modelMatrix).y < -5)) {
+		if ((m_rigidBody->getActivationState() != ACTIVE_TAG) || (Util::GetTranslationFromMatrix(m_modelMatrix).y < 0)) {
 			Physics::DeleteRigidBody(m_rigidBody);
 		}
 	}

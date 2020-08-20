@@ -43,6 +43,7 @@ namespace HellEngine
 		Audio::LoadAudio("WPNFLY_Glock_MagIn_Full.wav");
 		Audio::LoadAudio("BuolletCasingBounce.wav");
 		Audio::LoadAudio("FLY_Head_Explode_01.wav");
+		Audio::LoadAudio("GlassImpact.wav");
 		
 		//Audio::LoadAudio("Music.wav");
 	}

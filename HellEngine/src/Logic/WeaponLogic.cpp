@@ -25,7 +25,7 @@ namespace HellEngine
 	void WeaponLogic::Init()
 	{
 		// Setup Inventory
-		s_SelectedWeapon = 1;
+		s_SelectedWeapon = 0;
 		s_WeaponList.clear();
 		s_WeaponList.push_back(WEAPON::GLOCK);
 		s_WeaponList.push_back(WEAPON::SHOTGUN);

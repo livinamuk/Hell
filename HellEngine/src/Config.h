@@ -37,7 +37,9 @@ namespace HellEngine
 		static inline glm::quat TEST_QUAT2 = glm::quat(1, 0, 0, 0);
 
 		static inline float INSPECT_FOV = 1.0f; 
-		static inline unsigned int MOUSE_SESNSITIVITY = 100;
+		static inline unsigned int MOUSE_SESNSITIVITY = 10;
+
+		static inline glm::vec3 BLOOD_MESH_POSITION = glm::vec3(-0.9f, 1.5f, 0.4f);
 
 	};
 }

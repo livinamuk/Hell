@@ -1500,6 +1500,9 @@
     <ClInclude Include="src\Renderer\ExrTexture.h" />
     <ClInclude Include="src\Core\GameData.h" />
     <ClInclude Include="src\Core\Core.h" />
+    <ClInclude Include="src\Renderer\Effects\VolumetricBloodSplatter.h">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\AnimatedNode.cpp">
@@ -1768,6 +1771,9 @@
     </ClCompile>
     <ClCompile Include="src\Renderer\ExrTexture.cpp" />
     <ClCompile Include="src\Core\GameData.cpp" />
+    <ClCompile Include="src\Renderer\Effects\VolumetricBloodSplatter.cpp">
+      <Filter>src\Renderer\Effects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">

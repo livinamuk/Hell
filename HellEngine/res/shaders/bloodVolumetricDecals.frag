@@ -40,12 +40,43 @@ void main()
     vec4 worldSpacePosition = inverseViewMatrix * viewSpacePosition;
     vec3 WorldPos = worldSpacePosition.xyz;
 	
+	
+	float RoomLowestX = -0.96;;
+	float RoomHighestX = 2.50;
+	float RoomLowestZ = -2.50;
+	float RoomHighestZ = 2.06;
+
+	if (WorldPos.y > 0.1)
+	{
+	//	if (WorldPos.x < RoomLowestX + 0.09)
+	//		discard;
+	//	if (WorldPos.x > RoomHighestX - 0.09)
+	//		discard;
+		//if (WorldPos.z < RoomLowestZ + 0.09)
+		//	discard;	
+		//if (WorldPos.z < RoomLowestZ + 0.09)
+		//	discard;
+	}
+
+	if (WorldPos.y > 2.39)
+		discard;
+
+
 	vec4 objectPosition = inverse(model) * vec4(WorldPos, 1.0);
 
+       vec3 stepVal = (vec3(0.5, 0.5, 0.5) - abs(objectPosition.xyz)) * 1000;
+    stepVal.x = saturate(stepVal.x);
+    stepVal.y = saturate(stepVal.y);
+    stepVal.z = saturate(stepVal.z);
+	//half lookupHeight = tex2D(_LookupFade, float2(decalSpaceScenePos.y + 0.5, 0));
+	float projClipFade = stepVal.x * stepVal.y * stepVal.z;
+    
   ////  if (abs(objectPosition.x) > 0.5)
   //      discard;
   //  if (abs(objectPosition.y) > 0.5)
   //      discard;
+
+  
 
 
 
@@ -61,6 +92,7 @@ void main()
   
     vec4 res = vec4(0); 
     res.a = saturate(normal.a * 2);
+    res.a *= projClipFade;
     if (res.a < 0.01) 
        discard; //a little optimization
 
@@ -84,10 +116,18 @@ void main()
     light *= (1 - mask.z * colorMask); //in some big blood decals I use different channels for alpha/thin
 
     res.rgb = mix(_TintColor.rgb, _TintColor.rgb * 0.2, mask.z * colorMask * 0.75) + light;
-    gAlbedo = res.rgba * 0.5 * (1 - res.a) + res.rgba * res.a;
- 
-    gAlbedo = vec4(res.rgb * res.a, 1);
-    gNormal = normal.xyz;
 
-    gRMA = vec3(1, 0, 1);
+ 
+
+   // gAlbedo = res.rgba * 0.5 * (1 - res.a) + res.rgba * res.a;
+ gAlbedo.rgb = mix(vec3(0.67, 0.67, 0.67), res.rgb * 1.45, res.a * projClipFade);
+
+
+
+
+   // gAlbedo.rgb  = vec3(projClipFade, 0, 0);
+    //gAlbedo = vec4(res.rgb * res.a, 1);
+    //gNormal = normal.xyz;
+
+    gRMA = vec3(res.r * res.a * 0.35, 1, 0);
 }

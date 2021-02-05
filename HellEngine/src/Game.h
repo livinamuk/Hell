@@ -15,6 +15,7 @@
 #include "Renderer/Effects/Decal.h"
 #include "Misc/Shell.h"
 #include "Core/EnemyCharacter.h"
+#include "Renderer/Effects/VolumetricBloodSplatter.h"
 
 namespace HellEngine
 {
@@ -48,6 +49,7 @@ namespace HellEngine
 
 
 
+
 	//	std::vector<glm::mat4> m_animatedTransforms;
 	//	std::vector<glm::mat4> m_ZombieBoyAnimatedTransforms;
 //		std::vector<glm::mat4> m_srinivasdAnimatedTransforms; 
@@ -64,6 +66,9 @@ namespace HellEngine
 		AnimatedEntity m_NurseGuy;
 
 		EnemyCharacter m_zombieGuy;
+
+
+		static std::vector<VolumetricBloodSplatter> s_volumetricBloodSplatters;
 
 	};
 }

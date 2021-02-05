@@ -69,6 +69,9 @@ void main()
 		NRM =  texture(NRM_Texture0, finalTexCoords);
 	}
 	
+//	ALB = vec4(0.5, 0.5, 0.5, 1);
+//	NRM = vec4(0, 0, 1, 0);
+
 	////////////////////
 	// GBuffer Output //
 	////////////////////
@@ -76,6 +79,7 @@ void main()
 	gNormal = NRM.rgb;
 	gNormal = normalize(gNormal.rgb * 2.0 - 1.0);
 	gNormal = normalize(TBN * gNormal.rgb);
+
 
 	gAlbedo = ALB + vec4(ColorAdd, 0);
 	gRMA = RMA.rgb;
@@ -85,6 +89,9 @@ void main()
 		gRMA.g = metallicUniform;
 		gRMA.b = 1;
 	}
+
+	
+  //  gRMA = vec3(0.1, 0.9, 1);
 
 	// Has emissive map
 	if (hasEmissive) {

@@ -102,6 +102,19 @@ namespace HellEngine
 						Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::PLASTER));
 				}
 
+
+				// CREATE VOLUMETRIC BLOOD SPLATTER
+				glm::vec3 position = raycastResult.m_hitPoint;
+				glm::vec3 rotation = p_camera->m_transform.rotation;
+				//glm::vec3 rotation = raycastResult.m_hitPoint;
+				Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, p_camera->m_Front * glm::vec3(-1)));
+				
+
+			//	Renderer::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(raycastResult.m_hitPoint, p_camera->m_Front * glm::vec3(-1)));
+
+				
+
+
 				// make blood on couches and ragdolls
 				if ((raycastResult.m_objectType == PhysicsObjectType::MISC_MESH) || (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)) {
 					Renderer::s_bloodEffect.m_CurrentTime = 0;

@@ -16,6 +16,9 @@ void main() {
 	Texcoord = a_Texcoord;
 	FragPos = vec4(u_MatrixWorld * vec4(a_Position.xyz, 1.0)).xyz;
 
+
+
+	
 	gl_Position = u_MatrixProjection * u_MatrixView * vec4(FragPos, 1);
 
 	// this is fucking slow. do it on CPU.

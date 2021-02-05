@@ -540,6 +540,7 @@ void main()
 		//indirectLighting = vec3(0,0,0);
 	//	directLighting = vec3(0,0,0);
 	color = ((shadow * directLighting) + indirectLighting) * attenuation;
+
 //	color  = vec3(shadow);//(( directLighting) + indirectLighting) * attenuation;
 	//color = indirectLighting;// * attenuation * attenuation* attenuation * attenuation ;
 	//color = ((shadow * directLighting) + (indirectLighting * shadow)) * attenuation;

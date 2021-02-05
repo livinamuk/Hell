@@ -119,7 +119,7 @@ void main() {
 	}
 	else
 	{
-		vec3 diffuseColor = vec3(color.r);	
+		vec3 diffuseColor = vec3(color.r, 0, 0);	
 		float roughness = 1;
 		float metallic = 1;
 
@@ -135,8 +135,9 @@ void main() {
 
 		//vec3 viewPos = vec3(inverseViewMatrix * vec4(0, 0, 0, 1));
 	
-		vec3 n = Normal;	
+	//	vec3 n = Normal;	
 		vec3 v = normalize(u_ViewPos - FragPos); 
+		vec3 n = vec3(-v);
 
 		vec3 l;
 		int light_count = 6;
@@ -150,8 +151,8 @@ void main() {
 			l = normalize(lightPosition[i] - FragPos);
 
 			// flip to face the light if required
-			if (dot(n, l) < 0)
-				n *= -1;
+			//if (dot(n, l) < 0)
+			//	n *= -1;
 	
 			float NdotL = clamp(dot(n, l), 0.001, 1.0);
 						

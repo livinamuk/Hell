@@ -16,7 +16,7 @@ layout (binding = 1) uniform sampler2D u_NormTex;
 //uniform float u_Speed;
 //uniform int u_NumOfFrames;
 //uniform vec4 u_HeightOffset;
-uniform float u_Time;
+//uniform float u_Time;
 uniform vec3 u_WorldSpaceCameraPos;
 
 out vec3 v_WorldNormal;
@@ -50,7 +50,7 @@ void main() {
 
     //float currentSpeed = u_Speed / u_NumOfFrames;
 
- // float  u_Time = 0;
+  float  u_Time = 0.23;
 
     int u_NumOfFrames = 81;
     int u_Speed = 35;
@@ -91,16 +91,24 @@ void main() {
     
     v = texturePos.xzy * 25000;
 
-    v_WorldNormal = textureNorm.xzy * 2 - 1;
-    v_WorldNormal.x *= -1;
+  //  v_WorldNormal = textureNorm.xzy;
 
-    v_ViewDir = ObjSpaceViewDir(v);
+	v_WorldNormal = textureNorm.xzy;// * 2 - 1;
+
+	mat3 normalMatrix = mat3(u_MatrixWorld);
+//normalMatrix = inverse(normalMatrix);
+//normalMatrix = transpose(normalMatrix);
+//v_WorldNormal.xyz = normalize(v_WorldNormal * normalMatrix);
+
+
+
+//v_WorldNormal.xyz = (u_MatrixWorld * vec4(v_WorldNormal, 0.0)).xyz;
+
+
+//v_WorldNormal.xyz = (u_MatrixWorld * vec4(v_WorldNormal, 0.0)).xyz;
+//v_WorldNormal.xyz = (u_MatrixWorld * vec4(v_WorldNormal, 1.0)).xyz;
+    v_ViewDir = u_WorldSpaceCameraPos.xyz;
 
     gl_Position = u_MatrixProjection * u_MatrixView * u_MatrixWorld * vec4(v, 1.0);
-                
-   // v_WorldNormal = textureNorm.xyz * 2 - vec3(1, 1, 1); 
-    //v_WorldNormal.x = -v_WorldNormal.x;
-    
-    //v_ViewDir = (u_MatrixInverseWorld * vec4(u_WorldSpaceCameraPos, 1.0)).xyz - vertexPos;
 
 }

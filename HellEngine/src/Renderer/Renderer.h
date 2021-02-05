@@ -60,6 +60,7 @@ namespace HellEngine
 		static void EditorOverlayPass(Game* game, Shader* shader);
 		static void VolumetricBloodPass(Game* game, Shader* shader);
 		static void VolumetricBloodPassDecals(Game* game, Shader* shader);
+		static void RenderPlayerWeapon(Game* game, Shader* shader);
 
 		static void ViewCubeMap(Game* , Shader* shader, unsigned int CubeMapID);
 		static void CreateBRDFLut();
@@ -159,5 +160,6 @@ namespace HellEngine
 		static AnimatedEntity s_zombieAnimatedEntity;
 
 		static float s_animTime;
+
 	};
 }

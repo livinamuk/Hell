@@ -220,6 +220,7 @@
     <ClInclude Include="src\Renderer\Effects\Decal.h" />
     <ClInclude Include="src\Renderer\Effects\MuzzleFlash.h" />
     <ClInclude Include="src\Renderer\Effects\Quad.h" />
+    <ClInclude Include="src\Renderer\Effects\VolumetricBloodSplatter.h" />
     <ClInclude Include="src\Renderer\ExrTexture.h" />
     <ClInclude Include="src\Renderer\GLDebugDraw.h" />
     <ClInclude Include="src\Renderer\HDRTexture.h" />
@@ -705,6 +706,7 @@
     <ClCompile Include="src\Renderer\Effects\Decal.cpp" />
     <ClCompile Include="src\Renderer\Effects\MuzzleFlash.cpp" />
     <ClCompile Include="src\Renderer\Effects\Quad.cpp" />
+    <ClCompile Include="src\Renderer\Effects\VolumetricBloodSplatter.cpp" />
     <ClCompile Include="src\Renderer\ExrTexture.cpp" />
     <ClCompile Include="src\Renderer\GLDebugDraw.cpp" />
     <ClCompile Include="src\Renderer\HDRTexture.cpp" />

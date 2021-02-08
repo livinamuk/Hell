@@ -45,6 +45,7 @@ namespace HellEngine
 	Shader Renderer::s_TransparentSurfacesShader;
 	Shader Renderer::s_GlassBlur;
 	Shader Renderer::s_CombineGlassBlurWithFinalLighting;
+	Shader Renderer::s_DecalComposite;
 
 	std::string Renderer::s_debugString;
 
@@ -77,6 +78,7 @@ namespace HellEngine
 	DOFBuffer Renderer::s_DOFBuffer;
 	FXAABuffer Renderer::s_FXAABuffer;
 	ChromaticAbberationBuffer Renderer::s_ChromaticAbberationBuffer;
+	CompositeBuffer Renderer::s_compositeBuffer;
 
 	std::vector<BlurBuffer> Renderer::s_BlurBuffers;
 
@@ -122,9 +124,13 @@ namespace HellEngine
 
 		s_BloodShader = Shader("Blood", "blood.vert", "blood.frag", "NONE");
 		s_DecalShader = Shader("Decal", "decals.vert", "decals.frag", "NONE");
+		
 		s_BloodVolumetricShader = Shader("BloodVolumetric", "bloodVolumetric.vert", "bloodVolumetric.frag", "NONE");
-		s_BloodVolumetricShaderDecals = Shader("BloodVolumetricDecals", "bloodVolumetricDecals.vert", "bloodVolumetricDecals.frag", "NONE");
+		//s_BloodVolumetricShader = Shader("BloodVolumetric", "bloodVolumetric.vert", "bloodVolumetric.frag", "bloodVolumetric.geom"); 
 
+		s_BloodVolumetricShaderDecals = Shader("BloodVolumetricDecals", "bloodVolumetricDecals.vert", "bloodVolumetricDecals.frag", "NONE");
+		s_DecalComposite = Shader("DecalComposite", "DecalComposite.vert", "DecalComposite.frag", "NONE");
+		
 		s_GunInspectShader = Shader("GunInspect", "GunInspect.vert", "GunInspect.frag", "NONE");
 		s_SolidColor3D = Shader("SolidColor3D", "solidColor3D.vert", "solidColor3D.frag", "NONE");
 
@@ -136,6 +142,7 @@ namespace HellEngine
 		s_DOFBuffer = DOFBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		s_ChromaticAbberationBuffer = ChromaticAbberationBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		s_FXAABuffer = FXAABuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		s_compositeBuffer = CompositeBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 
 		s_BlurBuffers.push_back(BlurBuffer(SCR_WIDTH / 2, SCR_HEIGHT / 2));
 		s_BlurBuffers.push_back(BlurBuffer(SCR_WIDTH / 4, SCR_HEIGHT / 4));
@@ -515,6 +522,7 @@ namespace HellEngine
 			VolumetricBloodPassDecals(game, &s_BloodVolumetricShaderDecals);
 		}
 
+		DecalCompositePass(&s_DecalComposite);
 
 		{
 			GpuProfiler g("Volumetric Pass");
@@ -538,6 +546,7 @@ namespace HellEngine
 			GpuProfiler g("DecalPass");
 			DecalPass(game, &s_DecalShader);
 		}
+
 
 		{
 			GpuProfiler g("EffectsPass");
@@ -580,7 +589,9 @@ namespace HellEngine
 				//RenderFinalImage(&s_quadShader, s_FinalImageBuffer.TexID);
 				RenderFinalImage(&s_quadShader, s_ChromaticAbberationBuffer.TexID);
 			else
-					RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
+				//RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gBloodDecals);
+				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_compositeBuffer.gAlbedoDecalComposite, s_gBuffer.gRMA, s_gBuffer.gBloodDecals);
+			//RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_compositeBuffer.gAlbedoDecalComposite, s_gBuffer.gRMA, s_compositeBuffer.gRMADecalComposite);
 			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, GameData::p_house->m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
 		//		RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gGlassBlur, s_gBuffer.gFinalLighting);		
 			//RenderDebugTextures(&s_quadShader, s_gBuffer.gNormal, s_gBuffer.gGlassSurface, s_gBuffer.gGlassBlur, s_gBuffer.gFinalLighting);
@@ -714,7 +725,7 @@ namespace HellEngine
 
 
 		// RENDER ALL BLOOD SPLATTERS
-		for (VolumetricBloodSplatter& volumetricBloodSplater : game->s_volumetricBloodSplatters) 
+		/*for (VolumetricBloodSplatter& volumetricBloodSplater : game->s_volumetricBloodSplatters) 
 		{	
 			// debug line
 			Line line;
@@ -732,7 +743,7 @@ namespace HellEngine
 			transform.position = position;
 
 			DrawLine(&s_solidColorShader, line, glm::mat4(1));
-		}
+		}*/
 
 		//	DrawAnimatedEntityDebugBones_Animated(&s_solidColorShader, &game->m_testAnimatedEnttity);
 
@@ -765,7 +776,7 @@ namespace HellEngine
 
 	// volumetric blood point
 	//	DrawPoint(&s_solidColorShader, s_DebugTransform.position, glm::vec3(1, 1, 1));
-		DrawPoint(&s_solidColorShader, Config::BLOOD_MESH_POSITION, glm::vec3(1, 1, 1));
+	//	DrawPoint(&s_solidColorShader, Config::BLOOD_MESH_POSITION, glm::vec3(1, 1, 1));
 		
 
 	for (int i = 0; i < Ragdoll::BODYPART_COUNT; i++)
@@ -935,6 +946,7 @@ namespace HellEngine
 			DrawPoint(&s_solidColorShader, vertex.Position, glm::vec3(1, 0, 1));
 		}
 */
+	//	DrawPoint(&s_solidColorShader, glm::vec3(0), glm::vec3(1, 1, 1));
 
 		//glm::mat4 camMat = game->m_shotgunAnimatedEntity.GetCameraMatrix();
 		std::string text = "";// Util::Mat4ToString(camMat);
@@ -951,11 +963,11 @@ namespace HellEngine
 		//text += Util::PhysicsObjectEnumToString(game->m_cameraRaycast.m_objectType);
 				
 
-		for (VolumetricBloodSplatter splatter : Game::s_volumetricBloodSplatters)
+		/*for (VolumetricBloodSplatter splatter : Game::s_volumetricBloodSplatters)
 		{
 			text += "\n";
 			text += Util::Mat4ToString(splatter.GetModelMatrix());
-		}
+		}*/
 
 	//	text += "GameData::p_house->m_rooms.size(): ";
 	//	text += std::to_string(GameData::p_house->m_rooms.size());
@@ -1210,7 +1222,7 @@ namespace HellEngine
 
 
 		// Blood
-		s_bloodEffect.Draw(&s_BloodShader, s_hitPoint);
+		//s_bloodEffect.Draw(&s_BloodShader, s_hitPoint);
 		s_muzzleFlash.Draw(&s_BloodShader, t);
 
 		Transform t2;
@@ -1245,25 +1257,26 @@ namespace HellEngine
 
 		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("White"));
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, HellEngine::AssetManager::s_ExrTexture_pos.gTexId);
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, HellEngine::AssetManager::s_ExrTexture_norm.gTexId);
-
-	
-
-		
-
 		shader->use();
 		shader->setMat4("u_MatrixProjection", game->camera.m_projectionMatrix);
 		shader->setMat4("u_MatrixView", game->camera.m_viewMatrix);
 		shader->setVec3("u_WorldSpaceCameraPos", game->camera.m_viewPos);
 
-		
+	//	shader->setMat4("debugMatrix", s_DebugTransform.to_mat4());
+
 		// RENDER ALL BLOOD SPLATTERS
-		for (VolumetricBloodSplatter& volumetricBloodSplater : game->s_volumetricBloodSplatters) {
-			volumetricBloodSplater.Draw(shader);
+		//for (VolumetricBloodSplatter& volumetricBloodSplater : game->s_volumetricBloodSplatters) {
+		//	volumetricBloodSplater.Draw(shader);
+		//}
+
+		for (int i = 0; i < game->s_volumetricBloodSplatters.size(); i++)
+		{
+			if (i == 0) {
+			//	game->s_volumetricBloodSplatters[0].m_transform.position = glm::vec3(0);
+			//	game->s_volumetricBloodSplatters[0].m_transform.rotation = glm::vec3(0);
+
+			}
+			game->s_volumetricBloodSplatters[i].Draw(shader);
 		}
 	}
 
@@ -1280,126 +1293,39 @@ namespace HellEngine
 		glBindTexture(GL_TEXTURE_2D, s_gBuffer.rboDepth);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gNormal);
+		
+		// clear to specified color:
 
-		unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-		glDrawBuffers(3, attachments);
+		static const float white[] = { 1.0, 1.0, 1.0, 1.0 };
+		glClearTexImage(s_gBuffer.gBloodDecals, 0, GL_RGBA, GL_FLOAT, white);
+		
+		//unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT7 };
+		//glDrawBuffers(4, attachments);
+
+		unsigned int attachments[8] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6, GL_COLOR_ATTACHMENT7 };
+		glDrawBuffers(8, attachments);
+
+		glDepthMask(GL_FALSE);
 
 		glEnable(GL_BLEND);
-		glDepthMask(GL_FALSE);
 		glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
+		glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
+		glBlendEquation(GL_FUNC_ADD);
+
+		//glDisable(GL_BLEND);
+		//	
+
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
 
 		glCullFace(GL_FRONT);
 		glDisable(GL_DEPTH_TEST);
 		//glEnable(GL_DEPTH_TEST);
 
-		Transform transform;
-		transform.position = s_DebugTransform.position;// debugtransfglm::vec3(-1, 1, 0.09f);
-	//	transform.position = glm::vec3(Config::TEST_FLOAT, Config::TEST_FLOAT2, Config::TEST_FLOAT3);
-
-	//	transform.position = Config::BLOOD_MESH_POSITION;// s_DebugTransform.position;
-	//	transform.position = glm::vec3(Config::TEST_FLOAT, Config::TEST_FLOAT2, Config::TEST_FLOAT3);
-		transform.rotation = glm::vec3(0, 0, 0.3f);// s_DebugTransform.rotation;
-		transform.scale = glm::vec3(6, 10.1, 2.8) * glm::vec3(Config::TEST_FLOAT + 1);
-	//	transform.scale = s_DebugTransform.scale;// glm::vec3(6, 0.1, 2.8);
-	//	transform.scale = glm::vec3(11);
-
-		glm::mat4 modelMatrix = transform.to_mat4();// glm::translate(glm::mat4(1), transform.position);
-		glm::vec3 squareNormal = glm::vec3(0, 0, 1);
-		/*float angle = glm::acos(glm::dot(normal, squareNormal));
-		if (angle > 0.001f)
-		{
-			if (angle == HELL_PI)
-				modelMatrix = glm::rotate(modelMatrix, angle, glm::vec3(0, 1, 0));
-			else {
-				glm::vec3 axis = glm::normalize(glm::cross(squareNormal, normal));
-				modelMatrix = glm::rotate(modelMatrix, angle, axis);
-			}
-		}*/
-		// Draw the cunt
-	//	modelMatrix = glm::rotate(modelMatrix, randomRotation, glm::vec3(0, 0, 1));
-	//	modelMatrix = glm::scale(modelMatrix, transform.scale);
-		shader->setMat4("model", modelMatrix);
-
-		//		if (!blackOnly)
-		//			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("BulletHole1_BaseColor"));
-		//		else
-		//			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("BulletHole1Black_BaseColor"));
-
-
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("Decal_norm"));
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("Decal_mask"));
-		//	if (!blackOnly)
-		//		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("BulletHole1"));
-		//	else
-		//		AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("BulletHole1Black"));
-
-
-			//shader->setMat4("model", glm::mat4(1));
-
-		static unsigned int VAO = 0;
-		if (VAO == 0) {
-			float vertices[] = {
-				// positions          // normals           // texture coords	
-				0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,	// top
-				0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
-				-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-				-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-				-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-				0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-
-				0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,	// front
-				0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
-				-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-				-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-				-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-				0.5f, 0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-
-				-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f, // back
-				0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
-				0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-				0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-				-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
-				-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-
-				-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f, // right
-				-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-				-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-				-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-				-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-				-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-
-				0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f, // left
-				0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-				0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-				0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-				0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-				0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-
-				-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f, // bottom
-				0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
-				0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-				0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-				-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
-				-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f
-			};
-			unsigned int VBO;
-			glGenVertexArrays(1, &VAO);
-			glGenBuffers(1, &VBO);
-			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-			glBindVertexArray(VAO);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-			glEnableVertexAttribArray(2);
+		// RENDER ALL BLOOD SPLATTERS
+		for (VolumetricBloodSplatter& volumetricBloodSplater : game->s_volumetricBloodSplatters) {
+			volumetricBloodSplater.DrawDecal(shader);
 		}
-
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
 	}
@@ -1409,17 +1335,67 @@ namespace HellEngine
 		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
 		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 
-		unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-		glDrawBuffers(4, attachments);
+		unsigned int attachments[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,  GL_COLOR_ATTACHMENT7 };
+		glDrawBuffers(5, attachments);
 
 		glDepthMask(GL_TRUE);
 		glEnable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
 
 		shader->use();
+		shader->setBool("blockoutDecals", true);
 		WeaponLogic::RenderCurrentWeapon(shader, &game->camera);
+		shader->setBool("blockoutDecals", false);
 
 		glDepthMask(GL_FALSE);
+	}
+
+	void Renderer::DecalCompositePass(Shader* shader)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, s_compositeBuffer.ID);
+
+		glDisable(GL_BLEND);
+		unsigned int attachmentss[2] = { GL_COLOR_ATTACHMENT0 , GL_COLOR_ATTACHMENT1};
+		glDrawBuffers(2, attachmentss);
+
+
+
+		glCullFace(GL_BACK);
+
+		glUseProgram(shader->ID);
+		glDisable(GL_DEPTH_TEST);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gAlbedo);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gRMA);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gBloodDecals);
+		glActiveTexture(GL_TEXTURE3);
+
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+
+		shader->setMat4("model", glm::mat4(1));
+		Quad2D::RenderQuad(shader);
+
+
+
+		// ok now blit these back onto the original textures
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, s_compositeBuffer.ID);
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, s_gBuffer.ID);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+		glBlitFramebuffer(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight, 0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, s_compositeBuffer.ID);
+		glReadBuffer(GL_COLOR_ATTACHMENT1);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, s_gBuffer.ID);
+		glDrawBuffer(GL_COLOR_ATTACHMENT2);
+		glBlitFramebuffer(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight, 0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+
+		//glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+
 	}
 
 	void Renderer::DecalPass(Game* game, Shader* shader)

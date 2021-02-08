@@ -36,6 +36,8 @@ namespace HellEngine
 
 	ExrTexture AssetManager::s_ExrTexture_pos;
 	ExrTexture AssetManager::s_ExrTexture_norm;
+	ExrTexture AssetManager::s_ExrTexture_pos7;
+	ExrTexture AssetManager::s_ExrTexture_norm7;
 
 	bool AssetManager::s_loadingComplete = false;
 	std::string AssetManager::s_loadLog = "WELCOME TO HELL\nLoadng please wait...\n";
@@ -44,6 +46,8 @@ namespace HellEngine
 	{
 		s_ExrTexture_pos = ExrTexture("res/textures/blood_pos.exr");
 		s_ExrTexture_norm = ExrTexture("res/textures/blood_norm.exr");
+		s_ExrTexture_pos7 = ExrTexture("res/textures/blood_pos7.exr");
+		s_ExrTexture_norm7 = ExrTexture("res/textures/blood_norm7.exr");
 
 		// Find all textures
 		std::string path = "res/textures/";
@@ -135,6 +139,7 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Window.obj"));
 		models.emplace_back(Model("res/models/WindowGlass.obj"));
 		models.emplace_back(Model("res/models/blood_mesh.obj"));
+		models.emplace_back(Model("res/models/blood_mesh7.obj"));
 		//models.emplace_back(Model("res/models/Glock.obj"));
 		//models.emplace_back(Model("res/models/Glass.obj"));
 

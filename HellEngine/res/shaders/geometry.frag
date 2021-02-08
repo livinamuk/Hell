@@ -4,6 +4,9 @@ layout (location = 0) out vec4 gAlbedo;
 layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec3 gRMA;
 layout (location = 3) out vec3 gbuffer4;
+//layout (location = 4) out vec4 gBlood;
+
+
 
 layout (binding = 0) uniform sampler2D ALB_Texture0;
 layout (binding = 1) uniform sampler2D NRM_Texture0;
@@ -16,6 +19,8 @@ layout (binding = 6) uniform sampler2D EMMISIVE_Texture;
 uniform bool useRoughnessMetallicUniforms;
 uniform float roughnessUniform;
 uniform float metallicUniform;
+
+uniform bool blockoutDecals;
 
 in vec2 TexCoord;
 in vec3 FragPos;
@@ -37,6 +42,11 @@ uniform vec2 TEXTURE_SCALE;
 
 uniform vec2 texOffset;
 
+in vec3 attrNormal;
+in vec3 attrTangent;
+in vec3 attrBiTangent;
+
+uniform mat4 model;
 
 void main()
 {
@@ -76,10 +86,33 @@ void main()
 	// GBuffer Output //
 	////////////////////
 	
-	gNormal = NRM.rgb;
-	gNormal = normalize(gNormal.rgb * 2.0 - 1.0);
-	gNormal = normalize(TBN * gNormal.rgb);
+	vec3 normal_map = NRM.xyz * 2.0 - 1.0;
+	//vec3 bitangent = cross(attrNormal, attrTangent);
 
+//	vec3 T = normalize(vec3(model * vec4(attrTangent,   0.0)));
+//	vec3 B = normalize(vec3(model * vec4(attrBiTangent, 0.0)));
+	//vec3 N = normalize(vec3(model * vec4(attrNormal,    0.0)));
+	//mat3 TBNN = mat3(T, B, N);
+
+//	mat3 tbn = mat3(normalize(attrTangent), normalize(attrBiTangent), normalize(attrNormal));
+	//mat3 tbn = mat3(attrTangent, attrBiTangent, attrNormal); // emit aNormal from vs to fs (do skinning if you have to)
+//	vec3 normal = normalize(tbn * normal_map);
+	
+
+	//mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
+
+	//normal  = normalize(model * vec4(normal, 0.0)).xyz;
+	//normal  = normalize((model * vec4(normal, 0.0)).xyz);
+
+	//normal = normalize(modelOut * vec4(normal, 0.0)).xyz;
+//	gNormal = normal ;//* 0.5 + 0.5;
+
+	mat3 tbn = mat3(normalize(attrTangent), normalize(attrBiTangent), normalize(attrNormal));
+
+	vec3 normal = normalize(tbn * (texture(NRM_Texture0, finalTexCoords).rgb * 2.0 - 1.0));
+	gNormal = normal ;//* 0.5 + 0.5;
+
+	
 
 	gAlbedo = ALB + vec4(ColorAdd, 0);
 	gRMA = RMA.rgb;
@@ -90,7 +123,8 @@ void main()
 		gRMA.b = 1;
 	}
 
-	
+//	gAlbedo = vec4(1);
+
   //  gRMA = vec3(0.1, 0.9, 1);
 
 	// Has emissive map
@@ -109,15 +143,7 @@ void main()
 	//	gAlbedo =  texture(ALB_Texture1, finalTexCoords);
 	//	gRMA = vec3(1, 0, 0);
 	}
-	
-	//	gAlbedo =  RMA;//texture(RMA_Texture1, finalTexCoords);
-	//gAlbedo.rgb = vec3(round(MaterialID));
 
-	//gAlbedo.rgb = vec3(gRMA.g);//
-
-
-
-	if (hasAnimation) {
-	//	gAlbedo = vec3(test.x);
-	}
+//	gBlood = vec4(0, 1, 0, 1);
+	//gAlbedo = vec4(0.5);
 }

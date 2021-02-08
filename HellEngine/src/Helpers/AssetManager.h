@@ -89,5 +89,7 @@ namespace HellEngine
 
 		static ExrTexture s_ExrTexture_pos;
 		static ExrTexture s_ExrTexture_norm;
+		static ExrTexture s_ExrTexture_pos7;
+		static ExrTexture s_ExrTexture_norm7;
 	};
 }

@@ -1503,6 +1503,9 @@
     <ClInclude Include="src\Renderer\Effects\VolumetricBloodSplatter.h">
       <Filter>src\Renderer\Effects</Filter>
     </ClInclude>
+    <ClInclude Include="src\GL\CompositeBuffer.h">
+      <Filter>src\GL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\AnimatedNode.cpp">
@@ -1774,6 +1777,9 @@
     <ClCompile Include="src\Renderer\Effects\VolumetricBloodSplatter.cpp">
       <Filter>src\Renderer\Effects</Filter>
     </ClCompile>
+    <ClCompile Include="src\GL\CompositeBuffer.cpp">
+      <Filter>src\GL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">
@@ -1922,5 +1928,14 @@
     <None Include="res\shaders\GlassBlur.vert" />
     <None Include="res\shaders\CombineGlassBlurWithFinalLighting.frag" />
     <None Include="res\shaders\CombineGlassBlurWithFinalLighting.vert" />
+    <None Include="res\shaders\bloodVolumetric.geom">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\DecalComposite.frag">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\DecalComposite.vert">
+      <Filter>res\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

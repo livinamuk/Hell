@@ -39,8 +39,8 @@ namespace HellEngine
 		shader->use();
 
 		Transform rot;
-		rot.rotation.y = HELL_PI * 1.5f;
-		rot.rotation.x = -HELL_PI / 2;
+		//rot.rotation.y = HELL_PI * 1.5f;
+		//rot.rotation.x = -HELL_PI / 2;
 
 		shader->setInt("u_PosTex", 0);
 		shader->setInt("u_NormTex", 1);

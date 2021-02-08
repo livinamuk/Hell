@@ -8,19 +8,18 @@ uniform mat4 u_MatrixView;
 uniform mat4 u_MatrixWorld;
 uniform mat4 u_MatrixInverseWorld;
 
+uniform mat4 debugMatrix;
+
 layout (binding = 0) uniform sampler2D u_PosTex;
 layout (binding = 1) uniform sampler2D u_NormTex;
 
-//uniform float u_BoundingMax;
-//uniform float u_BoundingMin;
-//uniform float u_Speed;
-//uniform int u_NumOfFrames;
-//uniform vec4 u_HeightOffset;
-//uniform float u_Time;
 uniform vec3 u_WorldSpaceCameraPos;
 
 out vec3 v_WorldNormal;
 out vec3 v_ViewDir;
+out vec3 v_fragPos;
+
+ uniform float  u_Time;
 
 float LinearToGammaSpaceExact (float value)
 {
@@ -41,16 +40,13 @@ vec3 LinearToGammaSpace (vec3 linRGB)
 
 vec3 ObjSpaceViewDir(vec3 v )
 {
-    //vec3 objSpaceCameraPos = mul(u_MatrixWorld, vec4(u_WorldSpaceCameraPos.xyz, 1)).xyz;
     vec3 objSpaceCameraPos = (u_MatrixWorld, vec4(u_WorldSpaceCameraPos.xyz, 1)).xyz;
     return objSpaceCameraPos - v.xyz;
 }
 
-void main() {
-
-    //float currentSpeed = u_Speed / u_NumOfFrames;
-
-  float  u_Time = 0.23;
+void main() 
+{
+ // float  u_Time = 0.23;
 
     int u_NumOfFrames = 81;
     int u_Speed = 35;
@@ -68,47 +64,45 @@ void main() {
     vec3 v = a_Position;
     vec2 uv = a_Texcoord;
 
-    timeInFrames = u_Time;//
+    timeInFrames = u_Time;//0;//0.23; ;//u_Time;//
    // timeInFrames = 0.166;
 
     vec4 texturePos = textureLod(u_PosTex, vec2(uv.x, (timeInFrames + uv.y)), 0);
     vec4 textureNorm = textureLod(u_NormTex, vec2(uv.x, (timeInFrames + uv.y)), 0);
 
-    //float expand = u_BoundingMax - u_BoundingMin;
-    //texturePos.xyz *= expand;
-    //texturePos.xyz += u_BoundingMin;
-    //texturePos.x *= -1;
+    v_WorldNormal = textureNorm.xzy * 2.0 - 1.0;  
+    mat4 modelMatrix = inverse(transpose(u_MatrixWorld));
+   // v_WorldNormal =  (u_MatrixWorld * vec4(v_WorldNormal, 0.0)).xyz;
 
-    //v = texturePos.xzy * 20000;
-        
-   // texturePos *= (0.0001);
+    //v_WorldNormal =  (u_MatrixWorld * vec4(v_WorldNormal.xzy, 0.0)).xyz;   // wrong
+    //v_WorldNormal =  (modelMatrix * vec4(v_WorldNormal, 0.0)).xyz;         // right
 
-   // v = texturePos.xzy;
-   // v += u_HeightOffset.xyz;
     
+   
+  //  v_WorldNormal =  (normalMatrix * (v_WorldNormal)).xyz;         // right
+    //v_WorldNormal = normalize(v_WorldNormal * normalMatrix);
+    // You should also send your tranformed position to the fragment shader
+   // f_position = vec3(mvp * vec4(position, 1.0));
+//    v_WorldNormal.x  *= -1;
 
-  //  gl_Position = u_MatrixProjection * u_MatrixView * u_MatrixWorld * vec4(a_Position, 1.0);
-    
-    v = texturePos.xzy * 25000;
+    mat3 m = mat3(u_MatrixWorld);
+    mat3 t = mat3(cross(m[1], m[2]), cross(m[2], m[0]), cross(m[0], m[1])); // adjoint matrix
+    v_WorldNormal = t * v_WorldNormal;
 
-  //  v_WorldNormal = textureNorm.xzy;
+    mat3 normalMatrix = mat3(u_MatrixWorld);
+    normalMatrix = inverse(normalMatrix);
+    normalMatrix = transpose(normalMatrix);
 
-	v_WorldNormal = textureNorm.xzy;// * 2 - 1;
+    //v_WorldNormal.xyz = (v_WorldNormal * normalMatrix);
 
-	mat3 normalMatrix = mat3(u_MatrixWorld);
-//normalMatrix = inverse(normalMatrix);
-//normalMatrix = transpose(normalMatrix);
-//v_WorldNormal.xyz = normalize(v_WorldNormal * normalMatrix);
-
-
-
-//v_WorldNormal.xyz = (u_MatrixWorld * vec4(v_WorldNormal, 0.0)).xyz;
-
-
-//v_WorldNormal.xyz = (u_MatrixWorld * vec4(v_WorldNormal, 0.0)).xyz;
-//v_WorldNormal.xyz = (u_MatrixWorld * vec4(v_WorldNormal, 1.0)).xyz;
     v_ViewDir = u_WorldSpaceCameraPos.xyz;
 
-    gl_Position = u_MatrixProjection * u_MatrixView * u_MatrixWorld * vec4(v, 1.0);
+
+
+   // v_WorldNormal = textureNorm.xzy * 2.0 - 1.0;
+ //   v_WorldNormal.x *= -1;
+   // v_WorldNormal =  (u_MatrixWorld * vec4(v_WorldNormal.xyz, 0.0)).xyz;
+    
+    gl_Position =  u_MatrixProjection * u_MatrixView * u_MatrixWorld * vec4(texturePos.xzy, 1.0);
 
 }

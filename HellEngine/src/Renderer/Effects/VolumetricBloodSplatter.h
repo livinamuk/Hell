@@ -17,10 +17,13 @@ namespace HellEngine
 		Model* m_model;
 		glm::vec3 m_front;
 
+		int m_type = 1;
+
 	public: // methods
 		VolumetricBloodSplatter(glm::vec3 position, glm::vec3 rotation, glm::vec3 front);
 		void Update(float deltaTime);
-		void Draw(Shader* shader);
+		void Draw(Shader* shader); 
+		void DrawDecal(Shader* shader);
 		glm::mat4 GetModelMatrix();
 	};
 }

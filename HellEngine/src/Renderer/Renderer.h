@@ -9,6 +9,7 @@
 #include "GL/DOFBuffer.h"
 #include "GL/FXAABuffer.h"
 #include "GL/ChromaticAbberationBuffer.h"
+#include "GL/CompositeBuffer.h"
 #include "GL/CameraEnvMap.h"
 #include "GL/GpuProfiling.h"
 #include "TextBlitter.h"
@@ -61,6 +62,7 @@ namespace HellEngine
 		static void VolumetricBloodPass(Game* game, Shader* shader);
 		static void VolumetricBloodPassDecals(Game* game, Shader* shader);
 		static void RenderPlayerWeapon(Game* game, Shader* shader);
+		static void DecalCompositePass(Shader* shader);
 
 		static void ViewCubeMap(Game* , Shader* shader, unsigned int CubeMapID);
 		static void CreateBRDFLut();
@@ -110,6 +112,7 @@ namespace HellEngine
 
 		static Shader s_GlassBlur;
 		static Shader s_CombineGlassBlurWithFinalLighting;
+		static Shader s_DecalComposite;
 
 		static std::vector<BlurBuffer> s_BlurBuffers;
 
@@ -122,6 +125,7 @@ namespace HellEngine
 		static DOFBuffer s_DOFBuffer;
 		static FXAABuffer s_FXAABuffer;
 		static ChromaticAbberationBuffer s_ChromaticAbberationBuffer;
+		static CompositeBuffer s_compositeBuffer;
 
 		// Env maps
 		//static LightProbe s_LightProbe;

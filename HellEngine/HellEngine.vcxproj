@@ -168,6 +168,7 @@
     <ClInclude Include="src\GL\BlurBuffer.h" />
     <ClInclude Include="src\GL\CameraEnvMap.h" />
     <ClInclude Include="src\GL\ChromaticAbberationBuffer.h" />
+    <ClInclude Include="src\GL\CompositeBuffer.h" />
     <ClInclude Include="src\GL\CubeMapArray.h" />
     <ClInclude Include="src\GL\DOFBuffer.h" />
     <ClInclude Include="src\GL\EnvCubeMap.h" />
@@ -642,6 +643,7 @@
     <ClCompile Include="src\GL\BlurBuffer.cpp" />
     <ClCompile Include="src\GL\CameraEnvMap.cpp" />
     <ClCompile Include="src\GL\ChromaticAbberationBuffer.cpp" />
+    <ClCompile Include="src\GL\CompositeBuffer.cpp" />
     <ClCompile Include="src\GL\CubeMapArray.cpp" />
     <ClCompile Include="src\GL\DOFBuffer.cpp" />
     <ClCompile Include="src\GL\FXAABuffer.cpp" />
@@ -734,12 +736,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shaders\bloodVolumetric.geom" />
     <None Include="res\shaders\bloodVolumetricDecals.frag" />
     <None Include="res\shaders\bloodVolumetricDecals.vert" />
     <None Include="res\shaders\ChromaticAberration.frag" />
     <None Include="res\shaders\ChromaticAberration.vert" />
     <None Include="res\shaders\CombineGlassBlurWithFinalLighting.frag" />
     <None Include="res\shaders\CombineGlassBlurWithFinalLighting.vert" />
+    <None Include="res\shaders\DecalComposite.frag" />
+    <None Include="res\shaders\DecalComposite.vert" />
     <None Include="res\shaders\DOF.frag" />
     <None Include="res\shaders\DOF.vert" />
     <None Include="res\shaders\FXAA.frag" />

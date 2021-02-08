@@ -4,7 +4,7 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
 layout (location = 3) in vec3 aTangent;
-layout (location = 4) in vec3 aBinormal;
+layout (location = 4) in vec3 aBitangent;
 layout (location = 5) in ivec4 aBoneID;
 layout (location = 6) in vec4 aBoneWeight;
 layout (location = 7) in int aMaterialID;
@@ -20,9 +20,16 @@ out vec3 Normal;
 out mat3 TBN;
 out float MaterialID;
 
+out vec3 attrNormal;
+out vec3 attrTangent;
+out vec3 attrBiTangent;
+
 uniform bool hasAnimation;
 uniform mat4 skinningMats[64];
 uniform bool instanced;
+
+
+out mat4 modelOut;
 
 void main()
 {
@@ -39,7 +46,7 @@ void main()
 	vec4 worldPos;
 	vec4 totalLocalPos = vec4(0.0);
 	vec4 totalNormal = vec4(0.0);
-    mat3 normalMatrix = transpose(inverse(mat3(modelMatrix))); // do this on the cpu. its fucking slow.
+   // mat3 normalMatrix = transpose(inverse(mat3(modelMatrix))); // do this on the cpu. its fucking slow.
 	
 	vec4 vertexPosition =  vec4(aPos, 1.0);
 	vec4 vertexNormal = vec4(aNormal, 0.0);
@@ -68,8 +75,16 @@ void main()
 		gl_Position = projection * view * vec4(FragPos, 1);
 	}
 
-	vec3 T = normalize(vec3(modelMatrix * vec4(aTangent,   0.0)));
-	vec3 B = normalize(vec3(modelMatrix * vec4(aBinormal, 0.0)));
-	vec3 N = normalize(vec3(modelMatrix * vec4(Normal,    0.0)));
-	TBN = mat3(T, B, N);
+
+	attrNormal = (model * vec4(Normal, 0.0)).xyz;
+	attrTangent = (model * vec4(aTangent, 0.0)).xyz;
+	attrBiTangent = (model * vec4(aBitangent, 0.0)).xyz;
+
+	//attrNormal = Normal;
+	//attrTangent = aTangent;
+	//attrBiTangent = aBitangent;
+	//vec3 T = normalize(vec3(modelMatrix * vec4(aTangent,   0.0)));
+	//vec3 B = normalize(vec3(modelMatrix * vec4(aBitangent, 0.0)));
+	//vec3 N = normalize(vec3(modelMatrix * vec4(Normal,    0.0)));
+	//TBN = mat3(T, B, N);
 }

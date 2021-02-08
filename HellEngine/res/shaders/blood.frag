@@ -74,6 +74,7 @@ vec3 diffuse(PBRInfo pbrInputs) {
 
 void main() {
 
+//discard;
 	vec2 sizeTile =  vec2(1.0 / u_CountColumn, 1.0 / u_CountRaw);
 
 	int frameIndex0 = u_FrameIndex;

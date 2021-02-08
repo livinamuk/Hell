@@ -69,8 +69,9 @@ namespace HellEngine
 			Renderer::s_BloodVolumetricShader.ReloadShader();
 			Renderer::s_BloodVolumetricShaderDecals.ReloadShader();
 			Renderer::s_TransparentSurfacesShader.ReloadShader();
-			Renderer::s_GlassBlur.ReloadShader(); 
+			Renderer::s_GlassBlur.ReloadShader();
 			Renderer::s_CombineGlassBlurWithFinalLighting.ReloadShader();
+			Renderer::s_DecalComposite.ReloadShader();
 			Renderer::SetTextureBindings();
 		}
 

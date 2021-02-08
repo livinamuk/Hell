@@ -68,48 +68,25 @@ namespace HellEngine
 			Renderer::s_muzzleFlash.CreateFlash(GetShotgunBarrelHoleWorldPosition());
 
 		//	Renderer::s_muzzleFlash.m_CurrentTime = 0;
+
+			int counter = 0;
+
 			bool playFleshSound = false;
 			bool playGlassSound = false;
 
-			for (int i = 0; i < 12; i++)
+			// Fire 12 shots
+			for (int i = 0; i < 12; i++) 
 			{
-				RaycastResult raycastResult;
-				raycastResult.CastRay(p_camera->m_viewPos, p_camera->m_Front, 10.0f, 0.125f);
-				
-				// make bullet hole if it aint the ragdoll
-				if (raycastResult.m_objectType != PhysicsObjectType::RAGDOLL)
-				{
-					// Glass
-					if (raycastResult.m_objectType == PhysicsObjectType::GLASS) {
-						Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::GLASS));
-					}
-					// any other surface
-					else
-						Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::PLASTER));
-				}
+				GunshotReport gunshotReport = WeaponLogic::FireBullet(p_camera, 0.125f, 4);
 
-				// make blood on couches and ragdolls
-				if ((raycastResult.m_objectType == PhysicsObjectType::MISC_MESH) || (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)) {
-					Renderer::s_bloodEffect.m_CurrentTime = 0;
+				if (gunshotReport.hitType == PhysicsObjectType::RAGDOLL)
 					playFleshSound = true;
-					Renderer::s_hitPoint.position = raycastResult.m_hitPoint;
-					Renderer::s_hitPoint.rotation = p_camera->m_transform.rotation;
-				}
-				WeaponLogic::s_BulletHits.emplace_back(raycastResult);
-				//m_raycast = raycastResult;
 
-
-				if (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)
-				{
-					float FORCE_SCALING_FACTOR = 5;// 5;// Config::TEST_FLOAT;
-					raycastResult.m_rigidBody->activate(true);
-					btVector3 centerOfMass = raycastResult.m_rigidBody->getCenterOfMassPosition();
-					btVector3 hitPoint = Util::glmVec3_to_btVec3(raycastResult.m_hitPoint);
-					btVector3 force = Util::glmVec3_to_btVec3(p_camera->m_Front) * FORCE_SCALING_FACTOR;
-					raycastResult.m_rigidBody->applyImpulse(force, hitPoint - centerOfMass);
-				}
+				if (gunshotReport.hitType == PhysicsObjectType::GLASS)
+					playGlassSound = true;
 			}
 
+			// Audio
 			if (playFleshSound)
 				Audio::PlayAudio("FLY_Head_Explode_01.wav", 0.75f);
 			if (playGlassSound)

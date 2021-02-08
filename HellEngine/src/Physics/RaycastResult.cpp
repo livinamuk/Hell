@@ -9,7 +9,7 @@ namespace HellEngine
 
 	}
 
-	void RaycastResult::CastRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength, float variance)
+	void RaycastResult::CastRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength)
 	{
 		// Bail if NAN origin`
 		if (rayOrigin.x != rayOrigin.x)
@@ -23,14 +23,7 @@ namespace HellEngine
 		m_surfaceNormal = glm::vec3(0);
 		m_objectType = PhysicsObjectType::UNDEFINED;
 		
-		// Variance
-		float offset = (variance * 0.5f) - Util::RandomFloat(0, variance);
-		rayDirection.x += offset;
-		offset = (variance * 0.5f) - Util::RandomFloat(0, variance);
-		rayDirection.y += offset;
-		offset = (variance * 0.5f) - Util::RandomFloat(0, variance);
-		rayDirection.z += offset;
-		rayDirection = glm::normalize(rayDirection);
+		
 
 		// End of ray
 		glm::vec3 rayEnd = rayOrigin + (rayDirection * glm::vec3(rayLength));

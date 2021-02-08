@@ -63,8 +63,9 @@ void main()
 
     vec3 v = a_Position;
     vec2 uv = a_Texcoord;
-
-    timeInFrames = u_Time;//0;//0.23; ;//u_Time;//
+    
+    timeInFrames = 0.0;// u_Time;//0;//0.23; ;//u_Time;//
+  timeInFrames = u_Time;//0;//0.23; ;//u_Time;//
    // timeInFrames = 0.166;
 
     vec4 texturePos = textureLod(u_PosTex, vec2(uv.x, (timeInFrames + uv.y)), 0);

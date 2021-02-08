@@ -168,7 +168,7 @@ namespace HellEngine
 		WeaponLogic::Update(m_frameTime);
 
 		//ShotgunLogic::Update(m_frameTime);
-		m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 10.0f, 0); //ShotgunLogic::m_raycast;
+		m_cameraRaycast.CastRay(camera.m_viewPos, camera.m_Front, 10.0f); //ShotgunLogic::m_raycast;
 
 		
 

@@ -16,6 +16,7 @@ namespace HellEngine
 	class Util
 	{
 	public:
+		static int GetRandomInt(int low, int high);
 		static void RotateAxisBy90(Axis& axis);
 		static char* PhysicsObjectEnumToString(PhysicsObjectType objectType);
 		static btQuaternion GetQuatBetween2Points(glm::vec3 a, glm::vec3 b);

@@ -82,65 +82,12 @@ namespace HellEngine
 			GetGlockCasingSpawnWorldPosition();
 			Renderer::s_muzzleFlash.m_CurrentTime = 0;
 
-			bool playFleshSound = false;
-
-			for (int i = 0; i < 1; i++)
-			{
-				RaycastResult raycastResult;
-				raycastResult.CastRay(p_camera->m_viewPos, p_camera->m_Front, 10.0f, 0.05f);
-
-				// make bullet hole if it aint the ragdoll
-				if (raycastResult.m_objectType != PhysicsObjectType::RAGDOLL)
-				{
-					// Glass
-					if (raycastResult.m_objectType == PhysicsObjectType::GLASS) {
-						Audio::PlayAudio("GlassImpact.wav", 1.75	); 
-						Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::GLASS));
-					}
-					// any other surface
-					else
-						Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::PLASTER));
-				}
 
 
-				// CREATE VOLUMETRIC BLOOD SPLATTER
-				glm::vec3 position = raycastResult.m_hitPoint;
-				glm::vec3 rotation = p_camera->m_transform.rotation;
-				//glm::vec3 rotation = raycastResult.m_hitPoint;
-				Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, p_camera->m_Front * glm::vec3(-1)));
-				
+			GunshotReport gunshotReport = WeaponLogic::FireBullet(p_camera, 0.05f, 22);
 
-			//	Renderer::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(raycastResult.m_hitPoint, p_camera->m_Front * glm::vec3(-1)));
-
-				
-
-
-				// make blood on couches and ragdolls
-				if ((raycastResult.m_objectType == PhysicsObjectType::MISC_MESH) || (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)) {
-					Renderer::s_bloodEffect.m_CurrentTime = 0;
-					Renderer::s_bloodVolumetricEffect.m_CurrentTime = 0;
-					playFleshSound = true;
-					Renderer::s_hitPoint.position = raycastResult.m_hitPoint;
-					Renderer::s_hitPoint.rotation = p_camera->m_transform.rotation;
-				}
-				WeaponLogic::s_BulletHits.emplace_back(raycastResult);
-
-
-				if (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)
-				{
-					float FORCE_SCALING_FACTOR = 22;// Config::TEST_FLOAT;
-					raycastResult.m_rigidBody->activate(true);
-					btVector3 centerOfMass = raycastResult.m_rigidBody->getCenterOfMassPosition();
-					btVector3 hitPoint = Util::glmVec3_to_btVec3(raycastResult.m_hitPoint);
-					btVector3 force = Util::glmVec3_to_btVec3(p_camera->m_Front) * FORCE_SCALING_FACTOR;
-					raycastResult.m_rigidBody->applyImpulse(force, hitPoint - centerOfMass);
-				}
-			}
-
-			if (playFleshSound)
-			{
-					int RandomAudio = rand() % 8;
-
+			if (gunshotReport.hitType == PhysicsObjectType::RAGDOLL) {
+				int RandomAudio = rand() % 8;
 				if (RandomAudio == 0)
 					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_01.wav");
 				if (RandomAudio == 1)
@@ -158,6 +105,11 @@ namespace HellEngine
 				if (RandomAudio == 7)
 					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_08.wav");
 			}
+			if (gunshotReport.hitType == PhysicsObjectType::GLASS)
+			{
+				Audio::PlayAudio("GlassImpact.wav", 1.75f);
+			}
+
 			
 			SpawnBulletCasing();
 		}
@@ -215,10 +167,10 @@ namespace HellEngine
 		{
 			if (p_player->m_movementState != PlayerMovementState::WALKING)
 			{
-				if (!WeaponLogic::m_singleHanded)
+				//if (!WeaponLogic::m_singleHanded)
 					p_model->PlayAnimation("Glock_Idle.fbx", true);
-				else
-					p_model->PlayAnimation("Glock_SingleHanded_Idle.fbx", true);
+				//else
+				//	p_model->PlayAnimation("Glock_SingleHanded_Idle.fbx", true);
 			}
 			else
 				p_model->PlayAnimation("Glock_Walk.fbx", true);
@@ -227,7 +179,7 @@ namespace HellEngine
 		// Fire
 		if (m_gunState == GunState::FIRING)
 		{
-			if (!WeaponLogic::m_singleHanded) 
+			//if (!WeaponLogic::m_singleHanded) 
 			{
 				if (s_RandomFireAnimation == 0)
 					p_model->PlayAnimation("Glock_Fire0.fbx", false);
@@ -238,8 +190,8 @@ namespace HellEngine
 				if (s_RandomFireAnimation == 3)
 					p_model->PlayAnimation("Glock_Fire3.fbx", false);
 			}
-			else
-				p_model->PlayAnimation("Glock_SingleHanded_Fire0.fbx", false);
+			//else
+			//	p_model->PlayAnimation("Glock_SingleHanded_Fire0.fbx", false);
 
 			if (p_model->IsAnimationComplete())
 				m_gunState = GunState::IDLE;
@@ -249,7 +201,8 @@ namespace HellEngine
 		if (m_gunState == GunState::RELOADING)
 		{
 			if (m_reloadState == ReloadState::RELOAD_CLIP_FROM_EMPTY)
-				p_model->PlayAnimation("Glock_EmptyReload.fbx", false);
+				//p_model->PlayAnimation("Glock_EmptyReload.fbx", false);
+				p_model->PlayAnimation("Glock_Reload.fbx", false);
 			else
 				p_model->PlayAnimation("Glock_Reload.fbx", false);
 			//p_model->PlayAnimation("Glock_EmptyReload.fbx", false);

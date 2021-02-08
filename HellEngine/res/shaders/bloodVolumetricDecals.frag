@@ -23,7 +23,7 @@ uniform float screenHeight;
 uniform vec3 targetPlaneSurfaceNormal;
 uniform int writeRoughnessMetallic;
 
-in vec3 Normal;
+//in vec3 Normal;
 in mat3 TBN;
 
 uniform vec3 _DecalForwardDirection;
@@ -35,6 +35,10 @@ float saturate(float value)
 
 void main()
 {    
+   // discard;
+
+
+
     // Get the Fragment Z position (from the depth buffer)
     vec2 depthCoords = gl_FragCoord.xy / vec2(screenWidth, screenHeight);
     float z = texture(depthTexture, vec2(depthCoords.s, depthCoords.t)).x * 2.0f - 1.0f;
@@ -48,23 +52,7 @@ void main()
     vec3 WorldPos = worldSpacePosition.xyz;
 	
 	
-	float RoomLowestX = -0.96;;
-	float RoomHighestX = 2.50;
-	float RoomLowestZ = -2.50;
-	float RoomHighestZ = 2.06;
-
-	if (WorldPos.y > 0.1)
-	{
-	//	if (WorldPos.x < RoomLowestX + 0.09)
-	//		discard;
-	//	if (WorldPos.x > RoomHighestX - 0.09)
-	//		discard;
-	//	if (WorldPos.z < RoomLowestZ + 0.09)
-	//		discard;	
-	//	if (WorldPos.z < RoomLowestZ + 0.09)
-	//		discard;
-	}
-
+    // Don't draw on ceiling
 	if (WorldPos.y > 2.39)
 		discard;
 
@@ -117,7 +105,7 @@ if (abs(dFdy(z)) > _DepthDiffThreshold)
     vec4 res = vec4(0); 
     res.a = saturate(normal.a * 2);
     res.a *= projClipFade;
-    if (res.a < 0.9) 
+    if (res.a < 0.2) 
        discard; //a little optimization
 
 
@@ -144,11 +132,11 @@ if (abs(dFdy(z)) > _DepthDiffThreshold)
 
     mask = vec3(texture(Decal_mask, vec2(decalTexCoord.s, decalTexCoord.t)).a);
     //alphaMask = mask.r * 0.9;
-    colorMask = mask.r * 0.9;
+    colorMask = mask.r * 0.5;
   //  alphaMask = clamp(alphaMask, 0.0, 0.9);
 
 
-    res.a = alphaMask * min(u_Time * 10, 1);
+    res.a = alphaMask * min(u_Time * 5, 1);
   //  float light = max(0.001, dot(normal.xyz, normalize(_SunPos.xyz)));
   //  light = pow(light, 150) * 3 * intensity; //intensity [0-1]
   //  light *= (1 - mask.z * colorMask); //in some big blood decals I use different channels for alpha/thin
@@ -158,9 +146,11 @@ if (abs(dFdy(z)) > _DepthDiffThreshold)
  
 
    // gAlbedo = res.rgba * 0.5 * (1 - res.a) + res.rgba * res.a;
- gAlbedo.rgb = mix(vec3(0.67, 0.67, 0.67), res.rgb * 1.45, res.a * projClipFade);
+   float magic = 0.67;
+ gAlbedo.rgb = mix(vec3(magic), res.rgb * 1.45, res.a * projClipFade);
  
- gAlbedo.a = 0;
+ gAlbedo *= 0.725;
+// gAlbedo.a = 0;
 
  //gAlbedo.rgb = vec3(1);
  //gAlbedo.a = 1;
@@ -170,8 +160,22 @@ if (abs(dFdy(z)) > _DepthDiffThreshold)
    // gAlbedo.rgb  = vec3(projClipFade, 0, 0);
     //gAlbedo = vec4(res.rgb * res.a, 1);
     //gNormal = normal.xyz;
-
+    
    gRMA = vec3(res.r * res.a * 0.35, 1, 0);
+   
+   gRMA.r =  clamp(gRMA.r, 0.1f, 0.9f);
+   gRMA.g =  clamp(gRMA.g, 0.1f, 0.9f);
+   gRMA.b =  clamp(gRMA.b, 0.1f, 0.9f);
+   gAlbedo.r =  clamp(gAlbedo.r, 0, 1);
+   gAlbedo.g =  clamp(gAlbedo.g, 0, 1);
+   gAlbedo.b =  clamp(gAlbedo.b, 0, 1);
+   //gRMA = vec3(res.r * res.a , 1, 0);
+ //  gRMA = vec3(0.38 , 1, 1);
 
     gBlood = vec3(1);
+
+    
+ //   vec4 truemask =  texture(Decal_mask, vec2(decalTexCoord.s, decalTexCoord.t));
+
+    //gAlbedo = truemask;
 }

@@ -7,6 +7,13 @@
 
 namespace HellEngine
 {
+	struct GunshotReport {
+		PhysicsObjectType hitType;
+		glm::vec3 hitLocation;
+		glm::vec3 rayDirection;
+
+	};
+
 	class WeaponLogic
 	{
 	public: // static functions
@@ -18,6 +25,8 @@ namespace HellEngine
 		static void SwitchToDesiredWeapon();
 		static glm::mat4 GetCameraMatrix();
 		static glm::vec3 GetBarrelHoleWorldPosition();
+
+		static GunshotReport FireBullet(Camera* camera, float variance, float force);
 
 	public: // static variables
 		static unsigned int s_SelectedWeapon;
@@ -36,6 +45,10 @@ namespace HellEngine
 		static AnimatedEntity m_shotgunAnimatedEntity;
 		static AnimatedEntity m_glockAnimatedEntiyty;
 
-		static std::vector<RaycastResult> s_BulletHits; // bullet hits this frame
+		static std::vector<GunshotReport> s_BulletHitsThisFrame; // bullet hits this frame
+
+		//static int s_numberOfBulletsThatHitEnemiesThisFrame;
+		//static int s_numberOfFollowThroughBulletsThatHitEnemiesThisFrame;
+
 	};
 }

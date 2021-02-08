@@ -522,7 +522,7 @@ namespace HellEngine
 			VolumetricBloodPassDecals(game, &s_BloodVolumetricShaderDecals);
 		}
 
-		DecalCompositePass(&s_DecalComposite);
+	//	DecalCompositePass(&s_DecalComposite);
 
 		{
 			GpuProfiler g("Volumetric Pass");
@@ -531,6 +531,8 @@ namespace HellEngine
 
 
 		RenderPlayerWeapon(game, &s_geometryShader);
+
+		RenderEnemies(game, &s_geometryShader);
 
 		{
 			GpuProfiler g("LightingPass");
@@ -946,7 +948,9 @@ namespace HellEngine
 			DrawPoint(&s_solidColorShader, vertex.Position, glm::vec3(1, 0, 1));
 		}
 */
-	//	DrawPoint(&s_solidColorShader, glm::vec3(0), glm::vec3(1, 1, 1));
+	
+		// DRAW POINT AT ZERO
+		//DrawPoint(&s_solidColorShader, glm::vec3(0), glm::vec3(1, 1, 1));
 
 		//glm::mat4 camMat = game->m_shotgunAnimatedEntity.GetCameraMatrix();
 		std::string text = "";// Util::Mat4ToString(camMat);
@@ -1272,8 +1276,8 @@ namespace HellEngine
 		for (int i = 0; i < game->s_volumetricBloodSplatters.size(); i++)
 		{
 			if (i == 0) {
-			//	game->s_volumetricBloodSplatters[0].m_transform.position = glm::vec3(0);
-			//	game->s_volumetricBloodSplatters[0].m_transform.rotation = glm::vec3(0);
+		//		game->s_volumetricBloodSplatters[0].m_transform.position = glm::vec3(0);
+		//		game->s_volumetricBloodSplatters[0].m_transform.rotation = glm::vec3(0);
 
 			}
 			game->s_volumetricBloodSplatters[i].Draw(shader);
@@ -1348,6 +1352,26 @@ namespace HellEngine
 		shader->setBool("blockoutDecals", false);
 
 		glDepthMask(GL_FALSE);
+	}
+
+	void Renderer::RenderEnemies(Game* game, Shader* shader)
+	{
+			glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+			glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+
+			unsigned int attachments[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,  GL_COLOR_ATTACHMENT7 };
+			glDrawBuffers(5, attachments);
+
+			glDepthMask(GL_TRUE);
+			glEnable(GL_DEPTH_TEST);
+			glDisable(GL_BLEND);
+
+			shader->use();
+			shader->setBool("blockoutDecals", true);
+			game->m_zombieGuy.Draw(shader, glm::mat4(1));
+			shader->setBool("blockoutDecals", false);
+
+			glDepthMask(GL_FALSE);
 	}
 
 	void Renderer::DecalCompositePass(Shader* shader)
@@ -2248,9 +2272,7 @@ namespace HellEngine
 
 		//if (!s_demo)
 
-		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("NumberGrid"));
-		//AssetManager::BindMaterial(AssetManager::GetMaterialIDByName("Shell"));
-			game->m_zombieGuy.Draw(shader, glm::mat4(1));
+	
 
 	//	s_debugString += "\nmodelTransform\n";
 	//	s_debugString += Util::Mat4ToString(game->m_zombieGuy.m_modelTransform.to_mat4());

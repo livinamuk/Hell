@@ -36,8 +36,16 @@ namespace HellEngine
 
 	ExrTexture AssetManager::s_ExrTexture_pos;
 	ExrTexture AssetManager::s_ExrTexture_norm;
+	ExrTexture AssetManager::s_ExrTexture_pos4;
+	ExrTexture AssetManager::s_ExrTexture_norm4;
+	ExrTexture AssetManager::s_ExrTexture_pos6;
+	ExrTexture AssetManager::s_ExrTexture_norm6;
 	ExrTexture AssetManager::s_ExrTexture_pos7;
 	ExrTexture AssetManager::s_ExrTexture_norm7;
+	ExrTexture AssetManager::s_ExrTexture_pos8;
+	ExrTexture AssetManager::s_ExrTexture_norm8;
+	ExrTexture AssetManager::s_ExrTexture_pos9;
+	ExrTexture AssetManager::s_ExrTexture_norm9;
 
 	bool AssetManager::s_loadingComplete = false;
 	std::string AssetManager::s_loadLog = "WELCOME TO HELL\nLoadng please wait...\n";
@@ -46,8 +54,16 @@ namespace HellEngine
 	{
 		s_ExrTexture_pos = ExrTexture("res/textures/blood_pos.exr");
 		s_ExrTexture_norm = ExrTexture("res/textures/blood_norm.exr");
+		s_ExrTexture_pos4 = ExrTexture("res/textures/blood_pos4.exr");
+		s_ExrTexture_norm4 = ExrTexture("res/textures/blood_norm4.exr");
+		s_ExrTexture_pos6 = ExrTexture("res/textures/blood_pos6.exr");
+		s_ExrTexture_norm6 = ExrTexture("res/textures/blood_norm6.exr");
 		s_ExrTexture_pos7 = ExrTexture("res/textures/blood_pos7.exr");
 		s_ExrTexture_norm7 = ExrTexture("res/textures/blood_norm7.exr");
+		s_ExrTexture_pos8 = ExrTexture("res/textures/blood_pos8.exr");
+		s_ExrTexture_norm8 = ExrTexture("res/textures/blood_norm8.exr");
+		s_ExrTexture_pos9 = ExrTexture("res/textures/blood_pos9.exr");
+		s_ExrTexture_norm9 = ExrTexture("res/textures/blood_norm9.exr");
 
 		// Find all textures
 		std::string path = "res/textures/";
@@ -139,7 +155,11 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Window.obj"));
 		models.emplace_back(Model("res/models/WindowGlass.obj"));
 		models.emplace_back(Model("res/models/blood_mesh.obj"));
+		models.emplace_back(Model("res/models/blood_mesh4.obj"));
+		models.emplace_back(Model("res/models/blood_mesh6.obj"));
 		models.emplace_back(Model("res/models/blood_mesh7.obj"));
+		models.emplace_back(Model("res/models/blood_mesh8.obj"));
+		models.emplace_back(Model("res/models/blood_mesh9.obj"));
 		//models.emplace_back(Model("res/models/Glock.obj"));
 		//models.emplace_back(Model("res/models/Glass.obj"));
 

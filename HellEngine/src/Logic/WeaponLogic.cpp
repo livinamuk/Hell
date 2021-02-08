@@ -18,10 +18,12 @@ namespace HellEngine
 	ReloadState WeaponLogic::p_reloadState;
 	int WeaponLogic::m_AmmoInGun = 8;
 	int WeaponLogic::m_AmmoAvaliable = 1000;
-	std::vector<RaycastResult> WeaponLogic::s_BulletHits;
+	std::vector<GunshotReport> WeaponLogic::s_BulletHitsThisFrame;
 	Transform WeaponLogic::s_weaponTransform; 
 	bool WeaponLogic::m_singleHanded = false;
-
+	//int WeaponLogic::s_numberOfBulletsThatHitEnemiesThisFrame = 0;
+	//int WeaponLogic::s_numberOfFollowThroughBulletsThatHitEnemiesThisFrame = 0;
+	
 	void WeaponLogic::Init()
 	{
 		// Setup Inventory
@@ -49,14 +51,16 @@ namespace HellEngine
 	
 	void WeaponLogic::Update(float deltaTime)
 	{
+		// This is used to stop spawning 12 splatters when you shoot a guy. Capped it at 4 or something...
+		//s_numberOfBulletsThatHitEnemiesThisFrame = 0;
+		//s_numberOfFollowThroughBulletsThatHitEnemiesThisFrame = 0;
+
 		// Don't do shit if the level editor is open
 		if (CoreImGui::s_Show)
 			return;
 
 		// not sure how but this seems to be running twice. LOOK INTO IT!!!
 
-		// clear any bullet hits from last frame
-		s_BulletHits.clear();
 
 		// Weapon select
 		if (Input::s_keyPressed[HELL_KEY_1] && s_WeaponList.size() > 0) {
@@ -96,6 +100,47 @@ namespace HellEngine
 			p_reloadState = ShotgunLogic::m_reloadState;
 			p_currentAnimatedEntity = &m_shotgunAnimatedEntity;
 		}
+
+
+		// CREATE VOLUMETRIC BLOOD SPLATTER
+		int numberOfBulletsThatHitEnemiesThisFrame = 0;
+		Camera* camera = GlockLogic::p_camera;
+
+		for (GunshotReport& gunShotReport : s_BulletHitsThisFrame)
+		{
+			if (numberOfBulletsThatHitEnemiesThisFrame < 5) {
+				glm::vec3 position = gunShotReport.hitLocation;
+				glm::vec3 rotation = camera->m_transform.rotation;
+				Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1))); 
+				numberOfBulletsThatHitEnemiesThisFrame++;
+			}
+		}
+
+		// Follow through blood splatters
+		int numberOfFollowThroughBulletsThatHitEnemiesThisFrame = 0;
+
+		for (GunshotReport& gunShotReport : s_BulletHitsThisFrame)
+		{
+			if (numberOfFollowThroughBulletsThatHitEnemiesThisFrame < 5) {
+				if (gunShotReport.hitType == PhysicsObjectType::RAGDOLL)
+				{
+					RaycastResult followThroughShotResult;
+					followThroughShotResult.CastRay(gunShotReport.hitLocation + (gunShotReport.rayDirection * glm::vec3(0.2f)), gunShotReport.rayDirection, 10.0f);
+
+					glm::vec3 position = followThroughShotResult.m_hitPoint;
+					glm::vec3 rotation = camera->m_transform.rotation;
+					Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1), true));
+					numberOfFollowThroughBulletsThatHitEnemiesThisFrame++;
+				}
+			}
+		}
+
+
+
+
+
+		// clear any bullet hits from last frame
+		s_BulletHitsThisFrame.clear();
 	}
 
 	void WeaponLogic::UpdateSkeletalAnimation(float deltatime)
@@ -162,5 +207,83 @@ namespace HellEngine
 
 		if (s_SelectedWeapon == WEAPON::SHOTGUN)
 			return ShotgunLogic::GetShotgunBarrelHoleWorldPosition();
+	}
+
+
+	GunshotReport WeaponLogic::FireBullet(Camera* camera, float variance, float force)
+	{
+		glm::vec3 rayOrigin = camera->m_viewPos;
+		glm::vec3 rayDirection = camera->m_Front;
+
+		// Variance
+		float offset = (variance * 0.5f) - Util::RandomFloat(0, variance);
+		rayDirection.x += offset;
+		offset = (variance * 0.5f) - Util::RandomFloat(0, variance);
+		rayDirection.y += offset;
+		offset = (variance * 0.5f) - Util::RandomFloat(0, variance);
+		rayDirection.z += offset;
+		rayDirection = glm::normalize(rayDirection);
+
+		RaycastResult raycastResult;
+		raycastResult.CastRay(rayOrigin, rayDirection, 10.0f);
+
+		// make bullet hole if it aint the ragdoll
+		if (raycastResult.m_objectType != PhysicsObjectType::RAGDOLL)
+		{
+			// Glass
+			if (raycastResult.m_objectType == PhysicsObjectType::GLASS) {
+				Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::GLASS));
+			}
+			// any other surface
+			else
+				Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::PLASTER));
+		}
+
+
+		// Apply force to Ragdoll 
+		if (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)
+		{
+			float FORCE_SCALING_FACTOR = force;// 5;// Config::TEST_FLOAT;
+			raycastResult.m_rigidBody->activate(true);
+			btVector3 centerOfMass = raycastResult.m_rigidBody->getCenterOfMassPosition();
+			btVector3 hitPoint = Util::glmVec3_to_btVec3(raycastResult.m_hitPoint);
+			btVector3 force = Util::glmVec3_to_btVec3(camera->m_Front) * FORCE_SCALING_FACTOR;
+			raycastResult.m_rigidBody->applyImpulse(force, hitPoint - centerOfMass);
+
+		}
+
+		// Ragdoll and couch bleeds
+	//	if (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL || raycastResult.m_objectType == PhysicsObjectType::MISC_MESH)
+		{
+
+			// CREATE VOLUMETRIC BLOOD SPLATTER
+			
+			//	glm::vec3 position = raycastResult.m_hitPoint;
+			//	glm::vec3 rotation = camera->m_transform.rotation;
+		//		Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1)));
+	
+			// If an enemy was hit, make another splatter,decal only, on the wall behind it
+			/*if (s_numberOfFollowThroughBulletsThatHitEnemiesThisFrame < 5) {
+				if (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)
+				{
+					RaycastResult followThroughShotResult;
+					followThroughShotResult.CastRay(raycastResult.m_hitPoint + (rayDirection * glm::vec3(0.2f)), rayDirection, 10.0f);
+
+					glm::vec3 position = followThroughShotResult.m_hitPoint;
+					glm::vec3 rotation = camera->m_transform.rotation;
+					Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1), true));
+					s_numberOfFollowThroughBulletsThatHitEnemiesThisFrame++;
+				}
+			}*/
+	}
+
+		GunshotReport gunshotReport;
+		gunshotReport.hitType = raycastResult.m_objectType;
+		gunshotReport.hitLocation = raycastResult.m_hitPoint;
+		gunshotReport.rayDirection = rayDirection;
+
+		WeaponLogic::s_BulletHitsThisFrame.emplace_back(gunshotReport);
+
+		return gunshotReport;
 	}
 }

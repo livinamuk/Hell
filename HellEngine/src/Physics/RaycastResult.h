@@ -10,7 +10,7 @@ namespace HellEngine
 	{
 	public: // methods
 		RaycastResult();
-		void CastRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength, float variance = 0);
+		void CastRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength);
 		static RaycastResult CastMouseRay(Camera* camera);
 
 	public: // members

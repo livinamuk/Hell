@@ -17,10 +17,11 @@ namespace HellEngine
 		Model* m_model;
 		glm::vec3 m_front;
 
-		int m_type = 1;
+		int m_type = 9;
+		bool m_renderDecalOnly;
 
 	public: // methods
-		VolumetricBloodSplatter(glm::vec3 position, glm::vec3 rotation, glm::vec3 front);
+		VolumetricBloodSplatter(glm::vec3 position, glm::vec3 rotation, glm::vec3 front, bool renderDecalOnly = false);
 		void Update(float deltaTime);
 		void Draw(Shader* shader); 
 		void DrawDecal(Shader* shader);

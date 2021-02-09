@@ -180,7 +180,7 @@ namespace HellEngine
 		transform.scale = glm::vec3(3, 5, 1.5f);;
 		transform.scale = glm::vec3(3, 5, 1.5f) * glm::vec3(0.75);
 
-		glm::mat4 modelMatrix = transform.to_mat4();// glm::translate(glm::mat4(1), transform.position);
+		
 		//glm::vec3 squareNormal = glm::vec3(0, 0, 1);
 
 		Transform decalOffset;
@@ -205,14 +205,10 @@ namespace HellEngine
 		//	decalOffset.position = glm::vec3(Config::TEST_FLOAT2, Config::TEST_FLOAT3, Config::TEST_FLOAT4);
 		//decalOffset.position = glm::vec3(Config::TEST_FLOAT2, Config::TEST_FLOAT3, Config::TEST_FLOAT4); //decalOffset.position = glm::vec3(-1.3200000525, 0, 0);
 
-		shader->setMat4("model", modelMatrix * decalOffset.to_mat4());
+		glm::mat4 modelMatrix = transform.to_mat4() * decalOffset.to_mat4();
+		shader->setMat4("model", modelMatrix);
+		shader->setMat4("inverseModel", glm::inverse(modelMatrix));
 
-
-
-	//	glActiveTexture(GL_TEXTURE2);
-	//	glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("Decal_norm"));
-	///	glActiveTexture(GL_TEXTURE3);
-	//	glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("Decal_mask"));
 
 
 		if (m_type == 7) {

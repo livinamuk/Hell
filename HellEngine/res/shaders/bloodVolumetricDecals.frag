@@ -18,6 +18,7 @@ layout (binding = 3) uniform sampler2D Decal_mask;
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
 uniform mat4 model;
+uniform mat4 inverseModel;
 uniform float screenWidth;
 uniform float screenHeight;
 uniform vec3 targetPlaneSurfaceNormal;
@@ -37,29 +38,25 @@ void main()
 {    
    // discard;
 
-
-
     // Get the Fragment Z position (from the depth buffer)
     vec2 depthCoords = gl_FragCoord.xy / vec2(screenWidth, screenHeight);
     float z = texture(depthTexture, vec2(depthCoords.s, depthCoords.t)).x * 2.0f - 1.0f;
     vec4 clipSpacePosition = vec4(vec2(depthCoords.s, depthCoords.t) * 2.0 - 1.0, z, 1.0);
     vec4 viewSpacePosition = inverseProjectionMatrix * clipSpacePosition;
 
-
     // Get the Fragment XYZ position (perspective division, via it's depth value)
     viewSpacePosition /= viewSpacePosition.w;
     vec4 worldSpacePosition = inverseViewMatrix * viewSpacePosition;
     vec3 WorldPos = worldSpacePosition.xyz;
-	
-	
+
     // Don't draw on ceiling
 	if (WorldPos.y > 2.39)
 		discard;
 
 
-	vec4 objectPosition = inverse(model) * vec4(WorldPos, 1.0);
+	vec4 objectPosition = inverseModel  * vec4(WorldPos, 1.0);
 
-       vec3 stepVal = (vec3(0.5, 0.5, 0.5) - abs(objectPosition.xyz)) * 1000;
+    vec3 stepVal = (vec3(0.5, 0.5, 0.5) - abs(objectPosition.xyz)) * 1000;
     stepVal.x = saturate(stepVal.x);
     stepVal.y = saturate(stepVal.y);
     stepVal.z = saturate(stepVal.z);
@@ -80,19 +77,6 @@ void main()
 	// Add 0.5 to get texture coordinates.
 	vec2 decalTexCoord = vec2(objectPosition.x, objectPosition.z) + 0.5;
 
-
-    float _DepthDiffThreshold = 0.1;
-    vec2 dd_x = dFdx(decalTexCoord);
-    vec2 dd_y = dFdy(decalTexCoord);
-
-  //  float depth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, screenUV));
-//float2 dd_x = ddx(lightMapUV);
-if (abs(dFdx(z)) > _DepthDiffThreshold)
-  dd_x = vec2(0,0);
-
-//float2 dd_y = ddy(lightMapUV);
-if (abs(dFdy(z)) > _DepthDiffThreshold)
-  dd_y = vec2(0,0);
 
 
 

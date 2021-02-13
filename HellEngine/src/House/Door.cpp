@@ -108,8 +108,13 @@ namespace HellEngine
 		modelID = AssetManager::GetModelIDByName("Door");
 
 
+		shader->setBool("blockoutDecals", true);
 		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("Door"));
 		AssetManager::DrawModel(modelID, shader, GetDoorModelMatrixFromPhysicsEngine());
+		shader->setBool("blockoutDecals", false);
+
+
+
 	//	AssetManager::DrawModel(AssetManager::GetModelIDByName("DoorVolumeA"), shader, GetDoorModelMatrixFromPhysicsEngine());
 
 		//AssetManager::DrawModel(AssetManager::s_ModelID_Door, shader, GetDoorModelMatrixFromPhysicsEngine());

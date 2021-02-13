@@ -522,6 +522,9 @@ namespace HellEngine
 			VolumetricBloodPassDecals(game, &s_BloodVolumetricShaderDecals);
 		}
 
+
+		RenderProjectiles(&s_geometryShader);
+
 	//	DecalCompositePass(&s_DecalComposite);
 
 		{
@@ -532,7 +535,8 @@ namespace HellEngine
 
 		RenderPlayerWeapon(game, &s_geometryShader);
 
-		RenderEnemies(game, &s_geometryShader);
+		//RenderEnemies(game, &s_geometryShader);
+		//ReRenderDoors(&s_geometryShader);
 
 		{
 			GpuProfiler g("LightingPass");
@@ -591,8 +595,8 @@ namespace HellEngine
 				//RenderFinalImage(&s_quadShader, s_FinalImageBuffer.TexID);
 				RenderFinalImage(&s_quadShader, s_ChromaticAbberationBuffer.TexID);
 			else
-				//RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gBloodDecals);
-				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_compositeBuffer.gAlbedoDecalComposite, s_gBuffer.gRMA, s_gBuffer.gBloodDecals);
+				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
+				//RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_compositeBuffer.gAlbedoDecalComposite, s_gBuffer.gRMA, s_gBuffer.gBloodDecals);
 			//RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_compositeBuffer.gAlbedoDecalComposite, s_gBuffer.gRMA, s_compositeBuffer.gRMADecalComposite);
 			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, GameData::p_house->m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
 		//		RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gGlassBlur, s_gBuffer.gFinalLighting);		
@@ -1300,14 +1304,14 @@ namespace HellEngine
 		
 		// clear to specified color:
 
-		static const float white[] = { 1.0, 1.0, 1.0, 1.0 };
-		glClearTexImage(s_gBuffer.gBloodDecals, 0, GL_RGBA, GL_FLOAT, white);
+		//static const float white[] = { 1.0, 1.0, 1.0, 1.0 };
+		//glClearTexImage(s_gBuffer.gBloodDecals, 0, GL_RGBA, GL_FLOAT, white);
 		
 		//unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT7 };
 		//glDrawBuffers(4, attachments);
 
-		unsigned int attachments[8] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6, GL_COLOR_ATTACHMENT7 };
-		glDrawBuffers(8, attachments);
+		unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT2};
+		glDrawBuffers(2, attachments);
 
 		glDepthMask(GL_FALSE);
 
@@ -1315,6 +1319,9 @@ namespace HellEngine
 		glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
 		glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
 		glBlendEquation(GL_FUNC_ADD);
+		glEnablei(GL_BLEND, 1);
+		glBlendFunci(1, GL_DST_COLOR, GL_SRC_COLOR);
+		glDisablei(GL_BLEND, 1);
 
 		//glDisable(GL_BLEND);
 		//	
@@ -1354,7 +1361,7 @@ namespace HellEngine
 		glDepthMask(GL_FALSE);
 	}
 
-	void Renderer::RenderEnemies(Game* game, Shader* shader)
+	/*void Renderer::RenderEnemies(Game* game, Shader* shader)
 	{
 			glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
 			glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
@@ -1372,9 +1379,9 @@ namespace HellEngine
 			shader->setBool("blockoutDecals", false);
 
 			glDepthMask(GL_FALSE);
-	}
+	}*/
 
-	void Renderer::DecalCompositePass(Shader* shader)
+	/*void Renderer::DecalCompositePass(Shader* shader)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, s_compositeBuffer.ID);
 
@@ -1421,6 +1428,27 @@ namespace HellEngine
 
 
 	}
+	*/
+	void Renderer::RenderProjectiles(Shader* shader)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+		glDrawBuffers(4, attachments);
+		glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_TRUE);
+		shader->use();
+		Shell::DrawInstanced(shader, Shell::s_shotgunShells);
+		Shell::DrawInstanced(shader, Shell::s_bulletCasings);
+		glDepthMask(GL_FALSE);
+	}
+
+	/*void Renderer::ReRenderDoors(Shader* shader)
+	{
+		// Re-render the doors over the top of decals.
+		for (Door& door : GameData::p_house->m_doors)
+			door.Draw(shader);
+	}*/
 
 	void Renderer::DecalPass(Game* game, Shader* shader)
 	{
@@ -2174,11 +2202,19 @@ namespace HellEngine
 		// walls, floors, ceilings, doors, staircases.
 		GameData::p_house->Draw(shader, envMapPass);
 		
-		// Projectiles
-		Shell::DrawInstanced(shader, Shell::s_shotgunShells);
-		Shell::DrawInstanced(shader, Shell::s_bulletCasings);
+		// THIS IS ALL SHIT YOU DON'T WANT DECALS DRAWN OVER. BECAUSE IT MOVES.
+		{
+			shader->setBool("blockoutDecals", true);
 
+			// Enemies
+			game->m_zombieGuy.Draw(shader, glm::mat4(1));
+			
+			// Doors
+			for (Door& door : GameData::p_house->m_doors)
+					door.Draw(shader);
 
+			shader->setBool("blockoutDecals", false);
+		}
 	
 		////////////////
 		// ZOMBIE BOY //

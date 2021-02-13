@@ -105,6 +105,11 @@ namespace HellEngine
 			ShowOtherMenu(game);
 			ImGui::EndTabItem();
 		}
+
+		if (ImGui::BeginTabItem("Volumetric Blood")) {
+			VolumetricBloodMenu(game);
+			ImGui::EndTabItem();
+		}
 		
 		ImGui::EndTabBar();
 	
@@ -544,6 +549,77 @@ namespace HellEngine
 			ImGui::InputFloat3("Rotation", glm::value_ptr(entity->m_transform.rotation));
 			ImGui::InputFloat3("Scale   ", glm::value_ptr(entity->m_transform.scale));
 		}
+	}
+
+	void CoreImGui::VolumetricBloodMenu(Game* game)
+	{
+		/*static int selected = -1;
+
+		// Properties
+		ImGui::Text("gAlbedo Blending");
+
+		if (selected != -1)
+		{
+			Entity* entity = &GameData::p_house->m_entities[selected];
+			ImGui::InputText("Tag", entity->m_tag, 64);
+
+			// Build models list
+			std::vector<std::string> modelList;
+			for (Model& model : AssetManager::models)
+				modelList.push_back(model.name);
+
+			// Build materials list
+			std::vector<std::string> materialList;
+			for (Material& material : AssetManager::materials)
+				materialList.push_back(material.name);
+
+			std::vector<std::string> gAlbedoSource;
+			gAlbedoSource.push_back()
+
+			//for (int i = 0; i < GameData::p_house->m_entities.size(); i++)
+			//	blendingModes.push_back(AssetManager::GetModelNameByID(GameData::p_house->m_entities[i].m_materialID));
+
+			std::vector<std::string> currentMaterialName;
+			for (int i = 0; i < GameData::p_house->m_entities.size(); i++)
+				currentMaterialName.push_back(AssetManager::GetMaterialNameByID(GameData::p_house->m_entities[i].m_materialID));
+
+			// Show models list
+			if (ImGui::BeginCombo("Model", blendingModes[selected].c_str()))
+			{
+				for (int n = 0; n < modelList.size(); n++)
+				{
+					bool is_selected = (blendingModes[selected] == modelList[n]);
+					if (ImGui::Selectable(modelList[n].c_str(), is_selected)) {
+						entity->SetModelID(AssetManager::GetModelIDByName(modelList[n]));
+					}
+					if (is_selected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+
+			// Show materials list
+			if (ImGui::BeginCombo("Material", currentMaterialName[selected].c_str()))
+			{
+				for (int n = 0; n < materialList.size(); n++)
+				{
+					bool is_selected = (currentMaterialName[selected] == materialList[n]);
+					if (ImGui::Selectable(materialList[n].c_str(), is_selected)) {
+						entity->m_materialID = AssetManager::GetMaterialIDByName(materialList[n]);
+					}
+					if (is_selected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+
+
+
+			ImGui::PushItemWidth(200);
+			ImGui::InputFloat3("Position", glm::value_ptr(entity->m_transform.position));
+			ImGui::InputFloat3("Rotation", glm::value_ptr(entity->m_transform.rotation));
+			ImGui::InputFloat3("Scale   ", glm::value_ptr(entity->m_transform.scale));
+		}*/
 	}
 
 	void CoreImGui::ShowPlayerMenu(Game* game)

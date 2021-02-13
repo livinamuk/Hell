@@ -1,12 +1,9 @@
 #version 420 core
 
 layout (location = 0) out vec4 gAlbedo;
-layout (location = 1) out vec3 gNormal;
+layout (location = 1) out vec4 gNormal;
 layout (location = 2) out vec3 gRMA;
-layout (location = 3) out vec3 gbuffer4;
-//layout (location = 4) out vec4 gBlood;
-
-
+layout (location = 3) out vec3 gEmissive;
 
 layout (binding = 0) uniform sampler2D ALB_Texture0;
 layout (binding = 1) uniform sampler2D NRM_Texture0;
@@ -110,12 +107,12 @@ void main()
 	mat3 tbn = mat3(normalize(attrTangent), normalize(attrBiTangent), normalize(attrNormal));
 
 	vec3 normal = normalize(tbn * (texture(NRM_Texture0, finalTexCoords).rgb * 2.0 - 1.0));
-	gNormal = normal ;//* 0.5 + 0.5;
+	gNormal.rgb = normal ;//* 0.5 + 0.5;
 
 	
 
 	gAlbedo = ALB + vec4(ColorAdd, 0);
-	gRMA = RMA.rgb;
+	gRMA.rgb = RMA.rgb;
 	
 	if (useRoughnessMetallicUniforms) {
 		gRMA.r = roughnessUniform;
@@ -123,16 +120,12 @@ void main()
 		gRMA.b = 1;
 	}
 
-//	gAlbedo = vec4(1);
-
-  //  gRMA = vec3(0.1, 0.9, 1);
-
 	// Has emissive map
 	if (hasEmissive) {
-		gbuffer4 = texture(EMMISIVE_Texture, finalTexCoords).r * emissiveColor;
+		gEmissive = texture(EMMISIVE_Texture, finalTexCoords).r * emissiveColor;
 	}
 	else
-		gbuffer4 = vec3(0, 0, 0);
+		gEmissive = vec3(0, 0, 0);
 
 	//	gAlbedo.rgb = vec3(gAlbedo.a);
 	//gAlbedo.a = 1;
@@ -146,4 +139,15 @@ void main()
 
 //	gBlood = vec4(0, 1, 0, 1);
 	//gAlbedo = vec4(0.5);
+	
+	//if (blockoutDecals)
+	//	gNormal.a = 1;
+
+	//if (blockoutDecals)
+	//	gNormal.rgb = vec3(1);
+	//	else
+	//	gNormal.rgb = vec3(0);
+
+		//gNormal.rgb = vec3(blockoutDecals);  
+
 }

@@ -39,9 +39,10 @@ namespace HellEngine
 		model->DrawMesh(shader, 2, trans.to_mat4());
 		model->DrawMesh(shader, 4, trans.to_mat4());
 		//	glEnable(GL_CULL_FACE);
-
+		                                              
 		for (Room& room : m_rooms)
 			room.Draw(shader);
+
 
 		for (Door& door : m_doors)
 			door.Draw(shader);

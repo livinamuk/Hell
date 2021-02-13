@@ -84,31 +84,8 @@ namespace HellEngine
 
 
 
-			GunshotReport gunshotReport = WeaponLogic::FireBullet(p_camera, 0.05f, 22);
-
-			if (gunshotReport.hitType == PhysicsObjectType::RAGDOLL) {
-				int RandomAudio = rand() % 8;
-				if (RandomAudio == 0)
-					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_01.wav");
-				if (RandomAudio == 1)
-					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_02.wav");
-				if (RandomAudio == 2)
-					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_03.wav");
-				if (RandomAudio == 3)
-					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_04.wav");
-				if (RandomAudio == 4)
-					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_05.wav");
-				if (RandomAudio == 5)
-					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_06.wav");
-				if (RandomAudio == 6)
-					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_07.wav");
-				if (RandomAudio == 7)
-					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_08.wav");
-			}
-			if (gunshotReport.hitType == PhysicsObjectType::GLASS)
-			{
-				Audio::PlayAudio("GlassImpact.wav", 1.75f);
-			}
+			WeaponLogic::FireBullet(p_camera->m_viewPos, p_camera->m_Front, 0.05f, 22, WEAPON::GLOCK);
+				
 
 			
 			SpawnBulletCasing();

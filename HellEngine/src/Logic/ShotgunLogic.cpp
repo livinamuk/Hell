@@ -69,28 +69,9 @@ namespace HellEngine
 
 		//	Renderer::s_muzzleFlash.m_CurrentTime = 0;
 
-			int counter = 0;
-
-			bool playFleshSound = false;
-			bool playGlassSound = false;
-
 			// Fire 12 shots
 			for (int i = 0; i < 12; i++) 
-			{
-				GunshotReport gunshotReport = WeaponLogic::FireBullet(p_camera, 0.125f, 4);
-
-				if (gunshotReport.hitType == PhysicsObjectType::RAGDOLL)
-					playFleshSound = true;
-
-				if (gunshotReport.hitType == PhysicsObjectType::GLASS)
-					playGlassSound = true;
-			}
-
-			// Audio
-			if (playFleshSound)
-				Audio::PlayAudio("FLY_Head_Explode_01.wav", 0.75f);
-			if (playGlassSound)
-				Audio::PlayAudio("GlassImpact.wav", 1.75f);
+				WeaponLogic::FireBullet(p_camera->m_viewPos, p_camera->m_Front, 0.125f, 4, WEAPON::SHOTGUN);	
 		}
 	}
 

@@ -101,14 +101,27 @@ namespace HellEngine
 			p_currentAnimatedEntity = &m_shotgunAnimatedEntity;
 		}
 
+		Camera* camera = GlockLogic::p_camera;
+
+		// IS IT GLASS? DO A FOLLOW THROUGH
+		/*for (GunshotReport& gunShotReport : s_BulletHitsThisFrame)
+		{
+			if (gunShotReport.hitType == PhysicsObjectType::GLASS)
+				{
+					RaycastResult followThroughShotResult;
+					followThroughShotResult.CastRay(gunShotReport.hitLocation + (gunShotReport.rayDirection * glm::vec3(0.2f)), gunShotReport.rayDirection, 10.0f);
+					glm::vec3 position = followThroughShotResult.m_hitPoint;
+					glm::vec3 rotation = camera->m_transform.rotation;
+					Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1), true));
+				}
+		}*/
+
 
 		// CREATE VOLUMETRIC BLOOD SPLATTER
 		int numberOfBulletsThatHitEnemiesThisFrame = 0;
-		Camera* camera = GlockLogic::p_camera;
-
 		for (GunshotReport& gunShotReport : s_BulletHitsThisFrame)
 		{
-			if (numberOfBulletsThatHitEnemiesThisFrame < 5) {
+			if (numberOfBulletsThatHitEnemiesThisFrame < 5 && gunShotReport.hitType == PhysicsObjectType::RAGDOLL) {
 				glm::vec3 position = gunShotReport.hitLocation;
 				glm::vec3 rotation = camera->m_transform.rotation;
 				Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1))); 
@@ -118,7 +131,6 @@ namespace HellEngine
 
 		// Follow through blood splatters
 		int numberOfFollowThroughBulletsThatHitEnemiesThisFrame = 0;
-
 		for (GunshotReport& gunShotReport : s_BulletHitsThisFrame)
 		{
 			if (numberOfFollowThroughBulletsThatHitEnemiesThisFrame < 5) {
@@ -136,6 +148,45 @@ namespace HellEngine
 		}
 
 
+		// Process audio
+		bool playShotgunSplatSound = false;
+		bool playGlassSound = false;
+
+		for (GunshotReport& gunshotReport : s_BulletHitsThisFrame)
+		{
+			if (gunshotReport.hitType == PhysicsObjectType::GLASS)
+				playGlassSound = true;
+
+			if (gunshotReport.hitType == PhysicsObjectType::RAGDOLL && gunshotReport.weaponType == WEAPON::SHOTGUN)
+				playShotgunSplatSound = true;
+
+			// Glock flesh
+			if (gunshotReport.hitType == PhysicsObjectType::RAGDOLL) {
+				int RandomAudio = rand() % 8;
+				if (RandomAudio == 0)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_01.wav");
+				if (RandomAudio == 1)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_02.wav");
+				if (RandomAudio == 2)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_03.wav");
+				if (RandomAudio == 3)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_04.wav");
+				if (RandomAudio == 4)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_05.wav");
+				if (RandomAudio == 5)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_06.wav");
+				if (RandomAudio == 6)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_07.wav");
+				if (RandomAudio == 7)
+					Audio::PlayAudio("FLY_Bullet_Impact_Flesh_08.wav");
+			}
+		}
+
+		// Audio
+		if (playShotgunSplatSound)
+			Audio::PlayAudio("FLY_Head_Explode_01.wav", 0.75f);
+		if (playGlassSound)
+			Audio::PlayAudio("GlassImpact.wav", 1.75f);
 
 
 
@@ -210,10 +261,11 @@ namespace HellEngine
 	}
 
 
-	GunshotReport WeaponLogic::FireBullet(Camera* camera, float variance, float force)
+	//GunshotReport WeaponLogic::FireBullet(Camera* camera, float variance, float force)
+	void WeaponLogic::FireBullet(glm::vec3 rayOrigin, glm::vec3 rayDirection, float variance, float force, WEAPON weaponType)
 	{
-		glm::vec3 rayOrigin = camera->m_viewPos;
-		glm::vec3 rayDirection = camera->m_Front;
+	//	glm::vec3 rayOrigin = camera->m_viewPos;
+	//	glm::vec3 rayDirection = camera->m_Front;
 
 		// Variance
 		float offset = (variance * 0.5f) - Util::RandomFloat(0, variance);
@@ -227,18 +279,28 @@ namespace HellEngine
 		RaycastResult raycastResult;
 		raycastResult.CastRay(rayOrigin, rayDirection, 10.0f);
 
+		 
+
 		// make bullet hole if it aint the ragdoll
 		if (raycastResult.m_objectType != PhysicsObjectType::RAGDOLL)
 		{
 			// Glass
 			if (raycastResult.m_objectType == PhysicsObjectType::GLASS) {
 				Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::GLASS));
+				// spawn a follow through shot
+				glm::vec3 spawnPoint = raycastResult.m_hitPoint + (rayDirection * glm::vec3(0.2));
+				FireBullet(spawnPoint, rayDirection, variance, force, weaponType);
 			}
 			// any other surface
 			else
 				Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::PLASTER));
 		}
 
+
+		// Glass bullet goes through
+		if (raycastResult.m_objectType == PhysicsObjectType::GLASS) {
+			Decal::s_decals.push_back(Decal(raycastResult.m_hitPoint, raycastResult.m_surfaceNormal, DecalType::GLASS));
+		}
 
 		// Apply force to Ragdoll 
 		if (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)
@@ -247,43 +309,17 @@ namespace HellEngine
 			raycastResult.m_rigidBody->activate(true);
 			btVector3 centerOfMass = raycastResult.m_rigidBody->getCenterOfMassPosition();
 			btVector3 hitPoint = Util::glmVec3_to_btVec3(raycastResult.m_hitPoint);
-			btVector3 force = Util::glmVec3_to_btVec3(camera->m_Front) * FORCE_SCALING_FACTOR;
+			btVector3 force = Util::glmVec3_to_btVec3(rayDirection) * FORCE_SCALING_FACTOR;
 			raycastResult.m_rigidBody->applyImpulse(force, hitPoint - centerOfMass);
 
 		}
-
-		// Ragdoll and couch bleeds
-	//	if (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL || raycastResult.m_objectType == PhysicsObjectType::MISC_MESH)
-		{
-
-			// CREATE VOLUMETRIC BLOOD SPLATTER
-			
-			//	glm::vec3 position = raycastResult.m_hitPoint;
-			//	glm::vec3 rotation = camera->m_transform.rotation;
-		//		Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1)));
-	
-			// If an enemy was hit, make another splatter,decal only, on the wall behind it
-			/*if (s_numberOfFollowThroughBulletsThatHitEnemiesThisFrame < 5) {
-				if (raycastResult.m_objectType == PhysicsObjectType::RAGDOLL)
-				{
-					RaycastResult followThroughShotResult;
-					followThroughShotResult.CastRay(raycastResult.m_hitPoint + (rayDirection * glm::vec3(0.2f)), rayDirection, 10.0f);
-
-					glm::vec3 position = followThroughShotResult.m_hitPoint;
-					glm::vec3 rotation = camera->m_transform.rotation;
-					Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1), true));
-					s_numberOfFollowThroughBulletsThatHitEnemiesThisFrame++;
-				}
-			}*/
-	}
 
 		GunshotReport gunshotReport;
 		gunshotReport.hitType = raycastResult.m_objectType;
 		gunshotReport.hitLocation = raycastResult.m_hitPoint;
 		gunshotReport.rayDirection = rayDirection;
+		gunshotReport.weaponType = weaponType;
 
 		WeaponLogic::s_BulletHitsThisFrame.emplace_back(gunshotReport);
-
-		return gunshotReport;
 	}
 }

@@ -20,7 +20,8 @@ namespace HellEngine
 		static void ShowOtherMenu(Game* game);
 		static void ShowPlayerMenu(Game* game);
 		static void ShowShaderMenu(Game* game);
-		static void ShowSceneMenu(Game* game);
+		static void ShowSceneMenu(Game* game); 
+		static void VolumetricBloodMenu(Game* game);
 
 	public: // static variables
 		static bool s_Show;

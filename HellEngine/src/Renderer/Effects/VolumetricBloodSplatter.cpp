@@ -161,6 +161,73 @@ namespace HellEngine
 
 	void VolumetricBloodSplatter::DrawDecal(Shader* shader)
 	{
+		/////////////////////////
+		// MOVED TO INSTANCING //
+
+		// No shells? Then get outta here.
+		/*if (.size())
+			return;
+
+		GpuProfiler g("Shell");
+		static int Shell_ModelID = AssetManager::GetModelIDByName("Shell");
+		static int Shell_MaterialID = AssetManager::GetMaterialIDByName("Shell");
+		static int BulletCasing_ModelID = AssetManager::GetModelIDByName("BulletCasing");
+		static int BulletCasing_MaterialID = AssetManager::GetMaterialIDByName("BulletCasing");
+
+		std::vector<glm::mat4> modelMatrixVector;
+
+		for (Shell& shell : shells)
+		{
+			// If the projectile is still being simulated by the physics world then retrieve it's updated model matrix.
+			if (shell.m_rigidBody != nullptr)
+				shell.m_modelMatrix = Physics::GetModelMatrixFromRigidBody(shell.m_rigidBody);
+
+			glm::mat4 scaleMatrix = glm::scale(glm::mat4(1), glm::vec3(shell.m_shellScale));
+			modelMatrixVector.push_back(shell.m_modelMatrix * scaleMatrix);
+		}
+
+		// Check the projectile type.
+		int modelID, materialID;
+		if (shells[0].m_casingType == CasingType::BULLET_CASING) {
+			modelID = BulletCasing_ModelID;
+			materialID = BulletCasing_MaterialID;
+		}
+		if (shells[0].m_casingType == CasingType::SHOTGUN_SHELL) {
+			modelID = Shell_ModelID;
+			materialID = Shell_MaterialID;
+		}
+		AssetManager::BindMaterial_0(materialID);
+
+		//setup vertex buffers and vertex array for model matrices
+		// vertex buffer object -- should this be created every time?! very stupid question i think .. it keeps slowing the fps down!
+		glBindBuffer(GL_ARRAY_BUFFER, buffer);
+		glBufferData(GL_ARRAY_BUFFER, shells.size() * sizeof(glm::mat4), &modelMatrixVector[0], GL_STATIC_DRAW);
+
+		unsigned int VAO = AssetManager::models[modelID].m_meshes[0]->VAO;
+		glBindVertexArray(VAO);
+		// vertex attributes
+		std::size_t vec4Size = sizeof(glm::vec4);
+		glEnableVertexAttribArray(8);
+		glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+		glEnableVertexAttribArray(9);
+		glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+		glEnableVertexAttribArray(10);
+		glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+		glEnableVertexAttribArray(11);
+		glVertexAttribPointer(11, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+		glVertexAttribDivisor(8, 1);
+		glVertexAttribDivisor(9, 1);
+		glVertexAttribDivisor(10, 1);
+		glVertexAttribDivisor(11, 1);
+
+		//draw
+		glUniform1i(glGetUniformLocation(shader->ID, "instanced"), 1);
+		glBindVertexArray(AssetManager::models[modelID].m_meshes[0]->VAO);
+		glDrawElementsInstanced(GL_TRIANGLES, AssetManager::models[modelID].m_meshes[0]->indices.size(), GL_UNSIGNED_INT, 0, shells.size());
+		glUniform1i(glGetUniformLocation(shader->ID, "instanced"), 0);
+
+		*/
+
 		shader->setFloat("u_Time", this->m_CurrentTime);
 		shader->setVec3("_DecalForwardDirection", this->m_front);
 

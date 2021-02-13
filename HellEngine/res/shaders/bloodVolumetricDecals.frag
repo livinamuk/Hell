@@ -2,9 +2,7 @@
 #extension GL_ARB_shader_texture_lod : require
 
 layout (location = 0) out vec4 gAlbedo;
-layout (location = 1) out vec3 gNormal;
-layout (location = 2) out vec3 gRMA;
-layout (location = 7) out vec3 gBlood;
+layout (location = 1) out vec3 gRMA;
 
 layout (binding = 0) uniform sampler2D depthTexture;
 layout (binding = 1) uniform sampler2D normalTexture;
@@ -36,15 +34,29 @@ float saturate(float value)
 
 void main()
 {    
-   // discard;
+    // Get the screen coordinates
+    vec2 screenCoords = gl_FragCoord.xy / vec2(screenWidth, screenHeight);
 
-    // Get the Fragment Z position (from the depth buffer)
-    vec2 depthCoords = gl_FragCoord.xy / vec2(screenWidth, screenHeight);
-    float z = texture(depthTexture, vec2(depthCoords.s, depthCoords.t)).x * 2.0f - 1.0f;
-    vec4 clipSpacePosition = vec4(vec2(depthCoords.s, depthCoords.t) * 2.0 - 1.0, z, 1.0);
+    // Discard if the pixel is in the blockout map 
+    float blockout = texture(normalTexture, screenCoords).a;
+    if (blockout > 0.5)
+        discard;
+
+    // world normal
+    vec3 worldNormal = texture(normalTexture, screenCoords).rgb;
+    float angleToFloor = abs(dot(worldNormal, vec3(0, 1, 0)));
+    float angle = dot(worldNormal, _DecalForwardDirection);  
+    if(abs(angle) < 0.125 && angleToFloor < 0.5) 
+        discard;
+
+    // Backstab test. If world normal is facing away from original bullet angle.
+    if (angle < -0.5)
+        discard;
+
+    // Calculate the fragment's world position
+    float z = texture(depthTexture, vec2(screenCoords)).x * 2.0f - 1.0f;
+    vec4 clipSpacePosition = vec4(screenCoords * 2.0 - 1.0, z, 1.0);
     vec4 viewSpacePosition = inverseProjectionMatrix * clipSpacePosition;
-
-    // Get the Fragment XYZ position (perspective division, via it's depth value)
     viewSpacePosition /= viewSpacePosition.w;
     vec4 worldSpacePosition = inverseViewMatrix * viewSpacePosition;
     vec3 WorldPos = worldSpacePosition.xyz;
@@ -60,24 +72,11 @@ void main()
     stepVal.x = saturate(stepVal.x);
     stepVal.y = saturate(stepVal.y);
     stepVal.z = saturate(stepVal.z);
-	//half lookupHeight = tex2D(_LookupFade, float2(decalSpaceScenePos.y + 0.5, 0));
 	float projClipFade = stepVal.x * stepVal.y * stepVal.z;
     
-  ////  if (abs(objectPosition.x) > 0.5)
-  //      discard;
-  //  if (abs(objectPosition.y) > 0.5)
-  //      discard;
-
-  
-
-
-
-   vec3 worldNormal = texture(normalTexture, vec2(depthCoords.s, depthCoords.t)).rgb;
-
+ 
 	// Add 0.5 to get texture coordinates.
 	vec2 decalTexCoord = vec2(objectPosition.x, objectPosition.z) + 0.5;
-
-
 
 
     vec4 color = texture(Decal_mask, decalTexCoord);
@@ -87,7 +86,7 @@ void main()
     vec3 mask =  texture(Decal_mask, vec2(decalTexCoord.s, decalTexCoord.t)).rgb;
   
     vec4 res = vec4(0); 
-    res.a = saturate(normal.a * 2);
+    res.a = saturate(texture(Decal_mask, vec2(decalTexCoord.s, decalTexCoord.t)).a * 2);
     res.a *= projClipFade;
     if (res.a < 0.2) 
        discard; //a little optimization
@@ -95,8 +94,6 @@ void main()
 
        float floorAnge = abs(dot(worldNormal, vec3(0, 1, 0)));
 
-    float angle = abs(dot(worldNormal, _DecalForwardDirection));
-         if(angle < 0.25 && floorAnge < 0.5) discard;
 
     normal.xy = normal.xy* 2 - 1;
     normal.xyz = normalize(vec3(normal.x, 1, normal.y));
@@ -154,9 +151,8 @@ void main()
    gAlbedo.g =  clamp(gAlbedo.g, 0, 1);
    gAlbedo.b =  clamp(gAlbedo.b, 0, 1);
    //gRMA = vec3(res.r * res.a , 1, 0);
- //  gRMA = vec3(0.38 , 1, 1);
+   gRMA = vec3(0.125 , 0.25, 1);
 
-    gBlood = vec3(1);
 
     
  //   vec4 truemask =  texture(Decal_mask, vec2(decalTexCoord.s, decalTexCoord.t));

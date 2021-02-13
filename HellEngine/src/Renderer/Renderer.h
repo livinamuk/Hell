@@ -62,8 +62,10 @@ namespace HellEngine
 		static void VolumetricBloodPass(Game* game, Shader* shader);
 		static void VolumetricBloodPassDecals(Game* game, Shader* shader);
 		static void RenderPlayerWeapon(Game* game, Shader* shader);
-		static void RenderEnemies(Game* game, Shader* shader);
-		static void DecalCompositePass(Shader* shader);
+		//static void RenderEnemies(Game* game, Shader* shader);
+	//	static void DecalCompositePass(Shader* shader);
+		static void RenderProjectiles(Shader* shader);
+		//static void ReRenderDoors(Shader* shader);
 
 		static void ViewCubeMap(Game* , Shader* shader, unsigned int CubeMapID);
 		static void CreateBRDFLut();

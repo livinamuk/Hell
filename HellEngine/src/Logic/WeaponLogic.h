@@ -11,6 +11,7 @@ namespace HellEngine
 		PhysicsObjectType hitType;
 		glm::vec3 hitLocation;
 		glm::vec3 rayDirection;
+		WEAPON weaponType;
 
 	};
 
@@ -26,7 +27,8 @@ namespace HellEngine
 		static glm::mat4 GetCameraMatrix();
 		static glm::vec3 GetBarrelHoleWorldPosition();
 
-		static GunshotReport FireBullet(Camera* camera, float variance, float force);
+		//static GunshotReport FireBullet(Camera* camera, float variance, float force);
+		static void WeaponLogic::FireBullet(glm::vec3 rayOrigin, glm::vec3 rayDirection, float variance, float force, WEAPON weaponType);
 
 	public: // static variables
 		static unsigned int s_SelectedWeapon;

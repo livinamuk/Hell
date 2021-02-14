@@ -140,14 +140,16 @@ void main()
 //	gBlood = vec4(0, 1, 0, 1);
 	//gAlbedo = vec4(0.5);
 	
-	//if (blockoutDecals)
-	//	gNormal.a = 1;
+	if (blockoutDecals)
+		gNormal.a = 1;
+	else
+		gNormal.a = 0;
 
 	//if (blockoutDecals)
 	//	gNormal.rgb = vec3(1);
 	//	else
 	//	gNormal.rgb = vec3(0);
 
-		//gNormal.rgb = vec3(blockoutDecals);  
+		//gAlbedo.rgb = vec3(blockoutDecals);  
 
 }

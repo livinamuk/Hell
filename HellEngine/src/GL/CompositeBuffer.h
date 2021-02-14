@@ -10,7 +10,7 @@ namespace HellEngine
 		~CompositeBuffer();
 
 		unsigned int ID;
-		unsigned int gAlbedoDecalComposite, gRMADecalComposite;
+		unsigned int gAlbedoDecalComposite, gRMADecalComposite, gCopy;
 
 		void Configure(int width, int height);
 	};

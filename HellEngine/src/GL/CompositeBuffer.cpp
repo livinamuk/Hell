@@ -8,6 +8,7 @@ namespace HellEngine
 		glGenFramebuffers(1, &ID);
 		glGenTextures(1, &gAlbedoDecalComposite);
 		glGenTextures(1, &gRMADecalComposite);
+		glGenTextures(1, &gCopy);
 		Configure(width, height);
 	}
 
@@ -35,8 +36,14 @@ namespace HellEngine
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gRMADecalComposite, 0);
 
-		unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-		glDrawBuffers(2, attachments);
+		glBindTexture(GL_TEXTURE_2D, gCopy);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gCopy, 0);
+
+		unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+		glDrawBuffers(3, attachments);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

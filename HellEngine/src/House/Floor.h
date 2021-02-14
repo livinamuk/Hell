@@ -23,5 +23,7 @@ namespace HellEngine
 		std::vector<glm::vec3>worldSpaceCorners;
 		btCollisionObject* m_collisionObject;
 		btCollisionShape* m_collisionShape;
+
+		GLuint m_decalMapID;
 	};
 }

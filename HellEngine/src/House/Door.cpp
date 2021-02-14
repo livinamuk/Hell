@@ -111,7 +111,7 @@ namespace HellEngine
 		shader->setBool("blockoutDecals", true);
 		AssetManager::BindMaterial_0(AssetManager::GetMaterialIDByName("Door"));
 		AssetManager::DrawModel(modelID, shader, GetDoorModelMatrixFromPhysicsEngine());
-		shader->setBool("blockoutDecals", false);
+		shader->setBool("blockoutDecalas", false);
 
 
 

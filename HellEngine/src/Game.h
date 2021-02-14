@@ -68,7 +68,6 @@ namespace HellEngine
 		EnemyCharacter m_zombieGuy;
 
 
-		static std::vector<VolumetricBloodSplatter> s_volumetricBloodSplatters;
 
 	};
 }

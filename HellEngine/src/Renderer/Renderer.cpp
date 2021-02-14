@@ -158,6 +158,7 @@ namespace HellEngine
 		s_bloodEffect.Init();
 		s_muzzleFlash.Init();
 		s_bloodWallSplatter.Init();
+		VolumetricBloodSplatter::Init();
 
 		//s_bloodVolumetricEffect.Init();
 	
@@ -523,9 +524,9 @@ namespace HellEngine
 		}
 
 
-		RenderProjectiles(&s_geometryShader);
+		//RenderProjectiles(&s_geometryShader);
 
-	//	DecalCompositePass(&s_DecalComposite);
+		DecalCompositePass(&s_DecalComposite);
 
 		{
 			GpuProfiler g("Volumetric Pass");
@@ -589,6 +590,10 @@ namespace HellEngine
 		}
 
 		{
+
+			
+			//int floorDecalMap = GameData::p_house->m_rooms[0].m_floor.m_decalMapID;
+
 			GpuProfiler g("RenderFinalImage");
 			// Render Final image to screen
 			if (!Input::s_keyDown[HELL_KEY_CAPS_LOCK])
@@ -596,7 +601,7 @@ namespace HellEngine
 				RenderFinalImage(&s_quadShader, s_ChromaticAbberationBuffer.TexID);
 			else
 				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
-				//RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_compositeBuffer.gAlbedoDecalComposite, s_gBuffer.gRMA, s_gBuffer.gBloodDecals);
+		//		RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, floorDecalMap);
 			//RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_compositeBuffer.gAlbedoDecalComposite, s_gBuffer.gRMA, s_compositeBuffer.gRMADecalComposite);
 			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, GameData::p_house->m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
 		//		RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gGlassBlur, s_gBuffer.gFinalLighting);		
@@ -643,7 +648,7 @@ namespace HellEngine
 			Decal::s_decals.clear();
 			Shell::s_bulletCasings.clear();
 			Shell::s_shotgunShells.clear();
-			Game::s_volumetricBloodSplatters.clear();
+			VolumetricBloodSplatter::s_volumetricBloodSplatters.clear();
 
 			//		game->m_shotgunAmmo = 4;
 		}
@@ -971,10 +976,10 @@ namespace HellEngine
 		//text += Util::PhysicsObjectEnumToString(game->m_cameraRaycast.m_objectType);
 				
 
-		/*for (VolumetricBloodSplatter splatter : Game::s_volumetricBloodSplatters)
+	/*	for (VolumetricBloodSplatter splatter : VolumetricBloodSplatter::s_volumetricBloodSplatters)
 		{
 			text += "\n";
-			text += Util::Mat4ToString(splatter.GetModelMatrix());
+			text += Util::Mat4ToString(splatter.GetDecalModelMatrix());
 		}*/
 
 	//	text += "GameData::p_house->m_rooms.size(): ";
@@ -1277,19 +1282,39 @@ namespace HellEngine
 		//	volumetricBloodSplater.Draw(shader);
 		//}
 
-		for (int i = 0; i < game->s_volumetricBloodSplatters.size(); i++)
+		for (int i = 0; i < VolumetricBloodSplatter::s_volumetricBloodSplatters.size(); i++)
 		{
 			if (i == 0) {
 		//		game->s_volumetricBloodSplatters[0].m_transform.position = glm::vec3(0);
 		//		game->s_volumetricBloodSplatters[0].m_transform.rotation = glm::vec3(0);
 
 			}
-			game->s_volumetricBloodSplatters[i].Draw(shader);
+			VolumetricBloodSplatter::s_volumetricBloodSplatters[i].Draw(shader);
 		}
 	}
 
 	void Renderer::VolumetricBloodPassDecals(Game* game, Shader* shader)
 	{
+		/*static const float clearcolor[] = { 0, 0, 1, 1 };
+		glClearTexImage(s_gBuffer.gBloodDecals, 0, GL_RGBA, GL_FLOAT, clearcolor);
+		int scale = 2;
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, s_gBuffer.ID);
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, s_gBuffer.ID);
+		glDrawBuffer(GL_COLOR_ATTACHMENT7);
+		glBlitFramebuffer(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight, 0, 0, CoreGL::s_windowWidth / scale, CoreGL::s_windowHeight / scale, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			*/
+
+/*		glBindFramebuffer(GL_READ_FRAMEBUFFER, s_gBuffer.ID);
+		glReadBuffer(GL_COLOR_ATTACHMENT2);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, s_gBuffer.ID);
+		glDrawBuffer(GL_COLOR_ATTACHMENT7);
+		glBlitFramebuffer(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight, CoreGL::s_windowWidth / scale, 0, CoreGL::s_windowWidth / scale + CoreGL::s_windowWidth / scale, CoreGL::s_windowHeight / scale, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+*/
+		float scale = 1;
+		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+		glViewport(0, 0, CoreGL::s_windowWidth / scale, CoreGL::s_windowHeight / scale);
+
 		shader->use();
 		shader->setMat4("pv", game->camera.m_projectionViewMatrix);
 		shader->setMat4("inverseProjectionMatrix", glm::inverse(game->camera.m_projectionMatrix));
@@ -1301,16 +1326,23 @@ namespace HellEngine
 		glBindTexture(GL_TEXTURE_2D, s_gBuffer.rboDepth);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gNormal);
-		
-		// clear to specified color:
+	//	glActiveTexture(GL_TEXTURE6);
+	//	glBindTexture(GL_TEXTURE_2D, s_gBuffer.gBloodDecals);
 
-		//static const float white[] = { 1.0, 1.0, 1.0, 1.0 };
-		//glClearTexImage(s_gBuffer.gBloodDecals, 0, GL_RGBA, GL_FLOAT, white);
-		
-		//unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT7 };
-		//glDrawBuffers(4, attachments);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_mask7"));
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_mask6"));
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_mask9"));
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_mask4"));
 
-		unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT2};
+
+
+		unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT2 };
+		//unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT7 };
+		//unsigned int attachments[1] = {  GL_COLOR_ATTACHMENT7 };
 		glDrawBuffers(2, attachments);
 
 		glDepthMask(GL_FALSE);
@@ -1334,11 +1366,16 @@ namespace HellEngine
 		//glEnable(GL_DEPTH_TEST);
 
 		// RENDER ALL BLOOD SPLATTERS
-		for (VolumetricBloodSplatter& volumetricBloodSplater : game->s_volumetricBloodSplatters) {
+		for (VolumetricBloodSplatter& volumetricBloodSplater : VolumetricBloodSplatter::s_volumetricBloodSplatters) {
 			volumetricBloodSplater.DrawDecal(shader);
 		}
 
-
+		/*if (GameData::p_house->m_rooms.size()) 
+		{
+			int floorDecalMap = GameData::p_house->m_rooms[0].m_floor.m_decalMapID;
+			static const float clearcolor[] = { 0, 0, 1, 1 };
+			glClearTexImage(floorDecalMap, 0, GL_RGBA, GL_FLOAT, clearcolor);
+		}*/
 	}
 
 	void Renderer::RenderPlayerWeapon(Game* game, Shader* shader)
@@ -1381,24 +1418,22 @@ namespace HellEngine
 			glDepthMask(GL_FALSE);
 	}*/
 
-	/*void Renderer::DecalCompositePass(Shader* shader)
+	void Renderer::DecalCompositePass(Shader* shader)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, s_compositeBuffer.ID);
 
 		glDisable(GL_BLEND);
-		unsigned int attachmentss[2] = { GL_COLOR_ATTACHMENT0 , GL_COLOR_ATTACHMENT1};
-		glDrawBuffers(2, attachmentss);
-
-
+		unsigned int attachmentss[1] = { GL_COLOR_ATTACHMENT0};
+		glDrawBuffers(1, attachmentss);
 
 		glCullFace(GL_BACK);
 
 		glUseProgram(shader->ID);
 		glDisable(GL_DEPTH_TEST);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gAlbedo);
+		glBindTexture(GL_TEXTURE_2D, s_compositeBuffer.gAlbedoDecalComposite);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gRMA);
+		glBindTexture(GL_TEXTURE_2D, s_compositeBuffer.gCopy);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gBloodDecals);
 		glActiveTexture(GL_TEXTURE3);
@@ -1411,7 +1446,7 @@ namespace HellEngine
 
 
 		// ok now blit these back onto the original textures
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, s_compositeBuffer.ID);
+	/*	glBindFramebuffer(GL_READ_FRAMEBUFFER, s_compositeBuffer.ID);
 		glReadBuffer(GL_COLOR_ATTACHMENT0);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, s_gBuffer.ID);
 		glDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -1423,12 +1458,12 @@ namespace HellEngine
 		glDrawBuffer(GL_COLOR_ATTACHMENT2);
 		glBlitFramebuffer(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight, 0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-
+*/
 		//glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
 
 	}
-	*/
+	/*
 	void Renderer::RenderProjectiles(Shader* shader)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
@@ -1441,7 +1476,7 @@ namespace HellEngine
 		Shell::DrawInstanced(shader, Shell::s_shotgunShells);
 		Shell::DrawInstanced(shader, Shell::s_bulletCasings);
 		glDepthMask(GL_FALSE);
-	}
+	}*/
 
 	/*void Renderer::ReRenderDoors(Shader* shader)
 	{
@@ -2198,24 +2233,33 @@ namespace HellEngine
 
 	void Renderer::DrawScene(Game* game, Shader* shader, bool bindTextures, bool envMapPass)
 	{
+
 		// DRAW THE HOUSE
 		// walls, floors, ceilings, doors, staircases.
 		GameData::p_house->Draw(shader, envMapPass);
 		
 		// THIS IS ALL SHIT YOU DON'T WANT DECALS DRAWN OVER. BECAUSE IT MOVES.
 		{
-			shader->setBool("blockoutDecals", true);
 
 			// Enemies
+			shader->setBool("blockoutDecals", true);
 			game->m_zombieGuy.Draw(shader, glm::mat4(1));
-			
+			shader->setBool("blockoutDecals", false);
+
 			// Doors
 			for (Door& door : GameData::p_house->m_doors)
 					door.Draw(shader);
 
+		}
+
+		// If this is NOT the shadowmap pass, then draw projectiles, without decals on them
+		if (bindTextures) {
+			shader->setBool("blockoutDecals", true);
+			Shell::DrawInstanced(shader, Shell::s_shotgunShells);
+			Shell::DrawInstanced(shader, Shell::s_bulletCasings);
 			shader->setBool("blockoutDecals", false);
 		}
-	
+
 		////////////////
 		// ZOMBIE BOY //
 		////////////////

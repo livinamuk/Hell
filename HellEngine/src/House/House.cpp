@@ -47,6 +47,8 @@ namespace HellEngine
 		for (Door& door : m_doors)
 			door.Draw(shader);
 
+		shader->setBool("blockoutDecals", false);
+
 		for (Staircase& staircase : m_staircases)
 			staircase.Draw(shader);
 

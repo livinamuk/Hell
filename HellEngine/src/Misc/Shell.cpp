@@ -10,13 +10,15 @@ namespace HellEngine
 {
 	std::vector<Shell> Shell::s_shotgunShells;
 	std::vector<Shell> Shell::s_bulletCasings;
-	unsigned int Shell::buffer;
+	unsigned int Shell::s_buffer = 0;
 
 	Shell::Shell(Transform transform, glm::vec3 initialVelocity, CasingType casingType)
 	{
 		m_casingType = casingType;
 		m_transform = transform;
-		glGenBuffers(1, &buffer);
+
+		if (s_buffer == 0)
+			glGenBuffers(1, &s_buffer);
 
 		if (m_casingType == CasingType::BULLET_CASING)
 			m_shellScale = 1;
@@ -145,7 +147,7 @@ namespace HellEngine
 
 		//setup vertex buffers and vertex array for model matrices
 		// vertex buffer object -- should this be created every time?! very stupid question i think .. it keeps slowing the fps down!
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, s_buffer);
 		glBufferData(GL_ARRAY_BUFFER, shells.size() * sizeof(glm::mat4), &modelMatrixVector[0], GL_STATIC_DRAW);
 
 		unsigned int VAO = AssetManager::models[modelID].m_meshes[0]->VAO;

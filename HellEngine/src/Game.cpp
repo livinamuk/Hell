@@ -17,7 +17,6 @@
 namespace HellEngine
 {
 	bool Game::s_dontLoadShotgun = true;
-	std::vector<VolumetricBloodSplatter> Game::s_volumetricBloodSplatters;
 
 	Game::Game()
 	{
@@ -121,7 +120,7 @@ namespace HellEngine
 		Physics::Update(m_frameTime);
 
 
-		for (VolumetricBloodSplatter& volumetricBloodSplater : s_volumetricBloodSplatters) {
+		for (VolumetricBloodSplatter& volumetricBloodSplater : VolumetricBloodSplatter::s_volumetricBloodSplatters) {
 			volumetricBloodSplater.Update(m_frameTime);
 		}
 

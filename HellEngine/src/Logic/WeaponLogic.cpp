@@ -124,7 +124,7 @@ namespace HellEngine
 			if (numberOfBulletsThatHitEnemiesThisFrame < 5 && gunShotReport.hitType == PhysicsObjectType::RAGDOLL) {
 				glm::vec3 position = gunShotReport.hitLocation;
 				glm::vec3 rotation = camera->m_transform.rotation;
-				Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1))); 
+				VolumetricBloodSplatter::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1)));
 				numberOfBulletsThatHitEnemiesThisFrame++;
 			}
 		}
@@ -141,7 +141,7 @@ namespace HellEngine
 
 					glm::vec3 position = followThroughShotResult.m_hitPoint;
 					glm::vec3 rotation = camera->m_transform.rotation;
-					Game::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1), true));
+					VolumetricBloodSplatter::s_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, rotation, camera->m_Front * glm::vec3(-1), true));
 					numberOfFollowThroughBulletsThatHitEnemiesThisFrame++;
 				}
 			}

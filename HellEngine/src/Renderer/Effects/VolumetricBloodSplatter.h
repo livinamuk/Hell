@@ -26,5 +26,15 @@ namespace HellEngine
 		void Draw(Shader* shader); 
 		void DrawDecal(Shader* shader);
 		glm::mat4 GetModelMatrix();
+		glm::mat4 GetDecalModelMatrix();
+
+	public: // static functions
+		static void Init();
+		static void DrawInstancedDecals(Shader* shader);
+
+	public: // static Variables
+		static GLuint s_buffer_mode_matrices;
+		static GLuint s_vao;
+		static std::vector<VolumetricBloodSplatter> s_volumetricBloodSplatters;
 	};
 }

@@ -2,9 +2,14 @@
 #include "VolumetricBloodSplatter.h"
 #include "Config.h"
 #include "Helpers/Util.h"
+#include "Core/Input.h"
 
 namespace HellEngine
 {
+	GLuint VolumetricBloodSplatter::s_vao;
+	GLuint VolumetricBloodSplatter::s_buffer_mode_matrices;
+	std::vector<VolumetricBloodSplatter> VolumetricBloodSplatter::s_volumetricBloodSplatters;
+
 	VolumetricBloodSplatter::VolumetricBloodSplatter(glm::vec3 position, glm::vec3 rotation, glm::vec3 front,  bool renderDecalOnly)
 	{
 		m_transform.position = position;
@@ -14,8 +19,6 @@ namespace HellEngine
 
 		static int rand = 0;
 
-		//int rand = Util::GetRandomInt(0, 4);
-
 		if (rand == 0)
 			m_type = 7;
 		else if (rand == 1)
@@ -24,22 +27,12 @@ namespace HellEngine
 			m_type = 6;
 		else if (rand == 3)
 			m_type = 4;
-		else if (rand == 4)
-			m_type = 8;
+		//else if (rand == 4)
+		//	m_type = 8;
 
 		rand++;
 		if (rand == 4)
 			rand = 0;
-
-		//m_type = 8;
-		
-		// its like 9 iswrong as well
-
-
-	//	m_type = 1;
-	//	m_type = 7;
-
-		std::cout << "RAND: " << rand << " " << m_type << "\n";
 	}
 	
 	void VolumetricBloodSplatter::Update(float deltaTime)
@@ -54,10 +47,8 @@ namespace HellEngine
 		bloodMeshTransform.rotation = m_transform.rotation;
 		bloodMeshTransform.scale = glm::vec3(1.0f);
 
-
 		Transform bloodMeshOffset;
 	
-
 		if (m_type == 0)
 			bloodMeshOffset.position = glm::vec3(-0.08f, -0.23f, -0.155f);
 		else if (m_type == 7)
@@ -89,6 +80,155 @@ namespace HellEngine
 		return bloodMeshTransform.to_mat4() * scaleTransform.to_mat4() * rotTransform.to_mat4() * bloodMeshOffset.to_mat4();
 	}
 
+
+	glm::mat4 VolumetricBloodSplatter::GetDecalModelMatrix()
+	{
+		Transform transform;
+
+		transform.position = m_transform.position;
+		transform.position.y = 0;
+
+		transform.rotation = m_transform.rotation;
+		transform.rotation.x = 0.4;// Config::TEST_FLOAT2;
+		transform.rotation.z = 0;// Config::TEST_FLOAT3;
+
+		transform.scale = glm::vec3(Config::TEST_FLOAT2, Config::TEST_FLOAT3, Config::TEST_FLOAT4);;
+		transform.scale = glm::vec3(3, 5, 1.5f);;
+		transform.scale = glm::vec3(3, 5, 1.5f) * glm::vec3(0.75);
+		//transform.scale = glm::vec3(Config::TEST_FLOAT2, Config::TEST_FLOAT3, Config::TEST_FLOAT4) * glm::vec3(Config::TEST_FLOAT5);
+
+		Transform decalOffset;
+
+		if (m_type == 9)
+			decalOffset.position = glm::vec3(0, 0, 0.475f);
+		else if (m_type == 7)
+			decalOffset.position = glm::vec3(0);
+		else if (m_type == 6)
+			decalOffset.position = glm::vec3(-0.0199999996, 0, 0.4699999988);
+		else if (m_type == 4)
+			decalOffset.position = glm::vec3(0, 0, 0.5f);
+		else if (m_type == 8)
+			decalOffset.position = glm::vec3(-0.0199999996f, 0.0000000000f, 0.3600000143f);
+
+		return transform.to_mat4() * decalOffset.to_mat4();
+	}
+
+
+	/////////////////////////
+	//                     //
+	//   DRAW INSTANCIED   //
+	//                     //
+	/////////////////////////
+
+	void VolumetricBloodSplatter::Init()
+	{
+		glGenBuffers(1, &s_buffer_mode_matrices);
+
+		float vertices[] = {
+			// positions
+			0.5f,  0.5f,  0.5f,
+			0.5f,  0.5f, -0.5f, 
+			-0.5f,  0.5f, -0.5f,
+			-0.5f,  0.5f, -0.5f, 
+			-0.5f,  0.5f,  0.5f, 
+			0.5f,  0.5f,  0.5f,
+
+			0.5f,  0.5f, -0.5f,
+			0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,  
+			-0.5f,  0.5f, -0.5f,  
+			0.5f, 0.5f, -0.5f,
+
+			-0.5f, -0.5f,  0.5f,
+			0.5f, -0.5f,  0.5f, 
+			0.5f,  0.5f,  0.5f,
+			0.5f,  0.5f,  0.5f, 
+			-0.5f,  0.5f,  0.5f,
+			-0.5f, -0.5f,  0.5f,
+
+			-0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f, -0.5f, 
+			-0.5f, -0.5f, -0.5f, 
+			-0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f,
+
+			0.5f, -0.5f, -0.5f,
+			0.5f,  0.5f, -0.5f,
+			0.5f,  0.5f,  0.5f,
+			0.5f,  0.5f,  0.5f,
+			0.5f, -0.5f,  0.5f,
+			0.5f, -0.5f, -0.5f,
+
+			-0.5f, -0.5f, -0.5f,
+			0.5f, -0.5f, -0.5f, 
+			0.5f, -0.5f,  0.5f, 
+			0.5f, -0.5f,  0.5f, 
+			-0.5f, -0.5f,  0.5f, 
+			-0.5f, -0.5f, -0.5f,
+		};
+		unsigned int VBO;
+		glGenVertexArrays(1, &s_vao);
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glBindVertexArray(s_vao);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+	}
+	
+
+	void VolumetricBloodSplatter::DrawInstancedDecals(Shader* shader)
+	{
+		// No decals? Then get outta here.
+		if (!s_volumetricBloodSplatters.size())
+			return;
+
+		// No you can choose to only update this model matrix vector when a new decal is created. OR, a door is moving. 
+		// This makes a lot of sense and has to be faster, but by how much, worth looking into, it's an easy win.
+
+		static std::vector<glm::mat4> modelMatrixVector;
+
+		if (Input::s_keyPressed[HELL_KEY_O])
+		for (VolumetricBloodSplatter& splatter : s_volumetricBloodSplatters) {
+			modelMatrixVector.push_back(splatter.GetDecalModelMatrix());
+		}
+
+		if (!modelMatrixVector.size())
+			return;
+
+		shader->setFloat("u_Time", 0);
+		shader->setVec3("_DecalForwardDirection", s_volumetricBloodSplatters[0].m_front);
+		shader->setInt("u_Type", s_volumetricBloodSplatters[0].m_type);
+
+		glBindVertexArray(s_vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s_buffer_mode_matrices);
+		glBufferData(GL_ARRAY_BUFFER, s_volumetricBloodSplatters.size() * sizeof(glm::mat4), &modelMatrixVector[0], GL_STATIC_DRAW);
+
+
+		// vertex attributes
+		std::size_t vec4Size = sizeof(glm::vec4);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+		glVertexAttribDivisor(1, 1);
+		glVertexAttribDivisor(2, 1);
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+
+		//draw
+		glUniform1i(glGetUniformLocation(shader->ID, "instanced"), 1);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, 36, s_volumetricBloodSplatters.size());
+		glUniform1i(glGetUniformLocation(shader->ID, "instanced"), 0);
+	}
+
 	void VolumetricBloodSplatter::Draw(Shader* shader)
 	{
 		if (m_renderDecalOnly)
@@ -98,13 +238,11 @@ namespace HellEngine
 		if (m_CurrentTime > 0.9)
 			return;
 
-
 		shader->use();
 		shader->setMat4("u_MatrixWorld", this->GetModelMatrix());
 		shader->setFloat("u_Time", this->m_CurrentTime);
 
-		Model* m_model;
-
+		Model* m_model = NULL;
 
 		if (m_type == 0) {
 			glActiveTexture(GL_TEXTURE0);
@@ -149,7 +287,6 @@ namespace HellEngine
 			m_model = AssetManager::GetModelByName("blood_mesh4");
 		}
 
-
 		int VAO = m_model->m_meshes[0]->VAO;
 		int numIndices = m_model->m_meshes[0]->indices.size();
 		int numVerts = m_model->m_meshes[0]->vertices.size();
@@ -161,215 +298,16 @@ namespace HellEngine
 
 	void VolumetricBloodSplatter::DrawDecal(Shader* shader)
 	{
-		/////////////////////////
-		// MOVED TO INSTANCING //
-
-		// No shells? Then get outta here.
-		/*if (.size())
-			return;
-
-		GpuProfiler g("Shell");
-		static int Shell_ModelID = AssetManager::GetModelIDByName("Shell");
-		static int Shell_MaterialID = AssetManager::GetMaterialIDByName("Shell");
-		static int BulletCasing_ModelID = AssetManager::GetModelIDByName("BulletCasing");
-		static int BulletCasing_MaterialID = AssetManager::GetMaterialIDByName("BulletCasing");
-
-		std::vector<glm::mat4> modelMatrixVector;
-
-		for (Shell& shell : shells)
-		{
-			// If the projectile is still being simulated by the physics world then retrieve it's updated model matrix.
-			if (shell.m_rigidBody != nullptr)
-				shell.m_modelMatrix = Physics::GetModelMatrixFromRigidBody(shell.m_rigidBody);
-
-			glm::mat4 scaleMatrix = glm::scale(glm::mat4(1), glm::vec3(shell.m_shellScale));
-			modelMatrixVector.push_back(shell.m_modelMatrix * scaleMatrix);
-		}
-
-		// Check the projectile type.
-		int modelID, materialID;
-		if (shells[0].m_casingType == CasingType::BULLET_CASING) {
-			modelID = BulletCasing_ModelID;
-			materialID = BulletCasing_MaterialID;
-		}
-		if (shells[0].m_casingType == CasingType::SHOTGUN_SHELL) {
-			modelID = Shell_ModelID;
-			materialID = Shell_MaterialID;
-		}
-		AssetManager::BindMaterial_0(materialID);
-
-		//setup vertex buffers and vertex array for model matrices
-		// vertex buffer object -- should this be created every time?! very stupid question i think .. it keeps slowing the fps down!
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		glBufferData(GL_ARRAY_BUFFER, shells.size() * sizeof(glm::mat4), &modelMatrixVector[0], GL_STATIC_DRAW);
-
-		unsigned int VAO = AssetManager::models[modelID].m_meshes[0]->VAO;
-		glBindVertexArray(VAO);
-		// vertex attributes
-		std::size_t vec4Size = sizeof(glm::vec4);
-		glEnableVertexAttribArray(8);
-		glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
-		glEnableVertexAttribArray(9);
-		glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
-		glEnableVertexAttribArray(10);
-		glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
-		glEnableVertexAttribArray(11);
-		glVertexAttribPointer(11, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
-		glVertexAttribDivisor(8, 1);
-		glVertexAttribDivisor(9, 1);
-		glVertexAttribDivisor(10, 1);
-		glVertexAttribDivisor(11, 1);
-
-		//draw
-		glUniform1i(glGetUniformLocation(shader->ID, "instanced"), 1);
-		glBindVertexArray(AssetManager::models[modelID].m_meshes[0]->VAO);
-		glDrawElementsInstanced(GL_TRIANGLES, AssetManager::models[modelID].m_meshes[0]->indices.size(), GL_UNSIGNED_INT, 0, shells.size());
-		glUniform1i(glGetUniformLocation(shader->ID, "instanced"), 0);
-
-		*/
-
 		shader->setFloat("u_Time", this->m_CurrentTime);
 		shader->setVec3("_DecalForwardDirection", this->m_front);
 
-		Transform transform;
-
-		transform.position = m_transform.position;// glm::vec3(0);// s_DebugTransform.position;// debugtransfglm::vec3(-1, 1, 0.09f);
-		transform.position.y = 0;
-
-		transform.rotation = m_transform.rotation;
-		transform.rotation.x = 0.4;// Config::TEST_FLOAT2;
-		transform.rotation.z = 0;// Config::TEST_FLOAT3;
-
-		//transform.rotation.y = m_transform.rotation.y;
-	//	transform.rotation.z = 0.3f;
-	//	transform.rotation.y = m_transform.rotation.y;
-		transform.scale = glm::vec3(Config::TEST_FLOAT2, Config::TEST_FLOAT3, Config::TEST_FLOAT4);;
-		transform.scale = glm::vec3(3, 5, 1.5f);;
-		transform.scale = glm::vec3(3, 5, 1.5f) * glm::vec3(0.75);
-
-		
-		//glm::vec3 squareNormal = glm::vec3(0, 0, 1);
-
-		Transform decalOffset;
-
-
-		if (m_type == 9) {
-			decalOffset.position = glm::vec3(0, 0, 0.475f);
-		}
-		else if (m_type == 7) {
-			decalOffset.position = glm::vec3(0);
-		}
-		else if (m_type == 6) {
-			decalOffset.position = glm::vec3(-0.0199999996, 0, 0.4699999988);
-		}
-		else if (m_type == 4) {
-			decalOffset.position = glm::vec3(0, 0, 0.5f);
-		}
-		else if (m_type == 8) {
-			decalOffset.position = glm::vec3(-0.0199999996f, 0.0000000000f, 0.3600000143f);
-		}
-
-		//	decalOffset.position = glm::vec3(Config::TEST_FLOAT2, Config::TEST_FLOAT3, Config::TEST_FLOAT4);
-		//decalOffset.position = glm::vec3(Config::TEST_FLOAT2, Config::TEST_FLOAT3, Config::TEST_FLOAT4); //decalOffset.position = glm::vec3(-1.3200000525, 0, 0);
-
-		glm::mat4 modelMatrix = transform.to_mat4() * decalOffset.to_mat4();
+		glm::mat4 modelMatrix = GetDecalModelMatrix();
 		shader->setMat4("model", modelMatrix);
 		shader->setMat4("inverseModel", glm::inverse(modelMatrix));
 
+		shader->setInt("u_Type", this->m_type);
 
-
-		if (m_type == 7) {
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_norm7"));
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_mask7"));
-		}
-		else if (m_type == 6) {
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_norm6"));
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_mask6"));
-		}
-		else if (m_type == 9) {
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_norm9"));
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_mask9"));
-		}
-		else if (m_type == 4) {
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_norm4"));
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_mask4"));
-		}
-		else if (m_type == 8) {
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_norm8"));
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_mask8"));
-		}
-
-		static unsigned int VAO = 0;
-		if (VAO == 0) {
-			float vertices[] = {
-				// positions          // normals           // texture coords	
-				0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,	// top
-				0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
-				-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-				-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-				-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-				0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-
-				0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,	// front
-				0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
-				-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-				-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-				-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-				0.5f, 0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-
-				-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f, // back
-				0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
-				0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-				0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-				-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
-				-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-
-				-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f, // right
-				-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-				-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-				-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-				-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-				-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-
-				0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f, // left
-				0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-				0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-				0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-				0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-				0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-
-				-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f, // bottom
-				0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
-				0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-				0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-				-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
-				-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f
-			};
-			unsigned int VBO;
-			glGenVertexArrays(1, &VAO);
-			glGenBuffers(1, &VBO);
-			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-			glBindVertexArray(VAO);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-			glEnableVertexAttribArray(2);
-		}
-
-		glBindVertexArray(VAO);
+		glBindVertexArray(s_vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 }

@@ -609,7 +609,6 @@ namespace HellEngine
 			//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
 		}
 
-
 		static bool white = false;
 
 		if (Input::s_keyPressed[HELL_KEY_Q])

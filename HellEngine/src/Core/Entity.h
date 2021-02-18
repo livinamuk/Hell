@@ -11,7 +11,6 @@ namespace HellEngine
 		Entity(const Entity&);
 		Entity& operator = (const Entity& input);
 
-
 		Entity(char* name);
 		Entity(int modelID);
 		void Update(float deltaTime);
@@ -22,14 +21,17 @@ namespace HellEngine
 		int GetModelID();
 		void UpdateCollisionObject();
 		void RemoveCollisionObject();
+		//void SetMaterialID(int materialID);
+		void ConfigureDecalMap(int width, int height);
 
 	public:	// fields
 		Transform m_transform;
-		int m_materialID = -1;
 		char* m_tag = "Entity";
 		btCollisionObject* m_collisionObject;
 		btTriangleMesh* m_triangleMesh;
 		btBvhTriangleMeshShape* m_triangleMeshShape;
+		int m_materialID = -1;
+		GLuint m_decalMapID;
 
 	private: // field
 		int m_modelID = -1;

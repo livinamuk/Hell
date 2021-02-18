@@ -28,8 +28,7 @@ namespace HellEngine
 		if (RMA != 0)	this->RMA = RMA;
 		if (RME != 0)	this->RME = RME;
 
-		if (RME != 0)
-		{
+		if (RME != 0) {
 			std::cout << "OMGGG " << name << "HAS EMISSVE " << RME << "\n";
 		}
 	}

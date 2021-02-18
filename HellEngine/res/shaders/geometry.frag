@@ -12,12 +12,14 @@ layout (binding = 3) uniform sampler2D ALB_Texture1;
 layout (binding = 4) uniform sampler2D NRM_Texture1;
 layout (binding = 5) uniform sampler2D RMA_Texture1;
 layout (binding = 6) uniform sampler2D EMMISIVE_Texture;
+layout (binding = 7) uniform sampler2D DECAL_MAP_Texture;
 
 uniform bool useRoughnessMetallicUniforms;
 uniform float roughnessUniform;
 uniform float metallicUniform;
 
 uniform bool blockoutDecals;
+uniform bool u_hasDecalMap;
 
 in vec2 TexCoord;
 in vec3 FragPos;
@@ -151,5 +153,12 @@ void main()
 	//	gNormal.rgb = vec3(0);
 
 		//gAlbedo.rgb = vec3(blockoutDecals);  
+
+		
+		vec4 decalMapColor = texture(DECAL_MAP_Texture, finalTexCoords);
+
+		// DECAL MAP
+		if (u_hasDecalMap)
+			gAlbedo *=  decalMapColor;
 
 }

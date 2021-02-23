@@ -158,14 +158,19 @@ namespace HellEngine
 
 	void Entity::ConfigureDecalMap(int width, int height)
 	{
+		glGenFramebuffers(1, &m_decalMapFBO);
 		glGenTextures(1, &m_decalMapID);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_decalMapFBO);
+
 		glBindTexture(GL_TEXTURE_2D, m_decalMapID);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_decalMapID, 0);
+		glGenerateMipmap(GL_TEXTURE_2D); // dunno about this, is it neccessary??
+
+		unsigned int attachments[1] = { GL_COLOR_ATTACHMENT0};
+		glDrawBuffers(1, attachments);
 
 		// Clear it to test it works
 		float clearcolor[] = { 0, 0, 1, 1 };

@@ -31,6 +31,7 @@ namespace HellEngine
 		btTriangleMesh* m_triangleMesh;
 		btBvhTriangleMeshShape* m_triangleMeshShape;
 		int m_materialID = -1;
+		GLuint m_decalMapFBO;
 		GLuint m_decalMapID;
 
 	private: // field

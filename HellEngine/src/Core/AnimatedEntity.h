@@ -1,6 +1,7 @@
 #pragma once
 #include "Header.h"
 #include "Helpers/AssetManager.h"
+#include "Physics/Ragdoll2.h"
 
 namespace HellEngine
 {
@@ -25,6 +26,8 @@ namespace HellEngine
 		void SetAnimationToBindPose();
 		void PauseAnimation();
 
+		void InitRagdollFromMesh();
+
 	public:	// fields
 		Transform m_worldTransform;
 		Transform m_modelTransform;
@@ -36,6 +39,7 @@ namespace HellEngine
 		int m_currentAnimationIndex;
 		float m_currentAnimationTime;
 		float m_currentAnimationDuration;
+		//Ragdoll2 m_raggolll;
 
 	private: // methods
 		void UpdateAnimation(float deltatime);
@@ -46,5 +50,6 @@ namespace HellEngine
 		bool m_animationIsComplete;
 		int m_skinnedModelID = -1;		
 		bool m_pause = false;
+
 	};
 }

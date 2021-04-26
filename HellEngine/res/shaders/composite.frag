@@ -9,6 +9,7 @@ layout (binding = 3) uniform sampler2D blur2;
 layout (binding = 4) uniform sampler2D blur3;
 layout (binding = 5) uniform sampler2D GlassBlurTexture;
 layout (binding = 6) uniform sampler2D GlassSurfaceTexture;
+layout (binding = 7) uniform sampler2D ScreenSpaceReflectionsTexture;
 
 in vec2 TexCoords;
 
@@ -40,6 +41,7 @@ void main()
 		
 	// Glass Blur
 	vec3 glassSurface  = vec3(texture(GlassSurfaceTexture, TexCoords));
+	vec3 SSR = vec3(texture(ScreenSpaceReflectionsTexture, TexCoords));
 
 	// Tone mapping
 	//lighting = Tonemap_ACES(lighting);
@@ -58,6 +60,7 @@ void main()
 	final = Tonemap_ACES(final);
     // Gamma compressionlighting
 	final = OECF_sRGBFast(final);
-
+	
 	Composite = final + blur  ;
+	//Composite = SSR;
 }

@@ -46,7 +46,9 @@ namespace HellEngine
 	Shader Renderer::s_GlassBlur;
 	Shader Renderer::s_CombineGlassBlurWithFinalLighting;
 	Shader Renderer::s_DecalComposite;
-
+	Shader Renderer::s_DecalTexturePaint;
+	Shader Renderer::s_ScreenSpaceReflections;
+	
 	std::string Renderer::s_debugString;
 
 	BloodEffect Renderer::s_bloodEffect;
@@ -134,6 +136,9 @@ namespace HellEngine
 		s_GunInspectShader = Shader("GunInspect", "GunInspect.vert", "GunInspect.frag", "NONE");
 		s_SolidColor3D = Shader("SolidColor3D", "solidColor3D.vert", "solidColor3D.frag", "NONE");
 
+		s_DecalTexturePaint = Shader("DecalTexturePaint", "s_DecalTexturePaint.vert", "s_DecalTexturePaint.frag", "NONE");
+		s_ScreenSpaceReflections = Shader("ScreenSpaceReflections", "ScreenSpaceReflections.vert", "ScreenSpaceReflections.frag", "NONE");
+		
 		SetTextureBindings();
 
 		s_gBuffer = GBuffer(CoreGL::s_windowWidth, CoreGL::s_windowHeight);
@@ -508,6 +513,14 @@ namespace HellEngine
 			EnvMapPass(game, &s_reflection_Map_Shader, &s_SphericalH_Harmonics_Shader);
 		}
 
+
+		/////////////////////////
+		// DECAL TEXTURE PAINT //
+
+		DecalTexturePaint(&s_DecalComposite);
+
+
+
 		////////////////////////////////////////////
 		{
 			GpuProfiler g("ShadowmapPass");
@@ -526,7 +539,7 @@ namespace HellEngine
 
 		//RenderProjectiles(&s_geometryShader);
 
-		DecalCompositePass(&s_DecalComposite);
+		//DecalCompositePass(&s_DecalComposite);
 
 		{
 			GpuProfiler g("Volumetric Pass");
@@ -543,6 +556,8 @@ namespace HellEngine
 			GpuProfiler g("LightingPass");
 			LightingPass(game, &s_StencilShader, &s_lightingShader);
 		}
+
+		ScreenSpaceReflectionsPass(&s_ScreenSpaceReflections, game);
 
 		{
 			GpuProfiler g("GlassPass");
@@ -600,7 +615,9 @@ namespace HellEngine
 				//RenderFinalImage(&s_quadShader, s_FinalImageBuffer.TexID);
 				RenderFinalImage(&s_quadShader, s_ChromaticAbberationBuffer.TexID);
 			else
-				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
+				RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gSSR, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
+		//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, GameData::p_house->m_entities[2].m_decalMapID, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
+		//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, s_gBuffer.gFinalLighting);
 		//		RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, s_gBuffer.gRMA, floorDecalMap);
 			//RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_compositeBuffer.gAlbedoDecalComposite, s_gBuffer.gRMA, s_compositeBuffer.gRMADecalComposite);
 			//	RenderDebugTextures(&s_quadShader, s_gBuffer.gAlbedo, s_gBuffer.gNormal, GameData::p_house->m_lights[0].m_LightProbe.SH_TexID, s_gBuffer.gFinalLighting);
@@ -608,6 +625,12 @@ namespace HellEngine
 			//RenderDebugTextures(&s_quadShader, s_gBuffer.gNormal, s_gBuffer.gGlassSurface, s_gBuffer.gGlassBlur, s_gBuffer.gFinalLighting);
 			//	RenderDebugTextures(&s_quadShader, s_BlurBuffers[0].textureA, s_BlurBuffers[1].textureA, s_BlurBuffers[2].textureA, s_BlurBuffers[3].textureA);
 		}
+
+
+		
+
+
+
 
 		static bool white = false;
 
@@ -773,6 +796,15 @@ namespace HellEngine
 
 		//
 	
+		for (int i = 0; i < game->m_NurseGuy.m_animatedDebugTransforms_Animated.size(); i++)
+		{
+			glm::mat4 boneMatrix = game->m_NurseGuy.m_animatedDebugTransforms_Animated[i];
+			DrawTangentDebugAxis(&s_solidColorShader, game->m_NurseGuy.m_worldTransform.to_mat4() * boneMatrix, 0.05f);
+			DrawPoint(&s_solidColorShader, Util::GetTranslationFromMatrix(game->m_NurseGuy.m_worldTransform.to_mat4() * boneMatrix), glm::vec3(1, 0, 0));
+		}
+
+
+
 		// draw ragdoll joints
 	/*for (int i = 0; i < Ragdoll::JOINT_COUNT; i++)
 	{
@@ -794,8 +826,13 @@ namespace HellEngine
 		glm::mat4 rot = glm::mat4_cast(Config::TEST_QUAT);
 		glm::mat4 rot2 = glm::mat4_cast(Config::TEST_QUAT2);
 
+
+		/* old ragdoll
 		glm::mat4 m = game->m_zombieGuy.m_ragdoll->Get_Top_Joint_World_Matrix(i);
 		glm::mat4 m2 = game->m_zombieGuy.m_ragdoll->Get_Bottom_Joint_World_Matrix(i);
+		*/
+		
+
 	//	WERE USING THIS DrawPoint(&s_solidColorShader, Util::GetTranslationFromMatrix(m), glm::vec3(1, 0, 0));
 	// WERE USING THIS	DrawPoint(&s_solidColorShader, Util::GetTranslationFromMatrix(m2), glm::vec3(0, 1, 0));
 	}
@@ -826,7 +863,8 @@ namespace HellEngine
 	}*/
 	
 	// find magic matrix
-	Ragdoll* ragdoll = game->m_zombieGuy.m_ragdoll;
+	
+	/* OLD RAGDOLL Ragdoll* ragdoll = game->m_zombieGuy.m_ragdoll;
 	{
 		btGeneric6DofConstraint* constraint = ragdoll->m_joints[Ragdoll::JOINT_RIGHT_SHOULDER];
 		constraint->calculateTransforms();
@@ -864,28 +902,13 @@ namespace HellEngine
 		//DrawTangentDebugAxis(&s_solidColorShader, m, 0.025f);
 	}
 
-	{
-		/*btGeneric6DofConstraint* constraint = ragdoll->m_joints[Ragdoll::JOINT_RIGHT_HIP];
-		constraint->calculateTransforms();
-		btTransform transform = constraint->getCalculatedTransformB();
-		btVector3 pos = transform.getOrigin();
-		btQuaternion rot = transform.getRotation() * btQuaternion(0, 1, 0, 0);
-
-		glm::vec3 posGL = glm::vec3(pos.x(), pos.y(), pos.z());
-		glm::quat rotQL = glm::quat(rot.w(), rot.x(), rot.y(), rot.z());
-
-		glm::mat4 m = glm::translate(glm::mat4(1), posGL);
-		m *= glm::mat4_cast(rotQL);
-
-		DrawTangentDebugAxis(&s_solidColorShader, m, 0.05f);*/
-	}
-
+	
 
 	btTransform trann;
 	game->m_zombieGuy.m_ragdoll->m_bodies[Ragdoll::BODYPART_RIGHT_UPPER_LEG]->getMotionState()->getWorldTransform(trann);
 	glm::vec3 p = Util::btVec3_to_glmVec3(trann.getOrigin());
 
-
+	*/
 
 	//glm::vec3 p2 = game->m_zombieGuy.m_ragdoll->GetJointWorldPositionA(i);
 	//DrawPoint(&s_solidColorShader, p, glm::vec3(1, 1, 0));
@@ -936,19 +959,7 @@ namespace HellEngine
 //		DrawPoint(&s_solidColorShader, GlockLogic::GetGlockCasingSpawnWorldPosition(), glm::vec3(1, 1, 1));
 
 			// try draw ragdoll joints!!!
-		if (!s_demo)
-		{
-			GpuProfiler g("ragdoll");
-
-			Ragdoll* ragdoll = game->m_zombieGuy.m_ragdoll;
-
-			for (int i = 0; i < ragdoll->JOINT_COUNT; i++)
-			{
-				//	glm::vec3 jointWorldPos = ragdoll->GetJointWorldPosition(i);
-				//glm::vec3 jointWorldPos = Util::GetTranslationFromMatrix(ragdoll->GetJointWorldMatrix(i));
-				//DrawPoint(&s_solidColorShader, jointWorldPos, glm::vec3(1, 0, 1));
-			}
-		}
+		
 
 
 		/*for (Vertex& vertex : GameData::p_house->m_rooms[0].m_wallMesh.vertices)
@@ -1148,8 +1159,8 @@ namespace HellEngine
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-		glDrawBuffers(4, attachments);
+		unsigned int attachments[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT7 };
+		glDrawBuffers(5, attachments);
 
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -1434,7 +1445,7 @@ namespace HellEngine
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, s_compositeBuffer.gCopy);
 		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gBloodDecals);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gSSR);
 		glActiveTexture(GL_TEXTURE3);
 
 		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
@@ -1940,6 +1951,8 @@ namespace HellEngine
 		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gGlassBlur);
 		glActiveTexture(GL_TEXTURE6);
 		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gGlassSurface);
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gSSR);
 
 		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
 		Quad2D::RenderQuad(shader);
@@ -2243,6 +2256,9 @@ namespace HellEngine
 			// Enemies
 			shader->setBool("blockoutDecals", true);
 			game->m_zombieGuy.Draw(shader, glm::mat4(1));
+		
+			game->m_NurseGuy.Draw(shader, game->m_NurseGuy.m_worldTransform.to_mat4());
+
 			shader->setBool("blockoutDecals", false);
 
 			// Doors
@@ -2427,6 +2443,59 @@ namespace HellEngine
 		shader->setMat4("view", game->camera.m_viewMatrix);
 
 		LevelEditor::Update(game);
+	}
+
+	void Renderer::DecalTexturePaint(Shader* shader)
+	{
+
+
+		glDisable(GL_BLEND);
+		Entity* couchEntity = &GameData::p_house->m_entities[2];
+
+		float clearcolor[] = { 1, 0, 0, 1 };
+		glClearTexImage(couchEntity->m_decalMapID, 0, GL_RGBA, GL_FLOAT, clearcolor);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexIDByName("decal_mask7"));
+
+
+	}
+
+	void Renderer::ScreenSpaceReflectionsPass(Shader* shader, Game* game)
+	{
+		glViewport(0, 0, CoreGL::s_windowWidth, CoreGL::s_windowHeight);
+		glBindFramebuffer(GL_FRAMEBUFFER, s_gBuffer.ID);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, s_FXAABuffer.TexID); // Contains the previous renderered frame
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gNormal);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.rboDepth);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gRMA);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, s_gBuffer.gEmissive);
+
+		unsigned int attachments[1] = { GL_COLOR_ATTACHMENT7 };
+		glDrawBuffers(1, attachments);
+
+		shader->use();
+
+		shader->setMat4("pv", game->camera.m_projectionViewMatrix);
+		shader->setMat4("inverseProjectionMatrix", glm::inverse(game->camera.m_projectionMatrix));
+		shader->setMat4("inverseViewMatrix", glm::inverse(game->camera.m_viewMatrix));
+		shader->setFloat("screenWidth", CoreGL::s_windowWidth);
+		shader->setFloat("screenHeight", CoreGL::s_windowHeight);
+
+		Quad2D::RenderQuad(shader);
+
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, s_FXAABuffer.TexID);
+
+		// Ok this is wild but you are going to outpuit this pass to the GBUFFER aldebo tex
+
+		
 	}
 
 	void Renderer::ViewCubeMap(Game* game, Shader* shader, unsigned int CubeMapID)

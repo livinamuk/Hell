@@ -56,7 +56,7 @@ namespace HellEngine
 		windowModel->Set_Mesh_MaterialID_Set0("SM_Window_01c", AssetManager::GetMaterialIDByName("WindowExterior"));
 		windowModel->Set_Mesh_MaterialID_Set0("SM_Window_01d", AssetManager::GetMaterialIDByName("Window"));
 		windowModel->Set_Mesh_MaterialID_Set0("SM_Window_01d", AssetManager::GetMaterialIDByName("WindowExterior"));
-		windowModel->Set_Mesh_MaterialID_Set0("SM_Glass_Top", AssetManager::GetMaterialIDByName("White"));
+		windowModel->Set_Mesh_MaterialID_S et0("SM_Glass_Top", AssetManager::GetMaterialIDByName("White"));
 		windowModel->Set_Mesh_MaterialID_Set0("SM_Glass_Down", AssetManager::GetMaterialIDByName("White"));
 		*/
 		m_testAnimatedEnttity.SetSkinnedModel("Shotgun.fbx");
@@ -67,15 +67,27 @@ namespace HellEngine
 
 		m_NurseGuy.SetSkinnedModel("NurseGuy.fbx");
 		m_NurseGuy.m_worldTransform.position.x = 1;
-		m_NurseGuy.SetModelScale(0.01f);
-		m_NurseGuy.m_currentAnimationIndex = 1;
+	//	m_NurseGuy.SetModelScale(0.01025f);
+		m_NurseGuy.m_currentAnimationIndex = 0;
+
+
+
+
+
+		m_NurseGuy.SetMaterial("Ch16_Body1", "Nurse");
+		m_NurseGuy.SetMaterial("Ch16_Cap", "Nurse2");
+		m_NurseGuy.SetMaterial("Ch16_Eyelashes", "Nurse");
+		m_NurseGuy.SetMaterial("Ch16_Mask", "Nurse2");
+		m_NurseGuy.SetMaterial("Ch16_Pants", "Nurse");
+		m_NurseGuy.SetMaterial("Ch16_Shirt", "Nurse");
+		m_NurseGuy.SetMaterial("Ch16_Shoes", "Nurse2");
 
 
 		m_zombieGuy.SetSkinnedModel("Zombie.fbx");
 		m_zombieGuy.SetAnimationToBindPose();
 		m_zombieGuy.NewRagdollFromAnimatedTransforms();
 
-
+		m_NurseGuy.GetSkinnedModel()->PrintBonesList();
 
 
 
@@ -133,11 +145,14 @@ namespace HellEngine
 
 		if (Input::s_keyPressed[HELL_KEY_N])
 		{
+			/* old ragdoll 
 			for (int i = 0; i < Ragdoll::BODYPART_COUNT; ++i)
 				Physics::s_dynamicsWorld->removeRigidBody(m_zombieGuy.m_ragdoll->m_bodies[i]);
 
 			for (int i = 0; i < Ragdoll::JOINT_COUNT; ++i)
 				Physics::s_dynamicsWorld->removeConstraint(m_zombieGuy.m_ragdoll->m_joints[i]);
+				*/
+			m_zombieGuy.m_ragdoll->RemovePhysicsObjects();
 
 			m_zombieGuy.SetAnimationToBindPose();
 			m_zombieGuy.NewRagdollFromAnimatedTransforms();
@@ -206,12 +221,17 @@ namespace HellEngine
 		float deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		WeaponLogic::UpdateSkeletalAnimation(deltaTime);
+	//	WeaponLogic::UpdateSkeletalAnimation(deltaTime);
 
 		// Update all skeletal meshes
 		//m_testAnimatedEnttity.Update(deltaTime);
 
 		m_NurseGuy.Update(deltaTime);
+/*
+		std::cout << "\n";
+		std::cout << "anim cout: " << m_NurseGuy.GetSkinnedModel()->m_animations.size() << "\n";
+		std::cout << "anim index: " << m_NurseGuy.GetSkinnedModel()->currentAnimationIndex << "\n";
+		*/
 		
 		//m_zombieGuy.Update(deltaTime);
 		//m_zombieGuy.SetAnimationToBindPose();

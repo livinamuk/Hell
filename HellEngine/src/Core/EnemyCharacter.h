@@ -1,7 +1,7 @@
 #pragma once
 #include "header.h"
 #include "AnimatedEntity.h"
-#include "Physics/Ragdoll.h"
+#include "Physics/Ragdoll2.h"
 
 namespace HellEngine
 {
@@ -13,7 +13,8 @@ namespace HellEngine
         void AnimatedFromRagdoll();
         //void Draw(Shader* shader, glm::mat4 modelMatrix);
 
-        Ragdoll* m_ragdoll;
+        //Ragdoll* m_ragdoll;
+        Ragdoll2* m_ragdoll;
         bool m_animatedWithRagdoll = true;
 
     };

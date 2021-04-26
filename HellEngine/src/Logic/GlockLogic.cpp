@@ -19,7 +19,7 @@ namespace HellEngine
 	Camera* GlockLogic::p_camera;
 	Player* GlockLogic::p_player;
 	AnimatedEntity* GlockLogic::p_model;
-	bool GlockLogic::s_awaitingShell;
+	bool GlockLogic::s_firstEquip;
 	int GlockLogic::s_RandomFireAnimation;
 
 	void GlockLogic::Update(float deltatime)
@@ -122,8 +122,8 @@ namespace HellEngine
 	{
 		// Equip
 		if (m_gunState == GunState::EQUIP)		{
-			p_model->PlayAnimation("Glock_FirstEquip1.fbx", false);
-			//p_model->PlayAnimation("Glock_Equip.fbx", false);
+			//p_model->PlayAnimation("Glock_FirstEquip1.fbx", false);
+			p_model->PlayAnimation("Glock_Equip2.fbx", false);
 
 			if (p_model->IsAnimationComplete()) {
 				p_model->PlayAnimation("Glock_Idle.fbx", true);
@@ -132,12 +132,16 @@ namespace HellEngine
 			}
 			return;
 		}
-
-		// Equip
+		// Dequiping?
 		if (m_gunState == GunState::DEQUIP) {
-			WeaponLogic::SwitchToDesiredWeapon();
+			p_model->PlayAnimation("Glock_Holster.fbx", false);
+
+			if (p_model->IsAnimationComplete())
+				WeaponLogic::SwitchToDesiredWeapon();
+
 			return;
 		}
+
 
 		// Idle 
 		if (m_gunState == GunState::IDLE)			

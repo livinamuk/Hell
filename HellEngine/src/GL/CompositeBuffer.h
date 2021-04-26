@@ -10,7 +10,7 @@ namespace HellEngine
 		~CompositeBuffer();
 
 		unsigned int ID;
-		unsigned int gAlbedoDecalComposite, gRMADecalComposite, gCopy;
+		unsigned int gAlbedoDecalComposite, gRMADecalComposite, gCopy;// gPreviousFrame;
 
 		void Configure(int width, int height);
 	};

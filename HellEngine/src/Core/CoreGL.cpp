@@ -340,7 +340,7 @@ namespace HellEngine
  			std::cout << "SEVERE!!!\n";
 			std::cout << "SEVERE!!!\n";
 		}
-		/*if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+		/*if (severity == GL_DEBUG_SEVERITY_NOTIFICgATION)
 		{
 			std::cout << "NOTIFICATION!!!\n";
 			std::cout << "NOTIFICATION!!!\n";

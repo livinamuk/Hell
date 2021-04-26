@@ -11,6 +11,14 @@
 #include "assimp/matrix4x4.h"
 #include "assimp/matrix3x3.h"
 
+#include "rapidjson/document.h"
+#include <rapidjson/filereadstream.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/ostreamwrapper.h>
+#include <rapidjson/prettywriter.h>
+
 namespace HellEngine
 {
 	class Util
@@ -84,6 +92,11 @@ namespace HellEngine
 
 		static glm::mat4 btTransformToMat4(btTransform& trans);
 	
+		static glm::mat4 Mat4FromJSONArray(rapidjson::GenericArray<false, rapidjson::Value>& arr);
+		static glm::vec3 Vec3FromJSONArray(rapidjson::GenericArray<false, rapidjson::Value>& arr);
+		static btQuaternion BtQuatFromJSONArray(rapidjson::GenericArray<false, rapidjson::Value>& arr);
+		static btMatrix3x3 BtMat3FromGlmMatrix(glm::mat4 matrix);
+
 	private:
 			static unsigned int upFacingPlaneVAO;
 			static unsigned int downFacingPlaneVAO;

@@ -160,14 +160,15 @@ namespace HellEngine
 	{
 		glGenFramebuffers(1, &m_decalMapFBO);
 		glGenTextures(1, &m_decalMapID);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, m_decalMapFBO);
 
 		glBindTexture(GL_TEXTURE_2D, m_decalMapID);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_decalMapID, 0);
-		glGenerateMipmap(GL_TEXTURE_2D); // dunno about this, is it neccessary??
+		//	glGenerateMipmap(GL_TEXTURE_2D); // dunno about this, is it neccessary??
 
 		unsigned int attachments[1] = { GL_COLOR_ATTACHMENT0};
 		glDrawBuffers(1, attachments);
@@ -175,5 +176,8 @@ namespace HellEngine
 		// Clear it to test it works
 		float clearcolor[] = { 0, 0, 1, 1 };
 		glClearTexImage(m_decalMapID, 0, GL_RGBA, GL_FLOAT, clearcolor);
+
+		glClearColor(1, 1, 0, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT );	
 	}
 }

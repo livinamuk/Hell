@@ -46,6 +46,8 @@ namespace HellEngine
 		// Toggle fullscreen
 		if (s_keyPressed[HELL_KEY_F]) {
 			CoreGL::ToggleFullScreen();
+
+			
 		}
 
 		// Hotload Shaders
@@ -72,6 +74,8 @@ namespace HellEngine
 			Renderer::s_GlassBlur.ReloadShader();
 			Renderer::s_CombineGlassBlurWithFinalLighting.ReloadShader();
 			Renderer::s_DecalComposite.ReloadShader();
+			Renderer::s_DecalTexturePaint.ReloadShader();
+			Renderer::s_ScreenSpaceReflections.ReloadShader();
 			Renderer::SetTextureBindings();
 		}
 

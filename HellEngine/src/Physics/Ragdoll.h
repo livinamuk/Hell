@@ -105,7 +105,7 @@ namespace HellEngine
 		Ragdoll(const btVector3& positionOffset, float modelScale, glm::mat4 worldMatrix);
 		~Ragdoll();
 
-		void UpdateBoneTransform(SkinnedModel* skinnedModel, std::vector<glm::mat4>& Transforms, std::vector<glm::mat4>& DebugAnimatedTransforms);
+		void UpdateBoneTransform2(SkinnedModel* skinnedModel, std::vector<glm::mat4>& Transforms, std::vector<glm::mat4>& DebugAnimatedTransforms);
 
 		btRigidBody* m_bodies[BODYPART_COUNT];
 

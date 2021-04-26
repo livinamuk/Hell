@@ -525,13 +525,21 @@ namespace HellEngine
 
 	void Physics::Update(float deltaTime)
 	{
-		int maxSubSteps = 1;
+		int substeps = 2;
+		btScalar timeStep = 1.0 / 60.0;
+
+		for (auto s = 0U; s < substeps; s++) {
+			Physics::s_dynamicsWorld->stepSimulation(deltaTime / substeps, 1, timeStep / substeps);
+		}
+		
+		
+		/*int maxSubSteps = 1;
 		btScalar fixedTimeStep = btScalar(1.) / btScalar(60.);
 
 		//maxSubSteps = 10;
 		//fixedTimeStep = 1.0 / 240.0;
 		s_dynamicsWorld->stepSimulation(deltaTime , maxSubSteps, fixedTimeStep);
-
+		*/
 		CheckForCollisionEvents();
 	}
 

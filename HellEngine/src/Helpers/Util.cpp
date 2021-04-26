@@ -849,4 +849,56 @@ namespace HellEngine
 		m *= glm::mat4_cast(rotQL);
 		return  m;
 	}
+
+
+
+	glm::mat4 Util::Mat4FromJSONArray(rapidjson::GenericArray<false, rapidjson::Value>& arr)
+	{
+		glm::mat4 m;
+
+		m[0][0] = arr[0].GetFloat();
+		m[0][1] = arr[1].GetFloat();
+		m[0][2] = arr[2].GetFloat();
+		m[0][3] = arr[3].GetFloat();
+		m[1][0] = arr[4].GetFloat();
+		m[1][1] = arr[5].GetFloat();
+		m[1][2] = arr[6].GetFloat();
+		m[1][3] = arr[7].GetFloat();
+		m[2][0] = arr[8].GetFloat();
+		m[2][1] = arr[9].GetFloat();
+		m[2][2] = arr[10].GetFloat();
+		m[2][3] = arr[11].GetFloat();
+		m[3][0] = arr[12].GetFloat();
+		m[3][1] = arr[13].GetFloat();
+		m[3][2] = arr[14].GetFloat();
+		m[3][3] = arr[15].GetFloat();
+
+		return m;
+	}
+
+	glm::vec3 Util::Vec3FromJSONArray(rapidjson::GenericArray<false, rapidjson::Value>& arr)
+	{
+		return glm::vec3(arr[0].GetFloat(), arr[1].GetFloat(), arr[2].GetFloat());
+	}
+
+	btQuaternion Util::BtQuatFromJSONArray(rapidjson::GenericArray<false, rapidjson::Value>& arr)
+	{
+		return btQuaternion(arr[0].GetFloat(), arr[1].GetFloat(), arr[2].GetFloat(), arr[3].GetFloat());
+	}
+
+	btMatrix3x3 Util::BtMat3FromGlmMatrix(glm::mat4 matrix)
+	{
+		btMatrix3x3 m;
+		matrix = glm::transpose(matrix);
+		m[0][0] = matrix[0][0];
+		m[0][1] = matrix[0][1];
+		m[0][2] = matrix[0][2];
+		m[1][0] = matrix[1][0];
+		m[1][1] = matrix[1][1];
+		m[1][2] = matrix[1][2];
+		m[2][0] = matrix[2][0];
+		m[2][1] = matrix[2][1];
+		m[2][2] = matrix[2][2];
+		return m;
+	}
 }

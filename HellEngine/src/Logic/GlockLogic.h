@@ -36,7 +36,7 @@ namespace HellEngine
 		static Camera* p_camera;
 		static Player* p_player;
 		static AnimatedEntity* p_model;
-		static bool s_awaitingShell;
+		static bool s_firstEquip;
 		static int s_RandomFireAnimation;
 	};
 }

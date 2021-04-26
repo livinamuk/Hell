@@ -211,6 +211,7 @@
     <ClInclude Include="src\Physics\CharacterController.h" />
     <ClInclude Include="src\Physics\Physics.h" />
     <ClInclude Include="src\Physics\Ragdoll.h" />
+    <ClInclude Include="src\Physics\Ragdoll2.h" />
     <ClInclude Include="src\Physics\RagdollJoint.h" />
     <ClInclude Include="src\Physics\RaycastResult.h" />
     <ClInclude Include="src\Renderer\AssimpModel.h" />
@@ -698,6 +699,7 @@
     <ClCompile Include="src\Physics\CharacterController.cpp" />
     <ClCompile Include="src\Physics\Physics.cpp" />
     <ClCompile Include="src\Physics\Ragdoll.cpp" />
+    <ClCompile Include="src\Physics\Ragdoll2.cpp" />
     <ClCompile Include="src\Physics\RagdollJoint.cpp" />
     <ClCompile Include="src\Physics\RaycastResult.cpp" />
     <ClCompile Include="src\Renderer\AssimpModel.cpp" />
@@ -753,6 +755,8 @@
     <None Include="res\shaders\GlassBlur.vert" />
     <None Include="res\shaders\GunInspect.frag" />
     <None Include="res\shaders\GunInspect.vert" />
+    <None Include="res\shaders\ScreenSpaceReflections.frag" />
+    <None Include="res\shaders\ScreenSpaceReflections.vert" />
     <None Include="res\shaders\SH.frag" />
     <None Include="res\shaders\SH.vert" />
     <None Include="res\shaders\Shader.vert" />

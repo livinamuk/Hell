@@ -3,7 +3,7 @@
 layout (location = 0) out vec4 gAlbedo;
 layout (location = 1) out vec4 gNormal;
 layout (location = 2) out vec3 gRMA;
-layout (location = 3) out vec3 gEmissive;
+layout (location = 3) out vec4 gEmissive;
 
 layout (binding = 0) uniform sampler2D ALB_Texture0;
 layout (binding = 1) uniform sampler2D NRM_Texture0;
@@ -56,7 +56,7 @@ void main()
 
 	if (TEXTURE_FLAG == 3)								
 		finalTexCoords = vec2(FragPos.x, FragPos.z) * 0.4;		// Floor Regular
-	if (TEXTURE_FLAG == 4)								
+	else if (TEXTURE_FLAG == 4)								
 		finalTexCoords = vec2(FragPos.z, FragPos.x) * 0.4;		// Flooor Rotated 90 degrees
 	
 	//////////////////////
@@ -124,10 +124,22 @@ void main()
 
 	// Has emissive map
 	if (hasEmissive) {
-		gEmissive = texture(EMMISIVE_Texture, finalTexCoords).r * emissiveColor;
+		gEmissive.rgb = texture(EMMISIVE_Texture, finalTexCoords).r * emissiveColor;
 	}
 	else
-		gEmissive = vec3(0, 0, 0);
+		gEmissive.rgb = vec3(0, 0, 0);
+
+
+	// SSR mask
+	if (TEXTURE_FLAG == 3 || TEXTURE_FLAG == 4)	// if true receivesSSR
+		gEmissive.a = 0;
+	else
+		gEmissive.a = 1;
+
+	//if (normal.y < -0.95)
+	//	gEmissive.a = 1;
+
+
 
 	//	gAlbedo.rgb = vec3(gAlbedo.a);
 	//gAlbedo.a = 1;
@@ -157,8 +169,10 @@ void main()
 		
 		vec4 decalMapColor = texture(DECAL_MAP_Texture, finalTexCoords);
 
+		vec4 color = vec4(vec3(decalMapColor), 1);
+
 		// DECAL MAP
 		if (u_hasDecalMap)
-			gAlbedo *=  decalMapColor;
-
+			gAlbedo = gAlbedo;// * color;
+		
 }

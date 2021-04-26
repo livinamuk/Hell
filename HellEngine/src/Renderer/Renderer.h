@@ -66,6 +66,8 @@ namespace HellEngine
 		static void DecalCompositePass(Shader* shader);
 		//static void RenderProjectiles(Shader* shader);
 		//static void ReRenderDoors(Shader* shader);
+		static void DecalTexturePaint(Shader* shader);
+		static void ScreenSpaceReflectionsPass(Shader* shader, Game* game);
 
 		static void ViewCubeMap(Game* , Shader* shader, unsigned int CubeMapID);
 		static void CreateBRDFLut();
@@ -116,6 +118,9 @@ namespace HellEngine
 		static Shader s_GlassBlur;
 		static Shader s_CombineGlassBlurWithFinalLighting;
 		static Shader s_DecalComposite;
+		static Shader s_ScreenSpaceReflections;
+
+		static Shader s_DecalTexturePaint;
 
 		static std::vector<BlurBuffer> s_BlurBuffers;
 

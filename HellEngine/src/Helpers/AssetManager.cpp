@@ -169,11 +169,10 @@ namespace HellEngine
 		models.emplace_back(Model("res/models/Light_03.obj"));
 		models.emplace_back(Model("res/models/Light_04.obj"));
 
-		models.emplace_back(Model("res/models/Table.obj"));
+		models.emplace_back(Model("res/models/Table.obj")); 
 
 		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("NurseGuy.fbx"));
-		LoadAnimation("NurseGuy.fbx", "NurseGuyWalk.fbx");
-		LoadAnimation("NurseGuy.fbx", "NurseGuyRun.fbx");
+		LoadAnimation("NurseGuy.fbx", "NursdeGuyShotgunIdle.fbx");
 
 		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("Zombie.fbx"));
 		skinnedModels.emplace_back(FileImporter::LoadSkinnedModel("Shotgun.fbx"));
@@ -189,6 +188,8 @@ namespace HellEngine
 		LoadAnimation("Glock.fbx", "Glock_EmptyReload.fbx");
 		//LoadAnimation("Glock.fbx", "Glock_IdleEmpty.fbx");
 		LoadAnimation("Glock.fbx", "Glock_Equip.fbx");
+		LoadAnimation("Glock.fbx", "Glock_Equip2.fbx");
+		LoadAnimation("Glock.fbx", "Glock_Holster.fbx");
 		LoadAnimation("Glock.fbx", "Glock_FirstEquip1.fbx");
 		LoadAnimation("Glock.fbx", "Glock_Walk.fbx");
 

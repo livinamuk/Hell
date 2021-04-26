@@ -24,7 +24,8 @@ namespace HellEngine
 		
 
 		for (unsigned int i = 0; i < m_animatedTransforms.size(); i++)
-			shader->setMat4("skinningMats[" + std::to_string(i) + "]", m_animatedTransforms[i]);
+			//shader->setMat4("skinningMats[" + std::to_string(i) + "]", m_animatedTransforms[i]);
+			shader->setMat4("skinningMats[" + std::to_string(i) + "]", m_modelTransform.to_mat4() * m_animatedTransforms[i]);
 
 		SkinnedModel* skinnedModel = GetSkinnedModel();
 
@@ -160,6 +161,10 @@ namespace HellEngine
 	void AnimatedEntity::PauseAnimation()
 	{
 		m_pause = true;
+	}
+
+	void AnimatedEntity::InitRagdollFromMesh()
+	{
 	}
 
 	bool AnimatedEntity::IsAnimationComplete()

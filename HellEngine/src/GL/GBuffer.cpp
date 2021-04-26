@@ -13,7 +13,7 @@ namespace HellEngine
 		glGenTextures(1, &gFinalLighting);
 		glGenTextures(1, &gGlassBlur);
 		glGenTextures(1, &gGlassSurface);
-		glGenTextures(1, &gBloodDecals);
+		glGenTextures(1, &gSSR);
 		//glGenTextures(1, &gAlbedoDecalComposite);
 		glGenTextures(1, &rboDepth); 
 		Configure(width, height);
@@ -73,11 +73,11 @@ namespace HellEngine
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT6, GL_TEXTURE_2D, gGlassSurface, 0);
 
-		glBindTexture(GL_TEXTURE_2D, gBloodDecals);
+		glBindTexture(GL_TEXTURE_2D, gSSR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT7, GL_TEXTURE_2D, gBloodDecals, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT7, GL_TEXTURE_2D, gSSR, 0);
 		
 		/*glBindTexture(GL_TEXTURE_2D, gAlbedoDecalComposite);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16, width, height, 0, GL_RGB, GL_FLOAT, NULL);

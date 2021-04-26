@@ -1506,6 +1506,9 @@
     <ClInclude Include="src\GL\CompositeBuffer.h">
       <Filter>src\GL</Filter>
     </ClInclude>
+    <ClInclude Include="src\Physics\Ragdoll2.h">
+      <Filter>src\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\AnimatedNode.cpp">
@@ -1780,6 +1783,9 @@
     <ClCompile Include="src\GL\CompositeBuffer.cpp">
       <Filter>src\GL</Filter>
     </ClCompile>
+    <ClCompile Include="src\Physics\Ragdoll2.cpp">
+      <Filter>src\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\ChromaticAberration.frag">
@@ -1935,6 +1941,12 @@
       <Filter>res\shaders</Filter>
     </None>
     <None Include="res\shaders\DecalComposite.vert">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\ScreenSpaceReflections.vert">
+      <Filter>res\shaders</Filter>
+    </None>
+    <None Include="res\shaders\ScreenSpaceReflections.frag">
       <Filter>res\shaders</Filter>
     </None>
   </ItemGroup>

@@ -110,11 +110,26 @@ namespace HellEngine
         glm::vec3 end = glm::vec3(animatedNode->m_nodeKeys[NextIndex].scale);
         glm::vec3 delta = end - start;
         Out = start + Factor * delta;
+
+
+       /* std::cout << "m_nodeKeys.size():     " << animatedNode->m_nodeKeys.size() << 
+;
+        std::cout << "timestamp:     " << animatedNode->m_nodeKeys[Index].timeStamp << "\n";
+
+        std::cout << "DeltaTime:     " << DeltaTime << "\n";
+        std::cout << "Factor: " << Factor << "\n";
+        std::cout << "start:   " << start.x << ", " << start.y << ", " << start.z << "\n";
+        std::cout << "end:     " << end.x << ", " << end.y << ", " << end.z << "\n";
+        std::cout << "delta:   " << delta.x << ", " << delta.y << ", " << delta.z << "\n";
+        */
     }
 
 
     void SkinnedModel::BoneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms, std::vector<glm::mat4>& DebugAnimatedTransforms)
     {
+
+       TimeInSeconds = 0.24f;
+
         // Get the animation time
         float AnimationTime = 0;
         if (m_animations.size() > 0) {
@@ -124,13 +139,24 @@ namespace HellEngine
             float TimeInTicks = TimeInSeconds * TicksPerSecond;
             AnimationTime = fmod(TimeInTicks, animation->m_duration);
         }
+     //   std::cout << "\n" << m_filename << "\n";
 
+
+        std::vector<glm::mat4> tempParentFinalTransforms;
+        for (int i = 0; i < m_skeleton.m_joints.size(); i++)
+            tempParentFinalTransforms.push_back(glm::mat4(1));
 
         // Traverse the tree 
         for (int i = 0; i < m_skeleton.m_joints.size(); i++)
         {
+            if (m_skeleton.m_joints.size() == 90)
+            {
+              //  std::cout << "\ni: " << i << "\n";
+            }
+
             // Get the node and its um bind pose transform?
             const char* NodeName = m_skeleton.m_joints[i].m_name;
+           // std::cout << "NodeName " << NodeName << "\n";
             glm::mat4 NodeTransformation = m_skeleton.m_joints[i].m_inverseBindTransform;
 
             // Calculate any animation
@@ -155,16 +181,37 @@ namespace HellEngine
 
                     TranslationM = Util::Mat4InitTranslationTransform(Translation.x, Translation.y, Translation.z);
                     NodeTransformation = TranslationM * RotationM * ScalingM;
+
+                 //   std::cout << "ScalingM\n";
+                //    Util::PrintMat4(ScalingM);
+                 //   std::cout << "RotationQ\n";
+                    //std::cout << "(" << RotationQ.x << ", " << RotationQ.y << ", " << RotationQ.z << ", " RotationQ.w << "\n";
+             //       Util::PrintMat4(RotationM); 
+                //    std::cout << "TranslationM\n";
+               //     Util::PrintMat4(TranslationM);
                 }
             }
-            unsigned int parentIndex = m_skeleton.m_joints[i].m_parentIndex;
+            int parentIndex = m_skeleton.m_joints[i].m_parentIndex;
 
-            glm::mat4 ParentTransformation = (parentIndex == -1) ? glm::mat4(1) : m_skeleton.m_joints[parentIndex].m_currentFinalTransform;
+         //   std::cout << "parentIndex " << parentIndex << "\n";
+  
+
+            glm::mat4 ParentTransformation = (parentIndex == -1) ? glm::mat4(1) : tempParentFinalTransforms[parentIndex];
+
+            /*std::cout << "Node Transform\n";
+            Util::PrintMat4(NodeTransformation);
+            std::cout << "Parent Transform\n";
+            Util::PrintMat4(ParentTransformation);
+            */
             glm::mat4 GlobalTransformation = ParentTransformation * NodeTransformation;
 
-            // Store the current transformation, so child nodes can access it
-            m_skeleton.m_joints[i].m_currentFinalTransform = GlobalTransformation;
+            tempParentFinalTransforms[i] = GlobalTransformation;
 
+          /*  if (parentIndex == 4) {
+                std::cout << "i " << i << "\n";
+                std::cout << "parentIndex " << parentIndex << "\n";
+                Util::PrintMat4(NodeTransformation);
+            }*/
 
             if (Util::StrCmp(NodeName, "Camera001") || Util::StrCmp(NodeName, "Camera")) {
                 WeaponLogic::s_AnimatedCameraMatrix = GlobalTransformation;
@@ -196,13 +243,30 @@ namespace HellEngine
 
     const AnimatedNode* SkinnedModel::FindAnimatedNode(Animation* animation, const char* NodeName)
     {
+      /*  std::cout << "\n";
+        std::cout << "\n";
+        std::cout << "\n";
+
+        */
+       // std::cout << "there are " << animation->m_animatedNodes.size() << " animatedn nodes. They are: \n";
+
         for (unsigned int i = 0; i < animation->m_animatedNodes.size(); i++) {
             const AnimatedNode* animatedNode = &animation->m_animatedNodes[i];
+       //     std::cout << " " << animation->m_animatedNodes[i].m_nodeName << " with " << animation->m_animatedNodes[i].m_nodeKeys.size() << " keys \n";
 
             if (Util::StrCmp(animatedNode->m_nodeName, NodeName)) {
+           //     std::cout << "YOU FOUND THIS MATCH INCORECTRLY PROBABLY: " << NodeName << "\n";
                 return animatedNode;
             }
         }
         return nullptr;
+    }
+
+    void SkinnedModel::PrintBonesList()
+    {
+        std::cout << "\n" << m_filename << " bonelist\n";
+        for (int i = 0; i < m_BoneInfo.size(); i++) {
+            std::cout << " -" << m_BoneInfo[i].BoneName << "\n";
+        }
     }
 }

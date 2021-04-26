@@ -48,7 +48,7 @@ namespace HellEngine
             }
         };
 
-
+        void PrintBonesList();
 
         void CalcInterpolatedScaling(glm::vec3& Out, float AnimationTime, const AnimatedNode* animatedNode);
         void CalcInterpolatedRotation(glm::quat& Out, float AnimationTime, const AnimatedNode* animatedNode);

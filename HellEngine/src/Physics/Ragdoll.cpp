@@ -21,6 +21,8 @@ namespace HellEngine
 			half_sin * axis.z);
 	}*/
 
+
+
 	Ragdoll::Ragdoll(const btVector3& positionOffset, float modelScale, glm::mat4 worldMatrix)
 	{
 		m_ownerWorld = Physics::s_dynamicsWorld;
@@ -560,7 +562,7 @@ namespace HellEngine
 	}
 
 
-	void Ragdoll::UpdateBoneTransform(SkinnedModel* skinnedModel, std::vector<glm::mat4>& Transforms, std::vector<glm::mat4>& DebugAnimatedTransforms)
+	void Ragdoll::UpdateBoneTransform2(SkinnedModel* skinnedModel, std::vector<glm::mat4>& Transforms, std::vector<glm::mat4>& DebugAnimatedTransforms)
 	{
 		btGeneric6DofConstraint* joint6DOF = (btGeneric6DofConstraint*)m_joints[JOINT_LEFT_HIP];
 		joint6DOF->setAngularLowerLimit(btVector3(-SIMD_PI * Config::TEST_FLOAT, -SIMD_PI * Config::TEST_FLOAT2, -SIMD_PI * Config::TEST_FLOAT3));
